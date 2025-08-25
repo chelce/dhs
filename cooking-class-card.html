@@ -69,19 +69,6 @@
             box-shadow: 0 12px 40px rgba(0,0,0,0.2);
         }
         
-        .category {
-            display: inline-block;
-            padding: 4px 12px;
-            background-color: #e8f5e8;
-            border-radius: 15px;
-            font-size: 0.8em;
-            color: #2e7d32;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: bold;
-        }
-        
         .card-title {
             font-size: 1.4em;
             font-weight: bold;
@@ -90,9 +77,11 @@
         }
         
         .difficulty {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 0.9em;
             font-weight: bold;
             margin-bottom: 20px;
@@ -100,21 +89,16 @@
             color: white;
         }
         
+        .grid-size {
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+        
         .problem {
             font-size: 1em;
             color: #444;
             margin-bottom: 20px;
             line-height: 1.5;
-        }
-        
-        .grid-info {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 3px solid #4CAF50;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-            color: #666;
         }
         
         .flip-instruction {
@@ -192,27 +176,25 @@
     <div class="task-card" onclick="flipCard(this)">
         <div class="card-inner">
             <div class="card-front">
-                <div class="category">Logic Grid Puzzle</div>
+                <div class="difficulty">
+                    <span>Easy</span>
+                    <span class="grid-size">3×3</span>
+                </div>
                 <div class="card-title">Cooking Class</div>
-                <div class="difficulty">Easy</div>
                 <div class="problem">
                     Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
-                </div>
-                <div class="grid-info">
-                    <strong>Grid Size:</strong> 3×3<br>
-                    <strong>People:</strong> Fiona, Tobias, Leanne
                 </div>
                 
                 <div class="clues-section">
                     <h4>Clues:</h4>
                     <div class="clue">
-                        <strong>1.</strong> The three people are Tobias, the one who brought the Gado Gado, and the one who brought the Raspberry Tiramisu.
+                        <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
                     </div>
                     <div class="clue">
-                        <strong>2.</strong> Fiona did not bring the Beef Wellington.
+                        <strong>2.</strong> Sofia did not bring the Mole Chicken.
                     </div>
                     <div class="clue">
-                        <strong>3.</strong> The Shrimp Ceviche was brought by either Tobias or the person who brought the Creme Brulee.
+                        <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
                     </div>
                 </div>
                 
@@ -223,13 +205,13 @@
                 
                 <div class="strategy">
                     <h4>Step-by-Step Approach:</h4>
-                    <p><strong>Start with Clue 1:</strong> "The three people are Tobias, the one who brought the Gado Gado, and the one who brought the Raspberry Tiramisu."</p>
-                    <p>This means Tobias is different from both the Gado Gado person and the Raspberry Tiramisu person. So Tobias brought neither Gado Gado nor made Raspberry Tiramisu.</p>
+                    <p><strong>Start with Clue 1:</strong> "The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake."</p>
+                    <p>This means Diego is different from both the Carne Asada person and the Tres Leches Cake person. So Diego brought neither Carne Asada nor made Tres Leches Cake.</p>
                     
-                    <p><strong>Use Clue 2:</strong> "Fiona did not bring the Beef Wellington."</p>
-                    <p>So Fiona brought either Gado Gado or Shrimp Ceviche.</p>
+                    <p><strong>Use Clue 2:</strong> "Sofia did not bring the Mole Chicken."</p>
+                    <p>So Sofia brought either Carne Asada or Fish Tacos.</p>
                     
-                    <p><strong>Apply Clue 3:</strong> "The Shrimp Ceviche was brought by either Tobias or the person who brought the Creme Brulee."</p>
+                    <p><strong>Apply Clue 3:</strong> "The Fish Tacos were brought by either Diego or the person who brought the Flan."</p>
                     <p>Combined with what we know, this helps narrow down who brought what.</p>
                 </div>
                 
