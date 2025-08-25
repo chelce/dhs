@@ -1,7 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<html lang="en">        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>First Day Problem-Solving Task Cards</title>
     <style>
@@ -24,16 +30,18 @@
             background: transparent;
             border-radius: 12px;
             width: 100%;
-            height: 500px;
+            height: auto;
+            min-height: 450px;
             position: relative;
             perspective: 1000px;
             cursor: pointer;
+            margin-bottom: 20px;
         }
         
         .card-inner {
             position: relative;
             width: 100%;
-            height: 500px;
+            min-height: 450px;
             text-align: left;
             transition: transform 0.8s;
             transform-style: preserve-3d;
@@ -45,8 +53,10 @@
         
         .card-front, .card-back {
             position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 500px;
+            min-height: 450px;
             backface-visibility: hidden;
             background: white;
             border-radius: 12px;
@@ -54,7 +64,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             border-left: 5px solid #2196F3;
             box-sizing: border-box;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
         
         .card-back {
@@ -166,203 +178,223 @@
     </style>
 </head>
 <body>
-    <h1>First Day Problem-Solving Task Cards</h1>
+    <h1>First Day Language & Critical Thinking Challenges</h1>
     <p style="text-align: center; color: #666; margin-bottom: 40px;">
-        Engaging logic puzzles and brain teasers to get students thinking critically from day one.
+        Engaging language puzzles and critical thinking challenges to get students analyzing, discussing, and problem-solving from day one.
     </p>
     
     <div class="card-container">
         
-        <!-- Card 1: The Prisoner's Dilemma Light Switch -->
+        <!-- Card 1: Language Pattern Mystery -->
         <div class="task-card logic" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Logic Puzzle</div>
-                    <div class="card-title">The Mystery Switch</div>
-                    <div class="difficulty medium">Medium</div>
+                    <div class="category">Language Patterns</div>
+                    <div class="card-title">The Literary Cipher</div>
+                    <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        You're in a windowless room with three light switches. Each switch controls a light bulb in another room that you cannot see from where you are. You can flip the switches as many times as you want, but you can only visit the other room ONCE to check the bulbs. How can you determine which switch controls which bulb?
+                        A famous author left this coded message about writing. Each word is encoded using a different pattern:<br><br>
+                        <strong>"Ecneidua ruoy wonk ot deen uoy. Gnitirw tuohtiw esoprup si ekil gnikcol tuohtiw a yek."</strong><br><br>
+                        Decode the message and identify what writing principle the author is teaching.
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Think about what properties light bulbs have besides just being on or off...
+                        <strong>Hint:</strong> This isn't just backwards - look at sentence structure and where punctuation appears...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Mystery Switch</div>
+                    <div class="card-title">Solution: The Literary Cipher</div>
                     <div class="solution">
-                        <h4>Answer:</h4>
-                        <p><strong>Turn the first switch on for a few minutes, then turn it off. Turn the second switch on and leave it on. Leave the third switch off the entire time.</strong></p>
+                        <h4>Decoded Message:</h4>
+                        <p><strong>"You need to know your audience. Writing without purpose is like looking without a key."</strong></p>
                         
-                        <h4>Explanation:</h4>
-                        <p>When you go into the other room:</p>
-                        <ul>
-                            <li>The bulb that is <strong>ON</strong> is controlled by the second switch</li>
-                            <li>The bulb that is <strong>OFF but WARM</strong> is controlled by the first switch</li>
-                            <li>The bulb that is <strong>OFF and COOL</strong> is controlled by the third switch</li>
-                        </ul>
-                        <p>This works because incandescent bulbs generate heat when they're on. By using the heat property, you can determine which switch controlled which bulb even after turning some switches off.</p>
+                        <h4>Pattern:</h4>
+                        <p>Each word is spelled backwards, but the overall sentence structure remains intact. This creates a more complex puzzle than simple reversal.</p>
+                        
+                        <h4>Writing Principle:</h4>
+                        <p>The author is teaching that <strong>audience awareness and purpose are essential</strong> to effective writing. Without knowing your readers and having a clear purpose, writing becomes meaningless.</p>
+                        
+                        <h4>Critical Thinking Connection:</h4>
+                        <p>This connects to rhetorical analysis - understanding how authors make strategic choices based on their audience and purpose, which is fundamental to AP Language and 9th grade ELA.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
             </div>
         </div>
 
-        <!-- Card 2: River Crossing -->
+        <!-- Card 2: Reading Between the Lines -->
         <div class="task-card deduction" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Deductive Reasoning</div>
-                    <div class="card-title">The Bridge at Night</div>
-                    <div class="difficulty medium">Medium</div>
+                    <div class="category">Critical Reading</div>
+                    <div class="card-title">The Connotation Code</div>
+                    <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        Four people need to cross a bridge at night. The bridge is old and can only hold two people at a time. They have one flashlight, and anyone crossing must carry it. The four people walk at different speeds: 1 minute, 2 minutes, 5 minutes, and 10 minutes to cross. What's the fastest time all four can get across?
+                        Each sentence below uses a word with specific connotations. Replace the bolded word with three different words that change the tone completely but keep the basic meaning:<br><br>
+                        <strong>Original:</strong> "The politician <strong>spoke</strong> about tax reform."<br><br>
+                        Find words that make the politician seem: <strong>1) Passionate and convincing, 2) Boring and repetitive, 3) Deceptive and manipulative</strong><br><br>
+                        What does this reveal about how word choice shapes reader perception?
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Sometimes the fastest person should make multiple trips...
+                        <strong>Hint:</strong> Think about verbs that mean "to speak" but carry different emotional weight...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Bridge at Night</div>
+                    <div class="card-title">Solution: The Connotation Code</div>
                     <div class="solution">
-                        <h4>Answer: 17 minutes</h4>
-                        
-                        <h4>Optimal Strategy:</h4>
+                        <h4>Possible Answers:</h4>
                         <ol>
-                            <li><strong>1-min and 2-min cross together</strong> (2 minutes total)</li>
-                            <li><strong>1-min returns with flashlight</strong> (3 minutes total)</li>
-                            <li><strong>5-min and 10-min cross together</strong> (13 minutes total)</li>
-                            <li><strong>2-min returns with flashlight</strong> (15 minutes total)</li>
-                            <li><strong>1-min and 2-min cross together</strong> (17 minutes total)</li>
+                            <li><strong>Passionate/Convincing:</strong> "The politician <strong>championed/advocated/rallied for</strong> tax reform."</li>
+                            <li><strong>Boring/Repetitive:</strong> "The politician <strong>droned/lectured/recited</strong> about tax reform."</li>
+                            <li><strong>Deceptive/Manipulative:</strong> "The politician <strong>schemed/plotted/manipulated</strong> about tax reform."</li>
                         </ol>
                         
-                        <h4>Why this works:</h4>
-                        <p>The key insight is that the two slowest people (5-min and 10-min) should cross together, not separately. The fastest people shuttle the flashlight back and forth to make this possible efficiently.</p>
+                        <h4>Critical Analysis:</h4>
+                        <p><strong>Connotation vs. Denotation:</strong> All words have the basic meaning of "communicate," but emotional associations completely change reader response.</p>
+                        <p><strong>Bias in Language:</strong> No language choice is truly neutral - every word carries subtle implications.</p>
+                        
+                        <h4>Advanced ELA Connection:</h4>
+                        <p>This demonstrates how authors, journalists, and politicians use <strong>loaded language</strong> to influence reader opinion without changing factual content - a key skill in rhetorical analysis and media literacy.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
             </div>
         </div>
 
-        <!-- Card 3: Pattern Recognition -->
+        <!-- Card 3: Word Detective -->
         <div class="task-card pattern" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Pattern Recognition</div>
-                    <div class="card-title">The Sequence Mystery</div>
-                    <div class="difficulty easy">Easy</div>
+                    <div class="category">Language Analysis</div>
+                    <div class="card-title">The Root Revelation</div>
+                    <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        What comes next in this sequence?<br><br>
-                        <strong>O, T, T, F, F, S, S, E, ?</strong><br><br>
-                        And what's the pattern?
+                        These word sets share hidden Latin or Greek roots that create meaning connections. Identify the shared root and its meaning:<br><br>
+                        <strong>Set 1:</strong> Democracy, Demographic, Epidemic<br>
+                        <strong>Set 2:</strong> Telescope, Microscope, Horoscope<br>
+                        <strong>Set 3:</strong> Autobiography, Automatic, Autonomy<br><br>
+                        What root does each set share, and how does knowing the root help you understand ALL the words?
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Try saying each letter out loud and think about what they might represent...
+                        <strong>Hint:</strong> Think about what these words have in common conceptually, then look for letter patterns...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Sequence Mystery</div>
+                    <div class="card-title">Solution: The Root Revelation</div>
                     <div class="solution">
-                        <h4>Answer: N (Nine)</h4>
-                        
-                        <h4>Pattern:</h4>
-                        <p>Each letter represents the first letter of number names in order:</p>
+                        <h4>Root Answers:</h4>
                         <ul>
-                            <li><strong>O</strong>ne</li>
-                            <li><strong>T</strong>wo</li>
-                            <li><strong>T</strong>hree</li>
-                            <li><strong>F</strong>our</li>
-                            <li><strong>F</strong>ive</li>
-                            <li><strong>S</strong>ix</li>
-                            <li><strong>S</strong>even</li>
-                            <li><strong>E</strong>ight</li>
-                            <li><strong>N</strong>ine</li>
+                            <li><strong>Set 1: "demos"</strong> (Greek) = people/population</li>
+                            <li><strong>Set 2: "scope"</strong> (Greek) = to see/observe</li>
+                            <li><strong>Set 3: "auto"</strong> (Greek) = self</li>
                         </ul>
-                        <p>The sequence continues with T (Ten), E (Eleven), T (Twelve), etc.</p>
+                        
+                        <h4>Meaning Connections:</h4>
+                        <p><strong>Demos:</strong> Democracy (people rule), Demographic (people data), Epidemic (among people)</p>
+                        <p><strong>Scope:</strong> Telescope (see far), Microscope (see small), Horoscope (see time/stars)</p>
+                        <p><strong>Auto:</strong> Autobiography (self-written life), Automatic (self-operating), Autonomy (self-rule)</p>
+                        
+                        <h4>Advanced Vocabulary Strategy:</h4>
+                        <p>Understanding roots allows you to decode unfamiliar words. If you see "autobiography," knowing "auto" + "bio" + "graph" gives you "self-life-writing" = a person's own life story.</p>
+                        <p>This morphological awareness is crucial for academic vocabulary acquisition.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
             </div>
         </div>
 
-        <!-- Card 4: Spatial Reasoning -->
+        <!-- Card 4: Perspective Puzzle -->
         <div class="task-card spatial" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Spatial Reasoning</div>
-                    <div class="card-title">The Cube Challenge</div>
+                    <div class="category">Word Logic</div>
+                    <div class="card-title">The Sentence Transformer</div>
                     <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        Imagine a 3×3×3 cube made of 27 smaller cubes. If you paint the entire outside surface red, then take the cube apart, how many of the small cubes will have:
-                        <ul>
-                            <li>3 red faces?</li>
-                            <li>2 red faces?</li>
-                            <li>1 red face?</li>
-                            <li>0 red faces?</li>
-                        </ul>
+                        Transform the word "COLD" into the word "WARM" by changing only one letter at a time. Each step must create a real English word.<br><br>
+                        <strong>Example path (if possible):</strong><br>
+                        COLD → ???? → ???? → ???? → WARM<br><br>
+                        What's the shortest path from COLD to WARM?
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Think about which small cubes are at corners, edges, faces, and inside...
+                        <strong>Hint:</strong> Think of 4-letter words that are similar to COLD, then work toward WARM step by step...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Cube Challenge</div>
+                    <div class="card-title">Solution: The Sentence Transformer</div>
                     <div class="solution">
-                        <h4>Answer:</h4>
-                        <ul>
-                            <li><strong>3 red faces: 8 cubes</strong> (corner cubes)</li>
-                            <li><strong>2 red faces: 12 cubes</strong> (edge cubes, not corners)</li>
-                            <li><strong>1 red face: 6 cubes</strong> (face center cubes)</li>
-                            <li><strong>0 red faces: 1 cube</strong> (center cube)</li>
-                        </ul>
+                        <h4>Answer (5 steps):</h4>
+                        <p><strong>COLD → CORD → WORD → WORM → WARY → WARM</strong></p>
                         
-                        <h4>Explanation:</h4>
-                        <p><strong>3 faces:</strong> Corner cubes touch 3 faces (8 corners on a cube)</p>
-                        <p><strong>2 faces:</strong> Edge cubes that aren't corners (12 edges × 1 middle cube per edge = 12)</p>
-                        <p><strong>1 face:</strong> Center of each face (6 faces × 1 center cube = 6)</p>
-                        <p><strong>0 faces:</strong> The single cube in the very center of the 3×3×3</p>
-                        <p><em>Check: 8 + 12 + 6 + 1 = 27 ✓</em></p>
+                        <h4>Step-by-step breakdown:</h4>
+                        <ol>
+                            <li><strong>COLD → CORD</strong> (L becomes R)</li>
+                            <li><strong>CORD → WORD</strong> (C becomes W)</li>
+                            <li><strong>WORD → WORM</strong> (D becomes M)</li>
+                            <li><strong>WORM → WARY</strong> (M becomes Y, O becomes A)</li>
+                            <li><strong>WARY → WARM</strong> (Y becomes M)</li>
+                        </ol>
+                        
+                        <h4>Language Skill Connection:</h4>
+                        <p>This puzzle demonstrates how English words are built from patterns. Understanding letter patterns helps with:</p>
+                        <ul>
+                            <li><strong>Spelling:</strong> Recognizing common letter combinations</li>
+                            <li><strong>Vocabulary:</strong> Seeing relationships between similar words</li>
+                            <li><strong>Word families:</strong> How changing one letter creates new meanings</li>
+                        </ul>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
             </div>
         </div>
 
-        <!-- Card 5: Lateral Thinking -->
+        <!-- Card 5: Communication Challenge -->
         <div class="task-card lateral" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Lateral Thinking</div>
-                    <div class="card-title">The Elevator Problem</div>
-                    <div class="difficulty medium">Medium</div>
+                    <div class="category">Language Puzzle</div>
+                    <div class="card-title">The Syntax Shifter</div>
+                    <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        A man lives on the 20th floor of a 30-story building. Every morning he takes the elevator down to the ground floor. When he comes home, he takes the elevator to the 10th floor and walks the rest of the way... except on rainy days, when he takes the elevator all the way to the 20th floor. Why?
+                        These sentences follow unusual but logical syntax patterns. Decode the pattern and translate the final sentence:<br><br>
+                        <strong>Pattern Examples:</strong><br>
+                        "Happy very was she" = "She was very happy"<br>
+                        "Quickly the ran dog" = "The dog ran quickly"<br>
+                        "Loudly sang birds the" = "The birds sang loudly"<br><br>
+                        <strong>Decode this:</strong> "Carefully book the read students the"
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Think about what's different on rainy days that would help him reach higher floors...
+                        <strong>Hint:</strong> Look at how the word order changes - where do adjectives, verbs, and articles move to?
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Elevator Problem</div>
+                    <div class="card-title">Solution: The Syntax Shifter</div>
                     <div class="solution">
                         <h4>Answer:</h4>
-                        <p><strong>The man is too short to reach the button for the 20th floor.</strong></p>
+                        <p><strong>"The students read the book carefully"</strong></p>
                         
-                        <h4>Explanation:</h4>
-                        <p>The man can only reach up to the 10th floor button on the elevator panel. However, on rainy days, he carries an umbrella, which he can use to press the 20th floor button.</p>
-                        
-                        <p>Alternative solutions that also work:</p>
+                        <h4>Pattern Analysis:</h4>
+                        <p>The syntax pattern reverses typical English word order:</p>
                         <ul>
-                            <li>He could ask other passengers to press 20 for him</li>
-                            <li>He could use any object he's carrying to reach higher buttons</li>
-                            <li>On rainy days, other people might be in the elevator to help</li>
+                            <li><strong>Adverbs</strong> move to the beginning</li>
+                            <li><strong>Articles</strong> and <strong>nouns</strong> swap positions</li>
+                            <li><strong>Verbs</strong> stay in middle positions</li>
                         </ul>
                         
-                        <p>This is a classic lateral thinking puzzle that requires you to think outside conventional assumptions!</p>
+                        <h4>Advanced Grammar Connection:</h4>
+                        <p><strong>Syntax awareness:</strong> Understanding how word order affects meaning is crucial for:</p>
+                        <ul>
+                            <li>Analyzing complex sentence structures in literature</li>
+                            <li>Understanding how authors manipulate syntax for effect</li>
+                            <li>Recognizing patterns in different languages and dialects</li>
+                        </ul>
+                        
+                        <h4>Real-World Application:</h4>
+                        <p>Many of your Spanish/Portuguese-speaking students may naturally think in different syntax patterns - this exercise shows that all language patterns are logical systems.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
@@ -477,33 +509,45 @@
             <div class="card-inner">
                 <div class="card-front">
                     <div class="category">Word Logic</div>
-                    <div class="card-title">The Unusual Words</div>
-                    <div class="difficulty easy">Easy</div>
+                    <div class="card-title">The Metaphor Matrix</div>
+                    <div class="difficulty hard">Hard</div>
                     <div class="problem">
-                        What do these words have in common?<br><br>
-                        <strong>BANANA, DRESSER, GRAMMAR, POTATO, REVIVE, UNEVEN, ASSESS</strong><br><br>
-                        Can you think of another word that belongs in this group?
+                        Each analogy below is missing its final term. Find the pattern and complete the analogy:<br><br>
+                        <strong>1.</strong> Book is to Library as Song is to _____<br>
+                        <strong>2.</strong> Pen is to Writer as Brush is to _____<br>
+                        <strong>3.</strong> Storm is to Chaos as Sunrise is to _____<br>
+                        <strong>4.</strong> Memory is to Past as Hope is to _____<br><br>
+                        What logical relationships connect each pair?
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> Try removing one letter at a time from each word and see what happens...
+                        <strong>Hint:</strong> Think about the relationship between the first two words, then apply that same relationship to the third word...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Unusual Words</div>
+                    <div class="card-title">Solution: The Metaphor Matrix</div>
                     <div class="solution">
-                        <h4>Answer:</h4>
-                        <p><strong>If you take away one letter at a time, each word still remains a valid word until you're left with just one letter.</strong></p>
+                        <h4>Answers:</h4>
+                        <ol>
+                            <li><strong>Playlist/Album</strong> (Book:Library = Song:Collection)</li>
+                            <li><strong>Artist/Painter</strong> (Pen:Writer = Brush:Creator)</li>
+                            <li><strong>Peace/Hope</strong> (Storm:Chaos = Sunrise:Positive outcome)</li>
+                            <li><strong>Future</strong> (Memory:Past = Hope:Future time)</li>
+                        </ol>
                         
-                        <h4>Examples:</h4>
+                        <h4>Relationship Types:</h4>
+                        <p><strong>Item to collection:</strong> Individual piece to larger grouping</p>
+                        <p><strong>Tool to user:</strong> Instrument to the person who uses it</p>
+                        <p><strong>Cause to effect:</strong> Event to its typical outcome</p>
+                        <p><strong>Mental state to time:</strong> Psychological connection to temporal period</p>
+                        
+                        <h4>Advanced ELA Skills:</h4>
+                        <p>Analogical thinking is fundamental to understanding:</p>
                         <ul>
-                            <li><strong>BANANA</strong> → BANAN → BANA → BAN → BA → B</li>
-                            <li><strong>DRESSER</strong> → DRESSE → DRESS → DRES → DRE → DR → D</li>
-                            <li><strong>ASSESS</strong> → ASSES → ASSE → ASS → AS → A</li>
+                            <li><strong>Metaphors in literature</strong> (comparing unlike things)</li>
+                            <li><strong>Thematic connections</strong> (how different elements relate)</li>
+                            <li><strong>Rhetorical reasoning</strong> (logical argument structure)</li>
                         </ul>
-                        
-                        <h4>Other words that work:</h4>
-                        <p>STAIRS, SPOONS, LEARNS, PLATES, etc.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
@@ -620,30 +664,46 @@
         <div class="task-card pattern" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="category">Pattern Challenge</div>
-                    <div class="card-title">The Clock Puzzle</div>
+                    <div class="category">Reading Logic</div>
+                    <div class="card-title">The Story Equation</div>
                     <div class="difficulty easy">Easy</div>
                     <div class="problem">
-                        A clock shows 3:00. What's the angle between the hour and minute hands?<br><br>
-                        Bonus: At what time between 2:00 and 3:00 are the hands exactly on top of each other?
+                        Solve this reading logic puzzle:<br><br>
+                        <strong>If:</strong><br>
+                        • CAT + HAT = CHAT<br>
+                        • SUN + FUN = SFUN<br>
+                        • DOG + FOG = DFOG<br><br>
+                        <strong>Then:</strong><br>
+                        • CAR + TAR = ?<br><br>
+                        What's the pattern, and what does CAR + TAR equal?
                     </div>
                     <div class="hint">
-                        <strong>Hint:</strong> The hour hand moves continuously, not in jumps. Each hour represents 30 degrees of the circle...
+                        <strong>Hint:</strong> Look at how the first letters combine with the rest of the second word...
                     </div>
                     <div class="flip-instruction">Click to reveal solution</div>
                 </div>
                 <div class="card-back">
-                    <div class="card-title">Solution: The Clock Puzzle</div>
+                    <div class="card-title">Solution: The Story Equation</div>
                     <div class="solution">
-                        <h4>Answer:</h4>
-                        <p><strong>At 3:00, the angle is 90 degrees</strong></p>
-                        <p><strong>Hands overlap at 2:10:54 (approximately 2:11)</strong></p>
+                        <h4>Answer: CTAR</h4>
                         
-                        <h4>Explanation:</h4>
-                        <p><strong>3:00 angle:</strong> The minute hand points to 12, the hour hand points to 3. Since each hour mark represents 30° (360° ÷ 12), the angle is 3 × 30° = 90°</p>
+                        <h4>Pattern Explanation:</h4>
+                        <p>The pattern takes the first letter of the first word and combines it with the entire second word:</p>
+                        <ul>
+                            <li><strong>C</strong>AT + HAT = <strong>C</strong>HAT</li>
+                            <li><strong>S</strong>UN + FUN = <strong>S</strong>FUN</li>
+                            <li><strong>D</strong>OG + FOG = <strong>D</strong>FOG</li>
+                            <li><strong>C</strong>AR + TAR = <strong>C</strong>TAR</li>
+                        </ul>
                         
-                        <p><strong>Overlap time:</strong> The minute hand moves 360° per hour, the hour hand moves 30° per hour. The minute hand gains 330° per hour on the hour hand.</p>
-                        <p>At 2:00, the hour hand is 60° ahead. Time to catch up: 60° ÷ 330° per hour = 2/11 hours = 10.91 minutes ≈ 2:10:54</p>
+                        <h4>Language Connection:</h4>
+                        <p><strong>Pattern recognition</strong> in language helps with:</p>
+                        <ul>
+                            <li>Understanding word formation rules</li>
+                            <li>Recognizing spelling patterns</li>
+                            <li>Predicting how language structures work</li>
+                        </ul>
+                        <p>This type of logical thinking is essential for understanding how language follows systematic patterns.</p>
                     </div>
                     <div class="flip-instruction">Click to see problem again</div>
                 </div>
