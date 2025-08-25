@@ -49,7 +49,7 @@
         
         .task-card {
             width: 100%;
-            height: 500px;
+            height: 350px;
             perspective: 1000px;
             cursor: pointer;
             transition: transform 0.3s ease;
@@ -99,9 +99,12 @@
             font-size: 1.8em;
             font-weight: normal;
             margin-bottom: 2px;
-            color: #4CAF50;
             letter-spacing: 0.5px;
         }
+        
+        .title-easy { color: #4CAF50; }
+        .title-medium { color: #FF9800; }
+        .title-hard { color: #F44336; }
         
         .difficulty-level {
             font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
@@ -146,8 +149,11 @@
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #4CAF50;
         }
+        
+        .grid-easy { color: #4CAF50; }
+        .grid-medium { color: #FF9800; }
+        .grid-hard { color: #F44336; }
         
         .logic-grid {
             width: 100%;
@@ -175,8 +181,19 @@
         }
         
         .logic-grid th:first-child {
-            background-color: #4CAF50;
             color: white;
+        }
+        
+        .logic-grid-easy th:first-child {
+            background-color: #4CAF50;
+        }
+        
+        .logic-grid-medium th:first-child {
+            background-color: #FF9800;
+        }
+        
+        .logic-grid-hard th:first-child {
+            background-color: #F44336;
         }
         
         .solution-title {
@@ -227,7 +244,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">The Haunted Mansion</div>
+                    <div class="card-title title-easy">The Haunted Mansion</div>
                     <div class="difficulty-level difficulty-easy">Easy</div>
                     
                     <div class="card-content">
@@ -238,8 +255,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-easy">Logic Grid</div>
+                            <table class="logic-grid logic-grid-easy">
                                 <tr>
                                     <th></th>
                                     <th>Footsteps</th>
@@ -301,7 +318,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">Pity the Passwords</div>
+                    <div class="card-title title-easy">Pity the Passwords</div>
                     <div class="difficulty-level difficulty-easy">Easy</div>
                     
                     <div class="card-content">
@@ -312,8 +329,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-easy">Logic Grid</div>
+                            <table class="logic-grid logic-grid-easy">
                                 <tr>
                                     <th></th>
                                     <th>kittycats</th>
@@ -380,7 +397,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">Highway Murder Mystery</div>
+                    <div class="card-title title-medium">Highway Murder Mystery</div>
                     <div class="difficulty-level difficulty-medium">Medium</div>
                     
                     <div class="card-content">
@@ -391,8 +408,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-medium">Logic Grid</div>
+                            <table class="logic-grid logic-grid-medium">
                                 <tr>
                                     <th></th>
                                     <th>Bloodied Shirt</th>
@@ -460,7 +477,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">Stings & Scrapes Tattoo Studio</div>
+                    <div class="card-title title-medium">Stings & Scrapes Tattoo Studio</div>
                     <div class="difficulty-level difficulty-medium">Medium</div>
                     
                     <div class="card-content">
@@ -471,8 +488,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-medium">Logic Grid</div>
+                            <table class="logic-grid logic-grid-medium">
                                 <tr>
                                     <th></th>
                                     <th>Knuckles</th>
@@ -544,7 +561,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">Spilling the Tea</div>
+                    <div class="card-title title-hard">Spilling the Tea</div>
                     <div class="difficulty-level difficulty-hard">Hard</div>
                     
                     <div class="card-content">
@@ -555,8 +572,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-hard">Logic Grid</div>
+                            <table class="logic-grid logic-grid-hard">
                                 <tr>
                                     <th></th>
                                     <th>Cassandra</th>
@@ -618,7 +635,7 @@
         <div class="task-card" onclick="flipCard(this)">
             <div class="card-inner">
                 <div class="card-front">
-                    <div class="card-title">Sleepydale Radio Fresh Talent</div>
+                    <div class="card-title title-hard">Sleepydale Radio Fresh Talent</div>
                     <div class="difficulty-level difficulty-hard">Hard</div>
                     
                     <div class="card-content">
@@ -629,8 +646,8 @@
                         </div>
                         
                         <div class="grid-column">
-                            <div class="grid-title">Logic Grid</div>
-                            <table class="logic-grid">
+                            <div class="grid-title grid-hard">Logic Grid</div>
+                            <table class="logic-grid logic-grid-hard">
                                 <tr>
                                     <th></th>
                                     <th>The Fireneers</th>
