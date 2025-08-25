@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Grid Puzzle Cards</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 10px;
+            line-height: 1.2;
+            overflow-x: hidden;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 95vw;
+            max-height: 90vh;
+            margin: 0 auto;
+        }
+        
+        .task-card {
+            background: transparent;
+            border-radius: 8px;
+            width: 100%;
+            height: 25vh;
+            max-height: 280px;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .task-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #2196F3;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
+            font-size: 0.6em;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+            border-left-color: #4CAF50;
+            text-align: left;
+        }
+        
+        .task-card:hover .card-front {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .task-card:hover .card-back {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* Difficulty-based color coding */
+        .task-card.easy .card-front { border-left-color: #4CAF50; }
+        .task-card.easy .difficulty { background-color: #4CAF50; }
+        
+        .task-card.moderate .card-front { border-left-color: #FF9800; }
+        .task-card.moderate .difficulty { background-color: #FF9800; }
+        
+        .task-card.hard .card-front { border-left-color: #f44336; }
+        .task-card.hard .difficulty { background-color: #f44336; }
+        
+        .solution {
+            background-color: #e8f5e8;
+            padding: 6px;
+            border-radius: 3px;
+            margin-top: 6px;
+            text-align: left;
+            font-size: 0.85em;
+        }
+        
+        .solution h4 {
+            color: #2e7d32;
+            margin-top: 0;
+            margin-bottom: 3px;
+            font-size: 0.9em;
+        }
+        
+        .flip-instruction {
+            position: absolute;
+            bottom: 4px;
+            right: 6px;
+            font-size: 0.5em;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .card-title {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        
+        .card-content {
+            font-size: 0.65em;
+            line-height: 1.2;
+            overflow: hidden;
+        }
+        
+        .difficulty {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.45em;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: white;
+        }
+        
+        .problem {
+            font-size: 0.6em;
+            color: #444;
+            margin-bottom: 6px;
+            line-height: 1.2;
+        }
+        
+        .category {
+            display: inline-block;
+            padding: 1px 4px;
+            background-color: #e9ecef;
+            border-radius: 2px;
+            font-size: 0.45em;
+            color: #495057;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .grid-size {
+            font-size: 0.5em;
+            color: #666;
+            margin-top: 4px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        
+        <!-- Card 1: Easy - Cooking Class -->
+        <div class="task-card easy" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Cooking Class</div>
+                    <div class="difficulty">Easy</div>
+                    <div class="problem">
+                        Last night three friends who have just taken a cooking class held a dinner to practice their new skills, each bringing a main & dessert.
+                    </div>
+                    <div class="grid-size">Grid: 3x3</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Cooking Class</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each friend with their main dish and dessert using the given clues. Start with the most specific clues first.</p>
+                        <p><strong>Strategy:</strong> Create a grid with friends on one axis, dishes on the other. Use process of elimination based on the clues provided.</p>
+                        <p><strong>Difficulty:</strong> Perfect for beginners - small grid with straightforward clues.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Easy - Computer Repair Shop -->
+        <div class="task-card easy" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Computer Repair Shop</div>
+                    <div class="difficulty">Easy</div>
+                    <div class="problem">
+                        Bigger Bytes Computer Repair Shop fixed 5 devices today, each for a local owner who insisted they knew what the issue was but turned out to be sorely mistaken!
+                    </div>
+                    <div class="grid-size">Grid: 3x4</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Computer Repair Shop</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each device with its owner and the actual problem (vs. what they thought was wrong).</p>
+                        <p><strong>Strategy:</strong> Look for clues that eliminate multiple possibilities at once. Pay attention to "not" statements.</p>
+                        <p><strong>Difficulty:</strong> Easy level with clear logical connections.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Easy - Halloween Costumes -->
+        <div class="task-card easy" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Halloween Costumes</div>
+                    <div class="difficulty">Easy</div>
+                    <div class="problem">
+                        It is the week of Halloween and Elijah has five spooky gatherings to attend that will each require a costume!
+                    </div>
+                    <div class="grid-size">Grid: 3x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Halloween Costumes</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each Halloween event with the costume Elijah plans to wear.</p>
+                        <p><strong>Strategy:</strong> Use the process of elimination. Mark off impossible combinations as you work through clues.</p>
+                        <p><strong>Difficulty:</strong> Easy with fun, relatable theme perfect for October!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Moderate - Heroes Underground -->
+        <div class="task-card moderate" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Heroes Underground</div>
+                    <div class="difficulty">Moderate</div>
+                    <div class="problem">
+                        In the secret underground city of Rolis, five of the newest young superheroes are undergoing rigorous training to master and control their powers!
+                    </div>
+                    <div class="grid-size">Grid: 3x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Heroes Underground</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each superhero with their power and training focus.</p>
+                        <p><strong>Strategy:</strong> Look for interconnected clues. Some clues may reference multiple heroes at once.</p>
+                        <p><strong>Difficulty:</strong> Moderate - requires more complex reasoning and attention to detail.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Moderate - All That Glitters -->
+        <div class="task-card moderate" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">All That Glitters</div>
+                    <div class="difficulty">Moderate</div>
+                    <div class="problem">
+                        Five friends have been attending a weekly jewelry-making class led by a renowned local artisan. Can you match each participant with their creations?
+                    </div>
+                    <div class="grid-size">Grid: 4x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: All That Glitters</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each friend with the jewelry they made and the materials used.</p>
+                        <p><strong>Strategy:</strong> Create multiple grids if needed. Track materials, finished products, and creators separately.</p>
+                        <p><strong>Difficulty:</strong> Moderate - multiple variables require systematic approach.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6: Moderate - Christmas Lights -->
+        <div class="task-card moderate" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Christmas Lights</div>
+                    <div class="difficulty">Moderate</div>
+                    <div class="problem">
+                        The friendly neighborhood of Bloom Street has just had their annual competition for the house with the best Christmas lights display!
+                    </div>
+                    <div class="grid-size">Grid: 4x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Christmas Lights</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each house with their display type, ranking, and homeowner.</p>
+                        <p><strong>Strategy:</strong> Pay attention to ranking clues - they often provide ordering constraints.</p>
+                        <p><strong>Difficulty:</strong> Moderate - seasonal theme with multiple interconnected variables.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 7: Hard - Spilling The Tea -->
+        <div class="task-card hard" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Spilling The Tea</div>
+                    <div class="difficulty">Hard</div>
+                    <div class="problem">
+                        Between controversial decisions and inconsistent treatment of employees, rumors are always circulating at Myenda Insurance Group.
+                    </div>
+                    <div class="grid-size">Grid: 4x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Spilling The Tea</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match employees with the rumors they heard and who told them.</p>
+                        <p><strong>Strategy:</strong> Track the flow of information. Some clues involve chains of communication.</p>
+                        <p><strong>Difficulty:</strong> Hard - complex relationships and indirect clues require advanced reasoning.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 8: Hard - School Science Fair -->
+        <div class="task-card hard" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">School Science Fair</div>
+                    <div class="difficulty">Hard</div>
+                    <div class="problem">
+                        Students from Maplewood Middle School recently participated in a competition for best project in the Science Fair.
+                    </div>
+                    <div class="grid-size">Grid: 4x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: School Science Fair</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match students with their science projects, categories, and final rankings.</p>
+                        <p><strong>Strategy:</strong> Use ranking clues to establish order. Look for clues that reference multiple students.</p>
+                        <p><strong>Difficulty:</strong> Hard - academic theme with competition rankings adds complexity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 9: Hard - Junior Detectives -->
+        <div class="task-card hard" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="category">Logic Grid</div>
+                    <div class="card-title">Junior Detectives</div>
+                    <div class="difficulty">Hard</div>
+                    <div class="problem">
+                        It's the summer holidays, and five teens who have been neighbors for many years have decided to get together to form their own junior detective agency!
+                    </div>
+                    <div class="grid-size">Grid: 5x5</div>
+                    <div class="flip-instruction">Click to reveal details</div>
+                </div>
+                <div class="card-back">
+                    <div class="card-title">Solution: Junior Detectives</div>
+                    <div class="solution">
+                        <h4>How to Solve:</h4>
+                        <p>Match each teen detective with their specialization, first case, and role in the agency.</p>
+                        <p><strong>Strategy:</strong> Larger 5x5 grid requires systematic tracking. Use a detailed chart.</p>
+                        <p><strong>Difficulty:</strong> Hard - mystery theme with multiple roles and relationships to track.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+        }
+    </script>
+</body>
+</html>
