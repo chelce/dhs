@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Cards Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            height: 300px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: scale(1.05);
+        }
+        
+        .card-title {
+            font-size: 24px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .card-content {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-btn">← Back to Gallery</a>
+    
+    <h1>Simple Test - Can You See This?</h1>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-title">Card 1</div>
+            <div class="card-content">
+                This is a simple test card. If you can see this, the basic structure is working.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 2</div>
+            <div class="card-content">
+                Another test card to make sure the grid layout is working properly.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 3</div>
+            <div class="card-content">
+                Third test card. If all three cards show up in a row, CSS Grid is working.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 4</div>
+            <div class="card-content">
+                Fourth test card.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 5</div>
+            <div class="card-content">
+                Fifth test card.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 6</div>
+            <div class="card-content">
+                Sixth test card.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 7</div>
+            <div class="card-content">
+                Seventh test card.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 8</div>
+            <div class="card-content">
+                Eighth test card.
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">Card 9</div>
+            <div class="card-content">
+                Ninth test card.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log("JavaScript is working!");
+    </script>
+</body>
+</html>
