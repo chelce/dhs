@@ -97,7 +97,7 @@
         .card-title {
             font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
             font-size: 1.8em;
-            font-weight: normal;
+            font-weight: bold;
             margin-bottom: 2px;
             letter-spacing: 0.5px;
         }
@@ -119,10 +119,8 @@
         .difficulty-hard { color: #F44336; }
         
         .card-content {
-            display: flex;
-            gap: 12px;
             flex-grow: 1;
-            margin-bottom: 50px;
+            margin-bottom: 20px;
         }
         
         .riddle-column {
@@ -211,14 +209,29 @@
         }
         
         .clue {
+            padding: 6px 10px;
+            border-radius: 4px;
+            line-height: 1.2;
+            font-weight: 500;
+            font-size: 0.75em;
+        }
+        
+        .clue-easy {
             background-color: #e8f5e8;
             border-left: 4px solid #4CAF50;
-            padding: 8px 12px;
-            border-radius: 4px;
-            line-height: 1.3;
             color: #2e7d32;
-            font-weight: 500;
-            font-size: 0.9em;
+        }
+        
+        .clue-medium {
+            background-color: #fff3e0;
+            border-left: 4px solid #FF9800;
+            color: #e65100;
+        }
+        
+        .clue-hard {
+            background-color: #ffebee;
+            border-left: 4px solid #F44336;
+            color: #c62828;
         }
 
         @media (max-width: 1400px) {
@@ -248,44 +261,8 @@
                     <div class="difficulty-level difficulty-easy">Easy</div>
                     
                     <div class="card-content">
-                        <div class="riddle-column">
-                            <div class="puzzle-description">
-                                Five ghost hunters have just spent time in an allegedly haunted mansion in Whispering Pines, investigating paranormal activity reported by the new owner. Once inside the expansive home, which boasts 20 rooms, the ghost hunters split up and each had a chilling experience! From the clues provided, can you determine the experience each person had and the room they were in at the time?
-                            </div>
-                        </div>
-                        
-                        <div class="grid-column">
-                            <div class="grid-title grid-easy">Logic Grid</div>
-                            <table class="logic-grid logic-grid-easy">
-                                <tr>
-                                    <th></th>
-                                    <th>Footsteps</th>
-                                    <th>Shoulder Touch</th>
-                                    <th>Strange Shadows</th>
-                                    <th>Eerie Voices</th>
-                                    <th>Book Fell</th>
-                                </tr>
-                                <tr>
-                                    <th>Mr Apparition</th>
-                                    <td></td><td></td><td></td><td></td><td></td>
-                                </tr>
-                                <tr>
-                                    <th>Shadow Chaser</th>
-                                    <td></td><td></td><td></td><td></td><td></td>
-                                </tr>
-                                <tr>
-                                    <th>Specter Sleuth</th>
-                                    <td></td><td></td><td></td><td></td><td></td>
-                                </tr>
-                                <tr>
-                                    <th>Spirit Snoopervisor</th>
-                                    <td></td><td></td><td></td><td></td><td></td>
-                                </tr>
-                                <tr>
-                                    <th>Hairy Scary</th>
-                                    <td></td><td></td><td></td><td></td><td></td>
-                                </tr>
-                            </table>
+                        <div class="puzzle-description">
+                            Five ghost hunters have just spent time in an allegedly haunted mansion in Whispering Pines, investigating paranormal activity reported by the new owner. Once inside the expansive home, which boasts 20 rooms, the ghost hunters split up and each had a chilling experience! From the clues provided, can you determine the experience each person had and the room they were in at the time?
                         </div>
                     </div>
                 </div>
@@ -294,19 +271,19 @@
                     <div class="solution-title">The Haunted Mansion - Clues</div>
                     
                     <div class="clues-section">
-                        <div class="clue">
+                        <div class="clue clue-easy">
                             <strong>1.</strong> Shadow Chaser didn't see any spooky shadows during his time in the house. The shadows were not seen in the attic.
                         </div>
-                        <div class="clue">
+                        <div class="clue clue-easy">
                             <strong>2.</strong> Neither the ghost hunter who saw a book fall from a shelf nor Mr Apparition had their ghostly experiences in the attic.
                         </div>
-                        <div class="clue">
+                        <div class="clue clue-easy">
                             <strong>3.</strong> It was either Spirit Snoopervisor or Hairy Scary who had a memorable experience in the wine cellar - which was filled floor to ceiling with antiques and collectors items, but no wine!
                         </div>
-                        <div class="clue">
+                        <div class="clue clue-easy">
                             <strong>4.</strong> While taking some time in the main bedroom to text his wife about dinner, one startled investigator heard slow moving footsteps on the squeaky stairs that he confirmed could not have come from any of the others in the house.
                         </div>
-                        <div class="clue">
+                        <div class="clue clue-easy">
                             <strong>5.</strong> Hairy Scary earned her name due to her long, jet-black hair. While she may have looks akin to those of an actress from a Japanese horror film, she was entirely unprepared for the shock of hearing eerie voices on the radio device she was using!
                         </div>
                     </div>
