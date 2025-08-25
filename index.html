@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Card Sets Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card-set {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-set::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #FF5722, #4CAF50, #2196F3, #9C27B0, #FF9800);
+        }
+
+        .card-set:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .set-number {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .set-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .set-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .set-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .card-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-count::before {
+            content: '🎴';
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .difficulty.beginner::before {
+            content: '⭐';
+        }
+
+        .difficulty.intermediate::before {
+            content: '⭐⭐';
+        }
+
+        .difficulty.advanced::before {
+            content: '⭐⭐⭐';
+        }
+
+        .add-new {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: 2px dashed rgba(255,255,255,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .add-new:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .add-new::before {
+            content: '+';
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .add-new .add-text {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Task Card Sets Gallery</h1>
+            <p>Interactive learning activities for 9th Grade ELA</p>
+        </div>
+
+        <div class="gallery">
+            <!-- Set 1: First Day Activities -->
+            <a href="first-day-task-cards.html" class="card-set">
+                <div class="set-number">Set 1</div>
+                <div class="set-title">First Day Language Challenges</div>
+                <div class="set-description">
+                    Engaging ELA activities to kick off the school year! Students explore etymology, connotations, 
+                    literary devices, and critical thinking through interactive card challenges designed to build 
+                    confidence and assess reading levels.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">12 Cards</div>
+                    <div class="difficulty intermediate">Intermediate</div>
+                </div>
+            </a>
+
+            <!-- Placeholder for future sets -->
+            <div class="card-set add-new">
+                <div class="add-text">Create New Set</div>
+                <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Coming Soon</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click handler for the "add new" card
+        document.querySelector('.add-new').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('New task card sets coming soon! 🎉\n\nIdeas for future sets:\n• Poetry Analysis Cards\n• Grammar Detective Challenges\n• Creative Writing Prompts\n• Reading Comprehension Mysteries');
+        });
+
+        // Add some interactive elements
+        document.querySelectorAll('.card-set:not(.add-new)').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #f8f9ff, #ffffff)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.background = 'white';
+            });
+        });
+    </script>
+</body>
+</html>
