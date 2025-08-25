@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Class Grid - Test Layout</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 5px;
+            color: #666;
+            text-decoration: none;
+            font-size: 1.5em;
+            transition: color 0.3s ease;
+        }
+        
+        .back-button:hover {
+            color: #333;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .task-card {
+            width: 100%;
+            height: 27.5vh;
+            max-height: 308px;
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .task-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 5px solid #4CAF50;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
+            font-size: 0.7em;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+            border-left-color: #4CAF50;
+        }
+        
+        .task-card:hover .card-front,
+        .task-card:hover .card-back {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        }
+        
+        .card-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8em;
+            font-weight: normal;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-content {
+            display: flex;
+            gap: 12px;
+            flex-grow: 1;
+            margin-bottom: 50px;
+            align-items: flex-start;
+        }
+        
+        .riddle-column {
+            flex: 1.2;
+            font-size: 0.85em;
+            color: #444;
+            line-height: 1.3;
+        }
+        
+        .grid-column {
+            flex: 0.8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .logic-grid {
+            border-collapse: collapse;
+            font-size: 0.5em;
+            background: white;
+        }
+        
+        .logic-grid th, .logic-grid td {
+            border: 1px solid #ddd;
+            padding: 2px 4px;
+            text-align: center;
+            min-width: 15px;
+            height: 15px;
+        }
+        
+        .logic-grid th {
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+            font-size: 0.45em;
+        }
+        
+        .logic-grid .category-header {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            font-weight: bold;
+            font-size: 0.5em;
+        }
+        
+        .logic-grid td {
+            background-color: #fafafa;
+        }
+        
+        .flip-instruction {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 0.8em;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .solution-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #2e7d32;
+        }
+        
+        .clues-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .clue {
+            background-color: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 8px 12px;
+            border-radius: 4px;
+            line-height: 1.3;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back-button">←</a>
+    
+    <div class="card-container">
+        <!-- Card 1 -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards 2-9 with same structure -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title">Cooking Class</div>
+                    <div class="card-content">
+                        <div class="riddle-column">
+                            Last night three friends who have just taken a cooking class held a dinner to practice their new skills. Can you identify which person brought which main course, and the dessert they each made for the evening?
+                        </div>
+                        <div class="grid-column">
+                            <table class="logic-grid">
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Main Dishes</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Carne Asada</th>
+                                    <th>Mole Chicken</th>
+                                    <th>Fish Tacos</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="3" class="category-header">Desserts</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th>Tres Leches</th>
+                                    <th>Flan</th>
+                                    <th>Churros</th>
+                                </tr>
+                                <tr>
+                                    <th>Diego</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Sofia</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <th>Carlos</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="flip-instruction">Click to see clues</div>
+                </div>
+                <div class="card-back">
+                    <div class="solution-title">Cooking Class - Clues</div>
+                    <div class="clues-section">
+                        <div class="clue">
+                            <strong>1.</strong> The three people are Diego, the one who brought the Carne Asada, and the one who brought the Tres Leches Cake.
+                        </div>
+                        <div class="clue">
+                            <strong>2.</strong> Sofia did not bring the Mole Chicken.
+                        </div>
+                        <div class="clue">
+                            <strong>3.</strong> The Fish Tacos were brought by either Diego or the person who brought the Flan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let flipTimeouts = new Map();
+        
+        function flipCard(card) {
+            const cardId = card.dataset.cardId || Date.now() + Math.random();
+            card.dataset.cardId = cardId;
+            
+            // Clear any existing timeout for this card
+            if (flipTimeouts.has(cardId)) {
+                clearTimeout(flipTimeouts.get(cardId));
+                flipTimeouts.delete(cardId);
+            }
+            
+            // Toggle the flip
+            card.classList.toggle('flipped');
+            
+            // If card is now flipped (showing clues), set 30-second timeout
+            if (card.classList.contains('flipped')) {
+                const timeoutId = setTimeout(() => {
+                    card.classList.remove('flipped');
+                    flipTimeouts.delete(cardId);
+                }, 30000); // 30 seconds
+                
+                flipTimeouts.set(cardId, timeoutId);
+            }
+        }
+    </script>
+</body>
+</html>
