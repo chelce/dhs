@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logic Puzzle Answer Keys</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .main-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .difficulty-section {
+            margin-bottom: 50px;
+        }
+        
+        .difficulty-header {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 2.2em;
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .difficulty-easy {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .difficulty-medium {
+            background: linear-gradient(135deg, #FF9800, #f57c00);
+        }
+        
+        .difficulty-hard {
+            background: linear-gradient(135deg, #F44336, #d32f2f);
+        }
+        
+        .puzzle-answer {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .puzzle-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .answer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .answer-table th {
+            background: #f8f9fa;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: #333;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .answer-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #dee2e6;
+            color: #555;
+        }
+        
+        .answer-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .answer-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .solution-notes {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .solution-notes h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.2em;
+        }
+        
+        .color-easy { border-left-color: #4CAF50; }
+        .color-medium { border-left-color: #FF9800; }
+        .color-hard { border-left-color: #F44336; }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .answer-table {
+                font-size: 0.9em;
+            }
+            
+            .answer-table th,
+            .answer-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="main-title">Logic Puzzle Answer Keys</h1>
+        <p class="subtitle">Complete solutions for all 6 interactive logic puzzles</p>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">← Back to Home</a>
+            <a href="cooking-class-card-clean.html" class="nav-link">Logic Puzzle Cards</a>
+            <a href="card-template-gallery.html" class="nav-link">Template Gallery</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- EASY DIFFICULTY PUZZLES -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-easy">EASY LEVEL SOLUTIONS</div>
+            
+            <!-- Puzzle 1: The Haunted Mansion -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">The Haunted Mansion</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Ghost Hunter</th>
+                            <th>Experience</th>
+                            <th>Room</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Shadow Chaser</strong></td>
+                            <td>Heard eerie voices</td>
+                            <td>Living Room</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mr Apparition</strong></td>
+                            <td>Nothing unusual</td>
+                            <td>Hallway</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Spirit Snoopervisor</strong></td>
+                            <td>Saw spooky shadows</td>
+                            <td>Main Bedroom</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hairy Scary</strong></td>
+                            <td>Heard footsteps</td>
+                            <td>Wine Cellar</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Specter Sleuth</strong></td>
+                            <td>Saw book fall</td>
+                            <td>Attic</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-easy">
+                    <h4>Solution Logic:</h4>
+                    <p>Key deductions: From clue 9, Spirit Snoopervisor saw shadows (not in hallway per clue 9). From clue 5, Hairy Scary heard voices, but Shadow Chaser didn't see shadows (clue 1), so he heard voices. Working through the room assignments and experiences systematically using the process of elimination.</p>
+                </div>
+            </div>
+            
+            <!-- Puzzle 2: Pity the Passwords -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">Pity the Passwords</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Application</th>
+                            <th>Old Password</th>
+                            <th>New Password</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Client Management</strong></td>
+                            <td>password2</td>
+                            <td>bK9FByy7KtFjAm</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Social Media</strong></td>
+                            <td>password3</td>
+                            <td>kM8@nP4$qR7</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Document Sharing</strong></td>
+                            <td>thisisdumb</td>
+                            <td>VxY9zK3mLp2</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Video Production</strong></td>
+                            <td>bingo</td>
+                            <td>tEp@x2&N8fdayS</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Note Taking</strong></td>
+                            <td>123abc</td>
+                            <td>PieterRocks!</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Backup Manager</strong></td>
+                            <td>kittycats</td>
+                            <td>V7nM9@kL4pQ</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-easy">
+                    <h4>Solution Logic:</h4>
+                    <p>From clue 2, "kittycats" became a password starting with "V" (Backup Manager). From clue 8, Pieter used his name creatively for Note Taking. From clues 1 and 6, password2/password3 were for Client Management and Social Media, with Client Management getting "bK9FByy7KtFjAm". Working through symbols and requirements in clues 5 and 7 determines the rest.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEDIUM DIFFICULTY PUZZLES -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-medium">MEDIUM LEVEL SOLUTIONS</div>
+            
+            <!-- Puzzle 3: Highway Murder Mystery -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">Highway Murder Mystery</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Mile Marker</th>
+                            <th>Evidence Found</th>
+                            <th>Discovery Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mile 82</strong></td>
+                            <td>Blood-stained shirt</td>
+                            <td>Abandoned by suspect</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 83</strong></td>
+                            <td>Traces of blood</td>
+                            <td>Discovered by investigators</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 84</strong></td>
+                            <td>Rental car</td>
+                            <td>Ditched by suspect</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 85</strong></td>
+                            <td>Key evidence</td>
+                            <td>Found by hiker</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 86</strong></td>
+                            <td>Murder weapon</td>
+                            <td>Still had price sticker</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 86</strong></td>
+                            <td>Scout camp & footprint</td>
+                            <td>Discovered by scout troop</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 85</strong></td>
+                            <td>Cigarette butt</td>
+                            <td>Suspect's favorite brand</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mile 86</strong></td>
+                            <td>Strands of hair</td>
+                            <td>Found by investigators</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-medium">
+                    <h4>Solution Logic:</h4>
+                    <p>Starting with the fixed points from clues 1, 5, and 7 (car at 84, shirt at 82, weapon at 86), then using the mathematical relationships: hiker's evidence 1 mile less than car location (clue 2), scout camp 1 mile more than hiker's find (clue 4), cigarette 1 mile less than hair strands (clue 6). Sequential deduction places all evidence.</p>
+                </div>
+            </div>
+            
+            <!-- Puzzle 4: Stings & Scrapes Tattoo Studio -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">Stings & Scrapes Tattoo Studio</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Club Member</th>
+                            <th>Tattoo Design</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>9:00 AM</strong></td>
+                            <td>Riffraff</td>
+                            <td>Dragon</td>
+                        </tr>
+                        <tr>
+                            <td><strong>10:00 AM</strong></td>
+                            <td>Knuckles</td>
+                            <td>Eagle</td>
+                        </tr>
+                        <tr>
+                            <td><strong>11:00 AM</strong></td>
+                            <td>Poison</td>
+                            <td>Roses</td>
+                        </tr>
+                        <tr>
+                            <td><strong>1:00 PM</strong></td>
+                            <td>Spike</td>
+                            <td>Serpent</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3:00 PM</strong></td>
+                            <td>Medusa</td>
+                            <td>Motorcycle</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4:00 PM</strong></td>
+                            <td>Torpedo</td>
+                            <td>Flames</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5:00 PM</strong></td>
+                            <td>Gunner</td>
+                            <td>Skull</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-medium">
+                    <h4>Solution Logic:</h4>
+                    <p>From clue 4, appointments are consecutive: Riffraff → Knuckles → Poison. From clue 3, Poison gets roses but not at 3:00 PM. From clue 5, either Knuckles or motorcycle person is at 11:00 AM, the other at 3:00 PM. From clue 1, Riffraff is before Gunner. Sequential time slot deduction with design elimination follows.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- HARD DIFFICULTY PUZZLES -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-hard">HARD LEVEL SOLUTIONS</div>
+            
+            <!-- Puzzle 5: Spilling the Tea -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">Spilling the Tea</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Gossiper</th>
+                            <th>Subject</th>
+                            <th>Job Title</th>
+                            <th>Rumor Topic</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Helena</strong></td>
+                            <td>Rahul</td>
+                            <td>HR Manager</td>
+                            <td>Stealing lunches</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Quinn</strong></td>
+                            <td>Cassandra</td>
+                            <td>Account Manager</td>
+                            <td>Sneaking out early</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Noah</strong></td>
+                            <td>Tomas</td>
+                            <td>Assistant</td>
+                            <td>Lied on resume</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Lydia</strong></td>
+                            <td>Estelle</td>
+                            <td>Claims Examiner</td>
+                            <td>Unfair pay raise</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Ryan</strong></td>
+                            <td>Isabel</td>
+                            <td>Auditor</td>
+                            <td>Affair with boss</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-hard">
+                    <h4>Solution Logic:</h4>
+                    <p>Complex elimination using clue 1's unique list structure, clue 7's identification of Ryan's specific gossip topic, and clue 11's paired relationship. Helena talks about either Rahul or Claims Adjuster (clue 6), but no Claims Adjuster appears, so Helena talks about Rahul. Multiple constraint satisfaction with job title restrictions in clues 8-11.</p>
+                </div>
+            </div>
+            
+            <!-- Puzzle 6: Sleepydale Radio Fresh Talent -->
+            <div class="puzzle-answer">
+                <h3 class="puzzle-title">Sleepydale Radio Fresh Talent</h3>
+                
+                <table class="answer-table">
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Song Title</th>
+                            <th>Genre</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Hitch Atom</strong></td>
+                            <td>"Strained Slumber"</td>
+                            <td>Folk</td>
+                            <td>2:58</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Met A Man</strong></td>
+                            <td>"Darkest Days"</td>
+                            <td>Pop</td>
+                            <td>2:34</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tommy T. Tom</strong></td>
+                            <td>"City Of Dreams"</td>
+                            <td>Country</td>
+                            <td>3:22</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sleepy Wall</strong></td>
+                            <td>"One Eye Open"</td>
+                            <td>Rock</td>
+                            <td>4:00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>The Fireneers</strong></td>
+                            <td>"After Midnight"</td>
+                            <td>Hip Hop</td>
+                            <td>3:36</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Faster Slower</strong></td>
+                            <td>"Halfway Here"</td>
+                            <td>EDM</td>
+                            <td>3:46</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="solution-notes color-hard">
+                    <h4>Solution Logic:</h4>
+                    <p>Most complex puzzle requiring duration mathematics. From clue 5, "One Eye Open" = 4:00. From clue 9, Rock is 14 seconds longer than Country. From clue 8, Hip Hop and Fireneers differ by 1:02. From clue 6, no song starts with artist's first letter. Multiple mathematical constraints create unique solution through systematic duration calculation and genre elimination.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive highlights when hovering over table rows
+        document.querySelectorAll('.answer-table tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#e3f2fd';
+                this.style.transform = 'scale(1.02)';
+                this.style.transition = 'all 0.2s ease';
+            });
+            
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+                this.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add click to copy functionality for answers
+        document.querySelectorAll('.answer-table').forEach(table => {
+            table.addEventListener('click', function() {
+                // Visual feedback
+                this.style.boxShadow = '0 0 20px rgba(106, 90, 205, 0.4)';
+                setTimeout(() => {
+                    this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
