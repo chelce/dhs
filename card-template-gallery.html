@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Card Template Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .main-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .nav-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .template-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .template-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .template-description {
+            color: #666;
+            margin-bottom: 20px;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        .template-card {
+            width: 100%;
+            height: 300px;
+            perspective: 1000px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+        
+        .template-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .template-card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .template-card-front, .template-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .template-card-back {
+            transform: rotateY(180deg);
+        }
+        
+        /* Question + Clues Template */
+        .question-clues .template-card-front {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border: 3px solid #4CAF50;
+        }
+        
+        .question-clues .template-card-back {
+            background: linear-gradient(135deg, #f1f8e9 0%, #dcedc8 100%);
+            border: 3px solid #4CAF50;
+        }
+        
+        /* Image + Analysis Template */
+        .image-analysis .template-card-front {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 3px solid #FF9800;
+        }
+        
+        .image-analysis .template-card-back {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border: 3px solid #FF9800;
+        }
+        
+        /* Sentence Stems Template */
+        .sentence-stems .template-card-front {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 3px solid #2196F3;
+        }
+        
+        .sentence-stems .template-card-back {
+            background: linear-gradient(135deg, #e8f4f8 0%, #b3e5fc 100%);
+            border: 3px solid #2196F3;
+        }
+        
+        /* Consider This Template */
+        .consider-this .template-card-front {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+            border: 3px solid #E91E63;
+        }
+        
+        .consider-this .template-card-back {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+            border: 3px solid #E91E63;
+        }
+        
+        /* Quote Analysis Template */
+        .quote-analysis .template-card-front {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border: 3px solid #9C27B0;
+        }
+        
+        .quote-analysis .template-card-back {
+            background: linear-gradient(135deg, #f8f5fa 0%, #ede7f6 100%);
+            border: 3px solid #9C27B0;
+        }
+        
+        /* Vocabulary Template */
+        .vocabulary .template-card-front {
+            background: linear-gradient(135deg, #e8f5e8 0%, #a5d6a7 100%);
+            border: 3px solid #388E3C;
+        }
+        
+        .vocabulary .template-card-back {
+            background: linear-gradient(135deg, #f1f8e9 0%, #c8e6c9 100%);
+            border: 3px solid #388E3C;
+        }
+        
+        .card-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .image-placeholder {
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        
+        .stems-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .stems-list li {
+            background: rgba(255,255,255,0.7);
+            margin: 8px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+            font-size: 0.9em;
+        }
+        
+        .quote-box {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #9C27B0;
+            font-style: italic;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        .quote-box:before {
+            content: '"';
+            font-size: 3em;
+            color: #9C27B0;
+            position: absolute;
+            left: 5px;
+            top: -10px;
+        }
+        
+        .vocab-term {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 2em;
+            color: #388E3C;
+            margin-bottom: 10px;
+        }
+        
+        .definition {
+            background: rgba(255,255,255,0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        .clue-item {
+            background: rgba(255,255,255,0.7);
+            margin: 6px 0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border-left: 4px solid #4CAF50;
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+        
+        @media (max-width: 768px) {
+            .template-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .main-title {
+                font-size: 2.5em;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .template-card {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="main-title">Interactive Card Template Gallery</h1>
+        <p class="subtitle">Ready-to-use card layouts for engaging classroom activities</p>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">← Back to Home</a>
+            <a href="cooking-class-card-clean.html" class="nav-link">Logic Puzzle Cards</a>
+        </div>
+    </div>
+
+    <div class="template-grid">
+        <!-- Template 1: Question + Clues -->
+        <div class="template-section question-clues">
+            <h2 class="template-title">Question + Clues</h2>
+            <p class="template-description">Perfect for logic puzzles, mysteries, and analytical thinking tasks</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">The Mystery Challenge</div>
+                        <div class="card-content">
+                            <div class="puzzle-description">
+                                Five students are working on different projects for the school science fair. Each student chose a unique topic and is presenting in a different classroom. From the clues provided, can you determine which student is presenting which project and in which room?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Clues to Solve</div>
+                        <div class="card-content">
+                            <div class="clue-item">
+                                <strong>1.</strong> Sarah's project is not about robotics, and she's not presenting in Room 101.
+                            </div>
+                            <div class="clue-item">
+                                <strong>2.</strong> The chemistry project is being presented in Room 203, but not by Mike.
+                            </div>
+                            <div class="clue-item">
+                                <strong>3.</strong> Alex's presentation room number is higher than Emma's room number.
+                            </div>
+                            <div class="clue-item">
+                                <strong>4.</strong> The physics project is being presented by either Sarah or Jake.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 2: Image + Analysis -->
+        <div class="template-section image-analysis">
+            <h2 class="template-title">Image + Analysis</h2>
+            <p class="template-description">Ideal for visual analysis, art interpretation, and observational activities</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">Visual Analysis Challenge</div>
+                        <div class="card-content">
+                            <div class="image-placeholder">
+                                [Historical Photograph]<br>
+                                <small>Image would be displayed here</small>
+                            </div>
+                            <p>Study this historical photograph carefully. What details can you observe about the time period, setting, and people shown?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Analysis Framework</div>
+                        <div class="card-content">
+                            <div class="clue-item">
+                                <strong>Setting:</strong> What location and time period does this image represent?
+                            </div>
+                            <div class="clue-item">
+                                <strong>People:</strong> Who are the individuals in the photograph? What can you infer about them?
+                            </div>
+                            <div class="clue-item">
+                                <strong>Context:</strong> What historical events or social conditions might this image reflect?
+                            </div>
+                            <div class="clue-item">
+                                <strong>Significance:</strong> Why might this moment have been worth photographing?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 3: Sentence Stems -->
+        <div class="template-section sentence-stems">
+            <h2 class="template-title">Sentence Stems</h2>
+            <p class="template-description">Scaffolds student responses and supports academic language development</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">Literary Analysis Discussion</div>
+                        <div class="card-content">
+                            <p><strong>Topic:</strong> Character motivation in Chapter 5</p>
+                            <p>Use the sentence stems on the back to structure your analysis of the main character's decisions and motivations in this pivotal chapter.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Academic Sentence Stems</div>
+                        <div class="card-content">
+                            <ul class="stems-list">
+                                <li>Based on the evidence, I can conclude that...</li>
+                                <li>The character's motivation seems to be...</li>
+                                <li>This decision reveals that the character...</li>
+                                <li>The author's purpose in this scene is to...</li>
+                                <li>This connects to the theme because...</li>
+                                <li>In contrast to earlier chapters...</li>
+                                <li>The significance of this moment is...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 4: Consider This -->
+        <div class="template-section consider-this">
+            <h2 class="template-title">Consider This</h2>
+            <p class="template-description">Thought-provoking scenarios for critical thinking and debate</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">Ethical Dilemma</div>
+                        <div class="card-content">
+                            <p><strong>Consider This Scenario:</strong></p>
+                            <p>Your school is implementing a new policy that requires students to turn in their phones at the beginning of each day. The administration says it will improve focus and reduce distractions, but many students argue it violates their privacy and safety.</p>
+                            <p><em>What's your position? Click to see discussion questions.</em></p>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Discussion Questions</div>
+                        <div class="card-content">
+                            <div class="clue-item">
+                                <strong>1.</strong> What are the strongest arguments on both sides of this issue?
+                            </div>
+                            <div class="clue-item">
+                                <strong>2.</strong> How do you balance individual rights with collective benefits?
+                            </div>
+                            <div class="clue-item">
+                                <strong>3.</strong> What alternative solutions might address everyone's concerns?
+                            </div>
+                            <div class="clue-item">
+                                <strong>4.</strong> How might this policy affect different groups of students differently?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 5: Quote Analysis -->
+        <div class="template-section quote-analysis">
+            <h2 class="template-title">Quote Analysis</h2>
+            <p class="template-description">Deep dive into meaningful quotes from literature, speeches, or texts</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">Quote Exploration</div>
+                        <div class="card-content">
+                            <div class="quote-box">
+                                The only way to deal with an unfree world is to become so absolutely free that your very existence is an act of rebellion.
+                                <footer>— Albert Camus</footer>
+                            </div>
+                            <p>What does this quote mean to you? How might it apply to literature we're reading or current events?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Analysis Framework</div>
+                        <div class="card-content">
+                            <div class="clue-item">
+                                <strong>Context:</strong> What was happening in Camus's world when he wrote this?
+                            </div>
+                            <div class="clue-item">
+                                <strong>Meaning:</strong> Break down the key concepts: "unfree world," "absolutely free," "rebellion."
+                            </div>
+                            <div class="clue-item">
+                                <strong>Application:</strong> How do characters in our current reading embody or reject this philosophy?
+                            </div>
+                            <div class="clue-item">
+                                <strong>Personal Connection:</strong> When have you seen this principle in action in your own life?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Template 6: Vocabulary Builder -->
+        <div class="template-section vocabulary">
+            <h2 class="template-title">Vocabulary Builder</h2>
+            <p class="template-description">Interactive vocabulary development with context and application</p>
+            
+            <div class="template-card" onclick="flipTemplateCard(this)">
+                <div class="template-card-inner">
+                    <div class="template-card-front">
+                        <div class="card-title">Word of the Day</div>
+                        <div class="card-content">
+                            <div class="vocab-term">RESILIENCE</div>
+                            <div class="definition">
+                                <strong>Part of Speech:</strong> Noun<br><br>
+                                <strong>Definition:</strong> The ability to recover quickly from difficulties; toughness and flexibility in the face of adversity.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="template-card-back">
+                        <div class="card-title">Word in Action</div>
+                        <div class="card-content">
+                            <div class="clue-item">
+                                <strong>Example:</strong> "The community showed remarkable resilience after the natural disaster."
+                            </div>
+                            <div class="clue-item">
+                                <strong>Synonyms:</strong> Strength, toughness, durability, flexibility
+                            </div>
+                            <div class="clue-item">
+                                <strong>Your Turn:</strong> Write a sentence using "resilience" that relates to a character from our current reading.
+                            </div>
+                            <div class="clue-item">
+                                <strong>Think Deeper:</strong> How does resilience differ from stubbornness?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let templateTimers = new Map();
+        
+        function adjustTemplateCardHeight(cardInner) {
+            const isFlipped = cardInner.classList.contains('flipped');
+            const frontCard = cardInner.querySelector('.template-card-front');
+            const backCard = cardInner.querySelector('.template-card-back');
+            
+            // Measure the height of the visible face
+            const visibleCard = isFlipped ? backCard : frontCard;
+            const cardHeight = visibleCard.scrollHeight;
+            
+            // Smoothly animate to the new height
+            cardInner.style.height = cardHeight + 'px';
+        }
+        
+        function flipTemplateCard(card) {
+            const cardInner = card.querySelector('.template-card-inner');
+            const cardId = Array.from(document.querySelectorAll('.template-card')).indexOf(card);
+            
+            // Clear existing timer for this card
+            if (templateTimers.has(cardId)) {
+                clearTimeout(templateTimers.get(cardId));
+                templateTimers.delete(cardId);
+            }
+            
+            // Toggle the flip
+            cardInner.classList.toggle('flipped');
+            
+            // Adjust height immediately for smooth transition
+            setTimeout(() => {
+                adjustTemplateCardHeight(cardInner);
+            }, 100); // Small delay to let flip start
+            
+            // Set timer to auto-flip back after 30 seconds
+            if (cardInner.classList.contains('flipped')) {
+                const timerId = setTimeout(() => {
+                    cardInner.classList.remove('flipped');
+                    setTimeout(() => {
+                        adjustTemplateCardHeight(cardInner);
+                    }, 100);
+                    templateTimers.delete(cardId);
+                }, 30000);
+                templateTimers.set(cardId, timerId);
+            }
+        }
+        
+        // Initialize card heights on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.template-card-inner').forEach(adjustTemplateCardHeight);
+        });
+        
+        // Adjust heights on window resize
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.template-card-inner').forEach(adjustTemplateCardHeight);
+        });
+    </script>
+</body>
+</html>
