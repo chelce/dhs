@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Logic Puzzles - 2x3 Difficulty Grid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            background-color: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .nav-link:hover {
+            background-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 80vh;
+        }
+        
+        .task-card {
+            width: 100%;
+            height: auto;
+            min-height: 400px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s ease, height 0.8s ease;
+        }
+        
+        .task-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .card-inner {
+            width: 100%;
+            height: auto;
+            min-height: fit-content;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, height 0.8s ease;
+        }
+        
+        .card-front, .card-back {
+            width: 100%;
+            height: auto;
+            min-height: fit-content;
+            position: absolute;
+            top: 0;
+            left: 0;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+            color: #333;
+            border: 2px solid #e0e4e7;
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            color: #333;
+            border: 2px solid #e0e4e7;
+        }
+        
+        .card-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .title-easy { color: #4CAF50; }
+        .title-medium { color: #FF9800; }
+        .title-hard { color: #F44336; }
+        
+        .difficulty-level {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .difficulty-easy { color: #4CAF50; }
+        .difficulty-medium { color: #FF9800; }
+        .difficulty-hard { color: #F44336; }
+        
+        .card-content {
+            flex-grow: 1;
+            margin-bottom: 20px;
+        }
+        
+        .puzzle-description {
+            line-height: 1.4;
+            font-size: 1em;
+            color: #333;
+        }
+        
+        .solution-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .solution-title-easy { color: #4CAF50; }
+        .solution-title-medium { color: #FF9800; }
+        .solution-title-hard { color: #F44336; }
+        
+        .clues-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .clue {
+            padding: 8px 12px;
+            border-radius: 6px;
+            line-height: 1.3;
+            font-weight: 500;
+            font-size: 0.85em;
+        }
+        
+        .clue-easy {
+            background-color: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            color: #2e7d32;
+        }
+        
+        .clue-medium {
+            background-color: #fff3e0;
+            border-left: 4px solid #FF9800;
+            color: #e65100;
+        }
+        
+        .clue-hard {
+            background-color: #ffebee;
+            border-left: 4px solid #F44336;
+            color: #c62828;
+        }
+        
+        @media (max-width: 1400px) {
+            .card-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 25px;
+                max-width: 1200px;
+            }
+            
+            .task-card {
+                min-height: 350px;
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .card-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(2, 1fr);
+                gap: 15px;
+                max-width: 100%;
+                padding: 15px;
+            }
+            
+            .task-card {
+                min-height: 300px;
+            }
+            
+            .card-front, .card-back {
+                padding: 15px;
+            }
+            
+            .card-title {
+                font-size: 1.4em;
+            }
+            
+            .puzzle-description {
+                font-size: 0.9em;
+            }
+            
+            .clue {
+                font-size: 0.75em;
+                padding: 6px 10px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .card-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(6, 1fr);
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            .task-card {
+                min-height: 250px;
+            }
+            
+            .card-front, .card-back {
+                padding: 12px;
+            }
+            
+            .card-title {
+                font-size: 1.2em;
+                margin-bottom: 8px;
+            }
+            
+            .difficulty-level {
+                font-size: 0.9em;
+            }
+            
+            .puzzle-description {
+                font-size: 0.8em;
+                line-height: 1.3;
+            }
+            
+            .clue {
+                font-size: 0.7em;
+                padding: 5px 8px;
+                margin: 3px 0;
+            }
+            
+            .nav-bar {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .nav-link {
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="index.html" class="nav-link">← Home</a>
+        <a href="logic-puzzle-answers.html" class="nav-link">📝 Answer Keys</a>
+        <a href="card-template-gallery.html" class="nav-link">🎨 Templates</a>
+    </div>
+    
+    <div class="card-container">
+        <!-- TOP ROW: Easy, Medium, Hard -->
+        
+        <!-- Card 1: The Haunted Mansion (Easy) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-easy">The Haunted Mansion</div>
+                    <div class="difficulty-level difficulty-easy">Easy</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            Five ghost hunters have just spent time in an allegedly haunted mansion in Whispering Pines, investigating paranormal activity reported by the new owner. Once inside the expansive home, which boasts 20 rooms, the ghost hunters split up and each had a chilling experience! From the clues provided, can you determine the experience each person had and the room they were in at the time?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-easy">The Haunted Mansion - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-easy">
+                            <strong>1.</strong> Shadow Chaser didn't see any spooky shadows during his time in the house. The shadows were not seen in the attic.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>2.</strong> Neither the ghost hunter who saw a book fall from a shelf nor Mr Apparition had their ghostly experiences in the attic.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>3.</strong> It was either Spirit Snoopervisor or Hairy Scary who had a memorable experience in the wine cellar - which was filled floor to ceiling with antiques and collectors items, but no wine!
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>4.</strong> While taking some time in the main bedroom to text his wife about dinner, one startled investigator heard slow moving footsteps on the squeaky stairs that he confirmed could not have come from any of the others in the house.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>5.</strong> Hairy Scary earned her name due to her long, jet-black hair. While she may have looks akin to those of an actress from a Japanese horror film, she was entirely unprepared for the shock of hearing eerie voices on the radio device she was using!
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>6.</strong> One man shuddered when later telling the tale of how he felt a hand touch his shoulder, only to turn and find no one there! This did not occur in the wine cellar nor the living room.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>7.</strong> Compared to one of his colleagues, Mr Apparition had a very ordinary time when he passed through the hallway.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>8.</strong> Specter Sleuth maintains that the room was very still and he was nowhere near the bookcase when the book suddenly fell to the floor. It was a book about ornithology, which he found a little ironic given that it virtually flew by itself.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>9.</strong> Of the event that occurred in the hallway and the sighting of strange shadows, one was experienced by Spirit Snoopervisor and the other was experienced by Shadow Chaser.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Highway Murder Mystery (Medium) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-medium">Highway Murder Mystery</div>
+                    <div class="difficulty-level difficulty-medium">Medium</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            A serious crime has taken place along New York's Interstate 80 and special agents have been called in to investigate. Five vehicles were pulled over in rapid succession, and one driver has been murdered! The culprit is still at the scene of the crime. From the clues provided, can you determine the make and color of each vehicle, its state of origin, and the driver's name?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-medium">Highway Murder Mystery - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-medium">
+                            <strong>1.</strong> The suspect ditched the rental car near mile marker 84, just two miles before the point where members of a scout troop made camp for the night and discovered a footprint.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>2.</strong> The hiker found a key piece of evidence at mile marker 85, which was one mile less than the spot where the abandoned rental car was discovered by the police.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>3.</strong> It was at mile marker 83 where traces of blood were discovered by investigators later that evening.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>4.</strong> The mile marker where the scout troop made camp was one mile more than where the hiker found her piece of evidence.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>5.</strong> The suspect abandoned his blood stained shirt near mile marker 82.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>6.</strong> A cigarette butt in the suspect's favorite brand was found at the mile marker one mile less than where the strands of hair were found.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>7.</strong> The murder weapon was found at mile marker 86. It was purchased earlier that day and still had a price sticker on the handle.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Spilling the Tea (Hard) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-hard">Spilling the Tea</div>
+                    <div class="difficulty-level difficulty-hard">Hard</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            Myenda Insurance Group has operated with the same management team for two decades, many of whom are not popular among the company's employees. The staff turnover rate is high, and new employees are not always well vetted! Between controversial decisions and inconsistent treatment of employees, rumors are always circulating in the head office and employees make it through the day by exchanging the latest gossip. This week, five employees in various positions have been discussed at length, each for a unique reason.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-hard">Spilling the Tea - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-hard">
+                            <strong>1.</strong> The five rumors are the one about an unfair pay raise, the one about the Auditor, the one about Cassandra, the one started by Quinn, and the one about the Account Manager.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>2.</strong> Noah does not get along well with Tomas, but due to their desks being close he overheard some juicy information when Tomas was on the phone to his girlfriend this week. Noah just had to spill the tea to his favorite colleagues!
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>3.</strong> Lydia wasn't the one to start the rumor about the HR Manager stealing lunches, but she wasn't surprised when she heard it. Yesterday, her delicious leftover beef ragout mysteriously disappeared from the staff fridge. Its scent still lingered from the microwave... right before the manager's lunch meeting.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>4.</strong> It somehow made it through the grapevine that a certain staff member had received a generous pay raise, right at a time where other staff had been told of a pay freeze! The rumored recipient is neither Estelle nor Isabel.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>5.</strong> Neither Lydia nor Quinn were responsible for the gossip about Isabel.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>6.</strong> Helena is either the one who started the rumor about Rahul or the one who started the rumor about the Claims Adjuster.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>7.</strong> Usually management don't get involved in the gossip that makes its way around the office, but when they heard that Ryan had been suggesting to others that a certain staff member was having an affair with their boss, a company-wide email went out and Ryan was given a warning.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>8.</strong> Tomas is neither a Claims Adjuster nor a Claims Examiner.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>9.</strong> One talking point for the week was that one of the staff had been observed sneaking out from work early every day for the past month. This was neither Estelle nor the Account Manager.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>10.</strong> Lydia did not talk about the Claims Adjuster.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>11.</strong> Of the person rumored to have lied on their resume and the Auditor, one is Isabel and the other was first talked about by Noah.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM ROW: Easy, Medium, Hard -->
+
+        <!-- Card 4: Pity the Passwords (Easy) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-easy">Pity the Passwords</div>
+                    <div class="difficulty-level difficulty-easy">Easy</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            Pieter's first task of his new job at PR firm "Scandaless" is to organize his supervisor's most commonly used passwords. First he needs to reset them all in case his predecessor is a little bitter (also simply because she came up with terrible passwords), then he needs to record them in a secure location (like a logic puzzle!). From the clues provided, can you determine the old password and the new password for each type of application?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-easy">Pity the Passwords - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-easy">
+                            <strong>1.</strong> Pieter was a little amused at the use of passwords "password2" and "password3", which were the passwords used for the Client Management and the Social Media applications, but not necessarily in that order.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>2.</strong> The password "kittycats" was promptly changed to a more secure password, starting with a capital letter V.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>3.</strong> The two former passwords that were simply the word "password" followed by a number have now been changed to a more secure choice! Neither of them were changed to a password beginning with the lowercase letter "t".
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>4.</strong> As Pieter snickered at his predecessor's use of the password "thisisdumb" for the Document Sharing application, he wondered what he was getting himself into with this new job. Hopefully she was just bored that day.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>5.</strong> The new password for the Video Production application has at least one non-alphanumeric symbol in it. This is also the case for the Social Media application and the Backup Manager.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>6.</strong> Three of the unique applications are the one that had its password changed to "bK9FByy7KtFjAm", the one that formerly had the password "password3", and the Client Management application.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>7.</strong> The new password for the Document Sharing application does not have an @ symbol in it. The new password for the Backup Manager does not end with the dollar symbol ($).
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>8.</strong> Pieter employed a creative expression of his name for the Note Taking application password, but after his new supervisor was not amused he used a random password generator for the others.
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>9.</strong> The Note Taking application was either the one with old password "123abc" or the one with new password "tEp@x2&N8fdayS".
+                        </div>
+                        <div class="clue clue-easy">
+                            <strong>10.</strong> Of the Social Media application and the Video Production application, one has a new password beginning with lowercase letter "k", and the other previously had the password "bingo".
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Stings & Scrapes Tattoo Studio (Medium) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-medium">Stings & Scrapes Tattoo Studio</div>
+                    <div class="difficulty-level difficulty-medium">Medium</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            Stings And Scrapes Tattoo Studio is fully booked this Friday for seven members of the local motorcycle club, The Rollicking Riders. The club is comprised of all kinds of motorcycle enthusiasts just having a bit of fun and enjoying the company! Can you identify the appointment time of each member (identified by their club nickname) and the tattoo design they have chosen?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-medium">Stings & Scrapes Tattoo Studio - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-medium">
+                            <strong>1.</strong> Riffraff's appointment is earlier in the day than Gunner's. He's quietly afraid of the pain, and wants to get it over with as soon as possible.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>2.</strong> The person with the 2:00pm appointment time, Medusa, the person getting the flames design, the person with the 9:00am appointment, and the person getting the serpent design are five different people.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>3.</strong> Poison is booked in for a colorful roses design, but not at 3:00pm as he will be busy picking his kids up from school.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>4.</strong> Knuckles has his appointment immediately before Poison, and immediately after Riffraff.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>5.</strong> Of Knuckles and the one who is getting the motorcycle tattoo, one has an appointment at 11:00am and the other has an appointment at 3:00pm.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>6.</strong> Of Spike and the one who is getting the eagle tattoo, one has an appointment at 1:00pm and the other has an appointment at 5:00pm.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>7.</strong> The one getting the dragon tattoo is not Spike. The serpent design is not being tattooed during the 3:00pm appointment.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>8.</strong> Gunner is getting a design featuring a skull.
+                        </div>
+                        <div class="clue clue-medium">
+                            <strong>9.</strong> Torpedo's appointment is at some point after Spike's appointment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 6: Sleepydale Radio Fresh Talent (Hard) -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-title title-hard">Sleepydale Radio Fresh Talent</div>
+                    <div class="difficulty-level difficulty-hard">Hard</div>
+                    
+                    <div class="card-content">
+                        <div class="puzzle-description">
+                            The local community radio station in the small city of Sleepydale has just run its annual Fresh Talent competition, accepting song submissions from new bands and musical artists. The six finalists are each in a different genre of music. Can you determine the name of each artist, their genre, the name of their track that made the finals, and the length of each track (in minutes:seconds format)?
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="solution-title solution-title-hard">Sleepydale Radio Fresh Talent - Clues</div>
+                    
+                    <div class="clues-section">
+                        <div class="clue clue-hard">
+                            <strong>1.</strong> The six songs are the one by Hitch Atom, the one that goes for exactly 2 minutes 34 seconds, "City Of Dreams", "Strained Slumber", the one by Met A Man, and the EDM track.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>2.</strong> Of "Darkest Days" and the song by Met A Man, one is 3:36 long and the other is a Pop song.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>3.</strong> "One Eye Open" plays for longer than Tommy T. Tom's track.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>4.</strong> The Country song has a shorter duration than Sleepy Wall's offering.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>5.</strong> It's no accident that "One Eye Open" is precisely 4 minutes long, with the artist being a fan of round numbers.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>6.</strong> No song starts with the first letter of its artist's name.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>7.</strong> Of "City Of Dreams" and the Hitch Atom song, one is a Folk song and the other is 2:58 long.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>8.</strong> There is a difference in duration of 1 minute 2 seconds between the Hip Hop song and the song by The Fireneers.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>9.</strong> The Rock song is 14 seconds longer than the Country song.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>10.</strong> Faster Slower's song is 24 seconds longer than "Halfway Here".
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>11.</strong> "Darkest Days" is not a Hip Hop nor a Folk song.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>12.</strong> Faster Slower's song is longer than the Pop song, but shorter than Sleepy Wall's song.
+                        </div>
+                        <div class="clue clue-hard">
+                            <strong>13.</strong> "After Midnight", which is not a Hip Hop song, was not recorded by The Fireneers, Tommy T. Tom, nor Met A Man.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let cardTimers = new Map();
+        
+        function adjustCardHeight(cardInner) {
+            const isFlipped = cardInner.classList.contains('flipped');
+            const frontCard = cardInner.querySelector('.card-front');
+            const backCard = cardInner.querySelector('.card-back');
+            
+            // Measure the height of the visible face
+            const visibleCard = isFlipped ? backCard : frontCard;
+            const cardHeight = visibleCard.scrollHeight;
+            
+            // Smoothly animate to the new height
+            cardInner.style.height = cardHeight + 'px';
+        }
+        
+        function flipCard(card) {
+            const cardInner = card.querySelector('.card-inner');
+            const cardId = Array.from(card.parentElement.children).indexOf(card);
+            
+            // Clear existing timer for this card
+            if (cardTimers.has(cardId)) {
+                clearTimeout(cardTimers.get(cardId));
+                cardTimers.delete(cardId);
+            }
+            
+            // Toggle the flip
+            cardInner.classList.toggle('flipped');
+            
+            // Adjust height immediately for smooth transition
+            setTimeout(() => {
+                adjustCardHeight(cardInner);
+            }, 100); // Small delay to let flip start
+            
+            // Set timer to auto-flip back after 30 seconds
+            if (cardInner.classList.contains('flipped')) {
+                const timerId = setTimeout(() => {
+                    cardInner.classList.remove('flipped');
+                    setTimeout(() => {
+                        adjustCardHeight(cardInner);
+                    }, 100);
+                    cardTimers.delete(cardId);
+                }, 30000);
+                cardTimers.set(cardId, timerId);
+            }
+        }
+        
+        // Initialize card heights on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.card-inner').forEach(adjustCardHeight);
+        });
+        
+        // Clear all timers when page unloads
+        window.addEventListener('beforeunload', () => {
+            cardTimers.forEach(timerId => clearTimeout(timerId));
+        });
+    </script>
+</body>
+</html>
