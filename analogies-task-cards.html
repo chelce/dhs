@@ -546,6 +546,12 @@
                     <button class="control-btn" onclick="adjustGridFontSize(0.1)">A+</button>
                 </div>
             </div>
+            <div class="control-group">
+                <label>Auto-Flip:</label>
+                <div class="control-buttons">
+                    <button id="auto-flip-toggle" class="control-btn" onclick="toggleAutoFlip()" style="background-color: #dc3545; color: white; font-weight: bold;">Pause Auto-Flip</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1390,6 +1396,60 @@
             const existing = document.getElementById('grid-font-size-override');
             if (existing) existing.remove();
         }
+
+        // Auto-flip functionality
+        let autoFlipInterval;
+        let autoFlipEnabled = true;
+        let currentCardIndex = 0;
+
+        function startAutoFlip() {
+            if (!autoFlipEnabled) return;
+            
+            const cards = document.querySelectorAll('.task-card:not(.demo-card)');
+            
+            autoFlipInterval = setInterval(() => {
+                if (!autoFlipEnabled) return;
+                
+                if (currentCardIndex < cards.length) {
+                    const card = cards[currentCardIndex];
+                    if (!card.classList.contains('flipped')) {
+                        flipCard(card);
+                    }
+                    currentCardIndex++;
+                } else {
+                    // Reset to start over
+                    currentCardIndex = 0;
+                    // Flip all cards back to front
+                    cards.forEach(card => {
+                        if (card.classList.contains('flipped')) {
+                            flipCard(card);
+                        }
+                    });
+                }
+            }, 30000); // 30 seconds
+        }
+
+        function toggleAutoFlip() {
+            autoFlipEnabled = !autoFlipEnabled;
+            const button = document.getElementById('auto-flip-toggle');
+            
+            if (autoFlipEnabled) {
+                button.textContent = 'Pause Auto-Flip';
+                button.style.backgroundColor = '#dc3545';
+                startAutoFlip();
+            } else {
+                button.textContent = 'Resume Auto-Flip';
+                button.style.backgroundColor = '#28a745';
+                if (autoFlipInterval) {
+                    clearInterval(autoFlipInterval);
+                }
+            }
+        }
+
+        // Start auto-flip when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            startAutoFlip();
+        });
     </script>
 </body>
 </html>
