@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=0.25">
+    <title>Analogies Task Cards - Interactive Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        
+        html {
+            touch-action: manipulation;
+        }
+        
+        /* Control Panel Styles */
+        .control-panel {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+        }
+        
+        .control-section {
+            text-align: center;
+        }
+        
+        .control-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .control-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .control-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s;
+            min-width: 60px;
+        }
+        
+        .control-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        @media (max-width: 768px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px;
+                margin: 15px auto;
+            }
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #45a049;
+        }
+        
+        .nav-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-link {
+            background-color: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .nav-link:hover {
+            background-color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, auto);
+            gap: 30px;
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            min-height: 80vh;
+        }
+        
+        /* Demo Card Styles - Simple and Wide */
+        .demo-card-section {
+            width: 100%;
+            max-width: none;
+            text-align: center;
+            margin: 30px 0;
+            padding: 0 20px;
+        }
+        
+        .demo-card {
+            width: 1000px;
+            max-width: 95vw;
+            height: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 2px solid #dee2e6;
+            position: relative;
+            cursor: pointer;
+            perspective: 1000px;
+            display: inline-block;
+        }
+        
+        .demo-card .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .demo-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .demo-card .card-front,
+        .demo-card .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+        
+        .demo-card .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .task-card {
+            width: 100%;
+            height: auto;
+            min-height: 320px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin: 0;
+        }
+        
+        .task-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .card-inner {
+            width: 100%;
+            height: auto;
+            min-height: fit-content;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, height 0.8s ease;
+        }
+        
+        .card-front, .card-back {
+            width: 100%;
+            min-height: 300px;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: stretch;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-sizing: border-box;
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,240,0.9));
+            transform: rotateY(180deg);
+        }
+        
+        .flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .difficulty {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .difficulty.easy {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .difficulty.medium {
+            background: linear-gradient(45deg, #FF9800, #F57C00);
+            color: white;
+        }
+        
+        .difficulty.hard {
+            background: linear-gradient(45deg, #F44336, #D32F2F);
+            color: white;
+        }
+        
+        .card-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .card-back .card-title {
+            color: white;
+        }
+        
+        .analogy-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        
+        .analogies-container {
+            display: flex;
+            gap: 0;
+            align-items: stretch;
+            position: relative;
+        }
+        
+        .analogy-half {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+        
+        .analogy-half:first-child {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: none;
+        }
+        
+        .analogy-half:last-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: none;
+        }
+        
+        .analogy-divider {
+            width: 4px;
+            min-height: 60%;
+            align-self: center;
+            border-radius: 2px;
+            position: relative;
+        }
+        
+        .analogy-divider.easy {
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+        }
+        
+        .analogy-divider.medium {
+            background: linear-gradient(to bottom, #FF9800, #F57C00);
+        }
+        
+        .analogy-divider.hard {
+            background: linear-gradient(to bottom, #F44336, #D32F2F);
+        }
+        
+        .analogy-prompt {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .analogy-prompt.easy {
+            color: #2d5a3d;
+            background-color: rgba(76, 175, 80, 0.15);
+        }
+        
+        .analogy-prompt.medium {
+            color: #d17000;
+            background-color: rgba(255, 152, 0, 0.15);
+        }
+        
+        .analogy-prompt.hard {
+            color: #c44569;
+            background-color: rgba(244, 67, 54, 0.15);
+        }
+        
+        .analogy-choices {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .analogy-choices li {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.6);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .analogy-choices li:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateX(5px);
+        }
+
+        .choice-letter {
+            font-weight: bold;
+        }
+
+        .easy .choice-letter {
+            color: #2d5a3d;
+        }
+
+        .medium .choice-letter {
+            color: #d17000;
+        }
+
+        .hard .choice-letter {
+            color: #c44569;
+        }
+        
+        .answer-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(76, 175, 80, 0.2);
+            border-radius: 10px;
+            border: 2px solid rgba(76, 175, 80, 0.4);
+        }
+        
+        .answer-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2e7d32;
+            font-size: 1.1em;
+        }
+        
+        .answer {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1b5e20;
+        }
+        
+        .relationship {
+            font-style: italic;
+            color: #4a5568;
+            font-size: 0.95em;
+            margin-left: 10px;
+        }
+        
+        .flip-hint {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 1200px) {
+            .card-container {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: auto;
+                gap: 25px;
+                padding: 20px 15px;
+            }
+            
+            .demo-card {
+                min-height: 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 20px;
+                padding: 15px 10px;
+            }
+            
+            .demo-card {
+                min-height: 320px;
+            }
+            
+            .task-card {
+                min-height: 280px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="card-template-gallery.html" class="back-button">← Back to Gallery</a>
+    
+    <div class="nav-bar">
+        <a href="index.html" class="nav-link">🏠 Home</a>
+        <a href="card-template-gallery.html" class="nav-link">📚 Card Gallery</a>
+        <a href="cooking-class-card-clean.html" class="nav-link">🧩 Logic Puzzles</a>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="control-section">
+            <h3>📚 Demo Card Controls</h3>
+            <div class="control-group">
+                <label>Card Size:</label>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="adjustDemoCardSize(-50)">Smaller</button>
+                    <button class="control-btn" onclick="resetDemoCardSize()">Reset</button>
+                    <button class="control-btn" onclick="adjustDemoCardSize(50)">Larger</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Font Size:</label>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="adjustDemoFontSize(-0.1)">A-</button>
+                    <button class="control-btn" onclick="resetDemoFontSize()">Reset</button>
+                    <button class="control-btn" onclick="adjustDemoFontSize(0.1)">A+</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-section">
+            <h3>📋 Grid Cards Controls</h3>
+            <div class="control-group">
+                <label>Card Size:</label>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="adjustGridCardSize(-30)">Smaller</button>
+                    <button class="control-btn" onclick="resetGridCardSize()">Reset</button>
+                    <button class="control-btn" onclick="adjustGridCardSize(30)">Larger</button>
+                </div>
+            </div>
+            <div class="control-group">
+                <label>Font Size:</label>
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="adjustGridFontSize(-0.1)">A-</button>
+                    <button class="control-btn" onclick="resetGridFontSize()">Reset</button>
+                    <button class="control-btn" onclick="adjustGridFontSize(0.1)">A+</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Card for Teaching -->
+    <div class="demo-card-section">
+        <div class="demo-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty easy" style="background-color: #4CAF50; font-size: 1.5em; margin-bottom: 30px;">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-item">
+                            <div class="analogy-prompt super-easy" style="background-color: #e8f5e8; padding: 30px; font-size: 1.5em;">
+                                Cat is to kitten as dog is to ___
+                            </div>
+                            <div class="choices" style="margin-top: 25px; font-size: 1.3em;">
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">A</span> bone</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">B</span> puppy</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">C</span> bark</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">D</span> house</div>
+                            </div>
+                        </div>
+                        
+                        <div class="divider" style="margin: 35px 0; height: 5px; background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);"></div>
+                        
+                        <div class="analogy-item">
+                            <div class="analogy-prompt easy" style="background-color: #e8f5e8; padding: 30px; font-size: 1.5em;">
+                                Hand is to glove as foot is to ___
+                            </div>
+                            <div class="choices" style="margin-top: 25px; font-size: 1.3em;">
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">A</span> toe</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">B</span> shoe</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">C</span> leg</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">D</span> walk</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty easy" style="background-color: #4CAF50; font-size: 1.5em; margin-bottom: 30px;">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-item">
+                            <div class="analogy-prompt super-easy" style="background-color: #e8f5e8; padding: 30px; font-size: 1.5em;">
+                                Hot is to cold as day is to ___
+                            </div>
+                            <div class="choices" style="margin-top: 25px; font-size: 1.3em;">
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">A</span> sun</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">B</span> light</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">C</span> night</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">D</span> time</div>
+                            </div>
+                        </div>
+                        
+                        <div class="divider" style="margin: 35px 0; height: 5px; background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);"></div>
+                        
+                        <div class="analogy-item">
+                            <div class="analogy-prompt easy" style="background-color: #e8f5e8; padding: 30px; font-size: 1.5em;">
+                                Book is to read as song is to ___
+                            </div>
+                            <div class="choices" style="margin-top: 25px; font-size: 1.3em;">
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">A</span> music</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">B</span> listen</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">C</span> radio</div>
+                                <div class="choice"><span class="choice-letter" style="font-size: 1.2em;">D</span> dance</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-container">
+        
+        <!-- Easy Level Cards -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">hot : cold ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> big : huge</li>
+                                <li><span class="choice-letter">b)</span> happy : sad</li>
+                                <li><span class="choice-letter">c)</span> red : color</li>
+                                <li><span class="choice-letter">d)</span> fast : car</li>
+                                <li><span class="choice-letter">e)</span> loud : music</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">hand : finger ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> book : page</li>
+                                <li><span class="choice-letter">b)</span> car : drive</li>
+                                <li><span class="choice-letter">c)</span> house : live</li>
+                                <li><span class="choice-letter">d)</span> tree : green</li>
+                                <li><span class="choice-letter">e)</span> water : drink</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">dog : bark ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> cat : meow</li>
+                                <li><span class="choice-letter">b)</span> bird : nest</li>
+                                <li><span class="choice-letter">c)</span> fish : water</li>
+                                <li><span class="choice-letter">d)</span> horse : stable</li>
+                                <li><span class="choice-letter">e)</span> cow : farm</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">knife : cut ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> spoon : eat</li>
+                                <li><span class="choice-letter">b)</span> pen : write</li>
+                                <li><span class="choice-letter">c)</span> plate : food</li>
+                                <li><span class="choice-letter">d)</span> cup : drink</li>
+                                <li><span class="choice-letter">e)</span> fork : stab</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">cat : meow ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> dog : pet</li>
+                                <li><span class="choice-letter">b)</span> bird : fly</li>
+                                <li><span class="choice-letter">c)</span> cow : moo</li>
+                                <li><span class="choice-letter">d)</span> fish : swim</li>
+                                <li><span class="choice-letter">e)</span> horse : run</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">day : night ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> sun : moon</li>
+                                <li><span class="choice-letter">b)</span> light : bright</li>
+                                <li><span class="choice-letter">c)</span> morning : time</li>
+                                <li><span class="choice-letter">d)</span> dark : black</li>
+                                <li><span class="choice-letter">e)</span> sleep : bed</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">shoe : foot ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> hat : head</li>
+                                <li><span class="choice-letter">b)</span> shirt : blue</li>
+                                <li><span class="choice-letter">c)</span> sock : toe</li>
+                                <li><span class="choice-letter">d)</span> pants : leg</li>
+                                <li><span class="choice-letter">e)</span> coat : warm</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">bird : fly ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> fish : swim</li>
+                                <li><span class="choice-letter">b)</span> dog : pet</li>
+                                <li><span class="choice-letter">c)</span> cat : house</li>
+                                <li><span class="choice-letter">d)</span> horse : fast</li>
+                                <li><span class="choice-letter">e)</span> cow : milk</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">book : read ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> story : tell</li>
+                                <li><span class="choice-letter">b)</span> music : hear</li>
+                                <li><span class="choice-letter">c)</span> food : eat</li>
+                                <li><span class="choice-letter">d)</span> movie : watch</li>
+                                <li><span class="choice-letter">e)</span> game : fun</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">car : drive ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> bike : ride</li>
+                                <li><span class="choice-letter">b)</span> walk : feet</li>
+                                <li><span class="choice-letter">c)</span> bus : yellow</li>
+                                <li><span class="choice-letter">d)</span> train : fast</li>
+                                <li><span class="choice-letter">e)</span> plane : sky</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty easy">Easy Level</div>
+                    
+                    <div class="analogies-container easy">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">ice : cold ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> fire : hot</li>
+                                <li><span class="choice-letter">b)</span> water : wet</li>
+                                <li><span class="choice-letter">c)</span> snow : white</li>
+                                <li><span class="choice-letter">d)</span> sun : bright</li>
+                                <li><span class="choice-letter">e)</span> wind : blow</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider easy"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt easy">apple : eat ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> banana : yellow</li>
+                                <li><span class="choice-letter">b)</span> water : drink</li>
+                                <li><span class="choice-letter">c)</span> orange : round</li>
+                                <li><span class="choice-letter">d)</span> grape : small</li>
+                                <li><span class="choice-letter">e)</span> tree : grow</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Cards -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">whisper : shout ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> walk : run</li>
+                                <li><span class="choice-letter">b)</span> small : tiny</li>
+                                <li><span class="choice-letter">c)</span> speak : talk</li>
+                                <li><span class="choice-letter">d)</span> quiet : loud</li>
+                                <li><span class="choice-letter">e)</span> voice : sound</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">teacher : classroom ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> student : learn</li>
+                                <li><span class="choice-letter">b)</span> doctor : hospital</li>
+                                <li><span class="choice-letter">c)</span> book : library</li>
+                                <li><span class="choice-letter">d)</span> cook : food</li>
+                                <li><span class="choice-letter">e)</span> work : job</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">chapter : book ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> page : read</li>
+                                <li><span class="choice-letter">b)</span> verse : poem</li>
+                                <li><span class="choice-letter">c)</span> word : sentence</li>
+                                <li><span class="choice-letter">d)</span> story : author</li>
+                                <li><span class="choice-letter">e)</span> library : shelf</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">captain : ship ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> sailor : ocean</li>
+                                <li><span class="choice-letter">b)</span> pilot : airplane</li>
+                                <li><span class="choice-letter">c)</span> passenger : train</li>
+                                <li><span class="choice-letter">d)</span> driver : road</li>
+                                <li><span class="choice-letter">e)</span> boat : water</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">smile : happiness ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> face : head</li>
+                                <li><span class="choice-letter">b)</span> laugh : joke</li>
+                                <li><span class="choice-letter">c)</span> frown : sadness</li>
+                                <li><span class="choice-letter">d)</span> teeth : white</li>
+                                <li><span class="choice-letter">e)</span> mouth : speak</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">key : unlock ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> door : open</li>
+                                <li><span class="choice-letter">b)</span> lock : close</li>
+                                <li><span class="choice-letter">c)</span> question : answer</li>
+                                <li><span class="choice-letter">d)</span> problem : solve</li>
+                                <li><span class="choice-letter">e)</span> rope : untie</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">pencil : write ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> brush : paint</li>
+                                <li><span class="choice-letter">b)</span> paper : read</li>
+                                <li><span class="choice-letter">c)</span> eraser : mistake</li>
+                                <li><span class="choice-letter">d)</span> ruler : measure</li>
+                                <li><span class="choice-letter">e)</span> book : learn</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">butterfly : caterpillar ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> bird : egg</li>
+                                <li><span class="choice-letter">b)</span> frog : tadpole</li>
+                                <li><span class="choice-letter">c)</span> flower : seed</li>
+                                <li><span class="choice-letter">d)</span> tree : branch</li>
+                                <li><span class="choice-letter">e)</span> adult : child</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">seed : tree ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> plant : grow</li>
+                                <li><span class="choice-letter">b)</span> baby : adult</li>
+                                <li><span class="choice-letter">c)</span> small : big</li>
+                                <li><span class="choice-letter">d)</span> root : branch</li>
+                                <li><span class="choice-letter">e)</span> water : soil</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">author : book ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> read : story</li>
+                                <li><span class="choice-letter">b)</span> artist : painting</li>
+                                <li><span class="choice-letter">c)</span> teacher : student</li>
+                                <li><span class="choice-letter">d)</span> writer : pen</li>
+                                <li><span class="choice-letter">e)</span> library : shelf</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty medium">Medium Level</div>
+                    
+                    <div class="analogies-container medium">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">root : tree ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> foundation : building</li>
+                                <li><span class="choice-letter">b)</span> leaf : branch</li>
+                                <li><span class="choice-letter">c)</span> flower : garden</li>
+                                <li><span class="choice-letter">d)</span> water : soil</li>
+                                <li><span class="choice-letter">e)</span> sun : grow</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider medium"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt medium">recipe : cooking ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> food : eating</li>
+                                <li><span class="choice-letter">b)</span> map : traveling</li>
+                                <li><span class="choice-letter">c)</span> kitchen : chef</li>
+                                <li><span class="choice-letter">d)</span> ingredients : dish</li>
+                                <li><span class="choice-letter">e)</span> oven : baking</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Cards -->
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">drip : gush ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> cry : laugh</li>
+                                <li><span class="choice-letter">b)</span> curl : roll</li>
+                                <li><span class="choice-letter">c)</span> stream : tributary</li>
+                                <li><span class="choice-letter">d)</span> dent : destroy</li>
+                                <li><span class="choice-letter">e)</span> bend : angle</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">foundation : building ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> basement : house</li>
+                                <li><span class="choice-letter">b)</span> idea : essay</li>
+                                <li><span class="choice-letter">c)</span> ground : floor</li>
+                                <li><span class="choice-letter">d)</span> base : top</li>
+                                <li><span class="choice-letter">e)</span> start : finish</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">acorn : oak ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> seed : flower</li>
+                                <li><span class="choice-letter">b)</span> egg : bird</li>
+                                <li><span class="choice-letter">c)</span> idea : invention</li>
+                                <li><span class="choice-letter">d)</span> leaf : branch</li>
+                                <li><span class="choice-letter">e)</span> root : soil</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">microscopic : gigantic ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> tiny : huge</li>
+                                <li><span class="choice-letter">b)</span> whisper : roar</li>
+                                <li><span class="choice-letter">c)</span> molecule : mountain</li>
+                                <li><span class="choice-letter">d)</span> ant : elephant</li>
+                                <li><span class="choice-letter">e)</span> second : century</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">spark : flame ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> fire : burn</li>
+                                <li><span class="choice-letter">b)</span> hint : clue</li>
+                                <li><span class="choice-letter">c)</span> match : light</li>
+                                <li><span class="choice-letter">d)</span> warm : hot</li>
+                                <li><span class="choice-letter">e)</span> idea : invention</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">thread : fabric ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> sew : cloth</li>
+                                <li><span class="choice-letter">b)</span> word : sentence</li>
+                                <li><span class="choice-letter">c)</span> needle : sewing</li>
+                                <li><span class="choice-letter">d)</span> cotton : shirt</li>
+                                <li><span class="choice-letter">e)</span> weave : pattern</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">symphony : musician ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> orchestra : conductor</li>
+                                <li><span class="choice-letter">b)</span> novel : author</li>
+                                <li><span class="choice-letter">c)</span> painting : gallery</li>
+                                <li><span class="choice-letter">d)</span> theater : audience</li>
+                                <li><span class="choice-letter">e)</span> instrument : sound</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">democracy : vote ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> monarchy : king</li>
+                                <li><span class="choice-letter">b)</span> republic : president</li>
+                                <li><span class="choice-letter">c)</span> dictatorship : force</li>
+                                <li><span class="choice-letter">d)</span> government : law</li>
+                                <li><span class="choice-letter">e)</span> election : candidate</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-card" onclick="flipCard(this)">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">breeze : hurricane ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> wind : storm</li>
+                                <li><span class="choice-letter">b)</span> calm : chaos</li>
+                                <li><span class="choice-letter">c)</span> air : weather</li>
+                                <li><span class="choice-letter">d)</span> gentle : strong</li>
+                                <li><span class="choice-letter">e)</span> whisper : scream</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">rehearsal : performance ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> practice : game</li>
+                                <li><span class="choice-letter">b)</span> study : test</li>
+                                <li><span class="choice-letter">c)</span> prepare : ready</li>
+                                <li><span class="choice-letter">d)</span> stage : theater</li>
+                                <li><span class="choice-letter">e)</span> actor : audience</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+                
+                <div class="card-back">
+                    <div class="difficulty hard">Hard Level</div>
+                    
+                    <div class="analogies-container hard">
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">labyrinth : maze ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> puzzle : problem</li>
+                                <li><span class="choice-letter">b)</span> riddle : question</li>
+                                <li><span class="choice-letter">c)</span> enigma : mystery</li>
+                                <li><span class="choice-letter">d)</span> challenge : difficulty</li>
+                                <li><span class="choice-letter">e)</span> pathway : route</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="analogy-divider hard"></div>
+                        
+                        <div class="analogy-half">
+                            <div class="analogy-prompt hard">catalyst : reaction ::</div>
+                            <ul class="analogy-choices">
+                                <li><span class="choice-letter">a)</span> ingredient : recipe</li>
+                                <li><span class="choice-letter">b)</span> spark : fire</li>
+                                <li><span class="choice-letter">c)</span> fuel : engine</li>
+                                <li><span class="choice-letter">d)</span> key : lock</li>
+                                <li><span class="choice-letter">e)</span> switch : light</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="flip-hint">Click to see answers</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function flipCard(card) {
+            card.classList.toggle('flipped');
+            
+            // Adjust card height dynamically
+            const cardInner = card.querySelector('.card-inner');
+            const isFlipped = card.classList.contains('flipped');
+            
+            // Force a reflow to ensure smooth transitions
+            setTimeout(() => {
+                cardInner.style.height = 'auto';
+            }, 100);
+        }
+
+        // Add keyboard accessibility
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const focused = document.activeElement;
+                if (focused && focused.classList.contains('task-card')) {
+                    e.preventDefault();
+                    flipCard(focused);
+                }
+            }
+        });
+
+        // Make cards focusable for accessibility
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', 'Flip card to see answers');
+        });
+
+        // Control functions for demo card
+        let demoCardWidth = 1000;
+        let demoFontScale = 1;
+
+        function adjustDemoCardSize(change) {
+            demoCardWidth += change;
+            if (demoCardWidth < 500) demoCardWidth = 500;
+            if (demoCardWidth > 1400) demoCardWidth = 1400;
+            
+            const demoCard = document.querySelector('.demo-card');
+            if (demoCard) {
+                demoCard.style.width = demoCardWidth + 'px';
+                console.log('Demo card resized to:', demoCardWidth + 'px');
+            }
+        }
+
+        function resetDemoCardSize() {
+            demoCardWidth = 1000;
+            const demoCard = document.querySelector('.demo-card');
+            if (demoCard) {
+                demoCard.style.width = '1000px';
+                console.log('Demo card reset to: 1000px');
+            }
+        }
+
+        function adjustDemoFontSize(change) {
+            demoFontScale += change;
+            if (demoFontScale < 0.5) demoFontScale = 0.5;
+            if (demoFontScale > 2) demoFontScale = 2;
+            
+            // Create or update demo-specific font size override
+            const style = document.createElement('style');
+            style.id = 'demo-font-size-override';
+            
+            // Remove existing override
+            const existing = document.getElementById('demo-font-size-override');
+            if (existing) existing.remove();
+            
+            style.textContent = `
+                .demo-card .analogy-prompt {
+                    font-size: ${1.3 * demoFontScale}em !important;
+                }
+                .demo-card .choices {
+                    font-size: ${1.2 * demoFontScale}em !important;
+                }
+                .demo-card .choice-letter {
+                    font-size: ${1.1 * demoFontScale}em !important;
+                }
+                .demo-card .difficulty {
+                    font-size: ${1.3 * demoFontScale}em !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function resetDemoFontSize() {
+            demoFontScale = 1;
+            const existing = document.getElementById('demo-font-size-override');
+            if (existing) existing.remove();
+        }
+
+        // Control functions for grid cards
+        let gridCardScale = 1;
+        let gridFontScale = 1;
+
+        function adjustGridCardSize(change) {
+            // Calculate new scale based on change
+            const scaleChange = change / 320; // Base this on original card size
+            gridCardScale += scaleChange;
+            if (gridCardScale < 0.5) gridCardScale = 0.5;
+            if (gridCardScale > 2.0) gridCardScale = 2.0;
+            
+            const style = document.createElement('style');
+            style.id = 'grid-card-size-override';
+            
+            // Remove existing override
+            const existing = document.getElementById('grid-card-size-override');
+            if (existing) existing.remove();
+            
+            style.textContent = `
+                .card-container .task-card:not(.demo-card) {
+                    transform: scale(${gridCardScale}) !important;
+                    transform-origin: center !important;
+                    margin: ${10 * gridCardScale}px !important;
+                }
+                .card-container {
+                    gap: ${30 * gridCardScale}px !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function resetGridCardSize() {
+            gridCardScale = 1;
+            const existing = document.getElementById('grid-card-size-override');
+            if (existing) existing.remove();
+        }
+
+        function adjustGridFontSize(change) {
+            gridFontScale += change;
+            if (gridFontScale < 0.5) gridFontScale = 0.5;
+            if (gridFontScale > 2) gridFontScale = 2;
+            
+            const style = document.createElement('style');
+            style.id = 'grid-font-size-override';
+            
+            // Remove existing override
+            const existing = document.getElementById('grid-font-size-override');
+            if (existing) existing.remove();
+            
+            style.textContent = `
+                .card-container .task-card:not(.demo-card) {
+                    font-size: ${gridFontScale}em !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function resetGridFontSize() {
+            gridFontScale = 1;
+            const existing = document.getElementById('grid-font-size-override');
+            if (existing) existing.remove();
+        }
+    </script>
+</body>
+</html>

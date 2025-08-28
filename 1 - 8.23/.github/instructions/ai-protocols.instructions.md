@@ -1,6 +1,24 @@
 ---
 applyTo: '**'
 ---
+## **CRITICAL: REQUIREMENTS ADHERENCE PROTOCOL**
+
+### **MANDATORY PRE-DEVELOPMENT CHECKLIST**
+Before implementing ANY feature or architecture decision, AI agents MUST:
+
+1. **READ ALL THREE DOCUMENTATION FILES COMPLETELY**:
+   - `ai-protocols-instructions.md` (this file)
+   - `ai-task-card-guide-instructions.md` 
+   - `ai-teacher-profile-instructions.md`
+
+2. **VERIFY EXPLICIT REQUIREMENTS**: If a specific library, framework, or approach is mentioned in the documentation (e.g., "React Mosaic-based layout system"), it MUST be used exactly as specified.
+
+3. **NO CUSTOM ALTERNATIVES**: Do NOT create custom implementations when documented solutions exist. The requirements are research-backed and carefully chosen.
+
+4. **WHEN IN DOUBT, ASK**: If requirements seem unclear, request clarification rather than making assumptions.
+
+
+
 # AI Development Guide for Educational Materials Creation
 
 **Systematic approaches for AI agents creating task cards, lesson plans, and educational resources for 9th grade English Language Arts**

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opening Activity Logic Puzzles - Answer Key</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #45a049;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .difficulty-section {
+            margin-bottom: 50px;
+        }
+        
+        .difficulty-header {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .difficulty-easy {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .difficulty-medium {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+        
+        .difficulty-hard {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+        }
+        
+        .answer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .answer-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+        
+        .answer-title {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+        
+        .title-easy { color: #4CAF50; }
+        .title-medium { color: #FF9800; }
+        .title-hard { color: #F44336; }
+        
+        .answer-content {
+            margin-bottom: 20px;
+        }
+        
+        .answer-main {
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .answer-main.medium {
+            background: rgba(255, 152, 0, 0.1);
+            border-left-color: #FF9800;
+        }
+        
+        .answer-main.hard {
+            background: rgba(244, 67, 54, 0.1);
+            border-left-color: #F44336;
+        }
+        
+        .explanation {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .explanation ul {
+            margin: 10px 0 10px 20px;
+        }
+        
+        .explanation li {
+            margin-bottom: 5px;
+        }
+        
+        .teaching-notes {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            border: 2px solid #e1bee7;
+        }
+        
+        .teaching-notes h3 {
+            font-family: 'Bebas Neue', Impact, Arial Black, sans-serif;
+            font-size: 2em;
+            color: #7b1fa2;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .note-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .note-item h4 {
+            color: #7b1fa2;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .print-friendly {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .print-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .print-button:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .back-button, .print-friendly {
+                display: none;
+            }
+            
+            .header {
+                background: #667eea;
+                -webkit-print-color-adjust: exact;
+            }
+            
+            .answer-card {
+                break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .difficulty-header {
+                font-size: 2em;
+            }
+            
+            .answer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="opening-activity-interactive-cards.html" class="back-button">← Back to Puzzles</a>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🔑 Answer Key</h1>
+            <p>Opening Activity Logic Puzzles - Teacher Reference Guide</p>
+        </div>
+
+        <!-- Easy Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-easy">
+                ⭐ Easy Level Answers
+            </div>
+            
+            <div class="answer-grid">
+                <div class="answer-card">
+                    <div class="answer-title title-easy">1. The Locker Code</div>
+                    <div class="answer-content">
+                        <div class="answer-main">
+                            Answer: 5-6-5
+                        </div>
+                        <div class="explanation">
+                            <strong>Logic:</strong>
+                            <ul>
+                                <li>Jamie has 5 letters in their name</li>
+                                <li>First number = 5 (letters in "JAMIE")</li>
+                                <li>Second number = 6 (one more than 5)</li>
+                                <li>Third number = 5 (same as first)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-easy">2. The Birthday Party Game</div>
+                    <div class="answer-content">
+                        <div class="answer-main">
+                            Answer: Drew-Alex-Casey-Blake-Jordan
+                            <br><em>(One possible solution)</em>
+                        </div>
+                        <div class="explanation">
+                            <strong>Constraints:</strong>
+                            <ul>
+                                <li>Casey in middle (position 3) ✓</li>
+                                <li>Drew on end (position 1) ✓</li>
+                                <li>Alex and Blake not adjacent ✓</li>
+                                <li>Jordan not next to Casey ✓</li>
+                            </ul>
+                            <em>Other arrangements may also work!</em>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-easy">3. The Color Pattern</div>
+                    <div class="answer-content">
+                        <div class="answer-main">
+                            Answer: Red
+                        </div>
+                        <div class="explanation">
+                            <strong>Pattern:</strong> Red-Blue-Red-Blue-Yellow (repeats every 5)
+                            <br><strong>Math:</strong> 23 ÷ 5 = 4 remainder 3
+                            <br><strong>Result:</strong> Position 3 in pattern = Red
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-medium">
+                ⭐⭐ Medium Level Answers
+            </div>
+            
+            <div class="answer-grid">
+                <div class="answer-card">
+                    <div class="answer-title title-medium">4. The Group Chat Mystery</div>
+                    <div class="answer-content">
+                        <div class="answer-main medium">
+                            Multiple valid solutions possible
+                        </div>
+                        <div class="explanation">
+                            <strong>Example solution:</strong>
+                            <ul>
+                                <li><strong>Ana:</strong> Snapchat (not TikTok/Instagram)</li>
+                                <li><strong>Ben:</strong> YouTube (video content, not short)</li>
+                                <li><strong>Carlos:</strong> Instagram (not messaging app)</li>
+                                <li><strong>Diana:</strong> TikTok (not messaging app)</li>
+                                <li><strong>Elena:</strong> Discord (posts videos daily)</li>
+                            </ul>
+                            <em>Students may find other valid combinations!</em>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-medium">5. The Truth & Lies Game</div>
+                    <div class="answer-content">
+                        <div class="answer-main medium">
+                            Each person tells one truth, one lie
+                        </div>
+                        <div class="explanation">
+                            <strong>True statements:</strong>
+                            <ul>
+                                <li><strong>Maya:</strong> Has a dog (not born in Texas)</li>
+                                <li><strong>Luis:</strong> Plays soccer (Maya doesn't have cat)</li>
+                                <li><strong>Rosa:</strong> Has brown eyes (Luis does play soccer)</li>
+                                <li><strong>Jake:</strong> Maya born in California (Rosa doesn't have blue eyes)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-medium">6. The Playlist Order Mystery</div>
+                    <div class="answer-content">
+                        <div class="answer-main medium">
+                            The Weeknd → Bad Bunny → Taylor Swift → Olivia Rodrigo → Dua Lipa
+                        </div>
+                        <div class="explanation">
+                            <strong>Logic chain:</strong>
+                            <ul>
+                                <li>First song by male artist (The Weeknd)</li>
+                                <li>Bad Bunny right before Taylor Swift</li>
+                                <li>Taylor Swift not first or last</li>
+                                <li>Olivia Rodrigo after Taylor Swift</li>
+                                <li>Dua Lipa last</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header difficulty-hard">
+                ⭐⭐⭐ Hard Level Answers
+            </div>
+            
+            <div class="answer-grid">
+                <div class="answer-card">
+                    <div class="answer-title title-hard">7. The Detective Challenge</div>
+                    <div class="answer-content">
+                        <div class="answer-main hard">
+                            Answer: Alex ate the pizza
+                        </div>
+                        <div class="explanation">
+                            <strong>Deductive reasoning:</strong>
+                            <ul>
+                                <li>Only ONE person tells the truth</li>
+                                <li>If Drew tells truth: Casey lies → Drew innocent</li>
+                                <li>If Blake tells truth: He was in class → Blake innocent</li>
+                                <li>If Alex tells truth: Blake guilty → But Blake was in class (contradiction)</li>
+                                <li><strong>Therefore:</strong> Drew tells truth, Alex lied to frame Blake</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-hard">8. The Secret Word Cipher</div>
+                    <div class="answer-content">
+                        <div class="answer-main hard">
+                            Answer: PIANO
+                        </div>
+                        <div class="explanation">
+                            <strong>Decoding process:</strong>
+                            <ul>
+                                <li>Each letter shifted forward one: A→B, B→C, etc.</li>
+                                <li>To decode, shift backward one position</li>
+                                <li>Q → P, J → I, B → A, O → N, P → O</li>
+                                <li>Result: PIANO</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="answer-card">
+                    <div class="answer-title title-hard">9. The Schedule Solver</div>
+                    <div class="answer-content">
+                        <div class="answer-main hard">
+                            Answer: They cannot meet!
+                        </div>
+                        <div class="explanation">
+                            <strong>Schedule analysis:</strong>
+                            <ul>
+                                <li><strong>Before 2pm:</strong> Carlos working</li>
+                                <li><strong>2-3pm:</strong> Only 1 hour (need 2)</li>
+                                <li><strong>3-5pm:</strong> Ana has soccer practice</li>
+                                <li><strong>4-5:30pm:</strong> Ben at dentist</li>
+                                <li><strong>After 5pm:</strong> Diana must be home</li>
+                            </ul>
+                            <em>No 2-hour window works for all four friends!</em>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teaching Notes -->
+        <div class="teaching-notes">
+            <h3>📚 Teaching Notes & Tips</h3>
+            <div class="notes-grid">
+                <div class="note-item">
+                    <h4>🟢 Easy Problems</h4>
+                    <p>Focus on pattern recognition and simple constraints. Great for building confidence and introducing logical thinking concepts.</p>
+                </div>
+                
+                <div class="note-item">
+                    <h4>🟡 Medium Problems</h4>
+                    <p>Require elimination logic and multi-step reasoning. Encourage students to make charts or lists to track information.</p>
+                </div>
+                
+                <div class="note-item">
+                    <h4>🔴 Hard Problems</h4>
+                    <p>Complex deductive reasoning. Some problems may be impossible - great for teaching that not all problems have solutions!</p>
+                </div>
+                
+                <div class="note-item">
+                    <h4>⏱️ Time Management</h4>
+                    <p>7 minutes per problem for collaborative work. Allow extra time for discussion and explanation of reasoning.</p>
+                </div>
+                
+                <div class="note-item">
+                    <h4>👥 Group Size</h4>
+                    <p>2-4 students work best. Larger groups may have some students not participating actively in the problem-solving.</p>
+                </div>
+                
+                <div class="note-item">
+                    <h4>🎯 Assessment</h4>
+                    <p>Focus on reasoning process rather than just correct answers. Ask students to explain their thinking and methodology.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-friendly">
+            <button class="print-button" onclick="window.print()">🖨️ Print Answer Key</button>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive elements
+        document.querySelectorAll('.answer-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Smooth scroll to sections
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opening Activity Problem Task Cards</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 8.5in;
+            margin: 0 auto;
+        }
+        
+        .task-card {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+            height: 3.5in;
+            width: 4in;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-header {
+            background: #4a90e2;
+            color: white;
+            padding: 8px;
+            margin: -15px -15px 10px -15px;
+            border-radius: 6px 6px 0 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .card-number {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: white;
+            color: #4a90e2;
+            padding: 2px 6px;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .problem-text {
+            font-size: 13px;
+            line-height: 1.4;
+            flex-grow: 1;
+            margin-bottom: 10px;
+        }
+        
+        .answer-section {
+            margin-top: auto;
+            padding-top: 10px;
+            border-top: 1px dashed #ccc;
+            font-size: 11px;
+            color: #666;
+        }
+        
+        .timer {
+            float: right;
+            background: #ff6b6b;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .cards-container {
+                max-width: none;
+                margin: 0;
+            }
+            
+            .task-card {
+                box-shadow: none;
+                break-inside: avoid;
+            }
+        }
+        
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-container">
+        
+        <!-- Card 1 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Group Chat Mystery
+                <span class="card-number">1</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Five friends are in a group chat: Ana, Ben, Carlos, Diana, and Elena. Each person's favorite app is different: TikTok, Instagram, Snapchat, Discord, or YouTube. 
+                <br>• Ana doesn't use TikTok or Instagram
+                <br>• Ben loves video content but not short videos
+                <br>• Carlos and Diana both hate messaging apps
+                <br>• Elena posts dance videos daily
+                <br><br>
+                <strong>Who uses which app?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Locker Code Pattern
+                <span class="card-number">2</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Jamie forgot their locker combination but remembers the pattern: "It's three numbers. The first number is how many letters are in my first name. The second number is one more than the first. The third number is the same as the first."
+                <br><br>
+                If Jamie's name is "JAMIE," what's the combination?
+            </div>
+            <div class="answer-section">
+                Answer: ___ - ___ - ___
+            </div>
+        </div>
+        
+        <!-- Card 3 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Seating Chart Puzzle
+                <span class="card-number">3</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Five students need to sit in a row for the class photo: Alex, Blake, Casey, Drew, and Jordan. The rules are:
+                <br>• Alex won't sit next to Blake
+                <br>• Casey must sit in the middle
+                <br>• Drew wants to sit on one end
+                <br>• Jordan refuses to sit next to Casey
+                <br><br>
+                <strong>What's one possible seating order?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 4 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Playlist Order Mystery
+                <span class="card-number">4</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Alejandro made a 5-song playlist but the songs got shuffled. He remembers:
+                <br>• The Taylor Swift song isn't first or last
+                <br>• Bad Bunny comes right before the Taylor Swift song
+                <br>• Olivia Rodrigo is somewhere after Taylor Swift
+                <br>• The first song is by a male artist
+                <br>• Dua Lipa is the last song
+                <br><br>
+                <strong>What's the correct order?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 5 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Truth or Lie Challenge
+                <span class="card-number">5</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Four friends are playing a truth/lie game. Each person makes two statements - one true, one false:
+                <br><strong>Maya:</strong> "I have a dog. I was born in Texas."
+                <br><strong>Luis:</strong> "I play soccer. Maya has a cat."
+                <br><strong>Rosa:</strong> "Luis doesn't play soccer. I have brown eyes."
+                <br><strong>Jake:</strong> "Rosa has blue eyes. Maya was born in California."
+                <br><br>
+                <strong>What's true about each person?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 6 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Lunch Trade Dilemma
+                <span class="card-number">6</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Five friends want to trade lunch items. Each person has one thing they want to get rid of and one thing they want:
+                <br>• Ana has chips, wants cookies
+                <br>• Ben has cookies, wants fruit
+                <br>• Carlos has fruit, wants sandwich
+                <br>• Diana has sandwich, wants juice
+                <br>• Elena has juice, wants chips
+                <br><br>
+                <strong>Can everyone get what they want? How?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 7 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Weekend Plans Puzzle
+                <span class="card-number">7</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Isabella has three plans this weekend but can only do one each day (Friday, Saturday, Sunday):
+                <br>• The mall trip must be on a weekend day
+                <br>• The movie is not on Friday
+                <br>• If she goes to the beach, it has to be the day before the mall
+                <br>• She can't do the movie and beach on consecutive days
+                <br><br>
+                <strong>What should she do each day?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 8 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Friend Group Detective Story
+                <span class="card-number">8</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Someone ate the last slice of pizza at lunch. There are 4 suspects: Alex, Blake, Casey, and Drew. Here are the clues:
+                <br>• Alex says: "Blake did it"
+                <br>• Blake says: "I was in math class"
+                <br>• Casey says: "Drew did it"
+                <br>• Drew says: "Casey is lying"
+                <br>Only one person is telling the truth.
+                <br><br>
+                <strong>Who ate the pizza?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 9 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Color Pattern Code
+                <span class="card-number">9</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                The art teacher left a coded message using colored squares: Red-Blue-Red-Blue-Yellow-Red-Blue-Red-Blue-Yellow...
+                <br><br>
+                The pattern repeats every 5 colors. If you keep following the pattern, what color will be in the 23rd position?
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 10 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Class Pet Mystery
+                <span class="card-number">10</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Four students each brought a different pet to show: a hamster, a lizard, a bird, and a fish. Match each student to their pet:
+                <br>• Maria's pet doesn't need a cage
+                <br>• The boy brought something that flies
+                <br>• Carlos brought something cold-blooded
+                <br>• The lizard belongs to someone whose name starts with 'C'
+                <br>• Ana didn't bring the hamster
+                <br><br>
+                <strong>Who brought which pet?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="page-break"></div>
+    
+    <div class="cards-container">
+        
+        <!-- Card 11 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Birthday Invitation Code
+                <span class="card-number">11</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Sofia is sending coded birthday invitations. Each friend gets a different symbol:
+                <br>• Circle = Come at 2pm
+                <br>• Square = Come at 3pm  
+                <br>• Triangle = Come at 4pm
+                <br>• Star = Bring snacks
+                <br>• Heart = Bring drinks
+                <br><br>
+                If Maya gets "Circle + Star" and Carlos gets "Triangle + Heart," what should they each do?
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 12 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Phone App Mystery
+                <span class="card-number">12</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Someone's phone home screen has 4 apps in the bottom row, but they're all mixed up. The clues are:
+                <br>• Instagram is next to TikTok
+                <br>• Messages is on one end
+                <br>• TikTok is not next to Messages
+                <br>• Spotify is between two other apps
+                <br><br>
+                <strong>What's the correct order from left to right?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 13 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Group Project Roles
+                <span class="card-number">13</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Five students need different roles for their group project: Presenter, Researcher, Designer, Writer, and Organizer. Based on their preferences:
+                <br>• Alex hates public speaking
+                <br>• Blake loves making things look pretty
+                <br>• Casey is super organized
+                <br>• Drew is great at finding information
+                <br>• Elena loves talking to groups
+                <br><br>
+                <strong>Who should do what role?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 14 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Schedule Conflict Solver
+                <span class="card-number">14</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Four friends want to hang out, but they each have one commitment:
+                <br>• Ana: Soccer practice at 3pm
+                <br>• Ben: Dentist appointment at 4pm  
+                <br>• Carlos: Work shift ends at 2pm
+                <br>• Diana: Has to be home by 5pm
+                <br>They need 2 hours together. When can they all meet?
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 15 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Emoji Message Decoder
+                <span class="card-number">15</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Your friend sent you a coded message using emojis:
+                <br>🏠 + 🚗 + 🕒
+                <br><br>
+                The code is: 🏠 = "Meet me", 🚗 = "at the", 🕒 = time on the clock when both hands point to 12.
+                <br><br>
+                <strong>What's the full message?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 16 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Viral Video Pattern
+                <span class="card-number">16</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                A TikTok video follows this sharing pattern:
+                <br>• Day 1: 1 person shares it
+                <br>• Day 2: Those people each share it with 2 friends  
+                <br>• Day 3: Those people each share it with 2 friends
+                <br>• And so on...
+                <br><br>
+                <strong>On which day will more than 10 people share it?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: Day _____
+            </div>
+        </div>
+        
+        <!-- Card 17 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Locker Number Riddle
+                <span class="card-number">17</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Someone forgot their locker number but remembers these clues:
+                <br>• It's a 2-digit number
+                <br>• Both digits are the same
+                <br>• When you add the digits together, you get 8
+                <br>• It's less than 50
+                <br><br>
+                <strong>What's the locker number?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: _____
+            </div>
+        </div>
+        
+        <!-- Card 18 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Secret Word Game
+                <span class="card-number">18</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                Your teacher wrote a secret word using this code: Each letter becomes the next letter in the alphabet (A→B, B→C, etc.). The coded word is: QJABA
+                <br><br>
+                <strong>What's the original secret word?</strong>
+                <br><br>
+                <em>Hint: Work backwards!</em>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 19 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Family Language Tree
+                <span class="card-number">19</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                In Rosa's family tree, everyone speaks at least one language:
+                <br>• Grandparents: Only Spanish
+                <br>• Parents: Spanish + English  
+                <br>• Rosa's generation: Some speak all three (Spanish, English, Portuguese)
+                <br>• Rosa speaks Portuguese but her brother doesn't
+                <br>• Her cousin speaks the same languages as Rosa
+                <br><br>
+                <strong>Who speaks what languages?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+        <!-- Card 20 -->
+        <div class="task-card">
+            <div class="card-header">
+                The Seating Chart Challenge
+                <span class="card-number">20</span>
+                <span class="timer">7 min</span>
+            </div>
+            <div class="problem-text">
+                For the class party, 6 students need to sit around a circular table. The rules are:
+                <br>• Best friends Ana and Maria must sit next to each other
+                <br>• Ben won't sit next to Carlos (they had a fight)
+                <br>• Diana wants to sit across from Ana
+                <br>• Elena is happy anywhere
+                <br><br>
+                <strong>What's one possible seating arrangement?</strong>
+            </div>
+            <div class="answer-section">
+                Answer: ________________
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Answer Key on Last Page -->
+    <div class="page-break"></div>
+    
+    <div style="padding: 20px; max-width: 8.5in; margin: 0 auto;">
+        <h2 style="text-align: center; color: #4a90e2; margin-bottom: 30px;">Answer Key - Opening Activity Problem Cards</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; font-size: 14px;">
+            <div>
+                <h3>Cards 1-10</h3>
+                <ol>
+                    <li><strong>Group Chat Mystery:</strong> Ana=Snapchat, Ben=YouTube, Carlos=Instagram, Diana=TikTok, Elena=TikTok (multiple solutions)</li>
+                    <li><strong>Locker Code Pattern:</strong> 5-6-5</li>
+                    <li><strong>Seating Chart Puzzle:</strong> Multiple solutions (e.g., Drew-Alex-Casey-Blake-Jordan)</li>
+                    <li><strong>Playlist Order Mystery:</strong> [Male artist]-Bad Bunny-Taylor Swift-Olivia Rodrigo-Dua Lipa</li>
+                    <li><strong>Truth or Lie Challenge:</strong> Requires logical deduction (multiple solutions)</li>
+                    <li><strong>Lunch Trade Dilemma:</strong> Yes, everyone can trade in a circle</li>
+                    <li><strong>Weekend Plans Puzzle:</strong> Friday=Beach, Saturday=Mall, Sunday=Movie</li>
+                    <li><strong>Friend Group Detective:</strong> Alex ate the pizza</li>
+                    <li><strong>Color Pattern Code:</strong> Yellow (23rd position)</li>
+                    <li><strong>Class Pet Mystery:</strong> Maria=fish, [boy]=bird, Carlos=lizard, Ana=hamster</li>
+                </ol>
+            </div>
+            
+            <div>
+                <h3>Cards 11-20</h3>
+                <ol start="11">
+                    <li><strong>Birthday Invitation Code:</strong> Maya: Come at 2pm + Bring snacks; Carlos: Come at 4pm + Bring drinks</li>
+                    <li><strong>Phone App Mystery:</strong> Messages-Instagram-TikTok-Spotify (one solution)</li>
+                    <li><strong>Group Project Roles:</strong> Elena=Presenter, Drew=Researcher, Blake=Designer, Alex=Writer, Casey=Organizer</li>
+                    <li><strong>Schedule Conflict Solver:</strong> Cannot meet (no 2-hour window works for all)</li>
+                    <li><strong>Emoji Message Decoder:</strong> "Meet me at the 12 o'clock" (or "Meet me at noon")</li>
+                    <li><strong>Viral Video Pattern:</strong> Day 5 (16 people share it)</li>
+                    <li><strong>Locker Number Riddle:</strong> 44</li>
+                    <li><strong>Secret Word Game:</strong> PIANO</li>
+                    <li><strong>Family Language Tree:</strong> Logic-based family tree (multiple valid solutions)</li>
+                    <li><strong>Seating Chart Challenge:</strong> Multiple circular arrangements possible</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background-color: #f0f8ff; border-left: 4px solid #4a90e2;">
+            <h3>Teaching Notes:</h3>
+            <ul>
+                <li><strong>Group Size:</strong> 2-4 students per card works best</li>
+                <li><strong>Materials:</strong> Provide scratch paper and basic calculators if needed</li>
+                <li><strong>Differentiation:</strong> Some problems have multiple valid solutions - celebrate different approaches</li>
+                <li><strong>Discussion:</strong> Have groups share their solving strategies, not just answers</li>
+                <li><strong>Extension:</strong> Challenge early finishers to create their own similar problems</li>
+            </ul>
+        </div>
+    </div>
+    
+</body>
+</html>
