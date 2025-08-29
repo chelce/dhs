@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Calendar & Reflections</title>
+    <!-- Harmony OS Font -->
+    <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- TipTap Editor Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/index.umd.min.js"></script>
+    
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 20px;
             background-color: #f5f5f5;
         }
@@ -387,6 +396,86 @@
         .export-section {
             margin-left: auto;
         }
+        
+        /* TipTap Editor Styles */
+        .tiptap-editor {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: white;
+        }
+        
+        .tiptap-editor:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .tiptap-editor p {
+            margin: 0 0 8px 0;
+        }
+        
+        .tiptap-editor h3 {
+            margin: 12px 0 6px 0;
+            font-size: 16px;
+        }
+        
+        .tiptap-editor ul, .tiptap-editor ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        .tiptap-editor strong {
+            font-weight: 600;
+        }
+        
+        /* Event Details Modal */
+        .event-details-modal .modal-content {
+            max-width: 800px;
+        }
+        
+        .event-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .event-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .event-class-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .notes-section {
+            margin-top: 20px;
+        }
+        
+        .notes-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .event-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -507,7 +596,12 @@
             <form id="eventForm">
                 <div class="form-group">
                     <label for="eventText">Event Text:</label>
-                    <textarea id="eventText" placeholder="Enter event description..." required></textarea>
+                    <input type="text" id="eventText" placeholder="Enter event title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="eventNotes">Reflection Notes:</label>
+                    <div id="eventNotesEditor" class="tiptap-editor"></div>
+                    <input type="hidden" id="eventNotes">
                 </div>
                 <div class="form-group">
                     <label for="eventClass">Class/Type:</label>
@@ -536,12 +630,39 @@
         </div>
     </div>
     
+    <!-- Event Details Modal -->
+    <div id="eventDetailsModal" class="modal event-details-modal">
+        <div class="modal-content">
+            <div class="event-details-header">
+                <div>
+                    <div class="event-title" id="eventDetailsTitle"></div>
+                    <div class="event-meta" id="eventDetailsMeta"></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="event-class-badge" id="eventDetailsClassBadge"></span>
+                    <span class="close" onclick="closeEventDetailsModal()">&times;</span>
+                </div>
+            </div>
+            <div class="notes-section">
+                <label class="notes-label">Reflection Notes:</label>
+                <div id="eventDetailsNotes" class="tiptap-editor"></div>
+            </div>
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn btn-secondary" onclick="editEvent()">Edit Event</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEventDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         // Supabase Configuration
         const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co'
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk'
         
         let supabase = null;
+        let notesEditor = null;
+        let detailsEditor = null;
+        let currentEvent = null;
         
         // Initialize Supabase (will be set up after you create the project)
         function initSupabase() {
@@ -600,10 +721,37 @@
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
             initSupabase();
+            initTipTapEditors();
             generateCalendar();
             loadCalendarData();
             setupFilterListeners();
         });
+        
+        // Initialize TipTap editors
+        function initTipTapEditors() {
+            // Editor for adding/editing events
+            notesEditor = new window.Tiptap.Editor({
+                element: document.getElementById('eventNotesEditor'),
+                extensions: [
+                    window.TiptapStarterKit.StarterKit,
+                    window.TiptapPlaceholder.Placeholder.configure({
+                        placeholder: 'Add reflection notes about this lesson/activity...'
+                    })
+                ],
+                content: '',
+                onUpdate: ({ editor }) => {
+                    document.getElementById('eventNotes').value = editor.getHTML();
+                }
+            });
+            
+            // Read-only editor for viewing event details
+            detailsEditor = new window.Tiptap.Editor({
+                element: document.getElementById('eventDetailsNotes'),
+                extensions: [window.TiptapStarterKit.StarterKit],
+                editable: false,
+                content: ''
+            });
+        }
         
         // Generate the 7-week calendar dynamically
         function generateCalendar() {
@@ -680,31 +828,42 @@
             
             // August 23, 2025 events
             if (dateStr === '2025-08-23') {
-                addEventElement(dayCell, 'Reflection: Logic puzzles, Scattergories success', 'reflection', false, true);
-                addEventElement(dayCell, "Baker's problem", '2a', false, true);
+                addEventElement(dayCell, 'Logic Puzzle Opening Activity', '2a', false, true, 
+                    '<h3>What Worked Well:</h3><p>• Scattergories was a huge success</p><p>• Students engaged well with logic puzzles</p><h3>Notes for Next Time:</h3><p>• Baker\'s problem needs more scaffolding</p>');
+                addEventElement(dayCell, "Baker's Problem Activity", '2a', false, true,
+                    '<h3>Activity Notes:</h3><p>• Problem was challenging for students</p><p>• Need to provide more guidance next time</p><p>• Consider breaking into smaller steps</p>');
             }
             
-            // August 28, 2025 events
+            // August 28, 2025 events  
             if (dateStr === '2025-08-28') {
-                addEventElement(dayCell, 'Reflection: Analogies lesson', 'reflection', false, true);
-                addEventElement(dayCell, 'Analogies intro', 'ap', false, true);
-                addEventElement(dayCell, 'Analogies intro', '2a', false, true);
+                addEventElement(dayCell, 'Analogies Introduction', 'ap', false, true,
+                    '<h3>AP Class - Analogies Lesson:</h3><p>• Introduced analogy concepts</p><p>• Students seemed to grasp the basics</p><p>• Need more practice examples</p>');
+                addEventElement(dayCell, 'Analogies Introduction', '2a', false, true,
+                    '<h3>2A Class - Analogies Lesson:</h3><p>• Same content as AP but adapted pace</p><p>• Students needed more explanation</p><p>• Consider visual aids next time</p>');
             }
             
             // August 29, 2025 events
             if (dateStr === '2025-08-29') {
-                addEventElement(dayCell, 'Reflection: ABC game, Analogies, Rhetorical situation', 'reflection', false, true);
-                addEventElement(dayCell, 'ABC game + Analogies start', '2a', false, true);
-                addEventElement(dayCell, 'Rhetorical situation, profiling', 'ap', false, true);
-                addEventElement(dayCell, 'ABC game + Analogies', '4b', false, true);
+                addEventElement(dayCell, 'ABC Game + Analogies', '2a', false, true,
+                    '<h3>2A Today:</h3><p>• ABC game for kitchen items + things smaller than golf ball</p><p>• Started analogies (5 minutes only)</p><p>• Good pacing, will continue analogies next class</p>');
+                    
+                addEventElement(dayCell, 'Rhetorical Situation Lesson', 'ap', false, true,
+                    '<h3>AP Today:</h3><p>• Covered rhetorical triangle (SPACE[cat])</p><p>• In/out group, demographics, psychographics</p><p>• Self-profiling exercise went well</p><p>• Students work more efficiently than expected - felt scrambling</p><p>• Depth uncertain, need to assess better</p><p><strong>Next:</strong> Profile targeting exercise</p>');
+                    
+                addEventElement(dayCell, 'ABC Game + Analogies', '4b', false, true,
+                    '<h3>4B Today:</h3><p>• ABC game (kitchen items only) - took unexpectedly long</p><p>• Got through many analogies but 1/3 of class needs more content</p><p><strong>Next:</strong> Need more analogies or additional activity for faster finishers</p>');
+                    
+                addEventElement(dayCell, 'Hearts & Dollars Launch', 'reflection', false, true,
+                    '<h3>System Launch:</h3><p>• Introduced hearts & dollars system today</p><p>• Started paying students in 2A and 4B</p><p>• B day students all paid up</p><p>• NFC key integration postponed</p><p><strong>Issue:</strong> Need better group adherence enforcement - consider heart penalty</p>');
             }
         }
         
         // Helper function to create event elements
-        function addEventElement(parentCell, text, eventClass, isTentative = false, isHardcoded = false) {
+        function addEventElement(parentCell, text, eventClass, isTentative = false, isHardcoded = false, notes = '') {
             const eventDiv = document.createElement('div');
             eventDiv.className = `event class-${eventClass}`;
             eventDiv.setAttribute('data-class', eventClass);
+            eventDiv.setAttribute('data-notes', notes || '');
             
             if (isTentative) {
                 eventDiv.classList.add('tentative');
@@ -714,12 +873,76 @@
                 eventDiv.setAttribute('data-hardcoded', 'true');
             }
             
+            // Add click handler to show details
+            eventDiv.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('delete-btn')) {
+                    showEventDetails(eventDiv, text, eventClass, notes);
+                }
+            });
+            
             eventDiv.innerHTML = `
                 ${text}
                 <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
             `;
             
             parentCell.appendChild(eventDiv);
+        }
+        
+        // Show event details modal
+        function showEventDetails(eventElement, title, eventClass, notes) {
+            currentEvent = eventElement;
+            
+            // Set title and class badge
+            document.getElementById('eventDetailsTitle').textContent = title;
+            document.getElementById('eventDetailsMeta').textContent = `Class: ${getClassDisplayName(eventClass)}`;
+            
+            // Set class badge color and text
+            const badge = document.getElementById('eventDetailsClassBadge');
+            badge.textContent = getClassDisplayName(eventClass);
+            badge.className = `event-class-badge class-${eventClass}`;
+            
+            // Load notes into editor
+            detailsEditor.commands.setContent(notes || '<p>No reflection notes yet.</p>');
+            
+            // Show modal
+            document.getElementById('eventDetailsModal').style.display = 'block';
+        }
+        
+        // Helper function to get display name for class
+        function getClassDisplayName(eventClass) {
+            const classNames = {
+                '2a': '2A (Purple)',
+                '2b': '2B (Blue)', 
+                '3b': '3B (Green)',
+                'ap': 'AP (Orange)',
+                '4b': '4B (Hot Pink)',
+                'reflection': 'Reflection'
+            };
+            return classNames[eventClass] || eventClass;
+        }
+        
+        // Close event details modal
+        function closeEventDetailsModal() {
+            document.getElementById('eventDetailsModal').style.display = 'none';
+            currentEvent = null;
+        }
+        
+        // Edit current event
+        function editEvent() {
+            if (currentEvent) {
+                const title = document.getElementById('eventDetailsTitle').textContent;
+                const eventClass = currentEvent.getAttribute('data-class');
+                const notes = currentEvent.getAttribute('data-notes');
+                
+                // Populate edit form
+                document.getElementById('eventText').value = title;
+                document.getElementById('eventClass').value = eventClass;
+                notesEditor.commands.setContent(notes || '');
+                
+                // Close details modal and open edit modal
+                closeEventDetailsModal();
+                document.getElementById('eventModal').style.display = 'block';
+            }
         }
         
         // Update week range display
@@ -746,6 +969,10 @@
         function closeModal() {
             document.getElementById('eventModal').style.display = 'none';
             document.getElementById('eventForm').reset();
+            if (notesEditor) {
+                notesEditor.commands.clearContent();
+                document.getElementById('eventNotes').value = '';
+            }
         }
         
         function deleteEvent(button) {
@@ -774,6 +1001,7 @@
             const eventText = document.getElementById('eventText').value;
             const eventClass = document.getElementById('eventClass').value;
             const eventType = document.getElementById('eventType').value;
+            const eventNotes = document.getElementById('eventNotes').value;
             
             // Find the day cell for the selected date
             const dayCells = document.querySelectorAll('.day-cell');
@@ -791,7 +1019,7 @@
             });
             
             if (targetCell) {
-                addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false);
+                addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false, eventNotes);
                 saveCalendarData();
             }
             
@@ -828,6 +1056,7 @@
                             const text = event.textContent.replace('×', '').trim();
                             const className = event.getAttribute('data-class');
                             const isTentative = event.classList.contains('tentative');
+                            const notes = event.getAttribute('data-notes') || '';
                             
                             // Find the corresponding date
                             weeks.forEach(week => {
@@ -841,6 +1070,7 @@
                                             event_text: text,
                                             event_class: className,
                                             is_tentative: isTentative,
+                                            notes: notes,
                                             created_at: new Date().toISOString()
                                         });
                                     }
@@ -903,7 +1133,7 @@
                     dayCells.forEach(cell => {
                         const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
                         if (cellDayNumber === dayNumber) {
-                            addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false);
+                            addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
                         }
                     });
                 });
