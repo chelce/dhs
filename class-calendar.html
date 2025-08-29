@@ -1331,107 +1331,20 @@
             });
         }
         
-        // Data persistence with Supabase
-        async function saveCalendarData() {
-            if (!supabase) {
-                // Fallback to localStorage if Supabase not configured
-                saveToLocalStorage();
-                return;
-            }
+        // Export/Import functionality
+        function exportCalendar() {
+            const weeks = generateWeeks();
+            const startDate = weeks[0][0].date;
+            const endDate = weeks[6][6].date;
             
-            try {
-                // Clear existing events for this month/year
-                await supabase
-                    .from('calendar_events')
-                    .delete()
-                    .eq('month', currentMonth)
-                    .eq('year', currentYear);
-                
-                // Collect all events
-                const eventsToSave = [];
-                document.querySelectorAll('.day-cell').forEach(cell => {
-                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
-                    
-                    cell.querySelectorAll('.event').forEach(event => {
-                        const text = event.textContent.replace('×', '').trim();
-                        const className = event.getAttribute('data-class');
-                        const isTentative = event.classList.contains('tentative');
-                        
-                        eventsToSave.push({
-                            year: currentYear,
-                            month: currentMonth,
-                            day: dayNumber,
-                            event_text: text,
-                            event_class: className,
-                            is_tentative: isTentative,
-                            created_at: new Date().toISOString()
-                        });
-                    });
-                });
-                
-                // Insert new events
-                if (eventsToSave.length > 0) {
-                    const { error } = await supabase
-                        .from('calendar_events')
-                        .insert(eventsToSave);
-                    
-                    if (error) throw error;
-                }
-                
-                console.log('Calendar saved to Supabase successfully');
-            } catch (error) {
-                console.error('Error saving to Supabase:', error);
-                // Fallback to localStorage
-                saveToLocalStorage();
-            }
-        }
-        
-        async function loadCalendarData() {
-            if (!supabase) {
-                // Fallback to localStorage if Supabase not configured
-                loadFromLocalStorage();
-                return;
-            }
-            
-            try {
-                const { data, error } = await supabase
-                    .from('calendar_events')
-                    .select('*')
-                    .eq('month', currentMonth)
-                    .eq('year', currentYear);
-                
-                if (error) throw error;
-                
-                // Clear existing events (except hardcoded ones)
-                document.querySelectorAll('.event').forEach(event => {
-                    if (!event.hasAttribute('data-hardcoded')) {
-                        event.remove();
-                    }
-                });
-                
-                // Add events from database
-                data.forEach(eventData => {
-                    addEventToDOM(eventData.day, eventData.event_text, eventData.event_class, eventData.is_tentative);
-                });
-                
-                console.log('Calendar loaded from Supabase successfully');
-            } catch (error) {
-                console.error('Error loading from Supabase:', error);
-                // Fallback to localStorage
-                loadFromLocalStorage();
-            }
-        }
-        
-        // Fallback localStorage functions
-        function saveToLocalStorage() {
             const calendarData = {
-                month: currentMonth,
-                year: currentYear,
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
                 events: {}
             };
             
             document.querySelectorAll('.day-cell').forEach(cell => {
-                const dayNumber = cell.querySelector('.day-number').textContent;
+                const cellDate = cell.getAttribute('data-date');
                 const events = [];
                 
                 cell.querySelectorAll('.event').forEach(event => {
@@ -1439,76 +1352,29 @@
                         const text = event.textContent.replace('×', '').trim();
                         const className = event.getAttribute('data-class');
                         const isTentative = event.classList.contains('tentative');
+                        const notes = event.getAttribute('data-notes') || '';
                         
                         events.push({
                             text: text,
                             class: className,
-                            tentative: isTentative
+                            tentative: isTentative,
+                            notes: notes
                         });
                     }
                 });
                 
                 if (events.length > 0) {
-                    calendarData.events[dayNumber] = events;
+                    calendarData.events[cellDate] = events;
                 }
             });
             
-            localStorage.setItem('teachingCalendar', JSON.stringify(calendarData));
-        }
-        
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('teachingCalendar');
-            if (saved) {
-                const data = JSON.parse(saved);
-                
-                // Add events from localStorage
-                Object.keys(data.events || {}).forEach(day => {
-                    data.events[day].forEach(event => {
-                        addEventToDOM(parseInt(day), event.text, event.class, event.tentative);
-                    });
-                });
-            }
-        }
-        
-        // Helper function to add event to DOM
-        function addEventToDOM(day, text, className, isTentative = false) {
-            const dayCells = document.querySelectorAll('.day-cell');
-            let targetCell = null;
-            
-            dayCells.forEach(cell => {
-                const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
-                if (dayNumber === day) {
-                    targetCell = cell;
-                }
-            });
-            
-            if (targetCell) {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = `event class-${className}`;
-                eventDiv.setAttribute('data-class', className);
-                if (isTentative) {
-                    eventDiv.classList.add('tentative');
-                }
-                
-                eventDiv.innerHTML = `
-                    ${text}
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                `;
-                
-                targetCell.appendChild(eventDiv);
-            }
-        }
-        
-        // Export/Import functionality
-        function exportCalendar() {
-            saveCalendarData();
-            const data = localStorage.getItem('teachingCalendar');
-            const blob = new Blob([data], { type: 'application/json' });
+            const dataStr = JSON.stringify(calendarData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = `teaching-calendar-${currentYear}-${currentMonth + 1}.json`;
+            a.download = `teaching-calendar-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
