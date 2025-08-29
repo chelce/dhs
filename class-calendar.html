@@ -648,6 +648,7 @@
                 <div id="eventDetailsNotes" class="tiptap-editor"></div>
             </div>
             <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn btn-primary" onclick="saveEventNotes()">Save Notes</button>
                 <button type="button" class="btn btn-secondary" onclick="editEvent()">Edit Event</button>
                 <button type="button" class="btn btn-secondary" onclick="closeEventDetailsModal()">Close</button>
             </div>
@@ -744,11 +745,15 @@
                 }
             });
             
-            // Read-only editor for viewing event details
+            // Editable editor for viewing and editing event details
             detailsEditor = new window.Tiptap.Editor({
                 element: document.getElementById('eventDetailsNotes'),
-                extensions: [window.TiptapStarterKit.StarterKit],
-                editable: false,
+                extensions: [
+                    window.TiptapStarterKit.StarterKit,
+                    window.TiptapPlaceholder.Placeholder.configure({
+                        placeholder: 'Add your reflection notes here...'
+                    })
+                ],
                 content: ''
             });
         }
@@ -927,6 +932,16 @@
             currentEvent = null;
         }
         
+        // Save notes for current event
+        function saveEventNotes() {
+            if (currentEvent && detailsEditor) {
+                const newNotes = detailsEditor.getHTML();
+                currentEvent.setAttribute('data-notes', newNotes);
+                saveCalendarData();
+                alert('Notes saved successfully!');
+            }
+        }
+
         // Edit current event
         function editEvent() {
             if (currentEvent) {
