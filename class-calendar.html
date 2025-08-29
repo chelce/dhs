@@ -914,7 +914,9 @@
             // Add click handler to show details
             eventDiv.addEventListener('click', (e) => {
                 if (!e.target.classList.contains('delete-btn')) {
-                    showEventDetails(eventDiv, text, eventClass, notes);
+                    // Get the current notes from the data attribute
+                    const currentNotes = eventDiv.getAttribute('data-notes') || notes || '';
+                    showEventDetails(eventDiv, text, eventClass, currentNotes);
                 }
             });
             
@@ -930,6 +932,8 @@
         function showEventDetails(eventElement, title, eventClass, notes) {
             currentEvent = eventElement;
             
+            console.log('showEventDetails called with:', { title, eventClass, notes });
+            
             // Set title and class badge
             document.getElementById('eventDetailsTitle').textContent = title;
             document.getElementById('eventDetailsMeta').textContent = `Class: ${getClassDisplayName(eventClass)}`;
@@ -940,13 +944,27 @@
             badge.className = `event-class-badge class-${eventClass}`;
             
             // Load notes into editor
+            console.log('Loading notes:', notes);
             if (detailsEditor) {
-                detailsEditor.commands.setContent(notes || '<p>No reflection notes yet.</p>');
+                // Ensure editor is editable
+                detailsEditor.setEditable(true);
+                // Set content with proper formatting
+                if (notes && notes.trim() !== '') {
+                    detailsEditor.commands.setContent(notes);
+                } else {
+                    detailsEditor.commands.setContent('<p>No reflection notes yet. Click here to add notes...</p>');
+                }
             } else {
                 // Fallback for when TipTap isn't available
                 const notesElement = document.getElementById('eventDetailsNotes');
                 if (notesElement) {
-                    notesElement.innerHTML = notes || '<p>No reflection notes yet.</p>';
+                    if (notes && notes.trim() !== '') {
+                        notesElement.innerHTML = notes;
+                    } else {
+                        notesElement.innerHTML = '<p>No reflection notes yet. Click here to add notes...</p>';
+                    }
+                    // Make it editable even without TipTap
+                    notesElement.contentEditable = true;
                 }
             }
             
@@ -986,9 +1004,21 @@
                         newNotes = notesElement.innerHTML;
                     }
                 }
+                
+                console.log('Saving notes:', newNotes);
                 currentEvent.setAttribute('data-notes', newNotes);
                 saveCalendarData();
-                alert('Notes saved successfully!');
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Saved ✓';
+                button.style.backgroundColor = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
             }
         }
 
