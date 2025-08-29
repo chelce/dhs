@@ -33,7 +33,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
         }
 
         .header {
@@ -255,7 +255,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header" style="display: none;">
             <h1 id="pageTitle">Class Landing Page</h1>
             <p id="pageSubtitle">Stay updated with announcements and resources</p>
             
@@ -271,7 +271,7 @@
             </div>
         </div>
 
-        <div class="announcements">
+        <div class="announcements" style="display: none;">
             <h2 class="section-title">📢 Announcements</h2>
             <div id="announcementsContainer">
                 <!-- Announcements will be populated by JavaScript -->
@@ -279,7 +279,6 @@
         </div>
 
         <div class="cards-section">
-            <h2 class="section-title">📚 Resources & Activities</h2>
             <div class="cards-grid" id="cardsContainer">
                 <!-- Cards will be populated by JavaScript -->
             </div>
