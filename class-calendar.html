@@ -903,6 +903,14 @@
         
         // Helper function to create event elements
         function addEventElement(parentCell, text, eventClass, isTentative = false, isHardcoded = false, notes = '') {
+            console.log('addEventElement called with:', { text, eventClass, isTentative, isHardcoded, notes });
+            console.log('parentCell:', parentCell);
+            
+            if (!parentCell) {
+                console.error('addEventElement: parentCell is null or undefined');
+                return;
+            }
+            
             const eventDiv = document.createElement('div');
             eventDiv.className = `event class-${eventClass}`;
             eventDiv.setAttribute('data-class', eventClass);
@@ -931,6 +939,8 @@
             `;
             
             parentCell.appendChild(eventDiv);
+            console.log('Event element added to parent cell successfully');
+            console.log('Parent cell now has', parentCell.children.length, 'children');
         }
         
         // Show event details modal
@@ -1103,16 +1113,32 @@
         // Form submission
         document.getElementById('eventForm').addEventListener('submit', function(e) {
             e.preventDefault();
+            console.log('Form submission started');
             
             const eventText = document.getElementById('eventText').value;
             const eventClass = document.getElementById('eventClass').value;
             const eventType = document.getElementById('eventType').value;
             const eventNotes = document.getElementById('eventNotes').value;
             
+            console.log('Form data:', { eventText, eventClass, eventType, eventNotes, selectedDay });
+            
+            if (!eventText.trim()) {
+                alert('Please enter an event title');
+                return;
+            }
+            
             // Find the day cell for the selected date
             console.log('Looking for day cell for selectedDay:', selectedDay);
             const dayCells = document.querySelectorAll('.day-cell');
+            console.log('Found', dayCells.length, 'day cells');
             let targetCell = null;
+            
+            // Debug: log all cell dates
+            dayCells.forEach((cell, index) => {
+                const cellDate = cell.getAttribute('data-date');
+                const dayNumber = cell.querySelector('.day-number')?.textContent;
+                console.log(`Cell ${index}: date=${cellDate}, dayNumber=${dayNumber}`);
+            });
             
             // Store the date when creating day cells for better matching
             dayCells.forEach((cell, index) => {
@@ -1120,20 +1146,26 @@
                     // Check if this cell represents the selected date
                     const cellDate = cell.getAttribute('data-date');
                     if (cellDate) {
-                        const cellDateObj = new Date(cellDate);
-                        if (cellDateObj.toDateString() === selectedDay.toDateString()) {
+                        // Compare date strings directly to avoid timezone issues
+                        const selectedDateString = selectedDay.toISOString().split('T')[0];
+                        console.log(`Comparing: ${cellDate} === ${selectedDateString}`);
+                        if (cellDate === selectedDateString) {
+                            console.log(`Found matching cell at index ${index}`);
                             targetCell = cell;
                         }
                     } else {
                         // Fallback: use day number comparison (less reliable)
                         const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                        console.log(`Fallback comparison: ${dayNumber} === ${selectedDay.getDate()}`);
                         if (dayNumber === selectedDay.getDate()) {
+                            console.log(`Found matching cell by day number at index ${index}`);
                             targetCell = cell;
                         }
                     }
                 } else if (typeof selectedDay === 'number') {
                     const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
                     if (dayNumber === selectedDay) {
+                        console.log(`Found matching cell by number at index ${index}`);
                         targetCell = cell;
                     }
                 }
