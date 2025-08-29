@@ -1177,6 +1177,13 @@
                 console.log('Adding event to target cell:', eventText);
                 addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false, eventNotes);
                 saveCalendarData();
+                
+                // Ensure the new event is visible
+                setTimeout(() => {
+                    updateEventVisibility();
+                    console.log('Event visibility updated after creation');
+                }, 100);
+                
                 console.log('Event added successfully');
             } else {
                 console.error('Could not find target cell for selectedDay:', selectedDay);
@@ -1242,11 +1249,17 @@
                 
                 // Insert new events
                 if (eventsToSave.length > 0) {
+                    console.log('Attempting to save', eventsToSave.length, 'events to Supabase');
+                    console.log('Sample event data:', eventsToSave[0]);
+                    
                     const { error } = await supabase
                         .from('calendar_events')
                         .insert(eventsToSave);
                     
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Supabase insert error:', error);
+                        throw error;
+                    }
                 }
                 
                 console.log('Calendar saved to Supabase successfully');
@@ -1285,20 +1298,46 @@
                 
                 // Add events from database
                 data.forEach(eventData => {
-                    const eventDate = new Date(eventData.event_date + 'T00:00:00');
-                    const dayNumber = eventDate.getDate();
+                    const eventDateString = eventData.event_date;
+                    console.log('Loading event:', eventData.event_text, 'for date:', eventDateString);
                     
-                    // Find the corresponding day cell
+                    // Find the corresponding day cell by exact date match
                     const dayCells = document.querySelectorAll('.day-cell');
+                    let targetCell = null;
+                    
                     dayCells.forEach(cell => {
-                        const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
-                        if (cellDayNumber === dayNumber) {
-                            addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                        const cellDate = cell.getAttribute('data-date');
+                        if (cellDate === eventDateString) {
+                            targetCell = cell;
                         }
                     });
+                    
+                    if (targetCell) {
+                        console.log('Found target cell for event:', eventData.event_text);
+                        addEventElement(targetCell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                    } else {
+                        console.error('Could not find target cell for date:', eventDateString, 'event:', eventData.event_text);
+                        // Fallback to day number matching
+                        const eventDate = new Date(eventDateString + 'T00:00:00');
+                        const dayNumber = eventDate.getDate();
+                        dayCells.forEach(cell => {
+                            const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                            if (cellDayNumber === dayNumber && !targetCell) {
+                                console.log('Using fallback matching for:', eventData.event_text);
+                                addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                                targetCell = cell; // Prevent multiple matches
+                            }
+                        });
+                    }
                 });
                 
                 console.log('Calendar loaded from Supabase successfully');
+                
+                // Explicitly update event visibility to ensure all events are shown
+                setTimeout(() => {
+                    updateEventVisibility();
+                    console.log('Event visibility updated after loading');
+                }, 100);
             } catch (error) {
                 console.error('Error loading from Supabase:', error);
                 loadFromLocalStorage();
