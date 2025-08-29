@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Calendar & Reflections</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .calendar-header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .month-year {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .class-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .color-box {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e0e0e0;
+        }
+        
+        .day-header {
+            background: #34495e;
+            color: white;
+            padding: 10px 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .day-cell {
+            background: white;
+            min-height: 100px;
+            padding: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .day-cell.other-month .day-number {
+            color: #bdc3c7;
+        }
+        
+        .day-cell.today {
+            background: #ecf0f1;
+            border: 2px solid #3498db;
+        }
+        
+        .event {
+            font-size: 11px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .reflection {
+            background: #95a5a6;
+            border-left: 3px solid #7f8c8d;
+        }
+        
+        .tentative {
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        /* Class colors */
+        .class-2a { background: #9b59b6; }
+        .class-2b { background: #3498db; }
+        .class-3b { background: #27ae60; }
+        .class-ap { background: #e67e22; }
+        .class-4b { background: #e91e63; }
+        
+        .upcoming-section {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .upcoming-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .upcoming-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .upcoming-item {
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Interactive features */
+        .day-cell:hover {
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        .day-cell.today:hover {
+            background: #d5dbdb;
+        }
+        
+        .event {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .event:hover {
+            opacity: 0.8;
+        }
+        
+        .event .delete-btn {
+            position: absolute;
+            right: 2px;
+            top: 1px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+            color: #e74c3c;
+        }
+        
+        .event:hover .delete-btn {
+            display: block;
+        }
+        
+        .controls {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .filter-checkbox input[type="checkbox"] {
+            margin: 0;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .month-nav button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .month-nav button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .export-section {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="controls">
+            <div class="controls-row">
+                <div class="filter-group">
+                    <strong>Show Classes:</strong>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-2a" checked>
+                        <label for="show-2a">2A</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-2b" checked>
+                        <label for="show-2b">2B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-3b" checked>
+                        <label for="show-3b">3B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-ap" checked>
+                        <label for="show-ap">AP</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-4b" checked>
+                        <label for="show-4b">4B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-reflection" checked>
+                        <label for="show-reflection">Reflections</label>
+                    </div>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="exportCalendar()">Export Calendar</button>
+                    <button class="btn btn-secondary" onclick="importCalendar()">Import</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calendar-header">
+            <div class="month-nav">
+                <button onclick="changeMonth(-1)">← Previous</button>
+                <div class="month-year" id="monthYear">August 2025</div>
+                <button onclick="changeMonth(1)">Next →</button>
+            </div>
+            <div class="class-legend">
+                <div class="legend-item">
+                    <div class="color-box class-2a"></div>
+                    <span>2A (Purple)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-2b"></div>
+                    <span>2B (Blue)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-3b"></div>
+                    <span>3B (Green)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-ap"></div>
+                    <span>AP (Orange)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-4b"></div>
+                    <span>4B (Hot Pink)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box reflection"></div>
+                    <span>Reflection</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calendar-grid">
+            <!-- Day headers -->
+            <div class="day-header">Sun</div>
+            <div class="day-header">Mon</div>
+            <div class="day-header">Tue</div>
+            <div class="day-header">Wed</div>
+            <div class="day-header">Thu</div>
+            <div class="day-header">Fri</div>
+            <div class="day-header">Sat</div>
+            
+            <!-- Week 1 -->
+            <div class="day-cell other-month"><div class="day-number">27</div></div>
+            <div class="day-cell other-month"><div class="day-number">28</div></div>
+            <div class="day-cell other-month"><div class="day-number">29</div></div>
+            <div class="day-cell other-month"><div class="day-number">30</div></div>
+            <div class="day-cell other-month"><div class="day-number">31</div></div>
+            <div class="day-cell"><div class="day-number">1</div></div>
+            <div class="day-cell"><div class="day-number">2</div></div>
+            
+            <!-- Week 2 -->
+            <div class="day-cell"><div class="day-number">3</div></div>
+            <div class="day-cell"><div class="day-number">4</div></div>
+            <div class="day-cell"><div class="day-number">5</div></div>
+            <div class="day-cell"><div class="day-number">6</div></div>
+            <div class="day-cell"><div class="day-number">7</div></div>
+            <div class="day-cell"><div class="day-number">8</div></div>
+            <div class="day-cell"><div class="day-number">9</div></div>
+            
+            <!-- Week 3 -->
+            <div class="day-cell"><div class="day-number">10</div></div>
+            <div class="day-cell"><div class="day-number">11</div></div>
+            <div class="day-cell"><div class="day-number">12</div></div>
+            <div class="day-cell"><div class="day-number">13</div></div>
+            <div class="day-cell"><div class="day-number">14</div></div>
+            <div class="day-cell"><div class="day-number">15</div></div>
+            <div class="day-cell"><div class="day-number">16</div></div>
+            
+            <!-- Week 4 -->
+            <div class="day-cell"><div class="day-number">17</div></div>
+            <div class="day-cell"><div class="day-number">18</div></div>
+            <div class="day-cell"><div class="day-number">19</div></div>
+            <div class="day-cell"><div class="day-number">20</div></div>
+            <div class="day-cell"><div class="day-number">21</div></div>
+            <div class="day-cell"><div class="day-number">22</div></div>
+            <div class="day-cell">
+                <div class="day-number">23</div>
+                <div class="event reflection" data-class="reflection" data-hardcoded="true">
+                    Reflection: Logic puzzles, Scattergories success
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-2a" data-class="2a" data-hardcoded="true">
+                    Baker's problem
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+            </div>
+            
+            <!-- Week 5 -->
+            <div class="day-cell"><div class="day-number">24</div></div>
+            <div class="day-cell"><div class="day-number">25</div></div>
+            <div class="day-cell"><div class="day-number">26</div></div>
+            <div class="day-cell"><div class="day-number">27</div></div>
+            <div class="day-cell">
+                <div class="day-number">28</div>
+                <div class="event reflection" data-class="reflection" data-hardcoded="true">
+                    Reflection: Analogies lesson
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-ap" data-class="ap" data-hardcoded="true">
+                    Analogies intro
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-2a" data-class="2a" data-hardcoded="true">
+                    Analogies intro
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+            </div>
+            <div class="day-cell today" onclick="addEvent(29)">
+                <div class="day-number">29</div>
+                <div class="event reflection" data-class="reflection" data-hardcoded="true">
+                    Reflection: ABC game, Analogies, Rhetorical situation
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-2a" data-class="2a" data-hardcoded="true">
+                    ABC game + Analogies start
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-ap" data-class="ap" data-hardcoded="true">
+                    Rhetorical situation, profiling
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+                <div class="event class-4b" data-class="4b" data-hardcoded="true">
+                    ABC game + Analogies
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                </div>
+            </div>
+            <div class="day-cell"><div class="day-number">30</div></div>
+            
+            <!-- Week 6 start -->
+            <div class="day-cell"><div class="day-number">31</div></div>
+        </div>
+        
+        <div class="upcoming-section">
+            <div class="upcoming-title">Upcoming Items</div>
+            <ul class="upcoming-list">
+                <li class="upcoming-item class-2a">
+                    <span>2A: Continue analogies work</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-ap">
+                    <span>AP: Profile targeting exercise</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-4b">
+                    <span>4B: More analogies/additional activity needed</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-ap tentative">
+                    <span>AP: Vocab #1 + Intellectual Devotional Week 9 Quiz</span>
+                    <span>Week 3 (Tentative)</span>
+                </li>
+                <li class="upcoming-item reflection">
+                    <span>Create AP vocab list</span>
+                    <span>This week</span>
+                </li>
+                <li class="upcoming-item reflection">
+                    <span>Prepare more analogies content</span>
+                    <span>Before next 4B class</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Add Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Add Event</span>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="eventText">Event Text:</label>
+                    <textarea id="eventText" placeholder="Enter event description..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="eventClass">Class/Type:</label>
+                    <select id="eventClass" required>
+                        <option value="">Select class...</option>
+                        <option value="2a">2A (Purple)</option>
+                        <option value="2b">2B (Blue)</option>
+                        <option value="3b">3B (Green)</option>
+                        <option value="ap">AP (Orange)</option>
+                        <option value="4b">4B (Hot Pink)</option>
+                        <option value="reflection">Reflection</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventType">Event Type:</label>
+                    <select id="eventType">
+                        <option value="">Regular</option>
+                        <option value="tentative">Tentative</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk'
+        
+        let supabase = null;
+        
+        // Initialize Supabase (will be set up after you create the project)
+        function initSupabase() {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        }
+        
+        // Calendar data and state
+        let currentMonth = 7; // August (0-based)
+        let currentYear = 2025;
+        let selectedDay = null;
+        
+        // Month names
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        
+        // Initialize calendar on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initSupabase();
+            loadCalendarData();
+            setupFilterListeners();
+            updateCalendarDisplay();
+        });
+        
+        // Event handling functions
+        function addEvent(day) {
+            selectedDay = day;
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+            document.getElementById('eventForm').reset();
+        }
+        
+        function deleteEvent(button) {
+            event.stopPropagation();
+            if (confirm('Delete this event?')) {
+                button.parentElement.remove();
+                saveCalendarData();
+            }
+        }
+        
+        // Form submission
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const eventText = document.getElementById('eventText').value;
+            const eventClass = document.getElementById('eventClass').value;
+            const eventType = document.getElementById('eventType').value;
+            
+            // Find the day cell
+            const dayCells = document.querySelectorAll('.day-cell');
+            let targetCell = null;
+            
+            dayCells.forEach(cell => {
+                const dayNumber = cell.querySelector('.day-number').textContent;
+                if (parseInt(dayNumber) === selectedDay) {
+                    targetCell = cell;
+                }
+            });
+            
+                if (targetCell) {
+                    addEventToDOM(selectedDay, eventText, eventClass, eventType === 'tentative');
+                    saveCalendarData();
+                }
+            
+            closeModal();
+        });
+        
+        // Month navigation
+        function changeMonth(direction) {
+            currentMonth += direction;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            
+            updateCalendarDisplay();
+        }
+        
+        function updateCalendarDisplay() {
+            document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+            // Here you could regenerate the entire calendar for different months
+            // For now, we'll keep the static August 2025 layout
+        }
+        
+        // Filter functionality
+        function setupFilterListeners() {
+            const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateEventVisibility);
+            });
+        }
+        
+        function updateEventVisibility() {
+            const checkboxes = {
+                '2a': document.getElementById('show-2a').checked,
+                '2b': document.getElementById('show-2b').checked,
+                '3b': document.getElementById('show-3b').checked,
+                'ap': document.getElementById('show-ap').checked,
+                '4b': document.getElementById('show-4b').checked,
+                'reflection': document.getElementById('show-reflection').checked
+            };
+            
+            document.querySelectorAll('.event').forEach(event => {
+                const eventClass = event.getAttribute('data-class');
+                if (checkboxes[eventClass] !== undefined) {
+                    event.style.display = checkboxes[eventClass] ? 'block' : 'none';
+                }
+            });
+        }
+        
+        // Data persistence with Supabase
+        async function saveCalendarData() {
+            if (!supabase) {
+                // Fallback to localStorage if Supabase not configured
+                saveToLocalStorage();
+                return;
+            }
+            
+            try {
+                // Clear existing events for this month/year
+                await supabase
+                    .from('calendar_events')
+                    .delete()
+                    .eq('month', currentMonth)
+                    .eq('year', currentYear);
+                
+                // Collect all events
+                const eventsToSave = [];
+                document.querySelectorAll('.day-cell').forEach(cell => {
+                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                    
+                    cell.querySelectorAll('.event').forEach(event => {
+                        const text = event.textContent.replace('×', '').trim();
+                        const className = event.getAttribute('data-class');
+                        const isTentative = event.classList.contains('tentative');
+                        
+                        eventsToSave.push({
+                            year: currentYear,
+                            month: currentMonth,
+                            day: dayNumber,
+                            event_text: text,
+                            event_class: className,
+                            is_tentative: isTentative,
+                            created_at: new Date().toISOString()
+                        });
+                    });
+                });
+                
+                // Insert new events
+                if (eventsToSave.length > 0) {
+                    const { error } = await supabase
+                        .from('calendar_events')
+                        .insert(eventsToSave);
+                    
+                    if (error) throw error;
+                }
+                
+                console.log('Calendar saved to Supabase successfully');
+            } catch (error) {
+                console.error('Error saving to Supabase:', error);
+                // Fallback to localStorage
+                saveToLocalStorage();
+            }
+        }
+        
+        async function loadCalendarData() {
+            if (!supabase) {
+                // Fallback to localStorage if Supabase not configured
+                loadFromLocalStorage();
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('calendar_events')
+                    .select('*')
+                    .eq('month', currentMonth)
+                    .eq('year', currentYear);
+                
+                if (error) throw error;
+                
+                // Clear existing events (except hardcoded ones)
+                document.querySelectorAll('.event').forEach(event => {
+                    if (!event.hasAttribute('data-hardcoded')) {
+                        event.remove();
+                    }
+                });
+                
+                // Add events from database
+                data.forEach(eventData => {
+                    addEventToDOM(eventData.day, eventData.event_text, eventData.event_class, eventData.is_tentative);
+                });
+                
+                console.log('Calendar loaded from Supabase successfully');
+            } catch (error) {
+                console.error('Error loading from Supabase:', error);
+                // Fallback to localStorage
+                loadFromLocalStorage();
+            }
+        }
+        
+        // Fallback localStorage functions
+        function saveToLocalStorage() {
+            const calendarData = {
+                month: currentMonth,
+                year: currentYear,
+                events: {}
+            };
+            
+            document.querySelectorAll('.day-cell').forEach(cell => {
+                const dayNumber = cell.querySelector('.day-number').textContent;
+                const events = [];
+                
+                cell.querySelectorAll('.event').forEach(event => {
+                    if (!event.hasAttribute('data-hardcoded')) {
+                        const text = event.textContent.replace('×', '').trim();
+                        const className = event.getAttribute('data-class');
+                        const isTentative = event.classList.contains('tentative');
+                        
+                        events.push({
+                            text: text,
+                            class: className,
+                            tentative: isTentative
+                        });
+                    }
+                });
+                
+                if (events.length > 0) {
+                    calendarData.events[dayNumber] = events;
+                }
+            });
+            
+            localStorage.setItem('teachingCalendar', JSON.stringify(calendarData));
+        }
+        
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('teachingCalendar');
+            if (saved) {
+                const data = JSON.parse(saved);
+                
+                // Add events from localStorage
+                Object.keys(data.events || {}).forEach(day => {
+                    data.events[day].forEach(event => {
+                        addEventToDOM(parseInt(day), event.text, event.class, event.tentative);
+                    });
+                });
+            }
+        }
+        
+        // Helper function to add event to DOM
+        function addEventToDOM(day, text, className, isTentative = false) {
+            const dayCells = document.querySelectorAll('.day-cell');
+            let targetCell = null;
+            
+            dayCells.forEach(cell => {
+                const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                if (dayNumber === day) {
+                    targetCell = cell;
+                }
+            });
+            
+            if (targetCell) {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `event class-${className}`;
+                eventDiv.setAttribute('data-class', className);
+                if (isTentative) {
+                    eventDiv.classList.add('tentative');
+                }
+                
+                eventDiv.innerHTML = `
+                    ${text}
+                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+                `;
+                
+                targetCell.appendChild(eventDiv);
+            }
+        }
+        
+        // Export/Import functionality
+        function exportCalendar() {
+            saveCalendarData();
+            const data = localStorage.getItem('teachingCalendar');
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `teaching-calendar-${currentYear}-${currentMonth + 1}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function importCalendar() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            localStorage.setItem('teachingCalendar', e.target.result);
+                            alert('Calendar imported successfully! Refresh the page to see changes.');
+                        } catch (error) {
+                            alert('Error importing calendar: Invalid file format');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        
+        // Add click handlers to existing day cells
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.day-cell').forEach((cell, index) => {
+                if (!cell.onclick) {
+                    const dayNumber = cell.querySelector('.day-number').textContent;
+                    cell.onclick = () => addEvent(parseInt(dayNumber));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
