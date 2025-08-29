@@ -62,6 +62,26 @@
             background: #e0e0e0;
         }
         
+        .week-row {
+            display: contents;
+        }
+        
+        .week-label {
+            grid-column: 1 / -1;
+            background: #34495e;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            border-bottom: 2px solid #2c3e50;
+        }
+        
+        .week-label.current-week {
+            background: #3498db;
+            border-bottom-color: #2980b9;
+        }
+        
         .day-header {
             background: #34495e;
             color: white;
@@ -76,6 +96,12 @@
             min-height: 100px;
             padding: 8px;
             border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+        
+        .day-cell.current-week {
+            background: #f8f9fa;
+            border-left: 3px solid #3498db;
         }
         
         .day-number {
@@ -90,7 +116,20 @@
         
         .day-cell.today {
             background: #ecf0f1;
-            border: 2px solid #3498db;
+            border: 2px solid #e74c3c;
+        }
+        
+        .day-cell.today.current-week {
+            background: #d5dbdb;
+            border: 2px solid #e74c3c;
+        }
+        
+        .week-range {
+            text-align: center;
+            color: white;
+            margin: 5px 0;
+            font-size: 14px;
+            opacity: 0.9;
         }
         
         .event {
@@ -390,10 +429,11 @@
         
         <div class="calendar-header">
             <div class="month-nav">
-                <button onclick="changeMonth(-1)">← Previous</button>
-                <div class="month-year" id="monthYear">August 2025</div>
-                <button onclick="changeMonth(1)">Next →</button>
+                <button onclick="changeWeek(-1)">← Previous Week</button>
+                <div class="month-year" id="monthYear">7-Week Teaching View</div>
+                <button onclick="changeWeek(1)">Next Week →</button>
             </div>
+            <div class="week-range" id="weekRange"></div>
             <div class="class-legend">
                 <div class="legend-item">
                     <div class="color-box class-2a"></div>
@@ -422,105 +462,8 @@
             </div>
         </div>
         
-        <div class="calendar-grid">
-            <!-- Day headers -->
-            <div class="day-header">Sun</div>
-            <div class="day-header">Mon</div>
-            <div class="day-header">Tue</div>
-            <div class="day-header">Wed</div>
-            <div class="day-header">Thu</div>
-            <div class="day-header">Fri</div>
-            <div class="day-header">Sat</div>
-            
-            <!-- Week 1 -->
-            <div class="day-cell other-month"><div class="day-number">27</div></div>
-            <div class="day-cell other-month"><div class="day-number">28</div></div>
-            <div class="day-cell other-month"><div class="day-number">29</div></div>
-            <div class="day-cell other-month"><div class="day-number">30</div></div>
-            <div class="day-cell other-month"><div class="day-number">31</div></div>
-            <div class="day-cell"><div class="day-number">1</div></div>
-            <div class="day-cell"><div class="day-number">2</div></div>
-            
-            <!-- Week 2 -->
-            <div class="day-cell"><div class="day-number">3</div></div>
-            <div class="day-cell"><div class="day-number">4</div></div>
-            <div class="day-cell"><div class="day-number">5</div></div>
-            <div class="day-cell"><div class="day-number">6</div></div>
-            <div class="day-cell"><div class="day-number">7</div></div>
-            <div class="day-cell"><div class="day-number">8</div></div>
-            <div class="day-cell"><div class="day-number">9</div></div>
-            
-            <!-- Week 3 -->
-            <div class="day-cell"><div class="day-number">10</div></div>
-            <div class="day-cell"><div class="day-number">11</div></div>
-            <div class="day-cell"><div class="day-number">12</div></div>
-            <div class="day-cell"><div class="day-number">13</div></div>
-            <div class="day-cell"><div class="day-number">14</div></div>
-            <div class="day-cell"><div class="day-number">15</div></div>
-            <div class="day-cell"><div class="day-number">16</div></div>
-            
-            <!-- Week 4 -->
-            <div class="day-cell"><div class="day-number">17</div></div>
-            <div class="day-cell"><div class="day-number">18</div></div>
-            <div class="day-cell"><div class="day-number">19</div></div>
-            <div class="day-cell"><div class="day-number">20</div></div>
-            <div class="day-cell"><div class="day-number">21</div></div>
-            <div class="day-cell"><div class="day-number">22</div></div>
-            <div class="day-cell">
-                <div class="day-number">23</div>
-                <div class="event reflection" data-class="reflection" data-hardcoded="true">
-                    Reflection: Logic puzzles, Scattergories success
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-2a" data-class="2a" data-hardcoded="true">
-                    Baker's problem
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-            </div>
-            
-            <!-- Week 5 -->
-            <div class="day-cell"><div class="day-number">24</div></div>
-            <div class="day-cell"><div class="day-number">25</div></div>
-            <div class="day-cell"><div class="day-number">26</div></div>
-            <div class="day-cell"><div class="day-number">27</div></div>
-            <div class="day-cell">
-                <div class="day-number">28</div>
-                <div class="event reflection" data-class="reflection" data-hardcoded="true">
-                    Reflection: Analogies lesson
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-ap" data-class="ap" data-hardcoded="true">
-                    Analogies intro
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-2a" data-class="2a" data-hardcoded="true">
-                    Analogies intro
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-            </div>
-            <div class="day-cell today" onclick="addEvent(29)">
-                <div class="day-number">29</div>
-                <div class="event reflection" data-class="reflection" data-hardcoded="true">
-                    Reflection: ABC game, Analogies, Rhetorical situation
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-2a" data-class="2a" data-hardcoded="true">
-                    ABC game + Analogies start
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-ap" data-class="ap" data-hardcoded="true">
-                    Rhetorical situation, profiling
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-                <div class="event class-4b" data-class="4b" data-hardcoded="true">
-                    ABC game + Analogies
-                    <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
-                </div>
-            </div>
-            <div class="day-cell"><div class="day-number">30</div></div>
-            
-            <!-- Week 6 start -->
-            <div class="day-cell"><div class="day-number">31</div></div>
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Dynamic weekly calendar will be generated here -->
         </div>
         
         <div class="upcoming-section">
@@ -608,25 +551,195 @@
         }
         
         // Calendar data and state
-        let currentMonth = 7; // August (0-based)
-        let currentYear = 2025;
+        let currentWeekOffset = 0; // 0 = current week, -1 = prev week, +1 = next week
         let selectedDay = null;
         
         // Month names
         const monthNames = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"];
         
+        // Day names
+        const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        
+        // Get current date and week boundaries
+        function getCurrentWeekBounds() {
+            const today = new Date();
+            const currentDayOfWeek = today.getDay(); // 0 = Sunday
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - currentDayOfWeek + (currentWeekOffset * 7));
+            
+            return startOfWeek;
+        }
+        
+        // Generate 7 weeks of dates (3 before, current, 3 after)
+        function generateWeeks() {
+            const weeks = [];
+            const baseWeekStart = getCurrentWeekBounds();
+            
+            // Go back 3 weeks from the base week
+            for (let weekOffset = -3; weekOffset <= 3; weekOffset++) {
+                const weekStart = new Date(baseWeekStart);
+                weekStart.setDate(baseWeekStart.getDate() + (weekOffset * 7));
+                
+                const week = [];
+                for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+                    const date = new Date(weekStart);
+                    date.setDate(weekStart.getDate() + dayOffset);
+                    week.push({
+                        date: date,
+                        isCurrentWeek: weekOffset === 0,
+                        isToday: date.toDateString() === new Date().toDateString()
+                    });
+                }
+                weeks.push(week);
+            }
+            
+            return weeks;
+        }
+        
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
             initSupabase();
+            generateCalendar();
             loadCalendarData();
             setupFilterListeners();
-            updateCalendarDisplay();
         });
         
+        // Generate the 7-week calendar dynamically
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            dayNames.forEach(dayName => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = dayName.substring(0, 3);
+                calendarGrid.appendChild(header);
+            });
+            
+            // Generate weeks
+            const weeks = generateWeeks();
+            weeks.forEach((week, weekIndex) => {
+                // Add week label
+                const weekLabel = document.createElement('div');
+                weekLabel.className = 'week-label';
+                if (week[0].isCurrentWeek) {
+                    weekLabel.classList.add('current-week');
+                }
+                
+                const weekStart = week[0].date;
+                const weekEnd = week[6].date;
+                const startStr = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
+                const endStr = `${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+                
+                if (week[0].isCurrentWeek) {
+                    weekLabel.textContent = `Current Week: ${startStr} - ${endStr}`;
+                } else {
+                    weekLabel.textContent = `${startStr} - ${endStr}`;
+                }
+                
+                calendarGrid.appendChild(weekLabel);
+                
+                // Add days for this week
+                week.forEach(dayInfo => {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+                    
+                    if (dayInfo.isCurrentWeek) {
+                        dayCell.classList.add('current-week');
+                    }
+                    
+                    if (dayInfo.isToday) {
+                        dayCell.classList.add('today');
+                    }
+                    
+                    // Add click handler
+                    dayCell.onclick = () => addEvent(dayInfo.date);
+                    
+                    // Add day number
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = dayInfo.date.getDate();
+                    dayCell.appendChild(dayNumber);
+                    
+                    // Add hardcoded events for specific dates
+                    addHardcodedEvents(dayCell, dayInfo.date);
+                    
+                    calendarGrid.appendChild(dayCell);
+                });
+            });
+            
+            // Update week range display
+            updateWeekRangeDisplay();
+        }
+        
+        // Add hardcoded historical events
+        function addHardcodedEvents(dayCell, date) {
+            const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+            
+            // August 23, 2025 events
+            if (dateStr === '2025-08-23') {
+                addEventElement(dayCell, 'Reflection: Logic puzzles, Scattergories success', 'reflection', false, true);
+                addEventElement(dayCell, "Baker's problem", '2a', false, true);
+            }
+            
+            // August 28, 2025 events
+            if (dateStr === '2025-08-28') {
+                addEventElement(dayCell, 'Reflection: Analogies lesson', 'reflection', false, true);
+                addEventElement(dayCell, 'Analogies intro', 'ap', false, true);
+                addEventElement(dayCell, 'Analogies intro', '2a', false, true);
+            }
+            
+            // August 29, 2025 events
+            if (dateStr === '2025-08-29') {
+                addEventElement(dayCell, 'Reflection: ABC game, Analogies, Rhetorical situation', 'reflection', false, true);
+                addEventElement(dayCell, 'ABC game + Analogies start', '2a', false, true);
+                addEventElement(dayCell, 'Rhetorical situation, profiling', 'ap', false, true);
+                addEventElement(dayCell, 'ABC game + Analogies', '4b', false, true);
+            }
+        }
+        
+        // Helper function to create event elements
+        function addEventElement(parentCell, text, eventClass, isTentative = false, isHardcoded = false) {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event class-${eventClass}`;
+            eventDiv.setAttribute('data-class', eventClass);
+            
+            if (isTentative) {
+                eventDiv.classList.add('tentative');
+            }
+            
+            if (isHardcoded) {
+                eventDiv.setAttribute('data-hardcoded', 'true');
+            }
+            
+            eventDiv.innerHTML = `
+                ${text}
+                <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+            `;
+            
+            parentCell.appendChild(eventDiv);
+        }
+        
+        // Update week range display
+        function updateWeekRangeDisplay() {
+            const weeks = generateWeeks();
+            const firstWeek = weeks[0];
+            const lastWeek = weeks[6];
+            
+            const startDate = firstWeek[0].date;
+            const endDate = lastWeek[6].date;
+            
+            const startStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const endStr = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('weekRange').textContent = `${startStr} - ${endStr}`;
+        }
+        
         // Event handling functions
-        function addEvent(day) {
-            selectedDay = day;
+        function addEvent(date) {
+            selectedDay = date;
             document.getElementById('eventModal').style.display = 'block';
         }
         
@@ -643,6 +756,17 @@
             }
         }
         
+        // Week navigation
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            generateCalendar();
+            loadCalendarData();
+        }
+        
+        function updateCalendarDisplay() {
+            generateCalendar();
+        }
+        
         // Form submission
         document.getElementById('eventForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -651,43 +775,144 @@
             const eventClass = document.getElementById('eventClass').value;
             const eventType = document.getElementById('eventType').value;
             
-            // Find the day cell
+            // Find the day cell for the selected date
             const dayCells = document.querySelectorAll('.day-cell');
             let targetCell = null;
             
             dayCells.forEach(cell => {
-                const dayNumber = cell.querySelector('.day-number').textContent;
-                if (parseInt(dayNumber) === selectedDay) {
+                const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                if (selectedDay instanceof Date) {
+                    if (dayNumber === selectedDay.getDate()) {
+                        targetCell = cell;
+                    }
+                } else if (dayNumber === selectedDay) {
                     targetCell = cell;
                 }
             });
             
-                if (targetCell) {
-                    addEventToDOM(selectedDay, eventText, eventClass, eventType === 'tentative');
-                    saveCalendarData();
-                }
+            if (targetCell) {
+                addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false);
+                saveCalendarData();
+            }
             
             closeModal();
         });
         
-        // Month navigation
-        function changeMonth(direction) {
-            currentMonth += direction;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            } else if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
+        // Data persistence with Supabase
+        async function saveCalendarData() {
+            if (!supabase) {
+                saveToLocalStorage();
+                return;
             }
             
-            updateCalendarDisplay();
+            try {
+                // Get the current date range
+                const weeks = generateWeeks();
+                const startDate = weeks[0][0].date;
+                const endDate = weeks[6][6].date;
+                
+                // Clear existing events for this date range
+                await supabase
+                    .from('calendar_events')
+                    .delete()
+                    .gte('event_date', startDate.toISOString().split('T')[0])
+                    .lte('event_date', endDate.toISOString().split('T')[0]);
+                
+                // Collect all current events
+                const eventsToSave = [];
+                document.querySelectorAll('.day-cell').forEach(cell => {
+                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                    
+                    cell.querySelectorAll('.event').forEach(event => {
+                        if (!event.hasAttribute('data-hardcoded')) {
+                            const text = event.textContent.replace('×', '').trim();
+                            const className = event.getAttribute('data-class');
+                            const isTentative = event.classList.contains('tentative');
+                            
+                            // Find the corresponding date
+                            weeks.forEach(week => {
+                                week.forEach(day => {
+                                    if (day.date.getDate() === dayNumber) {
+                                        eventsToSave.push({
+                                            event_date: day.date.toISOString().split('T')[0],
+                                            year: day.date.getFullYear(),
+                                            month: day.date.getMonth(),
+                                            day: day.date.getDate(),
+                                            event_text: text,
+                                            event_class: className,
+                                            is_tentative: isTentative,
+                                            created_at: new Date().toISOString()
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+                
+                // Insert new events
+                if (eventsToSave.length > 0) {
+                    const { error } = await supabase
+                        .from('calendar_events')
+                        .insert(eventsToSave);
+                    
+                    if (error) throw error;
+                }
+                
+                console.log('Calendar saved to Supabase successfully');
+            } catch (error) {
+                console.error('Error saving to Supabase:', error);
+                saveToLocalStorage();
+            }
         }
         
-        function updateCalendarDisplay() {
-            document.getElementById('monthYear').textContent = `${monthNames[currentMonth]} ${currentYear}`;
-            // Here you could regenerate the entire calendar for different months
-            // For now, we'll keep the static August 2025 layout
+        async function loadCalendarData() {
+            if (!supabase) {
+                loadFromLocalStorage();
+                return;
+            }
+            
+            try {
+                // Get the current date range
+                const weeks = generateWeeks();
+                const startDate = weeks[0][0].date;
+                const endDate = weeks[6][6].date;
+                
+                const { data, error } = await supabase
+                    .from('calendar_events')
+                    .select('*')
+                    .gte('event_date', startDate.toISOString().split('T')[0])
+                    .lte('event_date', endDate.toISOString().split('T')[0]);
+                
+                if (error) throw error;
+                
+                // Clear existing non-hardcoded events
+                document.querySelectorAll('.event').forEach(event => {
+                    if (!event.hasAttribute('data-hardcoded')) {
+                        event.remove();
+                    }
+                });
+                
+                // Add events from database
+                data.forEach(eventData => {
+                    const eventDate = new Date(eventData.event_date + 'T00:00:00');
+                    const dayNumber = eventDate.getDate();
+                    
+                    // Find the corresponding day cell
+                    const dayCells = document.querySelectorAll('.day-cell');
+                    dayCells.forEach(cell => {
+                        const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                        if (cellDayNumber === dayNumber) {
+                            addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false);
+                        }
+                    });
+                });
+                
+                console.log('Calendar loaded from Supabase successfully');
+            } catch (error) {
+                console.error('Error loading from Supabase:', error);
+                loadFromLocalStorage();
+            }
         }
         
         // Filter functionality
