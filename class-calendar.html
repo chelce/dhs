@@ -721,41 +721,74 @@
         
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
-            initSupabase();
-            initTipTapEditors();
-            generateCalendar();
-            loadCalendarData();
-            setupFilterListeners();
+            try {
+                console.log('Initializing calendar...');
+                initSupabase();
+                generateCalendar();
+                loadCalendarData();
+                setupFilterListeners();
+                
+                // Initialize TipTap editors after a short delay to ensure libraries are loaded
+                setTimeout(() => {
+                    initTipTapEditors();
+                }, 100);
+                
+                console.log('Calendar initialized successfully');
+            } catch (error) {
+                console.error('Error initializing calendar:', error);
+                // Still try to generate basic calendar
+                generateCalendar();
+            }
         });
         
         // Initialize TipTap editors
         function initTipTapEditors() {
-            // Editor for adding/editing events
-            notesEditor = new window.Tiptap.Editor({
-                element: document.getElementById('eventNotesEditor'),
-                extensions: [
-                    window.TiptapStarterKit.StarterKit,
-                    window.TiptapPlaceholder.Placeholder.configure({
-                        placeholder: 'Add reflection notes about this lesson/activity...'
-                    })
-                ],
-                content: '',
-                onUpdate: ({ editor }) => {
-                    document.getElementById('eventNotes').value = editor.getHTML();
+            try {
+                // Check if TipTap is available
+                if (!window.Tiptap || !window.TiptapStarterKit || !window.TiptapPlaceholder) {
+                    console.warn('TipTap libraries not loaded, using fallback');
+                    return;
                 }
-            });
-            
-            // Editable editor for viewing and editing event details
-            detailsEditor = new window.Tiptap.Editor({
-                element: document.getElementById('eventDetailsNotes'),
-                extensions: [
-                    window.TiptapStarterKit.StarterKit,
-                    window.TiptapPlaceholder.Placeholder.configure({
-                        placeholder: 'Add your reflection notes here...'
-                    })
-                ],
-                content: ''
-            });
+
+                // Editor for adding/editing events
+                const eventNotesElement = document.getElementById('eventNotesEditor');
+                if (eventNotesElement) {
+                    notesEditor = new window.Tiptap.Editor({
+                        element: eventNotesElement,
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Add reflection notes about this lesson/activity...'
+                            })
+                        ],
+                        content: '',
+                        onUpdate: ({ editor }) => {
+                            const notesField = document.getElementById('eventNotes');
+                            if (notesField) {
+                                notesField.value = editor.getHTML();
+                            }
+                        }
+                    });
+                }
+                
+                // Editable editor for viewing and editing event details
+                const detailsNotesElement = document.getElementById('eventDetailsNotes');
+                if (detailsNotesElement) {
+                    detailsEditor = new window.Tiptap.Editor({
+                        element: detailsNotesElement,
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Add your reflection notes here...'
+                            })
+                        ],
+                        content: ''
+                    });
+                }
+            } catch (error) {
+                console.error('Error initializing TipTap editors:', error);
+                // Calendar should still work without TipTap
+            }
         }
         
         // Generate the 7-week calendar dynamically
@@ -907,7 +940,15 @@
             badge.className = `event-class-badge class-${eventClass}`;
             
             // Load notes into editor
-            detailsEditor.commands.setContent(notes || '<p>No reflection notes yet.</p>');
+            if (detailsEditor) {
+                detailsEditor.commands.setContent(notes || '<p>No reflection notes yet.</p>');
+            } else {
+                // Fallback for when TipTap isn't available
+                const notesElement = document.getElementById('eventDetailsNotes');
+                if (notesElement) {
+                    notesElement.innerHTML = notes || '<p>No reflection notes yet.</p>';
+                }
+            }
             
             // Show modal
             document.getElementById('eventDetailsModal').style.display = 'block';
@@ -934,8 +975,17 @@
         
         // Save notes for current event
         function saveEventNotes() {
-            if (currentEvent && detailsEditor) {
-                const newNotes = detailsEditor.getHTML();
+            if (currentEvent) {
+                let newNotes = '';
+                if (detailsEditor) {
+                    newNotes = detailsEditor.getHTML();
+                } else {
+                    // Fallback for when TipTap isn't available
+                    const notesElement = document.getElementById('eventDetailsNotes');
+                    if (notesElement) {
+                        newNotes = notesElement.innerHTML;
+                    }
+                }
                 currentEvent.setAttribute('data-notes', newNotes);
                 saveCalendarData();
                 alert('Notes saved successfully!');
@@ -952,7 +1002,9 @@
                 // Populate edit form
                 document.getElementById('eventText').value = title;
                 document.getElementById('eventClass').value = eventClass;
-                notesEditor.commands.setContent(notes || '');
+                if (notesEditor) {
+                    notesEditor.commands.setContent(notes || '');
+                }
                 
                 // Close details modal and open edit modal
                 closeEventDetailsModal();
@@ -986,7 +1038,10 @@
             document.getElementById('eventForm').reset();
             if (notesEditor) {
                 notesEditor.commands.clearContent();
-                document.getElementById('eventNotes').value = '';
+                const notesField = document.getElementById('eventNotes');
+                if (notesField) {
+                    notesField.value = '';
+                }
             }
         }
         
