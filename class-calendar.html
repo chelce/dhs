@@ -832,6 +832,9 @@
                     const dayCell = document.createElement('div');
                     dayCell.className = 'day-cell';
                     
+                    // Store the date for better event matching
+                    dayCell.setAttribute('data-date', dayInfo.date.toISOString().split('T')[0]);
+                    
                     if (dayInfo.isCurrentWeek) {
                         dayCell.classList.add('current-week');
                     }
@@ -1060,6 +1063,7 @@
         // Event handling functions
         function addEvent(date) {
             selectedDay = date;
+            console.log('addEvent called with date:', date);
             document.getElementById('eventModal').style.display = 'block';
         }
         
@@ -1104,23 +1108,45 @@
             const eventNotes = document.getElementById('eventNotes').value;
             
             // Find the day cell for the selected date
+            console.log('Looking for day cell for selectedDay:', selectedDay);
             const dayCells = document.querySelectorAll('.day-cell');
             let targetCell = null;
             
-            dayCells.forEach(cell => {
-                const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+            // Store the date when creating day cells for better matching
+            dayCells.forEach((cell, index) => {
                 if (selectedDay instanceof Date) {
-                    if (dayNumber === selectedDay.getDate()) {
+                    // Check if this cell represents the selected date
+                    const cellDate = cell.getAttribute('data-date');
+                    if (cellDate) {
+                        const cellDateObj = new Date(cellDate);
+                        if (cellDateObj.toDateString() === selectedDay.toDateString()) {
+                            targetCell = cell;
+                        }
+                    } else {
+                        // Fallback: use day number comparison (less reliable)
+                        const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                        if (dayNumber === selectedDay.getDate()) {
+                            targetCell = cell;
+                        }
+                    }
+                } else if (typeof selectedDay === 'number') {
+                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                    if (dayNumber === selectedDay) {
                         targetCell = cell;
                     }
-                } else if (dayNumber === selectedDay) {
-                    targetCell = cell;
                 }
             });
             
+            console.log('Found targetCell:', targetCell);
+            
             if (targetCell) {
+                console.log('Adding event to target cell:', eventText);
                 addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false, eventNotes);
                 saveCalendarData();
+                console.log('Event added successfully');
+            } else {
+                console.error('Could not find target cell for selectedDay:', selectedDay);
+                alert('Error: Could not add event. Please try clicking on the day again.');
             }
             
             closeModal();
