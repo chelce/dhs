@@ -898,30 +898,48 @@
                     return;
                 }
 
-                // Create toolbar for creating events
-                createEditorToolbar('eventNotesToolbar', 'eventNotesEditor');
+                console.log('Available TipTap extensions:', {
+                    Tiptap: !!window.Tiptap,
+                    StarterKit: !!window.TiptapStarterKit,
+                    Placeholder: !!window.TiptapPlaceholder,
+                    Underline: !!window.TiptapUnderline,
+                    TextAlign: !!window.TiptapTextAlign,
+                    Highlight: !!window.TiptapHighlight,
+                    Link: !!window.TiptapLink,
+                    TextStyle: !!window.TiptapTextStyle,
+                    Color: !!window.TiptapColor
+                });
+
+                // Create basic toolbar for creating events
+                createBasicToolbar('eventNotesToolbar');
                 
-                // Create toolbar for event details
-                createEditorToolbar('eventDetailsToolbar', 'eventDetailsNotes');
+                // Create basic toolbar for event details
+                createBasicToolbar('eventDetailsToolbar');
 
                 // Editor for adding/editing events
                 const eventNotesElement = document.getElementById('eventNotesEditor');
                 if (eventNotesElement) {
                     notesEditor = new window.Tiptap.Editor({
                         element: eventNotesElement,
-                        extensions: getEditorExtensions(),
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Start typing your reflection notes...'
+                            })
+                        ],
                         content: '',
                         onUpdate: ({ editor }) => {
                             const notesField = document.getElementById('eventNotes');
                             if (notesField) {
                                 notesField.value = editor.getHTML();
                             }
-                            updateToolbarState('eventNotesToolbar', editor);
+                            updateBasicToolbarState('eventNotesToolbar', editor);
                         },
                         onSelectionUpdate: ({ editor }) => {
-                            updateToolbarState('eventNotesToolbar', editor);
+                            updateBasicToolbarState('eventNotesToolbar', editor);
                         }
                     });
+                    console.log('Notes editor created successfully');
                 }
                 
                 // Editable editor for viewing and editing event details
@@ -929,15 +947,21 @@
                 if (detailsNotesElement) {
                     detailsEditor = new window.Tiptap.Editor({
                         element: detailsNotesElement,
-                        extensions: getEditorExtensions(),
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Add your reflection notes here...'
+                            })
+                        ],
                         content: '',
                         onUpdate: ({ editor }) => {
-                            updateToolbarState('eventDetailsToolbar', editor);
+                            updateBasicToolbarState('eventDetailsToolbar', editor);
                         },
                         onSelectionUpdate: ({ editor }) => {
-                            updateToolbarState('eventDetailsToolbar', editor);
+                            updateBasicToolbarState('eventDetailsToolbar', editor);
                         }
                     });
+                    console.log('Details editor created successfully');
                 }
             } catch (error) {
                 console.error('Error initializing TipTap editors:', error);
@@ -945,46 +969,8 @@
             }
         }
 
-        // Get editor extensions
-        function getEditorExtensions() {
-            const extensions = [
-                window.TiptapStarterKit.StarterKit.configure({
-                    heading: {
-                        levels: [1, 2, 3]
-                    }
-                }),
-                window.TiptapPlaceholder.Placeholder.configure({
-                    placeholder: 'Start typing your reflection notes...'
-                })
-            ];
-
-            // Add optional extensions if available
-            if (window.TiptapUnderline) {
-                extensions.push(window.TiptapUnderline.Underline);
-            }
-            if (window.TiptapTextAlign) {
-                extensions.push(window.TiptapTextAlign.TextAlign.configure({
-                    types: ['heading', 'paragraph']
-                }));
-            }
-            if (window.TiptapHighlight) {
-                extensions.push(window.TiptapHighlight.Highlight);
-            }
-            if (window.TiptapLink) {
-                extensions.push(window.TiptapLink.Link.configure({
-                    openOnClick: false
-                }));
-            }
-            if (window.TiptapTextStyle && window.TiptapColor) {
-                extensions.push(window.TiptapTextStyle.TextStyle);
-                extensions.push(window.TiptapColor.Color);
-            }
-
-            return extensions;
-        }
-
-        // Create toolbar for editor
-        function createEditorToolbar(toolbarId, editorId) {
+        // Create basic toolbar with core features
+        function createBasicToolbar(toolbarId) {
             const toolbar = document.getElementById(toolbarId);
             if (!toolbar) return;
 
@@ -994,12 +980,6 @@
                 </button>
                 <button type="button" data-action="italic" title="Italic (Ctrl+I)">
                     <em>I</em>
-                </button>
-                <button type="button" data-action="underline" title="Underline (Ctrl+U)">
-                    <u>U</u>
-                </button>
-                <button type="button" data-action="highlight" title="Highlight">
-                    <span style="background: #ffeb3b; padding: 1px 3px;">H</span>
                 </button>
                 
                 <div class="separator"></div>
@@ -1023,35 +1003,11 @@
                 
                 <div class="separator"></div>
                 
-                <button type="button" data-action="alignLeft" title="Align Left">
-                    ⬅
-                </button>
-                <button type="button" data-action="alignCenter" title="Align Center">
-                    ↔
-                </button>
-                <button type="button" data-action="alignRight" title="Align Right">
-                    ➡
-                </button>
-                
-                <div class="separator"></div>
-                
-                <button type="button" data-action="link" title="Add Link">
-                    🔗 Link
-                </button>
-                <button type="button" data-action="code" title="Inline Code">
-                    &lt;/&gt;
-                </button>
-                <button type="button" data-action="horizontalRule" title="Horizontal Line">
-                    ―
-                </button>
-                
-                <div class="separator"></div>
-                
                 <button type="button" data-action="undo" title="Undo (Ctrl+Z)">
-                    ↶
+                    ↶ Undo
                 </button>
                 <button type="button" data-action="redo" title="Redo (Ctrl+Y)">
-                    ↷
+                    ↷ Redo
                 </button>
             `;
 
@@ -1061,28 +1017,22 @@
                 if (!button) return;
 
                 const action = button.dataset.action;
-                const editor = editorId === 'eventNotesEditor' ? notesEditor : detailsEditor;
+                const editor = toolbarId.includes('eventNotes') ? notesEditor : detailsEditor;
                 
                 if (editor) {
-                    handleToolbarAction(editor, action);
+                    handleBasicToolbarAction(editor, action);
                 }
             });
         }
 
-        // Handle toolbar actions
-        function handleToolbarAction(editor, action) {
+        // Handle basic toolbar actions
+        function handleBasicToolbarAction(editor, action) {
             switch (action) {
                 case 'bold':
                     editor.chain().focus().toggleBold().run();
                     break;
                 case 'italic':
                     editor.chain().focus().toggleItalic().run();
-                    break;
-                case 'underline':
-                    editor.chain().focus().toggleUnderline().run();
-                    break;
-                case 'highlight':
-                    editor.chain().focus().toggleHighlight().run();
                     break;
                 case 'heading1':
                     editor.chain().focus().toggleHeading({ level: 1 }).run();
@@ -1105,27 +1055,6 @@
                 case 'blockquote':
                     editor.chain().focus().toggleBlockquote().run();
                     break;
-                case 'alignLeft':
-                    editor.chain().focus().setTextAlign('left').run();
-                    break;
-                case 'alignCenter':
-                    editor.chain().focus().setTextAlign('center').run();
-                    break;
-                case 'alignRight':
-                    editor.chain().focus().setTextAlign('right').run();
-                    break;
-                case 'link':
-                    const url = prompt('Enter URL:');
-                    if (url) {
-                        editor.chain().focus().setLink({ href: url }).run();
-                    }
-                    break;
-                case 'code':
-                    editor.chain().focus().toggleCode().run();
-                    break;
-                case 'horizontalRule':
-                    editor.chain().focus().setHorizontalRule().run();
-                    break;
                 case 'undo':
                     editor.chain().focus().undo().run();
                     break;
@@ -1135,8 +1064,8 @@
             }
         }
 
-        // Update toolbar button states
-        function updateToolbarState(toolbarId, editor) {
+        // Update basic toolbar button states
+        function updateBasicToolbarState(toolbarId, editor) {
             const toolbar = document.getElementById(toolbarId);
             if (!toolbar) return;
 
@@ -1151,12 +1080,6 @@
                         break;
                     case 'italic':
                         isActive = editor.isActive('italic');
-                        break;
-                    case 'underline':
-                        isActive = editor.isActive('underline');
-                        break;
-                    case 'highlight':
-                        isActive = editor.isActive('highlight');
                         break;
                     case 'heading1':
                         isActive = editor.isActive('heading', { level: 1 });
@@ -1175,18 +1098,6 @@
                         break;
                     case 'blockquote':
                         isActive = editor.isActive('blockquote');
-                        break;
-                    case 'code':
-                        isActive = editor.isActive('code');
-                        break;
-                    case 'alignLeft':
-                        isActive = editor.isActive({ textAlign: 'left' });
-                        break;
-                    case 'alignCenter':
-                        isActive = editor.isActive({ textAlign: 'center' });
-                        break;
-                    case 'alignRight':
-                        isActive = editor.isActive({ textAlign: 'right' });
                         break;
                 }
 
