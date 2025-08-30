@@ -142,17 +142,21 @@
         }
         
         .event {
-            font-size: 11px;
-            padding: 2px 4px;
-            border-radius: 3px;
-            margin-bottom: 2px;
+            font-size: 12px;
+            padding: 6px 8px;
+            border-radius: 5px;
+            margin-bottom: 3px;
             color: white;
-            font-weight: 500;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         .reflection {
-            background: #95a5a6;
-            border-left: 3px solid #7f8c8d;
+            background: #8e44ad !important;
+            border-left: 4px solid #6c3483;
+            color: white;
         }
         
         .tentative {
@@ -210,7 +214,9 @@
         }
         
         .event:hover {
-            opacity: 0.8;
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         
         .event .delete-btn {
@@ -1305,10 +1311,13 @@
                     const dayCells = document.querySelectorAll('.day-cell');
                     let targetCell = null;
                     
-                    dayCells.forEach(cell => {
+                    console.log('Available day cells with dates:');
+                    dayCells.forEach((cell, index) => {
                         const cellDate = cell.getAttribute('data-date');
+                        console.log(`Cell ${index}: date=${cellDate}`);
                         if (cellDate === eventDateString) {
                             targetCell = cell;
+                            console.log(`MATCH! Cell ${index} matches event date ${eventDateString}`);
                         }
                     });
                     
@@ -1317,9 +1326,14 @@
                         addEventElement(targetCell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
                     } else {
                         console.error('Could not find target cell for date:', eventDateString, 'event:', eventData.event_text);
+                        console.log('Event date string length:', eventDateString.length);
+                        console.log('Event date string chars:', Array.from(eventDateString));
+                        
                         // Fallback to day number matching
                         const eventDate = new Date(eventDateString + 'T00:00:00');
                         const dayNumber = eventDate.getDate();
+                        console.log('Trying fallback with day number:', dayNumber);
+                        
                         dayCells.forEach(cell => {
                             const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
                             if (cellDayNumber === dayNumber && !targetCell) {
@@ -1333,26 +1347,10 @@
                 
                 console.log('Calendar loaded from Supabase successfully');
                 
-                // Debug: Check what events are now in the DOM
-                const allEvents = document.querySelectorAll('.event');
-                console.log('Total events in DOM after loading:', allEvents.length);
-                allEvents.forEach((event, index) => {
-                    const text = event.textContent.replace('×', '').trim();
-                    const eventClass = event.getAttribute('data-class');
-                    const display = event.style.display;
-                    const isHardcoded = event.hasAttribute('data-hardcoded');
-                    console.log(`Event ${index}: "${text}" (class: ${eventClass}, display: ${display}, hardcoded: ${isHardcoded})`);
-                });
-                
-                // Explicitly update event visibility to ensure all events are shown
+                // Update event visibility to ensure all events are shown
                 setTimeout(() => {
                     updateEventVisibility();
                     console.log('Event visibility updated after loading');
-                    
-                    // Debug: Force show all events after a brief delay
-                    setTimeout(() => {
-                        debugShowAllEvents();
-                    }, 200);
                 }, 100);
             } catch (error) {
                 console.error('Error loading from Supabase:', error);
