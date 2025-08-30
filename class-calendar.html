@@ -142,24 +142,28 @@
         }
         
         .event {
-            font-size: 12px !important;
-            padding: 6px 8px !important;
-            border-radius: 5px !important;
-            margin-bottom: 3px !important;
+            font-size: 20px !important;
+            padding: 15px !important;
+            border-radius: 0px !important;
+            margin: 5px !important;
             color: #000000 !important;
-            font-weight: 600 !important;
+            font-weight: 900 !important;
             cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+            transition: none !important;
+            box-shadow: none !important;
             /* ULTRA-VISIBLE DEBUG STYLES */
             background: #ffff00 !important;
-            border: 5px solid #ff0000 !important;
-            min-height: 30px !important;
-            z-index: 9999 !important;
+            border: 10px solid #ff0000 !important;
+            min-height: 50px !important;
+            min-width: 100px !important;
+            z-index: 99999 !important;
             position: relative !important;
             display: block !important;
             opacity: 1 !important;
             visibility: visible !important;
+            text-decoration: none !important;
+            text-shadow: none !important;
+            line-height: 1.5 !important;
         }
         
         .reflection {
@@ -772,7 +776,9 @@
                 
                 // Initialize TipTap editors after a short delay to ensure libraries are loaded
                 setTimeout(() => {
-                    initTipTapEditors();
+                    // Temporarily disabled for debugging
+                    // initTipTapEditors();
+                    console.log('TipTap initialization temporarily disabled for debugging');
                 }, 100);
                 
                 console.log('Calendar initialized successfully');
@@ -972,6 +978,8 @@
                     showEventDetails(eventDiv, text, eventClass, currentNotes);
                 }
             });
+            
+            console.log('About to set innerHTML with text:', text);
             
             eventDiv.innerHTML = `
                 ${text}
