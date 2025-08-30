@@ -893,10 +893,17 @@
         
         // Initialize TipTap editors
         function initTipTapEditors() {
+            console.log('Initializing editors...');
+            
+            // Always create toolbars regardless of TipTap availability
+            createBasicToolbar('eventNotesToolbar');
+            createBasicToolbar('eventDetailsToolbar');
+            
             try {
                 // Check if TipTap is available
                 if (!window.Tiptap || !window.TiptapStarterKit || !window.TiptapPlaceholder) {
-                    console.warn('TipTap libraries not loaded, using fallback');
+                    console.warn('TipTap libraries not loaded, using fallback editors');
+                    setupFallbackEditors();
                     return;
                 }
 
@@ -911,12 +918,6 @@
                     TextStyle: !!window.TiptapTextStyle,
                     Color: !!window.TiptapColor
                 });
-
-                // Create basic toolbar for creating events
-                createBasicToolbar('eventNotesToolbar');
-                
-                // Create basic toolbar for event details
-                createBasicToolbar('eventDetailsToolbar');
 
                 // Editor for adding/editing events
                 const eventNotesElement = document.getElementById('eventNotesEditor');
@@ -967,7 +968,32 @@
                 }
             } catch (error) {
                 console.error('Error initializing TipTap editors:', error);
-                // Calendar should still work without TipTap
+                setupFallbackEditors();
+            }
+        }
+
+        // Setup fallback editors when TipTap isn't available
+        function setupFallbackEditors() {
+            console.log('Setting up fallback editors');
+            
+            const eventNotesElement = document.getElementById('eventNotesEditor');
+            if (eventNotesElement) {
+                eventNotesElement.contentEditable = true;
+                eventNotesElement.innerHTML = '<p>Start typing your reflection notes...</p>';
+                eventNotesElement.addEventListener('input', function() {
+                    const notesField = document.getElementById('eventNotes');
+                    if (notesField) {
+                        notesField.value = this.innerHTML;
+                    }
+                });
+                console.log('Notes fallback editor created');
+            }
+            
+            const detailsNotesElement = document.getElementById('eventDetailsNotes');
+            if (detailsNotesElement) {
+                detailsNotesElement.contentEditable = true;
+                detailsNotesElement.innerHTML = '<p>Add your reflection notes here...</p>';
+                console.log('Details fallback editor created');
             }
         }
 
@@ -1015,52 +1041,83 @@
 
                 const action = button.dataset.action;
                 console.log('Toolbar action:', action);
-                const editor = toolbarId.includes('eventNotes') ? notesEditor : detailsEditor;
                 
-                if (editor) {
-                    handleBasicToolbarAction(editor, action);
+                // Try to get TipTap editor first, then fallback to contentEditable
+                let editor = null;
+                let editorElement = null;
+                
+                if (toolbarId.includes('eventNotes')) {
+                    editor = notesEditor;
+                    editorElement = document.getElementById('eventNotesEditor');
                 } else {
-                    console.error('No editor found for toolbar:', toolbarId);
+                    editor = detailsEditor;
+                    editorElement = document.getElementById('eventDetailsNotes');
                 }
+                
+                // Focus the editor element for fallback commands
+                if (editorElement) {
+                    editorElement.focus();
+                }
+                
+                handleBasicToolbarAction(editor, action);
             });
         }
 
         // Handle basic toolbar actions
         function handleBasicToolbarAction(editor, action) {
-            switch (action) {
-                case 'bold':
-                    editor.chain().focus().toggleBold().run();
-                    break;
-                case 'italic':
-                    editor.chain().focus().toggleItalic().run();
-                    break;
-                case 'heading1':
-                    editor.chain().focus().toggleHeading({ level: 1 }).run();
-                    break;
-                case 'heading2':
-                    editor.chain().focus().toggleHeading({ level: 2 }).run();
-                    break;
-                case 'heading3':
-                    editor.chain().focus().toggleHeading({ level: 3 }).run();
-                    break;
-                case 'paragraph':
-                    editor.chain().focus().setParagraph().run();
-                    break;
-                case 'bulletList':
-                    editor.chain().focus().toggleBulletList().run();
-                    break;
-                case 'orderedList':
-                    editor.chain().focus().toggleOrderedList().run();
-                    break;
-                case 'blockquote':
-                    editor.chain().focus().toggleBlockquote().run();
-                    break;
-                case 'undo':
-                    editor.chain().focus().undo().run();
-                    break;
-                case 'redo':
-                    editor.chain().focus().redo().run();
-                    break;
+            if (editor && editor.chain) {
+                // TipTap editor
+                switch (action) {
+                    case 'bold':
+                        editor.chain().focus().toggleBold().run();
+                        break;
+                    case 'italic':
+                        editor.chain().focus().toggleItalic().run();
+                        break;
+                    case 'heading1':
+                        editor.chain().focus().toggleHeading({ level: 1 }).run();
+                        break;
+                    case 'heading2':
+                        editor.chain().focus().toggleHeading({ level: 2 }).run();
+                        break;
+                    case 'heading3':
+                        editor.chain().focus().toggleHeading({ level: 3 }).run();
+                        break;
+                    case 'bulletList':
+                        editor.chain().focus().toggleBulletList().run();
+                        break;
+                    case 'orderedList':
+                        editor.chain().focus().toggleOrderedList().run();
+                        break;
+                }
+            } else {
+                // Fallback contentEditable editor
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    switch (action) {
+                        case 'bold':
+                            document.execCommand('bold', false, null);
+                            break;
+                        case 'italic':
+                            document.execCommand('italic', false, null);
+                            break;
+                        case 'heading1':
+                            document.execCommand('formatBlock', false, 'H1');
+                            break;
+                        case 'heading2':
+                            document.execCommand('formatBlock', false, 'H2');
+                            break;
+                        case 'heading3':
+                            document.execCommand('formatBlock', false, 'H3');
+                            break;
+                        case 'bulletList':
+                            document.execCommand('insertUnorderedList', false, null);
+                            break;
+                        case 'orderedList':
+                            document.execCommand('insertOrderedList', false, null);
+                            break;
+                    }
+                }
             }
         }
 
