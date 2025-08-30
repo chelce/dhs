@@ -142,15 +142,24 @@
         }
         
         .event {
-            font-size: 12px;
-            padding: 6px 8px;
-            border-radius: 5px;
-            margin-bottom: 3px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            font-size: 12px !important;
+            padding: 6px 8px !important;
+            border-radius: 5px !important;
+            margin-bottom: 3px !important;
+            color: white !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+            /* ULTRA-VISIBLE DEBUG STYLES */
+            background: #ff0000 !important;
+            border: 5px solid #00ff00 !important;
+            min-height: 30px !important;
+            z-index: 9999 !important;
+            position: relative !important;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
         }
         
         .reflection {
@@ -669,6 +678,31 @@
         let supabase = null;
         let notesEditor = null;
         let detailsEditor = null;
+
+        // Debug: Count DOM events
+        function countDOMEvents() {
+            const allEvents = document.querySelectorAll('.event');
+            console.log(`DOM EVENT COUNT: ${allEvents.length} events found in DOM`);
+            
+            allEvents.forEach((event, index) => {
+                console.log(`DOM Event ${index + 1}:`, {
+                    title: event.textContent.trim(),
+                    parent: event.parentElement,
+                    parentClass: event.parentElement.className,
+                    parentDate: event.parentElement.dataset.date,
+                    styles: {
+                        display: getComputedStyle(event).display,
+                        visibility: getComputedStyle(event).visibility,
+                        opacity: getComputedStyle(event).opacity,
+                        background: getComputedStyle(event).backgroundColor,
+                        position: getComputedStyle(event).position,
+                        zIndex: getComputedStyle(event).zIndex
+                    }
+                });
+            });
+            
+            return allEvents.length;
+        }
         let currentEvent = null;
         
         // Initialize Supabase (will be set up after you create the project)
