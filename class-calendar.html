@@ -11,6 +11,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/index.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-highlight@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -407,37 +413,137 @@
         }
         
         /* TipTap Editor Styles */
-        .tiptap-editor {
+        .editor-container {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        
+        .editor-toolbar {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        
+        .editor-toolbar button {
+            background: white;
             border: 1px solid #ddd;
             border-radius: 4px;
-            padding: 12px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .editor-toolbar button:hover {
+            background: #e9ecef;
+            border-color: #999;
+        }
+        
+        .editor-toolbar button.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .editor-toolbar .separator {
+            width: 1px;
+            background: #ddd;
+            margin: 4px 6px;
+        }
+        
+        .tiptap-editor {
+            border: none;
+            border-radius: 0;
+            padding: 16px;
             min-height: 120px;
             max-height: 300px;
             overflow-y: auto;
             background: white;
+            font-family: 'Harmony OS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+            outline: none;
         }
         
         .tiptap-editor:focus {
             outline: none;
-            border-color: #3498db;
         }
         
         .tiptap-editor p {
-            margin: 0 0 8px 0;
+            margin: 0 0 1em 0;
         }
         
-        .tiptap-editor h3 {
-            margin: 12px 0 6px 0;
-            font-size: 16px;
+        .tiptap-editor h1, .tiptap-editor h2, .tiptap-editor h3 {
+            margin: 1em 0 0.5em 0;
+            font-weight: 600;
         }
+        
+        .tiptap-editor h1 { font-size: 1.5em; }
+        .tiptap-editor h2 { font-size: 1.3em; }
+        .tiptap-editor h3 { font-size: 1.1em; }
         
         .tiptap-editor ul, .tiptap-editor ol {
-            padding-left: 20px;
-            margin: 8px 0;
+            margin: 1em 0;
+            padding-left: 1.5em;
+        }
+        
+        .tiptap-editor li {
+            margin: 0.25em 0;
         }
         
         .tiptap-editor strong {
             font-weight: 600;
+        }
+        
+        .tiptap-editor em {
+            font-style: italic;
+        }
+        
+        .tiptap-editor u {
+            text-decoration: underline;
+        }
+        
+        .tiptap-editor mark {
+            background: #ffeb3b;
+            padding: 1px 2px;
+            border-radius: 2px;
+        }
+        
+        .tiptap-editor a {
+            color: #007bff;
+            text-decoration: underline;
+        }
+        
+        .tiptap-editor blockquote {
+            border-left: 4px solid #007bff;
+            margin: 1em 0;
+            padding-left: 1em;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .tiptap-editor code {
+            background: #f4f4f4;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .tiptap-editor hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 2em 0;
         }
         
         /* Event Details Modal */
@@ -609,7 +715,10 @@
                 </div>
                 <div class="form-group">
                     <label for="eventNotes">Reflection Notes:</label>
-                    <div id="eventNotesEditor" class="tiptap-editor"></div>
+                    <div class="editor-container">
+                        <div id="eventNotesToolbar" class="editor-toolbar"></div>
+                        <div id="eventNotesEditor" class="tiptap-editor"></div>
+                    </div>
                     <input type="hidden" id="eventNotes">
                 </div>
                 <div class="form-group">
@@ -654,7 +763,10 @@
             </div>
             <div class="notes-section">
                 <label class="notes-label">Reflection Notes:</label>
-                <div id="eventDetailsNotes" class="tiptap-editor"></div>
+                <div class="editor-container">
+                    <div id="eventDetailsToolbar" class="editor-toolbar"></div>
+                    <div id="eventDetailsNotes" class="tiptap-editor"></div>
+                </div>
             </div>
             <div class="form-actions" style="margin-top: 20px;">
                 <button type="button" class="btn btn-primary" onclick="saveEventNotes()">Save Notes</button>
@@ -786,23 +898,28 @@
                     return;
                 }
 
+                // Create toolbar for creating events
+                createEditorToolbar('eventNotesToolbar', 'eventNotesEditor');
+                
+                // Create toolbar for event details
+                createEditorToolbar('eventDetailsToolbar', 'eventDetailsNotes');
+
                 // Editor for adding/editing events
                 const eventNotesElement = document.getElementById('eventNotesEditor');
                 if (eventNotesElement) {
                     notesEditor = new window.Tiptap.Editor({
                         element: eventNotesElement,
-                        extensions: [
-                            window.TiptapStarterKit.StarterKit,
-                            window.TiptapPlaceholder.Placeholder.configure({
-                                placeholder: 'Add reflection notes about this lesson/activity...'
-                            })
-                        ],
+                        extensions: getEditorExtensions(),
                         content: '',
                         onUpdate: ({ editor }) => {
                             const notesField = document.getElementById('eventNotes');
                             if (notesField) {
                                 notesField.value = editor.getHTML();
                             }
+                            updateToolbarState('eventNotesToolbar', editor);
+                        },
+                        onSelectionUpdate: ({ editor }) => {
+                            updateToolbarState('eventNotesToolbar', editor);
                         }
                     });
                 }
@@ -812,19 +929,273 @@
                 if (detailsNotesElement) {
                     detailsEditor = new window.Tiptap.Editor({
                         element: detailsNotesElement,
-                        extensions: [
-                            window.TiptapStarterKit.StarterKit,
-                            window.TiptapPlaceholder.Placeholder.configure({
-                                placeholder: 'Add your reflection notes here...'
-                            })
-                        ],
-                        content: ''
+                        extensions: getEditorExtensions(),
+                        content: '',
+                        onUpdate: ({ editor }) => {
+                            updateToolbarState('eventDetailsToolbar', editor);
+                        },
+                        onSelectionUpdate: ({ editor }) => {
+                            updateToolbarState('eventDetailsToolbar', editor);
+                        }
                     });
                 }
             } catch (error) {
                 console.error('Error initializing TipTap editors:', error);
                 // Calendar should still work without TipTap
             }
+        }
+
+        // Get editor extensions
+        function getEditorExtensions() {
+            const extensions = [
+                window.TiptapStarterKit.StarterKit.configure({
+                    heading: {
+                        levels: [1, 2, 3]
+                    }
+                }),
+                window.TiptapPlaceholder.Placeholder.configure({
+                    placeholder: 'Start typing your reflection notes...'
+                })
+            ];
+
+            // Add optional extensions if available
+            if (window.TiptapUnderline) {
+                extensions.push(window.TiptapUnderline.Underline);
+            }
+            if (window.TiptapTextAlign) {
+                extensions.push(window.TiptapTextAlign.TextAlign.configure({
+                    types: ['heading', 'paragraph']
+                }));
+            }
+            if (window.TiptapHighlight) {
+                extensions.push(window.TiptapHighlight.Highlight);
+            }
+            if (window.TiptapLink) {
+                extensions.push(window.TiptapLink.Link.configure({
+                    openOnClick: false
+                }));
+            }
+            if (window.TiptapTextStyle && window.TiptapColor) {
+                extensions.push(window.TiptapTextStyle.TextStyle);
+                extensions.push(window.TiptapColor.Color);
+            }
+
+            return extensions;
+        }
+
+        // Create toolbar for editor
+        function createEditorToolbar(toolbarId, editorId) {
+            const toolbar = document.getElementById(toolbarId);
+            if (!toolbar) return;
+
+            toolbar.innerHTML = `
+                <button type="button" data-action="bold" title="Bold (Ctrl+B)">
+                    <strong>B</strong>
+                </button>
+                <button type="button" data-action="italic" title="Italic (Ctrl+I)">
+                    <em>I</em>
+                </button>
+                <button type="button" data-action="underline" title="Underline (Ctrl+U)">
+                    <u>U</u>
+                </button>
+                <button type="button" data-action="highlight" title="Highlight">
+                    <span style="background: #ffeb3b; padding: 1px 3px;">H</span>
+                </button>
+                
+                <div class="separator"></div>
+                
+                <button type="button" data-action="heading1" title="Heading 1">H1</button>
+                <button type="button" data-action="heading2" title="Heading 2">H2</button>
+                <button type="button" data-action="heading3" title="Heading 3">H3</button>
+                <button type="button" data-action="paragraph" title="Paragraph">P</button>
+                
+                <div class="separator"></div>
+                
+                <button type="button" data-action="bulletList" title="Bullet List">
+                    • List
+                </button>
+                <button type="button" data-action="orderedList" title="Numbered List">
+                    1. List
+                </button>
+                <button type="button" data-action="blockquote" title="Quote">
+                    " Quote
+                </button>
+                
+                <div class="separator"></div>
+                
+                <button type="button" data-action="alignLeft" title="Align Left">
+                    ⬅
+                </button>
+                <button type="button" data-action="alignCenter" title="Align Center">
+                    ↔
+                </button>
+                <button type="button" data-action="alignRight" title="Align Right">
+                    ➡
+                </button>
+                
+                <div class="separator"></div>
+                
+                <button type="button" data-action="link" title="Add Link">
+                    🔗 Link
+                </button>
+                <button type="button" data-action="code" title="Inline Code">
+                    &lt;/&gt;
+                </button>
+                <button type="button" data-action="horizontalRule" title="Horizontal Line">
+                    ―
+                </button>
+                
+                <div class="separator"></div>
+                
+                <button type="button" data-action="undo" title="Undo (Ctrl+Z)">
+                    ↶
+                </button>
+                <button type="button" data-action="redo" title="Redo (Ctrl+Y)">
+                    ↷
+                </button>
+            `;
+
+            // Add event listeners to toolbar buttons
+            toolbar.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (!button) return;
+
+                const action = button.dataset.action;
+                const editor = editorId === 'eventNotesEditor' ? notesEditor : detailsEditor;
+                
+                if (editor) {
+                    handleToolbarAction(editor, action);
+                }
+            });
+        }
+
+        // Handle toolbar actions
+        function handleToolbarAction(editor, action) {
+            switch (action) {
+                case 'bold':
+                    editor.chain().focus().toggleBold().run();
+                    break;
+                case 'italic':
+                    editor.chain().focus().toggleItalic().run();
+                    break;
+                case 'underline':
+                    editor.chain().focus().toggleUnderline().run();
+                    break;
+                case 'highlight':
+                    editor.chain().focus().toggleHighlight().run();
+                    break;
+                case 'heading1':
+                    editor.chain().focus().toggleHeading({ level: 1 }).run();
+                    break;
+                case 'heading2':
+                    editor.chain().focus().toggleHeading({ level: 2 }).run();
+                    break;
+                case 'heading3':
+                    editor.chain().focus().toggleHeading({ level: 3 }).run();
+                    break;
+                case 'paragraph':
+                    editor.chain().focus().setParagraph().run();
+                    break;
+                case 'bulletList':
+                    editor.chain().focus().toggleBulletList().run();
+                    break;
+                case 'orderedList':
+                    editor.chain().focus().toggleOrderedList().run();
+                    break;
+                case 'blockquote':
+                    editor.chain().focus().toggleBlockquote().run();
+                    break;
+                case 'alignLeft':
+                    editor.chain().focus().setTextAlign('left').run();
+                    break;
+                case 'alignCenter':
+                    editor.chain().focus().setTextAlign('center').run();
+                    break;
+                case 'alignRight':
+                    editor.chain().focus().setTextAlign('right').run();
+                    break;
+                case 'link':
+                    const url = prompt('Enter URL:');
+                    if (url) {
+                        editor.chain().focus().setLink({ href: url }).run();
+                    }
+                    break;
+                case 'code':
+                    editor.chain().focus().toggleCode().run();
+                    break;
+                case 'horizontalRule':
+                    editor.chain().focus().setHorizontalRule().run();
+                    break;
+                case 'undo':
+                    editor.chain().focus().undo().run();
+                    break;
+                case 'redo':
+                    editor.chain().focus().redo().run();
+                    break;
+            }
+        }
+
+        // Update toolbar button states
+        function updateToolbarState(toolbarId, editor) {
+            const toolbar = document.getElementById(toolbarId);
+            if (!toolbar) return;
+
+            const buttons = toolbar.querySelectorAll('button[data-action]');
+            buttons.forEach(button => {
+                const action = button.dataset.action;
+                let isActive = false;
+
+                switch (action) {
+                    case 'bold':
+                        isActive = editor.isActive('bold');
+                        break;
+                    case 'italic':
+                        isActive = editor.isActive('italic');
+                        break;
+                    case 'underline':
+                        isActive = editor.isActive('underline');
+                        break;
+                    case 'highlight':
+                        isActive = editor.isActive('highlight');
+                        break;
+                    case 'heading1':
+                        isActive = editor.isActive('heading', { level: 1 });
+                        break;
+                    case 'heading2':
+                        isActive = editor.isActive('heading', { level: 2 });
+                        break;
+                    case 'heading3':
+                        isActive = editor.isActive('heading', { level: 3 });
+                        break;
+                    case 'bulletList':
+                        isActive = editor.isActive('bulletList');
+                        break;
+                    case 'orderedList':
+                        isActive = editor.isActive('orderedList');
+                        break;
+                    case 'blockquote':
+                        isActive = editor.isActive('blockquote');
+                        break;
+                    case 'code':
+                        isActive = editor.isActive('code');
+                        break;
+                    case 'alignLeft':
+                        isActive = editor.isActive({ textAlign: 'left' });
+                        break;
+                    case 'alignCenter':
+                        isActive = editor.isActive({ textAlign: 'center' });
+                        break;
+                    case 'alignRight':
+                        isActive = editor.isActive({ textAlign: 'right' });
+                        break;
+                }
+
+                if (isActive) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
         }
         
         // Generate the 7-week calendar dynamically
