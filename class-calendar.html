@@ -1333,10 +1333,26 @@
                 
                 console.log('Calendar loaded from Supabase successfully');
                 
+                // Debug: Check what events are now in the DOM
+                const allEvents = document.querySelectorAll('.event');
+                console.log('Total events in DOM after loading:', allEvents.length);
+                allEvents.forEach((event, index) => {
+                    const text = event.textContent.replace('×', '').trim();
+                    const eventClass = event.getAttribute('data-class');
+                    const display = event.style.display;
+                    const isHardcoded = event.hasAttribute('data-hardcoded');
+                    console.log(`Event ${index}: "${text}" (class: ${eventClass}, display: ${display}, hardcoded: ${isHardcoded})`);
+                });
+                
                 // Explicitly update event visibility to ensure all events are shown
                 setTimeout(() => {
                     updateEventVisibility();
                     console.log('Event visibility updated after loading');
+                    
+                    // Debug: Force show all events after a brief delay
+                    setTimeout(() => {
+                        debugShowAllEvents();
+                    }, 200);
                 }, 100);
             } catch (error) {
                 console.error('Error loading from Supabase:', error);
@@ -1362,11 +1378,40 @@
                 'reflection': document.getElementById('show-reflection').checked
             };
             
+            console.log('Filter checkboxes state:', checkboxes);
+            
             document.querySelectorAll('.event').forEach(event => {
                 const eventClass = event.getAttribute('data-class');
+                const eventText = event.textContent.replace('×', '').trim();
+                
                 if (checkboxes[eventClass] !== undefined) {
-                    event.style.display = checkboxes[eventClass] ? 'block' : 'none';
+                    const shouldShow = checkboxes[eventClass];
+                    event.style.display = shouldShow ? 'block' : 'none';
+                    console.log(`Event "${eventText}" (class: ${eventClass}) - should show: ${shouldShow}, display: ${event.style.display}`);
+                } else {
+                    console.warn(`Unknown event class: ${eventClass} for event: ${eventText}`);
                 }
+            });
+        }
+        
+        // Debug function to show all events
+        function debugShowAllEvents() {
+            console.log('=== DEBUG: Showing all events ===');
+            document.querySelectorAll('.event').forEach((event, index) => {
+                const text = event.textContent.replace('×', '').trim();
+                const eventClass = event.getAttribute('data-class');
+                const computedStyle = window.getComputedStyle(event);
+                
+                // Force display
+                event.style.display = 'block';
+                event.style.visibility = 'visible';
+                event.style.opacity = '1';
+                
+                console.log(`Event ${index}: "${text}" (class: ${eventClass})`);
+                console.log(`  - display: ${computedStyle.display}`);
+                console.log(`  - visibility: ${computedStyle.visibility}`);
+                console.log(`  - opacity: ${computedStyle.opacity}`);
+                console.log(`  - position: ${computedStyle.position}`);
             });
         }
         
