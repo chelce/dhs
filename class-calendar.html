@@ -960,6 +960,7 @@
             
             // Add click handler to show details
             eventDiv.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event from bubbling up to day cell
                 if (!e.target.classList.contains('delete-btn')) {
                     // Get the current notes from the data attribute
                     const currentNotes = eventDiv.getAttribute('data-notes') || notes || '';
