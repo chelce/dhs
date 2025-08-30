@@ -421,12 +421,14 @@
         }
         
         .editor-toolbar {
-            background: #f8f9fa;
-            padding: 8px 12px;
-            border-bottom: 1px solid #e0e0e0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
+            background: #f8f9fa !important;
+            padding: 8px 12px !important;
+            border-bottom: 1px solid #e0e0e0 !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 4px !important;
+            min-height: 50px !important;
+            border: 2px solid #ff0000 !important; /* DEBUG: Red border to see toolbar */
         }
         
         .editor-toolbar button {
@@ -972,55 +974,53 @@
         // Create basic toolbar with core features
         function createBasicToolbar(toolbarId) {
             const toolbar = document.getElementById(toolbarId);
-            if (!toolbar) return;
+            console.log(`Creating toolbar for ${toolbarId}:`, toolbar);
+            
+            if (!toolbar) {
+                console.error(`Toolbar element not found: ${toolbarId}`);
+                return;
+            }
 
             toolbar.innerHTML = `
-                <button type="button" data-action="bold" title="Bold (Ctrl+B)">
+                <button type="button" data-action="bold" title="Bold (Ctrl+B)" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">
                     <strong>B</strong>
                 </button>
-                <button type="button" data-action="italic" title="Italic (Ctrl+I)">
+                <button type="button" data-action="italic" title="Italic (Ctrl+I)" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">
                     <em>I</em>
                 </button>
                 
-                <div class="separator"></div>
+                <div class="separator" style="width: 1px; background: #ddd; margin: 4px 6px; display: inline-block; height: 20px;"></div>
                 
-                <button type="button" data-action="heading1" title="Heading 1">H1</button>
-                <button type="button" data-action="heading2" title="Heading 2">H2</button>
-                <button type="button" data-action="heading3" title="Heading 3">H3</button>
-                <button type="button" data-action="paragraph" title="Paragraph">P</button>
+                <button type="button" data-action="heading1" title="Heading 1" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">H1</button>
+                <button type="button" data-action="heading2" title="Heading 2" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">H2</button>
+                <button type="button" data-action="heading3" title="Heading 3" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">H3</button>
                 
-                <div class="separator"></div>
+                <div class="separator" style="width: 1px; background: #ddd; margin: 4px 6px; display: inline-block; height: 20px;"></div>
                 
-                <button type="button" data-action="bulletList" title="Bullet List">
+                <button type="button" data-action="bulletList" title="Bullet List" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">
                     • List
                 </button>
-                <button type="button" data-action="orderedList" title="Numbered List">
+                <button type="button" data-action="orderedList" title="Numbered List" style="background: #fff; border: 1px solid #ddd; padding: 8px 12px; margin: 2px; border-radius: 4px; cursor: pointer;">
                     1. List
-                </button>
-                <button type="button" data-action="blockquote" title="Quote">
-                    " Quote
-                </button>
-                
-                <div class="separator"></div>
-                
-                <button type="button" data-action="undo" title="Undo (Ctrl+Z)">
-                    ↶ Undo
-                </button>
-                <button type="button" data-action="redo" title="Redo (Ctrl+Y)">
-                    ↷ Redo
                 </button>
             `;
 
+            console.log(`Toolbar HTML set for ${toolbarId}:`, toolbar.innerHTML.substring(0, 200) + '...');
+
             // Add event listeners to toolbar buttons
             toolbar.addEventListener('click', (e) => {
+                console.log('Toolbar clicked:', e.target);
                 const button = e.target.closest('button');
                 if (!button) return;
 
                 const action = button.dataset.action;
+                console.log('Toolbar action:', action);
                 const editor = toolbarId.includes('eventNotes') ? notesEditor : detailsEditor;
                 
                 if (editor) {
                     handleBasicToolbarAction(editor, action);
+                } else {
+                    console.error('No editor found for toolbar:', toolbarId);
                 }
             });
         }
