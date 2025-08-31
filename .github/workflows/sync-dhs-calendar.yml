@@ -1,0 +1,57 @@
+name: Sync calendar to public dhs repo
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'class-calendar.html'
+      - '.github/workflows/sync-dhs-calendar.yml'
+      - 'scripts/sync-dhs-calendar.sh'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    if: github.repository == 'chelce/SCHOOL'
+    steps:
+      - name: Checkout (shallow)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine if class-calendar.html changed
+        id: diffcheck
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q '^class-calendar.html$'; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Exit early if no change (manual run ignored)
+        if: steps.diffcheck.outputs.changed == 'false' && github.event_name != 'workflow_dispatch'
+        run: echo "No calendar changes; skipping sync." && exit 0
+
+      - name: Verify DHS_PAT secret present
+        run: |
+          if [ -z "${DHS_PAT:-}" ]; then
+            echo "Missing DHS_PAT secret; add it in repo settings." >&2
+            exit 1
+          fi
+        env:
+          DHS_PAT: ${{ secrets.DHS_PAT }}
+
+      - name: Set execution bit
+        run: chmod +x scripts/sync-dhs-calendar.sh
+
+      - name: Run sync script
+        env:
+          DHS_PAT: ${{ secrets.DHS_PAT }}
+          DHS_REPO: chelce/dhs
+          GITHUB_SHA: ${{ github.sha }}
+        run: scripts/sync-dhs-calendar.sh
+
+      - name: Summary
+        run: |
+          echo "Sync attempt complete." >> $GITHUB_STEP_SUMMARY
+          echo "If nothing changed, no commit was pushed." >> $GITHUB_STEP_SUMMARY
