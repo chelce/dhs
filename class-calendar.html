@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Calendar & Reflections</title>
+    <!-- Harmony OS Font -->
+    <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- TipTap Editor Dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-highlight@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.1.13/dist/index.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Cult UI Design System */
+        :root {
+            --cult-bg-primary: #0a0a0b;
+            --cult-bg-secondary: #18181b;
+            --cult-bg-tertiary: #27272a;
+            --cult-text-primary: #fafafa;
+            --cult-text-secondary: #a1a1aa;
+            --cult-text-muted: #71717a;
+            --cult-accent: #3b82f6;
+            --cult-accent-hover: #2563eb;
+            --cult-border: #27272a;
+            --cult-border-subtle: #3f3f46;
+            --cult-radius: 12px;
+            --cult-radius-lg: 16px;
+            --cult-spacing: 16px;
+            --cult-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --cult-shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --cult-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", system-ui, sans-serif;
+            margin: 0;
+            padding: var(--cult-spacing);
+            background: linear-gradient(135deg, var(--cult-bg-primary) 0%, #1a1a1f 100%);
+            color: var(--cult-text-primary);
+            font-weight: 400;
+            line-height: 1.6;
+            letter-spacing: -0.01em;
+            min-height: 100vh;
+        }
+        
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--cult-bg-secondary);
+            border-radius: var(--cult-radius-lg);
+            box-shadow: var(--cult-shadow-lg);
+            border: 1px solid var(--cult-border);
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+        
+        .calendar-header {
+            background: linear-gradient(135deg, var(--cult-bg-tertiary), var(--cult-bg-secondary));
+            color: var(--cult-text-primary);
+            padding: calc(var(--cult-spacing) * 2);
+            text-align: center;
+            border-bottom: 1px solid var(--cult-border);
+        }
+        
+        .month-year {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-bottom: var(--cult-spacing);
+            background: linear-gradient(135deg, var(--cult-text-primary), var(--cult-text-secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .class-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--cult-spacing);
+            margin-top: var(--cult-spacing);
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--cult-bg-tertiary);
+            border-radius: var(--cult-radius);
+            border: 1px solid var(--cult-border-subtle);
+            transition: var(--cult-transition);
+        }
+
+        .legend-item:hover {
+            background: var(--cult-bg-primary);
+            transform: translateY(-1px);
+        }
+        
+        .color-box {
+            width: 16px;
+            height: 16px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--cult-border);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--cult-border);
+            border-radius: var(--cult-radius);
+            overflow: hidden;
+            margin: var(--cult-spacing);
+        }
+        
+        .week-row {
+            display: contents;
+        }
+        
+        .week-label {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--cult-bg-tertiary), var(--cult-bg-secondary));
+            color: var(--cult-text-primary);
+            padding: 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: -0.01em;
+            border-bottom: 1px solid var(--cult-border);
+        }
+        
+        .week-label.current-week {
+            background: linear-gradient(135deg, var(--cult-accent), var(--cult-accent-hover));
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .day-header {
+            background: var(--cult-bg-tertiary);
+            color: var(--cult-text-secondary);
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+        
+        .day-cell {
+            background: var(--cult-bg-secondary);
+            min-height: 120px;
+            padding: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--cult-transition);
+            border: 1px solid transparent;
+        }
+
+        .day-cell:hover {
+            background: var(--cult-bg-tertiary);
+            border-color: var(--cult-border-subtle);
+            transform: scale(1.02);
+        }
+        
+        .day-cell.current-week {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--cult-accent);
+        }
+        
+        .day-number {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: var(--cult-text-primary);
+            letter-spacing: -0.01em;
+        }
+        
+        .day-cell.other-month .day-number {
+            color: var(--cult-text-muted);
+            opacity: 0.5;
+        }
+        
+        .day-cell.today {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid var(--cult-accent);
+            box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+        }
+        
+        .day-cell.today.current-week {
+            background: rgba(59, 130, 246, 0.15);
+            border: 2px solid var(--cult-accent);
+        }
+        
+        .week-range {
+            text-align: center;
+            color: var(--cult-text-secondary);
+            margin: 8px 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+        
+        .event {
+            font-size: 0.75rem !important;
+            padding: 8px 10px !important;
+            border-radius: var(--cult-radius) !important;
+            margin-bottom: 6px !important;
+            color: white !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: var(--cult-transition) !important;
+            box-shadow: var(--cult-shadow) !important;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+            letter-spacing: -0.01em !important;
+        }
+
+        .event:hover {
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: var(--cult-shadow-lg) !important;
+        }
+        
+        .class-reflection {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6) !important;
+            border-left: 3px solid #6c3483 !important;
+            color: white !important;
+        }
+        
+        .tentative {
+            opacity: 0.7;
+            font-style: italic;
+            border-style: dashed !important;
+        }
+        
+        /* Cult UI Class colors with gradients */
+        .class-2a { background: linear-gradient(135deg, #9b59b6, #8e44ad) !important; }
+        .class-2b { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
+        .class-3b { background: linear-gradient(135deg, #27ae60, #229954) !important; }
+        .class-ap { background: linear-gradient(135deg, #e67e22, #d35400) !important; }
+        .class-4b { background: linear-gradient(135deg, #e91e63, #c2185b) !important; }
+        
+        .upcoming-section {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+        
+        .upcoming-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .upcoming-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .upcoming-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: var(--cult-radius);
+            background: var(--cult-bg-tertiary);
+            border: 1px solid var(--cult-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--cult-transition);
+        }
+
+        .upcoming-item:hover {
+            background: var(--cult-bg-primary);
+            transform: translateY(-1px);
+        }
+        
+        .event .delete-btn {
+            position: absolute;
+            right: 6px;
+            top: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            color: white;
+            transition: var(--cult-transition);
+            backdrop-filter: blur(10px);
+        }
+
+        .event .delete-btn:hover {
+            background: #ef4444;
+            transform: scale(1.1);
+        }
+        
+        .event:hover .delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .controls {
+            padding: calc(var(--cult-spacing) * 1.5);
+            background: var(--cult-bg-tertiary);
+            border-bottom: 1px solid var(--cult-border);
+        }
+        
+        .controls-row {
+            display: flex;
+            gap: var(--cult-spacing);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--cult-bg-secondary);
+            border-radius: var(--cult-radius);
+            border: 1px solid var(--cult-border);
+            transition: var(--cult-transition);
+            cursor: pointer;
+        }
+
+        .filter-checkbox:hover {
+            background: var(--cult-bg-primary);
+            border-color: var(--cult-border-subtle);
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--cult-border-subtle);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            transition: var(--cult-transition);
+        }
+
+        .filter-checkbox input[type="checkbox"]:checked {
+            background: var(--cult-accent);
+            border-color: var(--cult-accent);
+        }
+
+        .filter-checkbox input[type="checkbox"]:checked::before {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .filter-checkbox label {
+            color: var(--cult-text-primary);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: 1px solid var(--cult-border);
+            border-radius: var(--cult-radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            transition: var(--cult-transition);
+            background: var(--cult-bg-tertiary);
+            color: var(--cult-text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--cult-bg-primary);
+            border-color: var(--cult-border-subtle);
+            transform: translateY(-1px);
+            box-shadow: var(--cult-shadow);
+        }
+
+        .btn-primary {
+            background: var(--cult-accent);
+            color: white;
+            border-color: var(--cult-accent);
+        }
+
+        .btn-primary:hover {
+            background: var(--cult-accent-hover);
+            border-color: var(--cult-accent-hover);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border-color: var(--cult-border-subtle);
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .month-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .month-nav button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .month-nav button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .export-section {
+            margin-left: auto;
+        }
+        
+        /* TipTap Simple Editor Template - Light Version (Official) */
+        .editor-container {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border: 2px solid #f1f1f1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        
+        .editor-container:focus-within {
+            border-color: #958df1;
+        }
+        
+        /* Toolbar Styling */
+        .toolbar {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0.75rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        /* Control Group - Button containers */
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background-color: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 0.375rem;
+            padding: 0.125rem;
+        }
+        
+        .control-group button {
+            background: transparent;
+            border: none;
+            border-radius: 0.25rem;
+            color: #374151;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            height: 2rem;
+            min-width: 2rem;
+            padding: 0.25rem 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s;
+        }
+        
+        .control-group button:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+        
+        .control-group button[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .control-group button.is-active,
+        .control-group button.active {
+            background-color: #958df1;
+            color: #ffffff;
+        }
+        
+        .control-group button.is-active:hover,
+        .control-group button.active:hover {
+            background-color: #7c70db;
+            color: #ffffff;
+        }
+        
+        /* TipTap Editor Content - Official Simple Editor Template Light Theme */
+        .tiptap {
+            border: none;
+            border-radius: 0;
+            padding: 1.5rem;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #000000;
+            outline: none;
+            caret-color: #958df1;
+        }
+        
+        .tiptap:focus {
+            outline: none;
+        }
+        
+        /* First child margin reset (Official Simple Editor pattern) */
+        .tiptap :first-child {
+            margin-top: 0;
+        }
+        
+        /* Paragraph styles */
+        .tiptap p {
+            margin-bottom: 1em;
+        }
+        
+        /* List styles (Official Simple Editor pattern) */
+        .tiptap ul,
+        .tiptap ol {
+            padding: 0 1rem;
+            margin: 1.25rem 1rem 1.25rem 0.4rem;
+        }
+        
+        .tiptap li p {
+            margin-top: 0.25em;
+            margin-bottom: 0.25em;
+        }
+        
+        /* Heading styles (Official Simple Editor pattern) */
+        .tiptap h1,
+        .tiptap h2,
+        .tiptap h3,
+        .tiptap h4,
+        .tiptap h5,
+        .tiptap h6 {
+            line-height: 1.1;
+            margin-top: 2.5rem;
+            text-wrap: pretty;
+            font-weight: 600;
+            color: #000000;
+        }
+        
+        .tiptap h1,
+        .tiptap h2 {
+            margin-top: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tiptap h1 { font-size: 1.4rem; }
+        .tiptap h2 { font-size: 1.2rem; }
+        .tiptap h3 { font-size: 1.1rem; }
+        .tiptap h4,
+        .tiptap h5,
+        .tiptap h6 { font-size: 1rem; }
+        
+        /* Text formatting */
+        .tiptap strong {
+            font-weight: 600;
+        }
+        
+        .tiptap em {
+            font-style: italic;
+        }
+        
+        .tiptap u {
+            text-decoration: underline;
+        }
+        
+        .tiptap s {
+            text-decoration: line-through;
+        }
+        
+        .tiptap mark {
+            background-color: #faf594;
+            padding: 0.1rem 0.2rem;
+            border-radius: 0.2rem;
+        }
+        
+        .tiptap a {
+            color: #958df1;
+            text-decoration: underline;
+        }
+        
+        /* Code styles */
+        .tiptap code {
+            background-color: rgba(97, 97, 97, 0.1);
+            color: #616161;
+            padding: 0.25em 0.3em;
+            border-radius: 0.4rem;
+            font-size: 0.85rem;
+        }
+        
+        .tiptap pre {
+            background: #0d0d0d;
+            border-radius: 0.5rem;
+            color: #fff;
+            font-family: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            margin: 1.5rem 0;
+            padding: 0.75rem 1rem;
+        }
+        
+        .tiptap pre code {
+            background: none;
+            color: inherit;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+        
+        /* Blockquote */
+        .tiptap blockquote {
+            border-left: 2px solid rgba(13, 13, 13, 0.1);
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+        
+        /* Horizontal rule */
+        .tiptap hr {
+            border: none;
+            border-top: 2px solid rgba(13, 13, 13, 0.1);
+            margin: 2rem 0;
+        }
+        
+        /* Selection and focus styles */
+        .tiptap .ProseMirror-selectednode {
+            outline: 3px solid #958df1;
+            outline-offset: 2px;
+        }
+        
+        /* Task lists (if enabled) */
+        .tiptap ul[data-type='taskList'] {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tiptap ul[data-type='taskList'] li {
+            align-items: center;
+            display: flex;
+        }
+        
+        .tiptap ul[data-type='taskList'] li > label {
+            flex: 0 0 auto;
+            margin-right: 0.5rem;
+            user-select: none;
+        }
+        
+        .tiptap ul[data-type='taskList'] li > div {
+            flex: 1 1 auto;
+        }
+        
+        /* Image styles (if using images) */
+        .tiptap img {
+            display: block;
+            height: auto;
+            margin: 1.5rem 0;
+            max-width: 100%;
+        }
+        
+        .tiptap img.ProseMirror-selectednode {
+            outline: 3px solid #958df1;
+        }
+        
+        /* Event Details Modal */
+        .event-details-modal .modal-content {
+            max-width: 800px;
+        }
+        
+        .event-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .event-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .event-class-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .notes-section {
+            margin-top: 20px;
+        }
+        
+        .notes-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .event-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="controls">
+            <div class="controls-row">
+                <div class="filter-group">
+                    <strong>Show Classes:</strong>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-2a" checked>
+                        <label for="show-2a">2A</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-2b" checked>
+                        <label for="show-2b">2B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-3b" checked>
+                        <label for="show-3b">3B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-ap" checked>
+                        <label for="show-ap">AP</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-4b" checked>
+                        <label for="show-4b">4B</label>
+                    </div>
+                    <div class="filter-checkbox">
+                        <input type="checkbox" id="show-reflection" checked>
+                        <label for="show-reflection">Reflections</label>
+                    </div>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="exportCalendar()">Export Calendar</button>
+                    <button class="btn btn-secondary" onclick="importCalendar()">Import</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calendar-header">
+            <div class="month-nav">
+                <button onclick="changeWeek(-1)">← Previous Week</button>
+                <div class="month-year" id="monthYear">7-Week Teaching View</div>
+                <button onclick="changeWeek(1)">Next Week →</button>
+            </div>
+            <div class="week-range" id="weekRange"></div>
+            <div class="class-legend">
+                <div class="legend-item">
+                    <div class="color-box class-2a"></div>
+                    <span>2A (Purple)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-2b"></div>
+                    <span>2B (Blue)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-3b"></div>
+                    <span>3B (Green)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-ap"></div>
+                    <span>AP (Orange)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box class-4b"></div>
+                    <span>4B (Hot Pink)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="color-box reflection"></div>
+                    <span>Reflection</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Dynamic weekly calendar will be generated here -->
+        </div>
+        
+        <div class="upcoming-section">
+            <div class="upcoming-title">Upcoming Items</div>
+            <ul class="upcoming-list">
+                <li class="upcoming-item class-2a">
+                    <span>2A: Continue analogies work</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-ap">
+                    <span>AP: Profile targeting exercise</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-4b">
+                    <span>4B: More analogies/additional activity needed</span>
+                    <span>Next class</span>
+                </li>
+                <li class="upcoming-item class-ap tentative">
+                    <span>AP: Vocab #1 + Intellectual Devotional Week 9 Quiz</span>
+                    <span>Week 3 (Tentative)</span>
+                </li>
+                <li class="upcoming-item reflection">
+                    <span>Create AP vocab list</span>
+                    <span>This week</span>
+                </li>
+                <li class="upcoming-item reflection">
+                    <span>Prepare more analogies content</span>
+                    <span>Before next 4B class</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Add Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Add Event</span>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="eventForm">
+                <div class="form-group">
+                    <label for="eventText">Event Text:</label>
+                    <input type="text" id="eventText" placeholder="Enter event title..." required>
+                </div>
+                <div class="form-group">
+                    <label for="eventNotes">Reflection Notes:</label>
+                    <div class="editor-container">
+                        <div id="eventNotesToolbar" class="toolbar"></div>
+                        <div id="eventNotesEditor" class="tiptap"></div>
+                    </div>
+                    <input type="hidden" id="eventNotes">
+                </div>
+                <div class="form-group">
+                    <label for="eventClass">Class/Type:</label>
+                    <select id="eventClass" required>
+                        <option value="">Select class...</option>
+                        <option value="2a">2A (Purple)</option>
+                        <option value="2b">2B (Blue)</option>
+                        <option value="3b">3B (Green)</option>
+                        <option value="ap">AP (Orange)</option>
+                        <option value="4b">4B (Hot Pink)</option>
+                        <option value="reflection">Reflection</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eventType">Event Type:</label>
+                    <select id="eventType">
+                        <option value="">Regular</option>
+                        <option value="tentative">Tentative</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Event Details Modal -->
+    <div id="eventDetailsModal" class="modal event-details-modal">
+        <div class="modal-content">
+            <div class="event-details-header">
+                <div>
+                    <div class="event-title" id="eventDetailsTitle"></div>
+                    <div class="event-meta" id="eventDetailsMeta"></div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="event-class-badge" id="eventDetailsClassBadge"></span>
+                    <span class="close" onclick="closeEventDetailsModal()">&times;</span>
+                </div>
+            </div>
+            <div class="notes-section">
+                <label class="notes-label">Reflection Notes:</label>
+                <div class="editor-container">
+                    <div id="eventDetailsToolbar" class="toolbar"></div>
+                    <div id="eventDetailsNotes" class="tiptap"></div>
+                </div>
+            </div>
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn btn-primary" onclick="saveEventNotes()">Save Notes</button>
+                <button type="button" class="btn btn-secondary" onclick="editEvent()">Edit Event</button>
+                <button type="button" class="btn btn-secondary" onclick="closeEventDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co'
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk'
+        
+        let supabase = null;
+        let notesEditor = null;
+        let detailsEditor = null;
+
+        // Debug: Count DOM events
+        function countDOMEvents() {
+            const allEvents = document.querySelectorAll('.event');
+            console.log(`DOM EVENT COUNT: ${allEvents.length} events found in DOM`);
+            
+            allEvents.forEach((event, index) => {
+                console.log(`DOM Event ${index + 1}:`, {
+                    title: event.textContent.trim(),
+                    parent: event.parentElement,
+                    parentClass: event.parentElement.className,
+                    parentDate: event.parentElement.dataset.date,
+                    styles: {
+                        display: getComputedStyle(event).display,
+                        visibility: getComputedStyle(event).visibility,
+                        opacity: getComputedStyle(event).opacity,
+                        background: getComputedStyle(event).backgroundColor,
+                        position: getComputedStyle(event).position,
+                        zIndex: getComputedStyle(event).zIndex
+                    }
+                });
+            });
+            
+            return allEvents.length;
+        }
+        let currentEvent = null;
+        
+        // Initialize Supabase (will be set up after you create the project)
+        function initSupabase() {
+            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        }
+        
+        // Calendar data and state
+        let currentWeekOffset = 0; // 0 = current week, -1 = prev week, +1 = next week
+        let selectedDay = null;
+        
+        // Month names
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        
+        // Day names
+        const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        
+        // Get current date and week boundaries (Monday-based week)
+        function getCurrentWeekBounds() {
+            const today = new Date();
+            const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            // Convert to Monday-based: Monday = 0, Tuesday = 1, ..., Sunday = 6
+            const mondayBasedDayOfWeek = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - mondayBasedDayOfWeek + (currentWeekOffset * 7));
+            
+            return startOfWeek;
+        }
+        
+        // Generate 7 weeks of dates (3 before, current, 3 after)
+        function generateWeeks() {
+            const weeks = [];
+            const baseWeekStart = getCurrentWeekBounds();
+            
+            // Go back 3 weeks from the base week
+            for (let weekOffset = -3; weekOffset <= 3; weekOffset++) {
+                const weekStart = new Date(baseWeekStart);
+                weekStart.setDate(baseWeekStart.getDate() + (weekOffset * 7));
+                
+                const week = [];
+                for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+                    const date = new Date(weekStart);
+                    date.setDate(weekStart.getDate() + dayOffset);
+                    week.push({
+                        date: date,
+                        isCurrentWeek: weekOffset === 0,
+                        isToday: date.toDateString() === new Date().toDateString()
+                    });
+                }
+                weeks.push(week);
+            }
+            
+            return weeks;
+        }
+        
+        // Initialize calendar on load
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('Initializing calendar...');
+                initSupabase();
+                generateCalendar();
+                loadCalendarData();
+                setupFilterListeners();
+                
+                // Initialize TipTap editors after a short delay to ensure libraries are loaded
+                setTimeout(() => {
+                    initTipTapEditors();
+                }, 100);
+                
+                console.log('Calendar initialized successfully');
+            } catch (error) {
+                console.error('Error initializing calendar:', error);
+                // Still try to generate basic calendar
+                generateCalendar();
+            }
+        });
+        
+        // Initialize TipTap editors
+        function initTipTapEditors() {
+            console.log('Initializing editors...');
+            
+            // Always create toolbars regardless of TipTap availability
+            createBasicToolbar('eventNotesToolbar');
+            createBasicToolbar('eventDetailsToolbar');
+            
+            try {
+                // Check if TipTap is available
+                if (!window.Tiptap || !window.TiptapStarterKit || !window.TiptapPlaceholder) {
+                    console.warn('TipTap libraries not loaded, using fallback editors');
+                    setupFallbackEditors();
+                    return;
+                }
+
+                console.log('Available TipTap extensions:', {
+                    Tiptap: !!window.Tiptap,
+                    StarterKit: !!window.TiptapStarterKit,
+                    Placeholder: !!window.TiptapPlaceholder,
+                    Underline: !!window.TiptapUnderline,
+                    TextAlign: !!window.TiptapTextAlign,
+                    Highlight: !!window.TiptapHighlight,
+                    Link: !!window.TiptapLink,
+                    TextStyle: !!window.TiptapTextStyle,
+                    Color: !!window.TiptapColor
+                });
+
+                // Editor for adding/editing events
+                const eventNotesElement = document.getElementById('eventNotesEditor');
+                if (eventNotesElement) {
+                    notesEditor = new window.Tiptap.Editor({
+                        element: eventNotesElement,
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Start typing your reflection notes...'
+                            })
+                        ],
+                        content: '',
+                        onUpdate: ({ editor }) => {
+                            const notesField = document.getElementById('eventNotes');
+                            if (notesField) {
+                                notesField.value = editor.getHTML();
+                            }
+                            updateBasicToolbarState('eventNotesToolbar', editor);
+                        },
+                        onSelectionUpdate: ({ editor }) => {
+                            updateBasicToolbarState('eventNotesToolbar', editor);
+                        }
+                    });
+                    console.log('Notes editor created successfully');
+                }
+                
+                // Editable editor for viewing and editing event details
+                const detailsNotesElement = document.getElementById('eventDetailsNotes');
+                if (detailsNotesElement) {
+                    detailsEditor = new window.Tiptap.Editor({
+                        element: detailsNotesElement,
+                        extensions: [
+                            window.TiptapStarterKit.StarterKit,
+                            window.TiptapPlaceholder.Placeholder.configure({
+                                placeholder: 'Add your reflection notes here...'
+                            })
+                        ],
+                        content: '',
+                        onUpdate: ({ editor }) => {
+                            updateBasicToolbarState('eventDetailsToolbar', editor);
+                        },
+                        onSelectionUpdate: ({ editor }) => {
+                            updateBasicToolbarState('eventDetailsToolbar', editor);
+                        }
+                    });
+                    console.log('Details editor created successfully');
+                }
+            } catch (error) {
+                console.error('Error initializing TipTap editors:', error);
+                setupFallbackEditors();
+            }
+        }
+
+        // Setup fallback editors when TipTap isn't available
+        function setupFallbackEditors() {
+            console.log('Setting up fallback editors');
+            
+            const eventNotesElement = document.getElementById('eventNotesEditor');
+            if (eventNotesElement) {
+                eventNotesElement.contentEditable = true;
+                eventNotesElement.innerHTML = '<p>Start typing your reflection notes...</p>';
+                eventNotesElement.addEventListener('input', function() {
+                    const notesField = document.getElementById('eventNotes');
+                    if (notesField) {
+                        notesField.value = this.innerHTML;
+                    }
+                });
+                console.log('Notes fallback editor created');
+            }
+            
+            const detailsNotesElement = document.getElementById('eventDetailsNotes');
+            if (detailsNotesElement) {
+                detailsNotesElement.contentEditable = true;
+                detailsNotesElement.innerHTML = '<p>Add your reflection notes here...</p>';
+                console.log('Details fallback editor created');
+            }
+        }
+
+        // Create basic toolbar with core features
+        function createBasicToolbar(toolbarId) {
+            const toolbar = document.getElementById(toolbarId);
+            console.log(`Creating toolbar for ${toolbarId}:`, toolbar);
+            
+            if (!toolbar) {
+                console.error(`Toolbar element not found: ${toolbarId}`);
+                return;
+            }
+
+            toolbar.innerHTML = `
+                <div class="control-group">
+                    <button type="button" data-action="bold" title="Bold (Ctrl+B)">
+                        <strong>B</strong>
+                    </button>
+                    <button type="button" data-action="italic" title="Italic (Ctrl+I)">
+                        <em>I</em>
+                    </button>
+                    <button type="button" data-action="underline" title="Underline (Ctrl+U)">
+                        <u>U</u>
+                    </button>
+                    <button type="button" data-action="strike" title="Strike">
+                        <s>S</s>
+                    </button>
+                </div>
+                <div class="control-group">
+                    <button type="button" data-action="heading1" title="Heading 1">H1</button>
+                    <button type="button" data-action="heading2" title="Heading 2">H2</button>
+                    <button type="button" data-action="heading3" title="Heading 3">H3</button>
+                    <button type="button" data-action="paragraph" title="Paragraph">P</button>
+                </div>
+                <div class="control-group">
+                    <button type="button" data-action="bulletList" title="Bullet List">
+                        • List
+                    </button>
+                    <button type="button" data-action="orderedList" title="Numbered List">
+                        1. List
+                    </button>
+                </div>
+                <div class="control-group">
+                    <button type="button" data-action="blockquote" title="Blockquote">
+                        " Quote
+                    </button>
+                    <button type="button" data-action="codeBlock" title="Code Block">
+                        &lt;/&gt;
+                    </button>
+                    <button type="button" data-action="link" title="Add Link">
+                        Link
+                    </button>
+                    <button type="button" data-action="image" title="Add Image">
+                        Img
+                    </button>
+                </div>
+            `;
+
+            console.log(`Toolbar HTML set for ${toolbarId}:`, toolbar.innerHTML.substring(0, 200) + '...');
+
+            // Add event listeners to toolbar buttons
+            toolbar.addEventListener('click', (e) => {
+                console.log('Toolbar clicked:', e.target);
+                const button = e.target.closest('button');
+                if (!button) return;
+
+                const action = button.dataset.action;
+                console.log('Toolbar action:', action);
+                
+                // Try to get TipTap editor first, then fallback to contentEditable
+                let editor = null;
+                let editorElement = null;
+                
+                if (toolbarId.includes('eventNotes')) {
+                    editor = notesEditor;
+                    editorElement = document.getElementById('eventNotesEditor');
+                } else {
+                    editor = detailsEditor;
+                    editorElement = document.getElementById('eventDetailsNotes');
+                }
+                
+                // Focus the editor element for fallback commands
+                if (editorElement) {
+                    editorElement.focus();
+                }
+                
+                handleBasicToolbarAction(editor, action);
+            });
+        }
+
+        // Handle basic toolbar actions
+        function handleBasicToolbarAction(editor, action) {
+            if (editor && editor.chain) {
+                // TipTap editor
+                switch (action) {
+                    case 'bold':
+                        editor.chain().focus().toggleBold().run();
+                        break;
+                    case 'italic':
+                        editor.chain().focus().toggleItalic().run();
+                        break;
+                    case 'underline':
+                        editor.chain().focus().toggleUnderline().run();
+                        break;
+                    case 'strike':
+                        editor.chain().focus().toggleStrike().run();
+                        break;
+                    case 'heading1':
+                        editor.chain().focus().toggleHeading({ level: 1 }).run();
+                        break;
+                    case 'heading2':
+                        editor.chain().focus().toggleHeading({ level: 2 }).run();
+                        break;
+                    case 'heading3':
+                        editor.chain().focus().toggleHeading({ level: 3 }).run();
+                        break;
+                    case 'paragraph':
+                        editor.chain().focus().setParagraph().run();
+                        break;
+                    case 'bulletList':
+                        editor.chain().focus().toggleBulletList().run();
+                        break;
+                    case 'orderedList':
+                        editor.chain().focus().toggleOrderedList().run();
+                        break;
+                    case 'blockquote':
+                        editor.chain().focus().toggleBlockquote().run();
+                        break;
+                    case 'codeBlock':
+                        editor.chain().focus().toggleCodeBlock().run();
+                        break;
+                    case 'link':
+                        const url = window.prompt('Enter URL:');
+                        if (url) {
+                            editor.chain().focus().setLink({ href: url }).run();
+                        }
+                        break;
+                    case 'image':
+                        const imgUrl = window.prompt('Enter image URL:');
+                        if (imgUrl) {
+                            editor.chain().focus().setImage({ src: imgUrl }).run();
+                        }
+                        break;
+                }
+            } else {
+                // Fallback contentEditable editor
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    switch (action) {
+                        case 'bold':
+                            document.execCommand('bold', false, null);
+                            break;
+                        case 'italic':
+                            document.execCommand('italic', false, null);
+                            break;
+                        case 'underline':
+                            document.execCommand('underline', false, null);
+                            break;
+                        case 'strike':
+                            document.execCommand('strikeThrough', false, null);
+                            break;
+                        case 'heading1':
+                            document.execCommand('formatBlock', false, 'H1');
+                            break;
+                        case 'heading2':
+                            document.execCommand('formatBlock', false, 'H2');
+                            break;
+                        case 'heading3':
+                            document.execCommand('formatBlock', false, 'H3');
+                            break;
+                        case 'paragraph':
+                            document.execCommand('formatBlock', false, 'P');
+                            break;
+                        case 'bulletList':
+                            document.execCommand('insertUnorderedList', false, null);
+                            break;
+                        case 'orderedList':
+                            document.execCommand('insertOrderedList', false, null);
+                            break;
+                        case 'blockquote':
+                            document.execCommand('formatBlock', false, 'BLOCKQUOTE');
+                            break;
+                        case 'codeBlock':
+                            document.execCommand('formatBlock', false, 'PRE');
+                            break;
+                        case 'link':
+                            const url = window.prompt('Enter URL:');
+                            if (url) {
+                                document.execCommand('createLink', false, url);
+                            }
+                            break;
+                        case 'image':
+                            const imgUrl = window.prompt('Enter image URL:');
+                            if (imgUrl) {
+                                document.execCommand('insertImage', false, imgUrl);
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+
+        // Update basic toolbar button states
+        function updateBasicToolbarState(toolbarId, editor) {
+            const toolbar = document.getElementById(toolbarId);
+            if (!toolbar) return;
+
+            const buttons = toolbar.querySelectorAll('button[data-action]');
+            buttons.forEach(button => {
+                const action = button.dataset.action;
+                let isActive = false;
+
+                switch (action) {
+                    case 'bold':
+                        isActive = editor.isActive('bold');
+                        break;
+                    case 'italic':
+                        isActive = editor.isActive('italic');
+                        break;
+                    case 'underline':
+                        isActive = editor.isActive('underline');
+                        break;
+                    case 'strike':
+                        isActive = editor.isActive('strike');
+                        break;
+                    case 'heading1':
+                        isActive = editor.isActive('heading', { level: 1 });
+                        break;
+                    case 'heading2':
+                        isActive = editor.isActive('heading', { level: 2 });
+                        break;
+                    case 'heading3':
+                        isActive = editor.isActive('heading', { level: 3 });
+                        break;
+                    case 'paragraph':
+                        isActive = editor.isActive('paragraph');
+                        break;
+                    case 'bulletList':
+                        isActive = editor.isActive('bulletList');
+                        break;
+                    case 'orderedList':
+                        isActive = editor.isActive('orderedList');
+                        break;
+                    case 'blockquote':
+                        isActive = editor.isActive('blockquote');
+                        break;
+                    case 'codeBlock':
+                        isActive = editor.isActive('codeBlock');
+                        break;
+                    case 'link':
+                        isActive = editor.isActive('link');
+                        break;
+                    // Note: image button doesn't have an active state
+                }
+
+                if (isActive) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+        
+        // Generate the 7-week calendar dynamically
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            dayNames.forEach(dayName => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = dayName.substring(0, 3);
+                calendarGrid.appendChild(header);
+            });
+            
+            // Generate weeks
+            const weeks = generateWeeks();
+            weeks.forEach((week, weekIndex) => {
+                // Add week label
+                const weekLabel = document.createElement('div');
+                weekLabel.className = 'week-label';
+                if (week[0].isCurrentWeek) {
+                    weekLabel.classList.add('current-week');
+                }
+                
+                const weekStart = week[0].date;
+                const weekEnd = week[6].date;
+                const startStr = `${weekStart.getMonth() + 1}/${weekStart.getDate()}`;
+                const endStr = `${weekEnd.getMonth() + 1}/${weekEnd.getDate()}`;
+                
+                if (week[0].isCurrentWeek) {
+                    weekLabel.textContent = `Current Week: ${startStr} - ${endStr}`;
+                } else {
+                    weekLabel.textContent = `${startStr} - ${endStr}`;
+                }
+                
+                calendarGrid.appendChild(weekLabel);
+                
+                // Add days for this week
+                week.forEach(dayInfo => {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+                    
+                    // Store the date for better event matching
+                    dayCell.setAttribute('data-date', dayInfo.date.toISOString().split('T')[0]);
+                    
+                    if (dayInfo.isCurrentWeek) {
+                        dayCell.classList.add('current-week');
+                    }
+                    
+                    if (dayInfo.isToday) {
+                        dayCell.classList.add('today');
+                    }
+                    
+                    // Add click handler
+                    dayCell.onclick = () => addEvent(dayInfo.date);
+                    
+                    // Add day number
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = dayInfo.date.getDate();
+                    dayCell.appendChild(dayNumber);
+                    
+                    // Add hardcoded events for specific dates
+                    addHardcodedEvents(dayCell, dayInfo.date);
+                    
+                    calendarGrid.appendChild(dayCell);
+                });
+            });
+            
+            // Update week range display
+            updateWeekRangeDisplay();
+        }
+        
+        // Add hardcoded historical events
+        function addHardcodedEvents(dayCell, date) {
+            const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+            
+            // August 23, 2025 events
+            if (dateStr === '2025-08-23') {
+                addEventElement(dayCell, 'Logic Puzzle Opening Activity', '2a', false, true, 
+                    '<h3>What Worked Well:</h3><p>• Scattergories was a huge success</p><p>• Students engaged well with logic puzzles</p><h3>Notes for Next Time:</h3><p>• Baker\'s problem needs more scaffolding</p>');
+                addEventElement(dayCell, "Baker's Problem Activity", '2a', false, true,
+                    '<h3>Activity Notes:</h3><p>• Problem was challenging for students</p><p>• Need to provide more guidance next time</p><p>• Consider breaking into smaller steps</p>');
+            }
+            
+            // August 28, 2025 events  
+            if (dateStr === '2025-08-28') {
+                addEventElement(dayCell, 'Analogies Introduction', 'ap', false, true,
+                    '<h3>AP Class - Analogies Lesson:</h3><p>• Introduced analogy concepts</p><p>• Students seemed to grasp the basics</p><p>• Need more practice examples</p>');
+                addEventElement(dayCell, 'Analogies Introduction', '2a', false, true,
+                    '<h3>2A Class - Analogies Lesson:</h3><p>• Same content as AP but adapted pace</p><p>• Students needed more explanation</p><p>• Consider visual aids next time</p>');
+            }
+            
+            // August 29, 2025 events
+            if (dateStr === '2025-08-29') {
+                addEventElement(dayCell, 'ABC Game + Analogies', '2a', false, true,
+                    '<h3>2A Today:</h3><p>• ABC game for kitchen items + things smaller than golf ball</p><p>• Started analogies (5 minutes only)</p><p>• Good pacing, will continue analogies next class</p>');
+                    
+                addEventElement(dayCell, 'Rhetorical Situation Lesson', 'ap', false, true,
+                    '<h3>AP Today:</h3><p>• Covered rhetorical triangle (SPACE[cat])</p><p>• In/out group, demographics, psychographics</p><p>• Self-profiling exercise went well</p><p>• Students work more efficiently than expected - felt scrambling</p><p>• Depth uncertain, need to assess better</p><p><strong>Next:</strong> Profile targeting exercise</p>');
+                    
+                addEventElement(dayCell, 'ABC Game + Analogies', '4b', false, true,
+                    '<h3>4B Today:</h3><p>• ABC game (kitchen items only) - took unexpectedly long</p><p>• Got through many analogies but 1/3 of class needs more content</p><p><strong>Next:</strong> Need more analogies or additional activity for faster finishers</p>');
+                    
+                addEventElement(dayCell, 'Hearts & Dollars Launch', 'reflection', false, true,
+                    '<h3>System Launch:</h3><p>• Introduced hearts & dollars system today</p><p>• Started paying students in 2A and 4B</p><p>• B day students all paid up</p><p>• NFC key integration postponed</p><p><strong>Issue:</strong> Need better group adherence enforcement - consider heart penalty</p>');
+            }
+        }
+        
+        // Helper function to create event elements
+        function addEventElement(parentCell, text, eventClass, isTentative = false, isHardcoded = false, notes = '') {
+            console.log('addEventElement called with:', { text, eventClass, isTentative, isHardcoded, notes });
+            console.log('parentCell:', parentCell);
+            
+            if (!parentCell) {
+                console.error('addEventElement: parentCell is null or undefined');
+                return;
+            }
+            
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event class-${eventClass}`;
+            eventDiv.setAttribute('data-class', eventClass);
+            eventDiv.setAttribute('data-notes', notes || '');
+            
+            if (isTentative) {
+                eventDiv.classList.add('tentative');
+            }
+            
+            if (isHardcoded) {
+                eventDiv.setAttribute('data-hardcoded', 'true');
+            }
+            
+            // Add click handler to show details
+            eventDiv.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent event from bubbling up to day cell
+                if (!e.target.classList.contains('delete-btn')) {
+                    // Get the current notes from the data attribute
+                    const currentNotes = eventDiv.getAttribute('data-notes') || notes || '';
+                    showEventDetails(eventDiv, text, eventClass, currentNotes);
+                }
+            });
+            
+            eventDiv.innerHTML = `
+                ${text}
+                <button class="delete-btn" onclick="deleteEvent(this)">&times;</button>
+            `;
+            
+            parentCell.appendChild(eventDiv);
+            console.log('Event element added to parent cell successfully');
+            console.log('Parent cell now has', parentCell.children.length, 'children');
+        }
+        
+        // Show event details modal
+        function showEventDetails(eventElement, title, eventClass, notes) {
+            currentEvent = eventElement;
+            
+            console.log('showEventDetails called with:', { title, eventClass, notes });
+            
+            // Set title and class badge
+            document.getElementById('eventDetailsTitle').textContent = title;
+            document.getElementById('eventDetailsMeta').textContent = `Class: ${getClassDisplayName(eventClass)}`;
+            
+            // Set class badge color and text
+            const badge = document.getElementById('eventDetailsClassBadge');
+            badge.textContent = getClassDisplayName(eventClass);
+            badge.className = `event-class-badge class-${eventClass}`;
+            
+            // Load notes into editor
+            console.log('Loading notes:', notes);
+            if (detailsEditor) {
+                // Ensure editor is editable
+                detailsEditor.setEditable(true);
+                // Set content with proper formatting
+                if (notes && notes.trim() !== '') {
+                    detailsEditor.commands.setContent(notes);
+                } else {
+                    detailsEditor.commands.setContent('<p>No reflection notes yet. Click here to add notes...</p>');
+                }
+            } else {
+                // Fallback for when TipTap isn't available
+                const notesElement = document.getElementById('eventDetailsNotes');
+                if (notesElement) {
+                    if (notes && notes.trim() !== '') {
+                        notesElement.innerHTML = notes;
+                    } else {
+                        notesElement.innerHTML = '<p>No reflection notes yet. Click here to add notes...</p>';
+                    }
+                    // Make it editable even without TipTap
+                    notesElement.contentEditable = true;
+                }
+            }
+            
+            // Show modal
+            document.getElementById('eventDetailsModal').style.display = 'block';
+        }
+        
+        // Helper function to get display name for class
+        function getClassDisplayName(eventClass) {
+            const classNames = {
+                '2a': '2A (Purple)',
+                '2b': '2B (Blue)', 
+                '3b': '3B (Green)',
+                'ap': 'AP (Orange)',
+                '4b': '4B (Hot Pink)',
+                'reflection': 'Reflection'
+            };
+            return classNames[eventClass] || eventClass;
+        }
+        
+        // Close event details modal
+        function closeEventDetailsModal() {
+            document.getElementById('eventDetailsModal').style.display = 'none';
+            currentEvent = null;
+        }
+        
+        // Save notes for current event
+        function saveEventNotes() {
+            if (currentEvent) {
+                let newNotes = '';
+                if (detailsEditor) {
+                    newNotes = detailsEditor.getHTML();
+                } else {
+                    // Fallback for when TipTap isn't available
+                    const notesElement = document.getElementById('eventDetailsNotes');
+                    if (notesElement) {
+                        newNotes = notesElement.innerHTML;
+                    }
+                }
+                
+                console.log('Saving notes:', newNotes);
+                currentEvent.setAttribute('data-notes', newNotes);
+                saveCalendarData();
+                
+                // Show success message
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = 'Saved ✓';
+                button.style.backgroundColor = '#28a745';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
+            }
+        }
+
+        // Edit current event
+        function editEvent() {
+            if (currentEvent) {
+                const title = document.getElementById('eventDetailsTitle').textContent;
+                const eventClass = currentEvent.getAttribute('data-class');
+                const notes = currentEvent.getAttribute('data-notes');
+                
+                // Populate edit form
+                document.getElementById('eventText').value = title;
+                document.getElementById('eventClass').value = eventClass;
+                if (notesEditor) {
+                    notesEditor.commands.setContent(notes || '');
+                }
+                
+                // Close details modal and open edit modal
+                closeEventDetailsModal();
+                document.getElementById('eventModal').style.display = 'block';
+            }
+        }
+        
+        // Update week range display
+        function updateWeekRangeDisplay() {
+            const weeks = generateWeeks();
+            const firstWeek = weeks[0];
+            const lastWeek = weeks[6];
+            
+            const startDate = firstWeek[0].date;
+            const endDate = lastWeek[6].date;
+            
+            const startStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const endStr = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            document.getElementById('weekRange').textContent = `${startStr} - ${endStr}`;
+        }
+        
+        // Event handling functions
+        function addEvent(date) {
+            selectedDay = date;
+            console.log('addEvent called with date:', date);
+            document.getElementById('eventModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+            document.getElementById('eventForm').reset();
+            if (notesEditor) {
+                notesEditor.commands.clearContent();
+                const notesField = document.getElementById('eventNotes');
+                if (notesField) {
+                    notesField.value = '';
+                }
+            }
+        }
+        
+        function deleteEvent(button) {
+            event.stopPropagation();
+            if (confirm('Delete this event?')) {
+                button.parentElement.remove();
+                saveCalendarData();
+            }
+        }
+        
+        // Week navigation
+        function changeWeek(direction) {
+            currentWeekOffset += direction;
+            generateCalendar();
+            loadCalendarData();
+        }
+        
+        function updateCalendarDisplay() {
+            generateCalendar();
+        }
+        
+        // Form submission
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submission started');
+            
+            const eventText = document.getElementById('eventText').value;
+            const eventClass = document.getElementById('eventClass').value;
+            const eventType = document.getElementById('eventType').value;
+            const eventNotes = document.getElementById('eventNotes').value;
+            
+            console.log('Form data:', { eventText, eventClass, eventType, eventNotes, selectedDay });
+            
+            if (!eventText.trim()) {
+                alert('Please enter an event title');
+                return;
+            }
+            
+            // Find the day cell for the selected date
+            console.log('Looking for day cell for selectedDay:', selectedDay);
+            const dayCells = document.querySelectorAll('.day-cell');
+            console.log('Found', dayCells.length, 'day cells');
+            let targetCell = null;
+            
+            // Debug: log all cell dates
+            dayCells.forEach((cell, index) => {
+                const cellDate = cell.getAttribute('data-date');
+                const dayNumber = cell.querySelector('.day-number')?.textContent;
+                console.log(`Cell ${index}: date=${cellDate}, dayNumber=${dayNumber}`);
+            });
+            
+            // Store the date when creating day cells for better matching
+            dayCells.forEach((cell, index) => {
+                if (selectedDay instanceof Date) {
+                    // Check if this cell represents the selected date
+                    const cellDate = cell.getAttribute('data-date');
+                    if (cellDate) {
+                        // Compare date strings directly to avoid timezone issues
+                        const selectedDateString = selectedDay.toISOString().split('T')[0];
+                        console.log(`Comparing: ${cellDate} === ${selectedDateString}`);
+                        if (cellDate === selectedDateString) {
+                            console.log(`Found matching cell at index ${index}`);
+                            targetCell = cell;
+                        }
+                    } else {
+                        // Fallback: use day number comparison (less reliable)
+                        const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                        console.log(`Fallback comparison: ${dayNumber} === ${selectedDay.getDate()}`);
+                        if (dayNumber === selectedDay.getDate()) {
+                            console.log(`Found matching cell by day number at index ${index}`);
+                            targetCell = cell;
+                        }
+                    }
+                } else if (typeof selectedDay === 'number') {
+                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                    if (dayNumber === selectedDay) {
+                        console.log(`Found matching cell by number at index ${index}`);
+                        targetCell = cell;
+                    }
+                }
+            });
+            
+            console.log('Found targetCell:', targetCell);
+            
+            if (targetCell) {
+                console.log('Adding event to target cell:', eventText);
+                addEventElement(targetCell, eventText, eventClass, eventType === 'tentative', false, eventNotes);
+                saveCalendarData();
+                
+                // Ensure the new event is visible
+                setTimeout(() => {
+                    updateEventVisibility();
+                    console.log('Event visibility updated after creation');
+                }, 100);
+                
+                console.log('Event added successfully');
+            } else {
+                console.error('Could not find target cell for selectedDay:', selectedDay);
+                alert('Error: Could not add event. Please try clicking on the day again.');
+            }
+            
+            closeModal();
+        });
+        
+        // Data persistence with Supabase
+        async function saveCalendarData() {
+            if (!supabase) {
+                saveToLocalStorage();
+                return;
+            }
+            
+            try {
+                // Get the current date range
+                const weeks = generateWeeks();
+                const startDate = weeks[0][0].date;
+                const endDate = weeks[6][6].date;
+                
+                // Clear existing events for this date range
+                await supabase
+                    .from('calendar_events')
+                    .delete()
+                    .gte('event_date', startDate.toISOString().split('T')[0])
+                    .lte('event_date', endDate.toISOString().split('T')[0]);
+                
+                // Collect all current events
+                const eventsToSave = [];
+                document.querySelectorAll('.day-cell').forEach(cell => {
+                    const dayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                    
+                    cell.querySelectorAll('.event').forEach(event => {
+                        if (!event.hasAttribute('data-hardcoded')) {
+                            const text = event.textContent.replace('×', '').trim();
+                            const className = event.getAttribute('data-class');
+                            const isTentative = event.classList.contains('tentative');
+                            const notes = event.getAttribute('data-notes') || '';
+                            
+                            // Find the corresponding date
+                            weeks.forEach(week => {
+                                week.forEach(day => {
+                                    if (day.date.getDate() === dayNumber) {
+                                        eventsToSave.push({
+                                            event_date: day.date.toISOString().split('T')[0],
+                                            year: day.date.getFullYear(),
+                                            month: day.date.getMonth(),
+                                            day: day.date.getDate(),
+                                            event_text: text,
+                                            event_class: className,
+                                            is_tentative: isTentative,
+                                            notes: notes,
+                                            created_at: new Date().toISOString()
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                });
+                
+                // Insert new events
+                if (eventsToSave.length > 0) {
+                    console.log('Attempting to save', eventsToSave.length, 'events to Supabase');
+                    console.log('Sample event data:', eventsToSave[0]);
+                    
+                    const { error } = await supabase
+                        .from('calendar_events')
+                        .insert(eventsToSave);
+                    
+                    if (error) {
+                        console.error('Supabase insert error:', error);
+                        throw error;
+                    }
+                }
+                
+                console.log('Calendar saved to Supabase successfully');
+            } catch (error) {
+                console.error('Error saving to Supabase:', error);
+                saveToLocalStorage();
+            }
+        }
+        
+        async function loadCalendarData() {
+            if (!supabase) {
+                loadFromLocalStorage();
+                return;
+            }
+            
+            try {
+                // Get the current date range
+                const weeks = generateWeeks();
+                const startDate = weeks[0][0].date;
+                const endDate = weeks[6][6].date;
+                
+                const { data, error } = await supabase
+                    .from('calendar_events')
+                    .select('*')
+                    .gte('event_date', startDate.toISOString().split('T')[0])
+                    .lte('event_date', endDate.toISOString().split('T')[0]);
+                
+                if (error) throw error;
+                
+                // Clear existing non-hardcoded events
+                document.querySelectorAll('.event').forEach(event => {
+                    if (!event.hasAttribute('data-hardcoded')) {
+                        event.remove();
+                    }
+                });
+                
+                // Add events from database
+                data.forEach(eventData => {
+                    const eventDateString = eventData.event_date;
+                    console.log('Loading event:', eventData.event_text, 'for date:', eventDateString);
+                    
+                    // Find the corresponding day cell by exact date match
+                    const dayCells = document.querySelectorAll('.day-cell');
+                    let targetCell = null;
+                    
+                    console.log('Available day cells with dates:');
+                    dayCells.forEach((cell, index) => {
+                        const cellDate = cell.getAttribute('data-date');
+                        console.log(`Cell ${index}: date=${cellDate}`);
+                        if (cellDate === eventDateString) {
+                            targetCell = cell;
+                            console.log(`MATCH! Cell ${index} matches event date ${eventDateString}`);
+                        }
+                    });
+                    
+                    if (targetCell) {
+                        console.log('Found target cell for event:', eventData.event_text);
+                        addEventElement(targetCell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                    } else {
+                        console.error('Could not find target cell for date:', eventDateString, 'event:', eventData.event_text);
+                        console.log('Event date string length:', eventDateString.length);
+                        console.log('Event date string chars:', Array.from(eventDateString));
+                        
+                        // Fallback to day number matching
+                        const eventDate = new Date(eventDateString + 'T00:00:00');
+                        const dayNumber = eventDate.getDate();
+                        console.log('Trying fallback with day number:', dayNumber);
+                        
+                        dayCells.forEach(cell => {
+                            const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
+                            if (cellDayNumber === dayNumber && !targetCell) {
+                                console.log('Using fallback matching for:', eventData.event_text);
+                                addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                                targetCell = cell; // Prevent multiple matches
+                            }
+                        });
+                    }
+                });
+                
+                console.log('Calendar loaded from Supabase successfully');
+                
+                // Update event visibility to ensure all events are shown
+                setTimeout(() => {
+                    updateEventVisibility();
+                    console.log('Event visibility updated after loading');
+                }, 100);
+            } catch (error) {
+                console.error('Error loading from Supabase:', error);
+                loadFromLocalStorage();
+            }
+        }
+        
+        // Filter functionality
+        function setupFilterListeners() {
+            const checkboxes = document.querySelectorAll('.filter-checkbox input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateEventVisibility);
+            });
+        }
+        
+        function updateEventVisibility() {
+            const checkboxes = {
+                '2a': document.getElementById('show-2a').checked,
+                '2b': document.getElementById('show-2b').checked,
+                '3b': document.getElementById('show-3b').checked,
+                'ap': document.getElementById('show-ap').checked,
+                '4b': document.getElementById('show-4b').checked,
+                'reflection': document.getElementById('show-reflection').checked
+            };
+            
+            console.log('Filter checkboxes state:', checkboxes);
+            
+            document.querySelectorAll('.event').forEach(event => {
+                const eventClass = event.getAttribute('data-class');
+                const eventText = event.textContent.replace('×', '').trim();
+                
+                if (checkboxes[eventClass] !== undefined) {
+                    const shouldShow = checkboxes[eventClass];
+                    event.style.display = shouldShow ? 'block' : 'none';
+                    console.log(`Event "${eventText}" (class: ${eventClass}) - should show: ${shouldShow}, display: ${event.style.display}`);
+                } else {
+                    console.warn(`Unknown event class: ${eventClass} for event: ${eventText}`);
+                }
+            });
+        }
+        
+        // Debug function to show all events
+        function debugShowAllEvents() {
+            console.log('=== DEBUG: Showing all events ===');
+            document.querySelectorAll('.event').forEach((event, index) => {
+                const text = event.textContent.replace('×', '').trim();
+                const eventClass = event.getAttribute('data-class');
+                const computedStyle = window.getComputedStyle(event);
+                
+                // Force display
+                event.style.display = 'block';
+                event.style.visibility = 'visible';
+                event.style.opacity = '1';
+                
+                console.log(`Event ${index}: "${text}" (class: ${eventClass})`);
+                console.log(`  - display: ${computedStyle.display}`);
+                console.log(`  - visibility: ${computedStyle.visibility}`);
+                console.log(`  - opacity: ${computedStyle.opacity}`);
+                console.log(`  - position: ${computedStyle.position}`);
+            });
+        }
+        
+        // Export/Import functionality
+        function exportCalendar() {
+            const weeks = generateWeeks();
+            const startDate = weeks[0][0].date;
+            const endDate = weeks[6][6].date;
+            
+            const calendarData = {
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
+                events: {}
+            };
+            
+            document.querySelectorAll('.day-cell').forEach(cell => {
+                const cellDate = cell.getAttribute('data-date');
+                const events = [];
+                
+                cell.querySelectorAll('.event').forEach(event => {
+                    if (!event.hasAttribute('data-hardcoded')) {
+                        const text = event.textContent.replace('×', '').trim();
+                        const className = event.getAttribute('data-class');
+                        const isTentative = event.classList.contains('tentative');
+                        const notes = event.getAttribute('data-notes') || '';
+                        
+                        events.push({
+                            text: text,
+                            class: className,
+                            tentative: isTentative,
+                            notes: notes
+                        });
+                    }
+                });
+                
+                if (events.length > 0) {
+                    calendarData.events[cellDate] = events;
+                }
+            });
+            
+            const dataStr = JSON.stringify(calendarData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `teaching-calendar-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function importCalendar() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            localStorage.setItem('teachingCalendar', e.target.result);
+                            alert('Calendar imported successfully! Refresh the page to see changes.');
+                        } catch (error) {
+                            alert('Error importing calendar: Invalid file format');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            input.click();
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+        
+        // Add click handlers to existing day cells
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.day-cell').forEach((cell, index) => {
+                if (!cell.onclick) {
+                    const dayNumber = cell.querySelector('.day-number').textContent;
+                    cell.onclick = () => addEvent(parseInt(dayNumber));
+                }
+            });
+        });
+    </script>
+</body>
+</html>
