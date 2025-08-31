@@ -62,7 +62,7 @@ if ($changed) {
   git config user.name "calendar-sync-bot"
   $msg = "Direct push calendar update (source SCHOOL working copy)"
   git commit -m $msg | Out-Null
-  Write-Host "Pushing changes to $repo:$branch ..."
+  Write-Host "Pushing changes to ${repo}:${branch} ..."
   git push origin $branch | Out-Null
   Pop-Location
   Write-Host 'Done.'
