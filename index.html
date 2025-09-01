@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Card Sets Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .card-set {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-set::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #FF5722, #4CAF50, #2196F3, #9C27B0, #FF9800);
+        }
+
+        .card-set:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .set-number {
+            display: inline-block;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .set-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .set-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .set-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .card-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-count::before {
+            content: '🎴';
+        }
+
+        .difficulty {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .difficulty.beginner::before {
+            content: '⭐';
+        }
+
+        .difficulty.intermediate::before {
+            content: '⭐⭐';
+        }
+
+        .difficulty.advanced::before {
+            content: '⭐⭐⭐';
+        }
+
+        .difficulty.mixed::before {
+            content: '⭐⭐';
+        }
+
+        .add-new {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: 2px dashed rgba(255,255,255,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .add-new:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .add-new::before {
+            content: '+';
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .add-new .add-text {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .gallery {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧩 Logic Puzzle Gallery</h1>
+            <p>Interactive logic puzzles for 9th Grade ELA - Developing critical thinking and problem-solving skills</p>
+        </div>
+
+        <div class="gallery">
+            <!-- Interactive Logic Puzzle Cards -->
+            <a href="cooking-class-card-clean.html" class="card-set">
+                <div class="set-number">Production Ready</div>
+                <div class="set-title">Interactive Logic Puzzle Cards</div>
+                <div class="set-description">
+                    Six engaging logic puzzles with three difficulty levels (Easy, Medium, Hard). Features dynamic 
+                    card sizing, smooth animations, and color-coded difficulty system. Perfect for developing 
+                    logical reasoning and deductive thinking skills. Optimized for SMART TV classroom display.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">6 Puzzles</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Analogies Interactive Task Cards -->
+            <a href="analogies-relationship-patterns-task-cards-complete.html" class="card-set">
+                <div class="set-number">🆕 Interactive</div>
+                <div class="set-title">Analogies & Word Relationships - Task Cards</div>
+                <div class="set-description">
+                    Interactive carousel task cards with three difficulty levels (Easy, Medium, Hard). Features 
+                    completion challenges, relationship categorization, and creative analogy creation. Includes 
+                    navigation controls and difficulty-specific color themes. Perfect for developing analogical reasoning.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">9 Card Sets</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Analogies Answer Key -->
+            <a href="analogies-relationship-patterns-answer-key.html" class="card-set" style="border: 2px solid #27ae60; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
+                <div class="set-number">📋 Answer Key</div>
+                <div class="set-title">Analogies & Word Relationships - Answer Key</div>
+                <div class="set-description">
+                    Complete answer key for all analogy task cards with solutions provided. Interactive carousel format 
+                    matching the student version but with all blanks filled in and correct categorizations shown. 
+                    Perfect for teacher reference and guided instruction.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">All Solutions</div>
+                    <div class="difficulty mixed">Teacher Reference</div>
+                </div>
+            </a>
+
+            <!-- Card Template Gallery -->
+            <a href="card-template-gallery.html" class="card-set">
+                <div class="set-number">Templates</div>
+                <div class="set-title">Interactive Card Template Gallery</div>
+                <div class="set-description">
+                    Ready-to-use card layouts for creating engaging classroom activities. Includes templates for 
+                    question + clues, image analysis, sentence stems, ethical dilemmas, quote analysis, and 
+                    vocabulary building. Perfect for designing custom interactive learning materials.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">6 Templates</div>
+                    <div class="difficulty mixed">All Layouts</div>
+                </div>
+            </a>
+
+            <!-- Opening Activity Logic Puzzles -->
+            <a href="1 - 8.23/opening-activity-interactive-cards.html" class="card-set">
+                <div class="set-number">New Release</div>
+                <div class="set-title">Opening Activity Logic Puzzles</div>
+                <div class="set-description">
+                    Nine brain-teasing logic puzzles designed for 7-minute opening activities. Three difficulty levels 
+                    with teen-relevant scenarios: secret codes, friend group mysteries, and deductive reasoning challenges. 
+                    No complex math required - pure logic and critical thinking!
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">9 Puzzles</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Answer Keys -->
+            <a href="logic-puzzle-answers.html" class="card-set">
+                <div class="set-number">Answer Keys</div>
+                <div class="set-title">Logic Puzzle Answer Tables</div>
+                <div class="set-description">
+                    Complete solution tables for all 6 logic puzzles with detailed answer breakdowns and solution 
+                    logic explanations. Perfect for teacher reference, student self-checking, or guided problem-solving 
+                    discussions. Organized by difficulty level for easy navigation.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">6 Solutions</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Placeholder for future puzzle sets -->
+            <div class="card-set add-new">
+                <div class="add-text">Add More Puzzles</div>
+                <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Future Expansion</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click handler for the "add new" card
+        document.querySelector('.add-new').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Future logic puzzle expansion! 🧩\n\nPlanned additions:\n• Advanced Mystery Puzzles\n• Word Logic Challenges\n• Mathematical Reasoning Cards\n• Cross-Curricular Logic Problems');
+        });
+
+        // Add some interactive elements
+        document.querySelectorAll('.card-set:not(.add-new)').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.background = 'linear-gradient(135deg, #f8f9ff, #ffffff)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.background = 'white';
+            });
+        });
+    </script>
+</body>
+</html>

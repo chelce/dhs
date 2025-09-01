@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogies & Word Relationship Patterns - Answer Key</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.2em;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .difficulty-level {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .difficulty-header {
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+
+        .difficulty-header h2 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.8em;
+            letter-spacing: 1px;
+        }
+
+        /* Difficulty-specific colors */
+        .difficulty-level:has(.easy-level) .difficulty-header {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .difficulty-level:has(.medium-level) .difficulty-header {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+        }
+
+        .difficulty-level:has(.hard-level) .difficulty-header {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel {
+            display: flex;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card {
+            min-width: 100%;
+            padding: 30px;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid;
+        }
+
+        /* Difficulty-specific instruction colors */
+        .difficulty-level:has(.easy-level) .instructions {
+            border-color: #4CAF50;
+        }
+
+        .difficulty-level:has(.medium-level) .instructions {
+            border-color: #FF9800;
+        }
+
+        .difficulty-level:has(.hard-level) .instructions {
+            border-color: #F44336;
+        }
+
+        .instructions strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .analogy-section {
+            margin-bottom: 25px;
+        }
+
+        .analogy-section h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .analogies-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .analogy-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .answer {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .categories-section h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .categories-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+        }
+
+        .category-item {
+            background: #e8f4f8;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .carousel-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .carousel-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .carousel-indicators {
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .difficulty-header h2 {
+                font-size: 2.2em;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .analogies-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Analogies & Word Relationship Patterns</h1>
+            <p style="font-size: 1.2em; opacity: 0.95; font-weight: 400;">Answer Key - Interactive Task Cards</p>
+        </div>
+
+        <!-- Easy Level -->
+        <div class="difficulty-level">
+            <div class="difficulty-header">
+                <h2 class="easy-level">Easy Level</h2>
+            </div>
+            <div class="carousel-container">
+                <div class="carousel" id="easy-carousel">
+                    <!-- Easy Set 1 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 analogies with their completed answers, then review the 8 basic relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Basic Analogies - Set 1 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Cat : Meow :: Dog : <span class="answer">Bark</span></div>
+                                <div class="analogy-item">Hot : Cold :: Up : <span class="answer">Down</span></div>
+                                <div class="analogy-item">Book : Read :: Song : <span class="answer">Listen</span></div>
+                                <div class="analogy-item">Hand : Glove :: Foot : <span class="answer">Sock</span></div>
+                                <div class="analogy-item">Bird : Fly :: Fish : <span class="answer">Swim</span></div>
+                                <div class="analogy-item">Apple : Tree :: Flower : <span class="answer">Plant</span></div>
+                                <div class="analogy-item">Night : Day :: Dark : <span class="answer">Light</span></div>
+                                <div class="analogy-item">Teacher : School :: Doctor : <span class="answer">Hospital</span></div>
+                                <div class="analogy-item">Rain : Umbrella :: Sun : <span class="answer">Sunglasses</span></div>
+                                <div class="analogy-item">Happy : Sad :: Laugh : <span class="answer">Cry</span></div>
+                                <div class="analogy-item">Car : Road :: Boat : <span class="answer">Water</span></div>
+                                <div class="analogy-item">Key : Lock :: Password : <span class="answer">Computer</span></div>
+                                <div class="analogy-item">Winter : Cold :: Summer : <span class="answer">Hot</span></div>
+                                <div class="analogy-item">Pen : Write :: Brush : <span class="answer">Paint</span></div>
+                                <div class="analogy-item">Big : Small :: Tall : <span class="answer">Short</span></div>
+                                <div class="analogy-item">Moon : Night :: Sun : <span class="answer">Day</span></div>
+                                <div class="analogy-item">Kitchen : Cook :: Bedroom : <span class="answer">Sleep</span></div>
+                                <div class="analogy-item">Fire : Hot :: Ice : <span class="answer">Cold</span></div>
+                                <div class="analogy-item">Library : Books :: Museum : <span class="answer">Art</span></div>
+                                <div class="analogy-item">Hungry : Eat :: Thirsty : <span class="answer">Drink</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>8 Basic Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Sound/Action (Cat : Meow)</div>
+                                <div class="category-item">2. Opposites (Hot : Cold)</div>
+                                <div class="category-item">3. Object/Function (Book : Read)</div>
+                                <div class="category-item">4. Part/Whole (Hand : Glove)</div>
+                                <div class="category-item">5. Characteristic/Action (Bird : Fly)</div>
+                                <div class="category-item">6. Source/Product (Apple : Tree)</div>
+                                <div class="category-item">7. Time/Quality (Night : Day)</div>
+                                <div class="category-item">8. Person/Place (Teacher : School)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Easy Set 2 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 analogies with their completed answers, then review the 8 basic relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Basic Analogies - Set 2 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Smile : Happy :: Frown : <span class="answer">Sad</span></div>
+                                <div class="analogy-item">Fast : Slow :: Loud : <span class="answer">Quiet</span></div>
+                                <div class="analogy-item">Hammer : Nail :: Screwdriver : <span class="answer">Screw</span></div>
+                                <div class="analogy-item">Wheel : Car :: Wing : <span class="answer">Airplane</span></div>
+                                <div class="analogy-item">Snake : Slither :: Rabbit : <span class="answer">Hop</span></div>
+                                <div class="analogy-item">Cow : Milk :: Bee : <span class="answer">Honey</span></div>
+                                <div class="analogy-item">Morning : Evening :: Spring : <span class="answer">Fall</span></div>
+                                <div class="analogy-item">Chef : Restaurant :: Pilot : <span class="answer">Airplane</span></div>
+                                <div class="analogy-item">Cold : Coat :: Bright : <span class="answer">Sunglasses</span></div>
+                                <div class="analogy-item">Excited : Calm :: Angry : <span class="answer">Peaceful</span></div>
+                                <div class="analogy-item">Train : Track :: Ship : <span class="answer">Ocean</span></div>
+                                <div class="analogy-item">Ring : Finger :: Hat : <span class="answer">Head</span></div>
+                                <div class="analogy-item">Spring : Warm :: Winter : <span class="answer">Cold</span></div>
+                                <div class="analogy-item">Scissors : Cut :: Spoon : <span class="answer">Stir</span></div>
+                                <div class="analogy-item">Wide : Narrow :: Deep : <span class="answer">Shallow</span></div>
+                                <div class="analogy-item">Stars : Night :: Clouds : <span class="answer">Day</span></div>
+                                <div class="analogy-item">Garage : Car :: Barn : <span class="answer">Animals</span></div>
+                                <div class="analogy-item">Candle : Light :: Blanket : <span class="answer">Warmth</span></div>
+                                <div class="analogy-item">Theater : Movies :: Stadium : <span class="answer">Sports</span></div>
+                                <div class="analogy-item">Tired : Rest :: Dirty : <span class="answer">Clean</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>8 Basic Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Sound/Action (Cat : Meow)</div>
+                                <div class="category-item">2. Opposites (Hot : Cold)</div>
+                                <div class="category-item">3. Object/Function (Book : Read)</div>
+                                <div class="category-item">4. Part/Whole (Hand : Glove)</div>
+                                <div class="category-item">5. Characteristic/Action (Bird : Fly)</div>
+                                <div class="category-item">6. Source/Product (Apple : Tree)</div>
+                                <div class="category-item">7. Time/Quality (Night : Day)</div>
+                                <div class="category-item">8. Person/Place (Teacher : School)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Easy Set 3 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 analogies with their completed answers, then review the 8 basic relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Basic Analogies - Set 3 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Clap : Hands :: Wink : <span class="answer">Eye</span></div>
+                                <div class="analogy-item">Sweet : Sour :: Soft : <span class="answer">Hard</span></div>
+                                <div class="analogy-item">Phone : Call :: Camera : <span class="answer">Picture</span></div>
+                                <div class="analogy-item">Button : Shirt :: Lace : <span class="answer">Shoe</span></div>
+                                <div class="analogy-item">Horse : Gallop :: Duck : <span class="answer">Waddle</span></div>
+                                <div class="analogy-item">Chicken : Egg :: Sheep : <span class="answer">Wool</span></div>
+                                <div class="analogy-item">Dawn : Dusk :: Beginning : <span class="answer">End</span></div>
+                                <div class="analogy-item">Nurse : Hospital :: Teacher : <span class="answer">School</span></div>
+                                <div class="analogy-item">Noise : Earplugs :: Rain : <span class="answer">Umbrella</span></div>
+                                <div class="analogy-item">Brave : Scared :: Proud : <span class="answer">Ashamed</span></div>
+                                <div class="analogy-item">Bike : Path :: Plane : <span class="answer">Sky</span></div>
+                                <div class="analogy-item">Crown : King :: Badge : <span class="answer">Officer</span></div>
+                                <div class="analogy-item">Summer : Hot :: Autumn : <span class="answer">Cool</span></div>
+                                <div class="analogy-item">Fork : Eat :: Pencil : <span class="answer">Write</span></div>
+                                <div class="analogy-item">Heavy : Light :: Rough : <span class="answer">Smooth</span></div>
+                                <div class="analogy-item">Rainbow : Rain :: Lightning : <span class="answer">Thunder</span></div>
+                                <div class="analogy-item">Office : Work :: Park : <span class="answer">Play</span></div>
+                                <div class="analogy-item">Match : Fire :: Seed : <span class="answer">Plant</span></div>
+                                <div class="analogy-item">Concert : Music :: Gallery : <span class="answer">Art</span></div>
+                                <div class="analogy-item">Sleepy : Sleep :: Hungry : <span class="answer">Eat</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>8 Basic Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Sound/Action (Cat : Meow)</div>
+                                <div class="category-item">2. Opposites (Hot : Cold)</div>
+                                <div class="category-item">3. Object/Function (Book : Read)</div>
+                                <div class="category-item">4. Part/Whole (Hand : Glove)</div>
+                                <div class="category-item">5. Characteristic/Action (Bird : Fly)</div>
+                                <div class="category-item">6. Source/Product (Apple : Tree)</div>
+                                <div class="category-item">7. Time/Quality (Night : Day)</div>
+                                <div class="category-item">8. Person/Place (Teacher : School)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-button" onclick="navigateCarousel('easy', -1)" id="easy-prev">‹</button>
+                    <div class="carousel-indicators" id="easy-indicators">
+                        <span class="indicator active" onclick="goToSlide('easy', 0)"></span>
+                        <span class="indicator" onclick="goToSlide('easy', 1)"></span>
+                        <span class="indicator" onclick="goToSlide('easy', 2)"></span>
+                    </div>
+                    <button class="carousel-button" onclick="navigateCarousel('easy', 1)" id="easy-next">›</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level -->
+        <div class="difficulty-level">
+            <div class="difficulty-header">
+                <h2 class="medium-level">Medium Level</h2>
+            </div>
+            <div class="carousel-container">
+                <div class="carousel" id="medium-carousel">
+                    <!-- Medium Set 1 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 intermediate analogies with their completed answers, then review the 10 intermediate relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Intermediate Analogies - Set 1 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Telescope : Stars :: Microscope : <span class="answer">Bacteria</span></div>
+                                <div class="analogy-item">Optimistic : Pessimistic :: Generous : <span class="answer">Selfish</span></div>
+                                <div class="analogy-item">Compass : Navigation :: Calculator : <span class="answer">Mathematics</span></div>
+                                <div class="analogy-item">Chapter : Book :: Scene : <span class="answer">Play</span></div>
+                                <div class="analogy-item">Eagle : Soar :: Cheetah : <span class="answer">Sprint</span></div>
+                                <div class="analogy-item">Acorn : Oak :: Seed : <span class="answer">Plant</span></div>
+                                <div class="analogy-item">Democracy : Vote :: Monarchy : <span class="answer">Crown</span></div>
+                                <div class="analogy-item">Archaeologist : Artifacts :: Geologist : <span class="answer">Rocks</span></div>
+                                <div class="analogy-item">Drought : Water :: Famine : <span class="answer">Food</span></div>
+                                <div class="analogy-item">Confident : Insecure :: Patient : <span class="answer">Impatient</span></div>
+                                <div class="analogy-item">Submarine : Ocean :: Spaceship : <span class="answer">Space</span></div>
+                                <div class="analogy-item">Steering wheel : Car :: Rudder : <span class="answer">Ship</span></div>
+                                <div class="analogy-item">Renaissance : Art :: Industrial Revolution : <span class="answer">Technology</span></div>
+                                <div class="analogy-item">Stethoscope : Heart :: Thermometer : <span class="answer">Temperature</span></div>
+                                <div class="analogy-item">Abundant : Scarce :: Flexible : <span class="answer">Rigid</span></div>
+                                <div class="analogy-item">Comet : Tail :: Planet : <span class="answer">Rings</span></div>
+                                <div class="analogy-item">Laboratory : Experiment :: Studio : <span class="answer">Create</span></div>
+                                <div class="analogy-item">Catalyst : Reaction :: Inspiration : <span class="answer">Creativity</span></div>
+                                <div class="analogy-item">Archive : History :: Encyclopedia : <span class="answer">Knowledge</span></div>
+                                <div class="analogy-item">Motivated : Success :: Lazy : <span class="answer">Failure</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>10 Intermediate Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Tool/Purpose (Telescope : Stars)</div>
+                                <div class="category-item">2. Characteristic Opposites (Optimistic : Pessimistic)</div>
+                                <div class="category-item">3. Instrument/Field (Compass : Navigation)</div>
+                                <div class="category-item">4. Part/Larger Work (Chapter : Book)</div>
+                                <div class="category-item">5. Animal/Specialized Movement (Eagle : Soar)</div>
+                                <div class="category-item">6. Seed/Mature Form (Acorn : Oak)</div>
+                                <div class="category-item">7. System/Symbol (Democracy : Vote)</div>
+                                <div class="category-item">8. Professional/Study Object (Archaeologist : Artifacts)</div>
+                                <div class="category-item">9. Problem/Missing Resource (Drought : Water)</div>
+                                <div class="category-item">10. Quality/Consequence (Motivated : Success)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medium Set 2 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 intermediate analogies with their completed answers, then review the 10 intermediate relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Intermediate Analogies - Set 2 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Binoculars : Distance :: Magnifying glass : <span class="answer">Detail</span></div>
+                                <div class="analogy-item">Diplomatic : Aggressive :: Humble : <span class="answer">Arrogant</span></div>
+                                <div class="analogy-item">Violin : Orchestra :: Actor : <span class="answer">Theater</span></div>
+                                <div class="analogy-item">Paragraph : Essay :: Verse : <span class="answer">Poem</span></div>
+                                <div class="analogy-item">Dolphin : Leap :: Penguin : <span class="answer">Waddle</span></div>
+                                <div class="analogy-item">Caterpillar : Butterfly :: Tadpole : <span class="answer">Frog</span></div>
+                                <div class="analogy-item">Republic : President :: Kingdom : <span class="answer">King</span></div>
+                                <div class="analogy-item">Botanist : Plants :: Astronomer : <span class="answer">Stars</span></div>
+                                <div class="analogy-item">Insomnia : Sleep :: Amnesia : <span class="answer">Memory</span></div>
+                                <div class="analogy-item">Enthusiastic : Apathetic :: Decisive : <span class="answer">Indecisive</span></div>
+                                <div class="analogy-item">Helicopter : Sky :: Submarine : <span class="answer">Ocean</span></div>
+                                <div class="analogy-item">Brake : Car :: Anchor : <span class="answer">Ship</span></div>
+                                <div class="analogy-item">Enlightenment : Reason :: Romanticism : <span class="answer">Emotion</span></div>
+                                <div class="analogy-item">Barometer : Pressure :: Anemometer : <span class="answer">Wind</span></div>
+                                <div class="analogy-item">Transparent : Opaque :: Permanent : <span class="answer">Temporary</span></div>
+                                <div class="analogy-item">Meteor : Streak :: Aurora : <span class="answer">Colors</span></div>
+                                <div class="analogy-item">Workshop : Build :: Theater : <span class="answer">Perform</span></div>
+                                <div class="analogy-item">Fertilizer : Growth :: Exercise : <span class="answer">Fitness</span></div>
+                                <div class="analogy-item">Dictionary : Definitions :: Atlas : <span class="answer">Maps</span></div>
+                                <div class="analogy-item">Disciplined : Achievement :: Careless : <span class="answer">Mistakes</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>10 Intermediate Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Tool/Purpose (Telescope : Stars)</div>
+                                <div class="category-item">2. Characteristic Opposites (Optimistic : Pessimistic)</div>
+                                <div class="category-item">3. Instrument/Field (Compass : Navigation)</div>
+                                <div class="category-item">4. Part/Larger Work (Chapter : Book)</div>
+                                <div class="category-item">5. Animal/Specialized Movement (Eagle : Soar)</div>
+                                <div class="category-item">6. Seed/Mature Form (Acorn : Oak)</div>
+                                <div class="category-item">7. System/Symbol (Democracy : Vote)</div>
+                                <div class="category-item">8. Professional/Study Object (Archaeologist : Artifacts)</div>
+                                <div class="category-item">9. Problem/Missing Resource (Drought : Water)</div>
+                                <div class="category-item">10. Quality/Consequence (Motivated : Success)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medium Set 3 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 intermediate analogies with their completed answers, then review the 10 intermediate relationship categories they demonstrate.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Intermediate Analogies - Set 3 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Periscope : Submarine :: Rearview mirror : <span class="answer">Car</span></div>
+                                <div class="analogy-item">Methodical : Chaotic :: Sincere : <span class="answer">Deceptive</span></div>
+                                <div class="analogy-item">Piano : Concert :: Paintbrush : <span class="answer">Art</span></div>
+                                <div class="analogy-item">Stanza : Poem :: Movement : <span class="answer">Symphony</span></div>
+                                <div class="analogy-item">Hummingbird : Hover :: Kangaroo : <span class="answer">Bounce</span></div>
+                                <div class="analogy-item">Embryo : Animal :: Bud : <span class="answer">Flower</span></div>
+                                <div class="analogy-item">Federation : States :: Empire : <span class="answer">Colonies</span></div>
+                                <div class="analogy-item">Paleontologist : Fossils :: Meteorologist : <span class="answer">Weather</span></div>
+                                <div class="analogy-item">Claustrophobia : Confined spaces :: Arachnophobia : <span class="answer">Spiders</span></div>
+                                <div class="analogy-item">Meticulous : Careless :: Rational : <span class="answer">Irrational</span></div>
+                                <div class="analogy-item">Rocket : Space :: Submarine : <span class="answer">Ocean</span></div>
+                                <div class="analogy-item">Throttle : Motorcycle :: Reins : <span class="answer">Horse</span></div>
+                                <div class="analogy-item">Impressionism : Light :: Cubism : <span class="answer">Geometry</span></div>
+                                <div class="analogy-item">Seismograph : Earthquakes :: Radar : <span class="answer">Objects</span></div>
+                                <div class="analogy-item">Volatile : Stable :: Fragile : <span class="answer">Sturdy</span></div>
+                                <div class="analogy-item">Nebula : Stars :: Coral reef : <span class="answer">Fish</span></div>
+                                <div class="analogy-item">Kitchen : Cook :: Observatory : <span class="answer">Observe</span></div>
+                                <div class="analogy-item">Vitamin : Health :: Knowledge : <span class="answer">Wisdom</span></div>
+                                <div class="analogy-item">Thesaurus : Synonyms :: Almanac : <span class="answer">Facts</span></div>
+                                <div class="analogy-item">Persistent : Success :: Negligent : <span class="answer">Problems</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>10 Intermediate Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Tool/Purpose (Telescope : Stars)</div>
+                                <div class="category-item">2. Characteristic Opposites (Optimistic : Pessimistic)</div>
+                                <div class="category-item">3. Instrument/Field (Compass : Navigation)</div>
+                                <div class="category-item">4. Part/Larger Work (Chapter : Book)</div>
+                                <div class="category-item">5. Animal/Specialized Movement (Eagle : Soar)</div>
+                                <div class="category-item">6. Seed/Mature Form (Acorn : Oak)</div>
+                                <div class="category-item">7. System/Symbol (Democracy : Vote)</div>
+                                <div class="category-item">8. Professional/Study Object (Archaeologist : Artifacts)</div>
+                                <div class="category-item">9. Problem/Missing Resource (Drought : Water)</div>
+                                <div class="category-item">10. Quality/Consequence (Motivated : Success)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-button" onclick="navigateCarousel('medium', -1)" id="medium-prev">‹</button>
+                    <div class="carousel-indicators" id="medium-indicators">
+                        <span class="indicator active" onclick="goToSlide('medium', 0)"></span>
+                        <span class="indicator" onclick="goToSlide('medium', 1)"></span>
+                        <span class="indicator" onclick="goToSlide('medium', 2)"></span>
+                    </div>
+                    <button class="carousel-button" onclick="navigateCarousel('medium', 1)" id="medium-next">›</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level -->
+        <div class="difficulty-level">
+            <div class="difficulty-header">
+                <h2 class="hard-level">Hard Level</h2>
+            </div>
+            <div class="carousel-container">
+                <div class="carousel" id="hard-carousel">
+                    <!-- Hard Set 1 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 advanced analogies with their completed answers and correct categories.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Advanced Analogies - Set 1 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Phoenix : Rebirth :: Anchor : <span class="answer">Stability</span></div>
+                                <div class="analogy-item">Machiavellian : Cunning :: Quixotic : <span class="answer">Idealistic</span></div>
+                                <div class="analogy-item">Catalyst : Acceleration :: Inhibitor : <span class="answer">Suppression</span></div>
+                                <div class="analogy-item">Prelude : Symphony :: Prologue : <span class="answer">Novel</span></div>
+                                <div class="analogy-item">Metamorphosis : Transformation :: Photosynthesis : <span class="answer">Conversion</span></div>
+                                <div class="analogy-item">Paradigm : Framework :: Algorithm : <span class="answer">Process</span></div>
+                                <div class="analogy-item">Hegemony : Dominance :: Autonomy : <span class="answer">Independence</span></div>
+                                <div class="analogy-item">Cryptographer : Codes :: Philologist : <span class="answer">Languages</span></div>
+                                <div class="analogy-item">Cognitive dissonance : Mental conflict :: Synergy : <span class="answer">Cooperative enhancement</span></div>
+                                <div class="analogy-item">Stoic : Emotional restraint :: Epicurean : <span class="answer">Sensual pleasure</span></div>
+                                <div class="analogy-item">Quantum leap : Dramatic change :: Paradigm shift : <span class="answer">Fundamental transformation</span></div>
+                                <div class="analogy-item">Gyroscope : Stability :: Pendulum : <span class="answer">Rhythm</span></div>
+                                <div class="analogy-item">Baroque : Ornate complexity :: Minimalist : <span class="answer">Essential simplicity</span></div>
+                                <div class="analogy-item">Spectrometer : Light analysis :: Chromatograph : <span class="answer">Chemical separation</span></div>
+                                <div class="analogy-item">Ephemeral : Permanent :: Ubiquitous : <span class="answer">Rare</span></div>
+                                <div class="analogy-item">Supernova : Stellar explosion :: Eclipse : <span class="answer">Celestial alignment</span></div>
+                                <div class="analogy-item">Atelier : Artistic creation :: Scriptorium : <span class="answer">Manuscript copying</span></div>
+                                <div class="analogy-item">Symbiosis : Mutual benefit :: Parasitism : <span class="answer">One-sided exploitation</span></div>
+                                <div class="analogy-item">Lexicon : Vocabulary :: Taxonomy : <span class="answer">Classification</span></div>
+                                <div class="analogy-item">Procrastination : Failure :: Preparation : <span class="answer">Success</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>12 Advanced Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Symbol/Abstract Concept (Phoenix : Rebirth)</div>
+                                <div class="category-item">2. Literary Term/Characteristic (Machiavellian : Cunning)</div>
+                                <div class="category-item">3. Agent/Effect (Catalyst : Acceleration)</div>
+                                <div class="category-item">4. Introduction/Main Work (Prelude : Symphony)</div>
+                                <div class="category-item">5. Process/Function (Metamorphosis : Transformation)</div>
+                                <div class="category-item">6. Concept/Type (Paradigm : Framework)</div>
+                                <div class="category-item">7. Political Concept/Meaning (Hegemony : Dominance)</div>
+                                <div class="category-item">8. Specialist/Field of Study (Cryptographer : Codes)</div>
+                                <div class="category-item">9. Psychological Term/Definition (Cognitive dissonance : Mental conflict)</div>
+                                <div class="category-item">10. Philosophy/Core Principle (Stoic : Emotional restraint)</div>
+                                <div class="category-item">11. Metaphor/Meaning (Quantum leap : Dramatic change)</div>
+                                <div class="category-item">12. Behavioral Pattern/Result (Procrastination : Failure)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hard Set 2 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 advanced analogies with their completed answers and correct categories.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Advanced Analogies - Set 2 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Sisyphean : Endless futility :: Pyrrhic : <span class="answer">Costly victory</span></div>
+                                <div class="analogy-item">Zeitgeist : Cultural spirit :: Weltanschauung : <span class="answer">World view</span></div>
+                                <div class="analogy-item">Osmosis : Gradual absorption :: Diffusion : <span class="answer">Spreading distribution</span></div>
+                                <div class="analogy-item">Overture : Opera :: Hypothesis : <span class="answer">Research</span></div>
+                                <div class="analogy-item">Mitosis : Cell division :: Meiosis : <span class="answer">Genetic reduction</span></div>
+                                <div class="analogy-item">Heuristic : Problem-solving approach :: Mnemonic : <span class="answer">Memory technique</span></div>
+                                <div class="analogy-item">Oligarchy : Few rulers :: Plutocracy : <span class="answer">Wealth-based rule</span></div>
+                                <div class="analogy-item">Lexicographer : Dictionary :: Cartographer : <span class="answer">Maps</span></div>
+                                <div class="analogy-item">Paradox : Contradictory truth :: Oxymoron : <span class="answer">Contradictory terms</span></div>
+                                <div class="analogy-item">Pragmatic : Practical focus :: Idealistic : <span class="answer">Perfect vision</span></div>
+                                <div class="analogy-item">Watershed moment : Turning point :: Tipping point : <span class="answer">Critical threshold</span></div>
+                                <div class="analogy-item">Compass : Direction :: Altimeter : <span class="answer">Elevation</span></div>
+                                <div class="analogy-item">Renaissance : Cultural rebirth :: Reformation : <span class="answer">Religious renewal</span></div>
+                                <div class="analogy-item">Telescope : Magnification :: Prism : <span class="answer">Light separation</span></div>
+                                <div class="analogy-item">Transient : Enduring :: Mundane : <span class="answer">Extraordinary</span></div>
+                                <div class="analogy-item">Black hole : Gravitational collapse :: White dwarf : <span class="answer">Stellar remnant</span></div>
+                                <div class="analogy-item">Conservatory : Music cultivation :: Incubator : <span class="answer">Business development</span></div>
+                                <div class="analogy-item">Mutualism : Reciprocal benefit :: Commensalism : <span class="answer">One-sided benefit</span></div>
+                                <div class="analogy-item">Glossary : Term explanations :: Index : <span class="answer">Topic locations</span></div>
+                                <div class="analogy-item">Perfectionism : Paralysis :: Flexibility : <span class="answer">Adaptability</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>12 Advanced Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Symbol/Abstract Concept (Phoenix : Rebirth)</div>
+                                <div class="category-item">2. Literary Term/Characteristic (Machiavellian : Cunning)</div>
+                                <div class="category-item">3. Agent/Effect (Catalyst : Acceleration)</div>
+                                <div class="category-item">4. Introduction/Main Work (Prelude : Symphony)</div>
+                                <div class="category-item">5. Process/Function (Metamorphosis : Transformation)</div>
+                                <div class="category-item">6. Concept/Type (Paradigm : Framework)</div>
+                                <div class="category-item">7. Political Concept/Meaning (Hegemony : Dominance)</div>
+                                <div class="category-item">8. Specialist/Field of Study (Cryptographer : Codes)</div>
+                                <div class="category-item">9. Psychological Term/Definition (Cognitive dissonance : Mental conflict)</div>
+                                <div class="category-item">10. Philosophy/Core Principle (Stoic : Emotional restraint)</div>
+                                <div class="category-item">11. Metaphor/Meaning (Quantum leap : Dramatic change)</div>
+                                <div class="category-item">12. Behavioral Pattern/Result (Procrastination : Failure)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hard Set 3 -->
+                    <div class="card">
+                        <div class="instructions">
+                            <strong>Task:</strong> Study the 20 advanced analogies with their completed answers and correct categories.
+                        </div>
+                        
+                        <div class="analogy-section">
+                            <h3>20 Advanced Analogies - Set 3 (Answers Provided)</h3>
+                            <div class="analogies-list">
+                                <div class="analogy-item">Labyrinthine : Complex navigation :: Herculean : <span class="answer">Enormous effort</span></div>
+                                <div class="analogy-item">Schadenfreude : Others' misfortune pleasure :: Saudade : <span class="answer">Nostalgic longing</span></div>
+                                <div class="analogy-item">Hydrolysis : Water breakdown :: Synthesis : <span class="answer">Component combination</span></div>
+                                <div class="analogy-item">Preamble : Constitution :: Abstract : <span class="answer">Research paper</span></div>
+                                <div class="analogy-item">Photosynthesis : Energy creation :: Respiration : <span class="answer">Energy release</span></div>
+                                <div class="analogy-item">Metaphor : Comparison device :: Allegory : <span class="answer">Extended symbolism</span></div>
+                                <div class="analogy-item">Theocracy : Religious rule :: Meritocracy : <span class="answer">Achievement-based rule</span></div>
+                                <div class="analogy-item">Etymologist : Word origins :: Genealogist : <span class="answer">Family lineage</span></div>
+                                <div class="analogy-item">Irony : Unexpected contrast :: Metaphor : <span class="answer">Implied comparison</span></div>
+                                <div class="analogy-item">Empirical : Evidence-based :: Theoretical : <span class="answer">Concept-based</span></div>
+                                <div class="analogy-item">Inflection point : Change direction :: Catalyst : <span class="answer">Reaction trigger</span></div>
+                                <div class="analogy-item">Barometer : Atmospheric pressure :: Hygrometer : <span class="answer">Humidity levels</span></div>
+                                <div class="analogy-item">Enlightenment : Rational thought :: Romanticism : <span class="answer">Emotional expression</span></div>
+                                <div class="analogy-item">Microscope : Cellular examination :: Spectroscope : <span class="answer">Light analysis</span></div>
+                                <div class="analogy-item">Immutable : Variable :: Infinite : <span class="answer">Finite</span></div>
+                                <div class="analogy-item">Pulsar : Rotating beacon :: Quasar : <span class="answer">Distant energy source</span></div>
+                                <div class="analogy-item">Greenhouse : Plant nurturing :: Laboratory : <span class="answer">Scientific exploration</span></div>
+                                <div class="analogy-item">Symbiosis : Interdependent relationship :: Autonomy : <span class="answer">Independent existence</span></div>
+                                <div class="analogy-item">Bibliography : Source list :: Appendix : <span class="answer">Supplementary material</span></div>
+                                <div class="analogy-item">Obsession : Dysfunction :: Passion : <span class="answer">Achievement</span></div>
+                            </div>
+                        </div>
+
+                        <div class="categories-section">
+                            <h3>12 Advanced Relationship Categories</h3>
+                            <div class="categories-list">
+                                <div class="category-item">1. Symbol/Abstract Concept (Phoenix : Rebirth)</div>
+                                <div class="category-item">2. Literary Term/Characteristic (Machiavellian : Cunning)</div>
+                                <div class="category-item">3. Agent/Effect (Catalyst : Acceleration)</div>
+                                <div class="category-item">4. Introduction/Main Work (Prelude : Symphony)</div>
+                                <div class="category-item">5. Process/Function (Metamorphosis : Transformation)</div>
+                                <div class="category-item">6. Concept/Type (Paradigm : Framework)</div>
+                                <div class="category-item">7. Political Concept/Meaning (Hegemony : Dominance)</div>
+                                <div class="category-item">8. Specialist/Field of Study (Cryptographer : Codes)</div>
+                                <div class="category-item">9. Psychological Term/Definition (Cognitive dissonance : Mental conflict)</div>
+                                <div class="category-item">10. Philosophy/Core Principle (Stoic : Emotional restraint)</div>
+                                <div class="category-item">11. Metaphor/Meaning (Quantum leap : Dramatic change)</div>
+                                <div class="category-item">12. Behavioral Pattern/Result (Procrastination : Failure)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-controls">
+                    <button class="carousel-button" onclick="navigateCarousel('hard', -1)" id="hard-prev">‹</button>
+                    <div class="carousel-indicators" id="hard-indicators">
+                        <span class="indicator active" onclick="goToSlide('hard', 0)"></span>
+                        <span class="indicator" onclick="goToSlide('hard', 1)"></span>
+                        <span class="indicator" onclick="goToSlide('hard', 2)"></span>
+                    </div>
+                    <button class="carousel-button" onclick="navigateCarousel('hard', 1)" id="hard-next">›</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const carouselStates = {
+            easy: { currentSlide: 0, totalSlides: 3 },
+            medium: { currentSlide: 0, totalSlides: 3 },
+            hard: { currentSlide: 0, totalSlides: 3 }
+        };
+
+        function updateCarousel(level) {
+            const carousel = document.getElementById(`${level}-carousel`);
+            const indicators = document.querySelectorAll(`#${level}-indicators .indicator`);
+            const prevButton = document.getElementById(`${level}-prev`);
+            const nextButton = document.getElementById(`${level}-next`);
+            
+            const state = carouselStates[level];
+            const translateX = -state.currentSlide * 100;
+            
+            carousel.style.transform = `translateX(${translateX}%)`;
+            
+            // Update indicators
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === state.currentSlide);
+            });
+            
+            // Update button states
+            prevButton.disabled = state.currentSlide === 0;
+            nextButton.disabled = state.currentSlide === state.totalSlides - 1;
+        }
+
+        function navigateCarousel(level, direction) {
+            const state = carouselStates[level];
+            const newSlide = state.currentSlide + direction;
+            
+            if (newSlide >= 0 && newSlide < state.totalSlides) {
+                state.currentSlide = newSlide;
+                updateCarousel(level);
+            }
+        }
+
+        function goToSlide(level, slideIndex) {
+            const state = carouselStates[level];
+            if (slideIndex >= 0 && slideIndex < state.totalSlides) {
+                state.currentSlide = slideIndex;
+                updateCarousel(level);
+            }
+        }
+
+        // Initialize carousels
+        document.addEventListener('DOMContentLoaded', function() {
+            Object.keys(carouselStates).forEach(level => {
+                updateCarousel(level);
+            });
+        });
+    </script>
+</body>
+</html>
