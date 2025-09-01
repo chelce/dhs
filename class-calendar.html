@@ -721,6 +721,7 @@ function updateReplicaToolbar(editor, el){
 /* ========= ENHANCEMENTS: image removal, task list drag reorder, paste auto-embed ========= */
 function setupEditorEnhancements(editor){
   if(!editor) return;
+  
   // Auto-embed on paste (YouTube / image)
   const el = editor.view.dom;
   el.addEventListener('paste', (e)=>{
@@ -732,94 +733,36 @@ function setupEditorEnhancements(editor){
         const url = urlMatch[1];
         // YouTube
         const yt = /(?:https?:\/\/(?:www\.)?youtu\.be\/([\w-]{6,})|youtube\.com\/watch\?v=([\w-]{6,}))/i.exec(url);
-        if(yt){ editor.chain().focus().setYoutubeVideo({ src: url }).run(); return; }
+        if(yt){ 
+          // Only if YouTube extension is available
+          if(editor.commands.setYoutubeVideo) {
+            editor.chain().focus().setYoutubeVideo({ src: url }).run(); 
+            return; 
+          }
+        }
         // Image by extension
         if(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url)){
-          editor.chain().focus().setImage({ src:url }).run();
+          // Only if Image extension is available
+          if(editor.commands.setImage) {
+            editor.chain().focus().setImage({ src:url }).run();
+          }
         }
       } catch(err){ console.warn('auto-embed paste err', err); }
     },10);
   });
-  // Image remove (Shift+Click)
+  
+  // Image remove (Shift+Click) - simplified version
   el.addEventListener('click', ev=>{
     const img = ev.target.closest('img');
     if(img && ev.shiftKey){
       if(confirm('Remove image?')){
-        // select image node then delete
-        const pos = findDomNodePos(editor, img);
-        if(pos!=null){ editor.commands.command(({ tr })=>{ tr.delete(pos, pos+1); return true; }); }
+        // Simple approach - just remove the DOM element
+        img.remove();
       }
     }
   });
-  // Task list drag reorder
-  function refreshTaskListDraggable(){
-    el.querySelectorAll('ul[data-type="taskList"] li').forEach((li,i)=>{
-      li.setAttribute('draggable','true');
-      li.dataset.tindex = i;
-    });
-  }
-  el.addEventListener('dragstart', e=>{
-    const li = e.target.closest('ul[data-type="taskList"] li');
-    if(editor && ch){
-      switch(act){
-        case 'undo': ch.undo().run(); break;
-        case 'redo': ch.redo().run(); break;
-        case 'bold': ch.toggleBold().run(); break;
-        case 'italic': ch.toggleItalic().run(); break;
-        case 'underline': ch.toggleUnderline?.().run(); break;
-        case 'strike': ch.toggleStrike().run(); break;
-        case 'code': ch.toggleCode().run(); break;
-        case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
-        case 'h1': ch.toggleHeading({level:1}).run(); break;
-        case 'h2': ch.toggleHeading({level:2}).run(); break;
-        case 'h3': ch.toggleHeading({level:3}).run(); break;
-        case 'paragraph': ch.setParagraph().run(); break;
-        case 'bulletList': ch.toggleBulletList().run(); break;
-        case 'orderedList': ch.toggleOrderedList().run(); break;
-        case 'blockquote': ch.toggleBlockquote().run(); break;
-        case 'codeBlock': ch.toggleCodeBlock().run(); break;
-        case 'hr': ch.setHorizontalRule().run(); break;
-        case 'align-left': ch.setTextAlign('left').run(); break;
-        case 'align-center': ch.setTextAlign('center').run(); break;
-        case 'align-right': ch.setTextAlign('right').run(); break;
-        case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
-        case 'unlink': ch.unsetLink().run(); break;
-        case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
-      }
-      updateSimpleMenu(editor, el);
-    } else {
-      // Fallback contentEditable execCommand
-      const activeEl = document.getElementById('eventNotesEditor') || document.getElementById('detailsNotesEditor');
-      if(activeEl) activeEl.focus();
-      const exec = (cmd,val=null)=>{ try{ document.execCommand(cmd,false,val);}catch(_){} };
-      switch(act){
-        case 'undo': exec('undo'); break;
-        case 'redo': exec('redo'); break;
-        case 'bold': exec('bold'); break;
-        case 'italic': exec('italic'); break;
-        case 'underline': exec('underline'); break;
-        case 'strike': exec('strikeThrough'); break;
-        case 'code': exec('formatBlock','pre'); break;
-        case 'h1': exec('formatBlock','h1'); break;
-        case 'h2': exec('formatBlock','h2'); break;
-        case 'h3': exec('formatBlock','h3'); break;
-        case 'paragraph': exec('formatBlock','p'); break;
-        case 'bulletList': exec('insertUnorderedList'); break;
-        case 'orderedList': exec('insertOrderedList'); break;
-        case 'blockquote': exec('formatBlock','blockquote'); break;
-        case 'hr': exec('insertHorizontalRule'); break;
-        case 'link': { const url=prompt('Enter URL'); if(url) exec('createLink',url); break; }
-        case 'unlink': exec('unlink'); break;
-        case 'clear': exec('removeFormat'); break;
-      }
-    }
-  const view = editor.view;
-  if(editor){ editor.on('transaction', ()=>updateSimpleMenu(editor, el)); updateSimpleMenu(editor, el); }
-    const current = view.nodeDOM(pos);
-    if(current===domNode){ found=pos; return false; }
-    return true;
-  });
-  return found;
+  
+  console.log('Editor enhancements setup completed');
 }
 
 function reorderTaskItems(editor, fromIdx, toIdx){
