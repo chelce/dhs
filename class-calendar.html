@@ -1152,7 +1152,14 @@
                 console.log('Initializing calendar...');
                 initSupabase();
                 generateCalendar();
-                loadCalendarData();
+                
+                // Load calendar data after generation
+                loadCalendarData().then(() => {
+                    console.log('Calendar data loaded');
+                }).catch(error => {
+                    console.error('Error loading calendar data:', error);
+                });
+                
                 setupFilterListeners();
                 
                 // Initialize TipTap editors after a short delay to ensure libraries are loaded
@@ -1160,11 +1167,20 @@
                     initTipTapEditors();
                 }, 100);
                 
+                // Setup click handlers for day cells after calendar is generated
+                setTimeout(() => {
+                    setupDayCellClickHandlers();
+                }, 200);
+                
                 console.log('Calendar initialized successfully');
             } catch (error) {
                 console.error('Error initializing calendar:', error);
                 // Still try to generate basic calendar
-                generateCalendar();
+                try {
+                    generateCalendar();
+                } catch (fallbackError) {
+                    console.error('Failed to generate fallback calendar:', fallbackError);
+                }
             }
         });
         
@@ -2112,6 +2128,19 @@
             loadCalendarData();
         }
         
+        // Setup day cell click handlers
+        function setupDayCellClickHandlers() {
+            document.querySelectorAll('.day-cell').forEach((cell, index) => {
+                if (!cell.onclick) {
+                    const dayNumber = cell.querySelector('.day-number');
+                    if (dayNumber) {
+                        cell.onclick = () => addEvent(parseInt(dayNumber.textContent));
+                    }
+                }
+            });
+        }
+
+        // Update calendar display (used by other functions)
         function updateCalendarDisplay() {
             generateCalendar();
         }
@@ -2277,11 +2306,14 @@
         
         async function loadCalendarData() {
             if (!supabase) {
+                console.log('No Supabase connection, loading from localStorage');
                 loadFromLocalStorage();
                 return;
             }
             
             try {
+                console.log('Loading calendar data from Supabase...');
+                
                 // Get the current date range
                 const weeks = generateWeeks();
                 const startDate = weeks[0][0].date;
@@ -2303,52 +2335,76 @@
                 });
                 
                 // Add events from database
-                data.forEach(eventData => {
-                    const eventDateString = eventData.event_date;
-                    console.log('Loading event:', eventData.event_text, 'for date:', eventDateString);
-                    
-                    // Find the corresponding day cell by exact date match
-                    const dayCells = document.querySelectorAll('.day-cell');
-                    let targetCell = null;
-                    
-                    console.log('Available day cells with dates:');
-                    dayCells.forEach((cell, index) => {
-                        const cellDate = cell.getAttribute('data-date');
-                        console.log(`Cell ${index}: date=${cellDate}`);
-                        if (cellDate === eventDateString) {
-                            targetCell = cell;
-                            console.log(`MATCH! Cell ${index} matches event date ${eventDateString}`);
+                if (data && data.length > 0) {
+                    console.log(`Loading ${data.length} events from database`);
+                    data.forEach(eventData => {
+                        try {
+                            const eventDateString = eventData.event_date;
+                            console.log('Loading event:', eventData.event_text, 'for date:', eventDateString);
+                            
+                            // Find the corresponding day cell by exact date match
+                            const dayCells = document.querySelectorAll('.day-cell');
+                            let targetCell = null;
+                            
+                            dayCells.forEach((cell, index) => {
+                                const cellDate = cell.getAttribute('data-date');
+                                if (cellDate === eventDateString) {
+                                    targetCell = cell;
+                                    console.log(`Found target cell for event: ${eventData.event_text}`);
+                                }
+                            });
+                            
+                            if (targetCell) {
+                                addEventElement(targetCell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                            } else {
+                                console.warn('Could not find target cell for date:', eventDateString, 'event:', eventData.event_text);
+                                
+                                // Fallback to day number matching
+                                const eventDate = new Date(eventDateString + 'T00:00:00');
+                                const dayNumber = eventDate.getDate();
+                                console.log('Trying fallback with day number:', dayNumber);
+                                
+                                dayCells.forEach(cell => {
+                                    const dayNumberElement = cell.querySelector('.day-number');
+                                    if (dayNumberElement) {
+                                        const cellDayNumber = parseInt(dayNumberElement.textContent);
+                                        if (cellDayNumber === dayNumber && !targetCell) {
+                                            console.log('Using fallback matching for:', eventData.event_text);
+                                            addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
+                                            targetCell = cell; // Prevent multiple matches
+                                        }
+                                    }
+                                });
+                            }
+                        } catch (eventError) {
+                            console.error('Error processing individual event:', eventData, eventError);
                         }
                     });
-                    
-                    if (targetCell) {
-                        console.log('Found target cell for event:', eventData.event_text);
-                        addEventElement(targetCell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
-                    } else {
-                        console.error('Could not find target cell for date:', eventDateString, 'event:', eventData.event_text);
-                        console.log('Event date string length:', eventDateString.length);
-                        console.log('Event date string chars:', Array.from(eventDateString));
-                        
-                        // Fallback to day number matching
-                        const eventDate = new Date(eventDateString + 'T00:00:00');
-                        const dayNumber = eventDate.getDate();
-                        console.log('Trying fallback with day number:', dayNumber);
-                        
-                        dayCells.forEach(cell => {
-                            const cellDayNumber = parseInt(cell.querySelector('.day-number').textContent);
-                            if (cellDayNumber === dayNumber && !targetCell) {
-                                console.log('Using fallback matching for:', eventData.event_text);
-                                addEventElement(cell, eventData.event_text, eventData.event_class, eventData.is_tentative, false, eventData.notes || '');
-                                targetCell = cell; // Prevent multiple matches
-                            }
-                        });
-                    }
-                });
+                } else {
+                    console.log('No events found in database for current date range');
+                }
                 
                 console.log('Calendar loaded from Supabase successfully');
                 
                 // Update event visibility to ensure all events are shown
                 setTimeout(() => {
+                    try {
+                        updateEventVisibility();
+                    } catch (visibilityError) {
+                        console.error('Error updating event visibility:', visibilityError);
+                    }
+                }, 100);
+                
+            } catch (error) {
+                console.error('Error loading calendar data from Supabase:', error);
+                console.log('Falling back to localStorage...');
+                try {
+                    loadFromLocalStorage();
+                } catch (localError) {
+                    console.error('Error loading from localStorage as fallback:', localError);
+                }
+            }
+        }
                     updateEventVisibility();
                     console.log('Event visibility updated after loading');
                 }, 100);
@@ -2496,15 +2552,6 @@
             }
         };
         
-        // Add click handlers to existing day cells
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.day-cell').forEach((cell, index) => {
-                if (!cell.onclick) {
-                    const dayNumber = cell.querySelector('.day-number').textContent;
-                    cell.onclick = () => addEvent(parseInt(dayNumber));
-                }
-            });
-        });
     </script>
 </body>
 </html>
