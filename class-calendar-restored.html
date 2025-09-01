@@ -12,6 +12,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-highlight@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
 <style>
 body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:16px;}
 .calendar-container{max-width:1200px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;}
@@ -174,15 +177,121 @@ function wireUI(){
 }
 
 function initEditors(){
-  const baseExt=[window.TiptapStarterKit?.StarterKit?.configure({heading:{levels:[1,2,3]}}), window.TiptapPlaceholder?.Placeholder?.configure({placeholder:'Add notes...'}), window.TiptapUnderline?.Underline, window.TiptapHighlight?.Highlight, window.TiptapLink?.Link];
+  const baseExt=[
+    window.TiptapStarterKit?.StarterKit?.configure({heading:{levels:[1,2,3]}}),
+    window.TiptapPlaceholder?.Placeholder?.configure({placeholder:'Add notes...'}),
+    window.TiptapUnderline?.Underline,
+    window.TiptapHighlight?.Highlight,
+    window.TiptapLink?.Link,
+    window.TiptapTextStyle?.TextStyle,
+    window.TiptapColor?.Color,
+    window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] })
+  ];
   try {
-    notesEditor = new window.Tiptap.Editor({ element: document.getElementById('eventNotesEditor'), extensions: baseExt.filter(Boolean), content:'' , onUpdate:({editor})=>{document.getElementById('eventNotes').value=editor.getHTML();}});
-    detailsEditor = new window.Tiptap.Editor({ element: document.getElementById('detailsNotesEditor'), extensions: baseExt.filter(Boolean), content:'', onUpdate:({editor})=>{/* live editing allowed */} });
+    notesEditor = new window.Tiptap.Editor({
+      element: document.getElementById('eventNotesEditor'),
+      extensions: baseExt.filter(Boolean),
+      content:'',
+      onUpdate:({editor})=>{document.getElementById('eventNotes').value=editor.getHTML();}
+    });
+    detailsEditor = new window.Tiptap.Editor({
+      element: document.getElementById('detailsNotesEditor'),
+      extensions: baseExt.filter(Boolean),
+      content:'',
+      onUpdate:()=>{}
+    });
+    buildToolbar(notesEditor, document.getElementById('eventNotesToolbar'));
+    buildToolbar(detailsEditor, document.getElementById('detailsNotesToolbar'));
   } catch(e){
-    // fallback contentEditable
     document.getElementById('eventNotesEditor').contentEditable='true';
     document.getElementById('detailsNotesEditor').contentEditable='true';
   }
+}
+
+function buildToolbar(editor, toolbarEl){
+  if(!editor||!toolbarEl) return;
+  toolbarEl.innerHTML=`
+    <button data-act="undo" title="Undo">↺</button>
+    <button data-act="redo" title="Redo">↻</button>
+    <button data-act="bold" title="Bold"><b>B</b></button>
+    <button data-act="italic" title="Italic"><i>I</i></button>
+    <button data-act="underline" title="Underline"><u>U</u></button>
+    <button data-act="strike" title="Strikethrough"><s>S</s></button>
+    <button data-act="code" title="Inline Code">{;}</button>
+    <button data-act="highlight" title="Highlight">HL</button>
+    <button data-act="h1" title="H1">H1</button>
+    <button data-act="h2" title="H2">H2</button>
+    <button data-act="h3" title="H3">H3</button>
+    <button data-act="paragraph" title="Paragraph">P</button>
+    <button data-act="bulletList" title="Bullet List">• List</button>
+    <button data-act="orderedList" title="Numbered List">1.</button>
+    <button data-act="blockquote" title="Blockquote">❝❞</button>
+    <button data-act="codeBlock" title="Code Block">&lt;/&gt;</button>
+    <button data-act="hr" title="Horizontal Rule">HR</button>
+    <button data-act="align-left" title="Align Left">⯇</button>
+    <button data-act="align-center" title="Align Center">≡</button>
+    <button data-act="align-right" title="Align Right">⯈</button>
+    <button data-act="link" title="Add Link">Link</button>
+    <button data-act="unlink" title="Remove Link">Unlink</button>
+    <button data-act="clear" title="Clear Formatting">CLR</button>`;
+  toolbarEl.addEventListener('click', e=>{
+    const btn=e.target.closest('button'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+    switch(act){
+      case 'undo': ch.undo().run(); break;
+      case 'redo': ch.redo().run(); break;
+      case 'bold': ch.toggleBold().run(); break;
+      case 'italic': ch.toggleItalic().run(); break;
+      case 'underline': ch.toggleUnderline?.().run(); break;
+      case 'strike': ch.toggleStrike().run(); break;
+      case 'code': ch.toggleCode().run(); break;
+      case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
+      case 'h1': ch.toggleHeading({level:1}).run(); break;
+      case 'h2': ch.toggleHeading({level:2}).run(); break;
+      case 'h3': ch.toggleHeading({level:3}).run(); break;
+      case 'paragraph': ch.setParagraph().run(); break;
+      case 'bulletList': ch.toggleBulletList().run(); break;
+      case 'orderedList': ch.toggleOrderedList().run(); break;
+      case 'blockquote': ch.toggleBlockquote().run(); break;
+      case 'codeBlock': ch.toggleCodeBlock().run(); break;
+      case 'hr': ch.setHorizontalRule().run(); break;
+      case 'align-left': ch.setTextAlign('left').run(); break;
+      case 'align-center': ch.setTextAlign('center').run(); break;
+      case 'align-right': ch.setTextAlign('right').run(); break;
+      case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
+      case 'unlink': ch.unsetLink().run(); break;
+      case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
+    }
+    updateToolbarState(editor, toolbarEl);
+  });
+  editor.on('transaction', ()=>updateToolbarState(editor, toolbarEl));
+  updateToolbarState(editor, toolbarEl);
+}
+
+function updateToolbarState(editor, toolbarEl){
+  toolbarEl.querySelectorAll('button').forEach(btn=>{
+    const act=btn.dataset.act; let active=false;
+    switch(act){
+      case 'bold': active=editor.isActive('bold'); break;
+      case 'italic': active=editor.isActive('italic'); break;
+      case 'underline': active=editor.isActive('underline'); break;
+      case 'strike': active=editor.isActive('strike'); break;
+      case 'code': active=editor.isActive('code'); break;
+      case 'highlight': active=editor.isActive('highlight'); break;
+      case 'h1': active=editor.isActive('heading',{level:1}); break;
+      case 'h2': active=editor.isActive('heading',{level:2}); break;
+      case 'h3': active=editor.isActive('heading',{level:3}); break;
+      case 'paragraph': active=editor.isActive('paragraph'); break;
+      case 'bulletList': active=editor.isActive('bulletList'); break;
+      case 'orderedList': active=editor.isActive('orderedList'); break;
+      case 'blockquote': active=editor.isActive('blockquote'); break;
+      case 'codeBlock': active=editor.isActive('codeBlock'); break;
+      case 'align-left': active=editor.isActive({textAlign:'left'}); break;
+      case 'align-center': active=editor.isActive({textAlign:'center'}); break;
+      case 'align-right': active=editor.isActive({textAlign:'right'}); break;
+      case 'link': active=editor.isActive('link'); break;
+    }
+    btn.classList.toggle('active', !!active);
+  });
 }
 
 /* ========= DATE / CALC ========= */
@@ -207,19 +316,19 @@ function fmtDate(d){return d.toISOString().slice(0,10);}
 function loadHardcoded(){
   const add=(day,text,cls,notes='')=>{events.push({id:'hard-'+cls+'-'+day+'-'+text.replace(/\s+/g,'_'),date:day,text,class:cls,isTentative:false,isHardcoded:true,notes,createdAt:day});};
   const hc=[
-    ['2025-09-01','LABOR DAY','reflection','<p>No reflection notes yet.</p>'],
-    ['2025-09-01','Breakfast','reflection','<p>Breakfast is happening.</p>'],
-    ['2025-08-23','Logic Puzzle Opening Activity','2a','<p>Scattergories success; logic puzzles engaged.</p>'],
-    ["2025-08-23","Baker's Problem Activity",'2a','<p>Challenging; add scaffolding next time.</p>'],
-    ['2025-08-28','Analogies Introduction','ap','<p>AP grasped basics; need more examples.</p>'],
-    ['2025-08-28','Analogies Introduction','2a','<p>Needed more explanation; add visuals.</p>'],
-    ['2025-08-29','ABC Game + Analogies','2a','<p>Continue next class.</p>'],
-    ['2025-08-29','Rhetorical Situation Lesson','ap','<p>Triangle & profiling covered.</p>'],
-    ['2025-08-29','ABC Game + Analogies','4b','<p>Need more content for fast finishers.</p>'],
-    ['2025-08-29','Hearts & Dollars Launch','reflection','<p>Launched; enforce adherence.</p>'],
-    ['2025-09-02','Analogies & Word Relationship Patterns','2a','<p>Identify & create patterns.</p>'],
-    ['2025-09-04','Advertisement Analysis: Audience & Purpose','ap','<p>Audience appeals; HW: ad analysis.</p>'],
-    ['2025-09-05','Analogies & Word Relationship Patterns','english','<p>Pattern recognition tiers.</p>']
+    ['2025-09-01','LABOR DAY','reflection','<p>No reflection notes yet. Click here to add <b>notes</b>...</p>'],
+    ['2025-09-01','Breakfast','reflection','<p><b>Breakfast </b>is happening.</p>'],
+    ['2025-08-23','Logic Puzzle Opening Activity','2a','<h3>What Worked Well:</h3><p>&bull; Scattergories was a huge success</p><p>&bull; Students engaged well with logic puzzles</p><h3>Notes for Next Time:</h3><p>&bull; Baker\'s problem needs more scaffolding</p>'],
+    ["2025-08-23","Baker's Problem Activity",'2a','<h3>Activity Notes:</h3><p>&bull; Problem was challenging for students</p><p>&bull; Need to provide more guidance next time</p><p>&bull; Consider breaking into smaller steps</p>'],
+    ['2025-08-28','Analogies Introduction','ap','<h3>AP Class - Analogies Lesson:</h3><p>&bull; Introduced analogy concepts</p><p>&bull; Students seemed to grasp the basics</p><p>&bull; Need more practice examples</p>'],
+    ['2025-08-28','Analogies Introduction','2a','<h3>2A Class - Analogies Lesson:</h3><p>&bull; Same content as AP but adapted pace</p><p>&bull; Students needed more explanation</p><p>&bull; Consider visual aids next time</p>'],
+    ['2025-08-29','ABC Game + Analogies','2a','<h3>2A Today:</h3><p>&bull; ABC game for kitchen items + things smaller than golf ball</p><p>&bull; Started analogies (5 minutes only)</p><p>&bull; Good pacing, will continue analogies next class</p>'],
+    ['2025-08-29','Rhetorical Situation Lesson','ap','<h3>AP Today:</h3><p>&bull; Covered rhetorical triangle (SPACE[cat])</p><p>&bull; In/out group, demographics, psychographics</p><p>&bull; Self-profiling exercise went well</p><p>&bull; Students work more efficiently than expected - felt scrambling</p><p>&bull; Depth uncertain, need to assess better</p><p><strong>Next:</strong> Profile targeting exercise</p>'],
+    ['2025-08-29','ABC Game + Analogies','4b','<h3>4B Today:</h3><p>&bull; ABC game (kitchen items only) - took unexpectedly long</p><p>&bull; Got through many analogies but 1/3 of class needs more content</p><p><strong>Next:</strong> Need more analogies or additional activity for faster finishers</p>'],
+    ['2025-08-29','Hearts & Dollars Launch','reflection','<h3>System Launch:</h3><p>&bull; Introduced hearts & dollars system today</p><p>&bull; Started paying students in 2A and 4B</p><p>&bull; B day students all paid up</p><p>&bull; NFC key integration postponed</p><p><strong>Issue:</strong> Need better group adherence enforcement - consider heart penalty</p>'],
+    ['2025-09-04','Advertisement Analysis: Audience & Purpose','ap','<h3>AP Lang - Advertisement Analysis Lesson</h3><p><strong>Learning Target:</strong> I can analyze how advertisements appeal to audiences to achieve a purpose</p><h3>Original Source Material:</h3><p><strong>Google Slides Presentation:</strong> <a href="https://docs.google.com/presentation/d/1rylvC72B2KM_NV25M0FsiGJt0m5cPPvvf4G6o0BP7MM/edit?usp=sharing" target="_blank">Advertisement Analysis Slides</a></p><h3>Lesson Materials:</h3><p><strong>Interactive Teaching Cards:</strong> <code>demographics-psychographics-interactive-cards.html</code></p><p><strong>Student Worksheet:</strong> <code>advertisement-analysis-worksheet.html</code></p><p><strong>Complete Lesson Plan:</strong> <code>lesson-reflections/2025-26-school-year/september/2025-09-04-ap-lang-advertisement-analysis.md</code></p><h3>Activities:</h3><p>&bull; Demographics vs. Psychographics interactive cards</p><p>&bull; Guided practice: Toyota, HelloFresh, Dove advertisements</p><p>&bull; Step-by-step analysis process (2-step method)</p><p>&bull; Independent advertisement selection for homework</p><h3>Assessment:</h3><p>&bull; <strong>Homework Due Next Class:</strong> Advertisement Analysis on Edulastic by 7am</p><h3>Key Concepts:</h3><p>&bull; In-Group vs. Out-Group dynamics</p><p>&bull; Market segmentation strategies</p><p>&bull; Demographics (who) vs. Psychographics (why)</p><p>&bull; Connecting audience analysis to rhetorical appeals</p><h3>Time Structure:</h3><p>&bull; Opening (10) • Direct (15) • Guided (20) • Independent Start (5)</p>'],
+    ['2025-09-02','Analogies & Word Relationship Patterns','2a','<h3>2A/3A - Analogies & Word Relationship Patterns</h3><p><strong>Learning Target:</strong> I can identify relationship types in analogies and create new analogies using specific patterns</p><h3>Lesson Materials:</h3><p><strong>Interactive Task Cards:</strong> <a href="https://chelce.github.io/dhs/analogies-relationship-patterns-interactive-cards.html" target="_blank">Three-tier collaborative activity</a></p><p><strong>Student Worksheet & Skill Checks:</strong> <a href="https://chelce.github.io/dhs/analogies-relationship-patterns-worksheet.html" target="_blank">Digital assessment worksheet</a></p><p><strong>Complete Lesson Plan:</strong> <a href="https://chelce.github.io/dhs/lesson-reflections/2025-26-school-year/september/2025-09-05-analogies-word-relationship-patterns.md" target="_blank">Full lesson plan</a></p><h3>Activities:</h3><p>&bull; Easy: Sort 12 analogies</p><p>&bull; Medium: Categorize 18 + create 2 each</p><p>&bull; Hard: Complex chains + writing</p><h3>Assessment:</h3><p>&bull; Formative circulation; tiered checks next class</p><h3>Key Concepts:</h3><p>&bull; 6 Types: Part/Whole, Synonyms, Antonyms, Function, Cause/Effect, Category/Example</p><p>&bull; Pattern recognition foundation</p><h3>Economy Integration:</h3><p>&bull; Easy $15-20 • Medium $35-45 • Hard $55-70</p>'],
+    ['2025-09-05','Analogies & Word Relationship Patterns','english','<h3>9th Grade ELA - Analogies & Word Relationship Patterns</h3><p><strong>Learning Target:</strong> I can identify relationship types in analogies and create new analogies using specific patterns</p><h3>Lesson Materials:</h3><p><strong>Interactive Task Cards:</strong> <code>analogies-relationship-patterns-interactive-cards.html</code></p><p><strong>Student Worksheet & Skill Checks:</strong> <code>analogies-relationship-patterns-worksheet.html</code></p><p><strong>Complete Lesson Plan:</strong> <code>lesson-reflections/2025-26-school-year/september/2025-09-05-analogies-word-relationship-patterns.md</code></p><h3>Activities:</h3><p>&bull; Sorting • Creation • Chains</p><h3>Assessment:</h3><p>&bull; Tiered skill checks upcoming</p><h3>Key Concepts:</h3><p>&bull; 6 main relationship types</p><h3>Economy:</h3><p>&bull; Participation payouts vary by tier</p>']
   ];
   hc.forEach(h=>add(...h));
 }
