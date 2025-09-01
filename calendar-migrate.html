@@ -118,13 +118,13 @@ async function backfill(){
   log('Backfilling '+missing.length+' hardcoded events (chunked upsert)...');
   const nowISO=new Date().toISOString();
   const all = missing.map(m=>({
-    id: uuidFromKey(byKey(m)),
-    event_date:m.date,
-    year:parseInt(m.date.slice(0,4),10),
-    month:parseInt(m.date.slice(5,7),10)-1,
-    day:parseInt(m.date.slice(8,10),10),
-    event_text:m.text,
-    event_class:m.class,
+  id: uuidFromKey(byKey(m)),
+  event_date:m.date,
+  year:parseInt(m.date.slice(0,4),10),
+  month:parseInt(m.date.slice(5,7),10)-1,
+  day:parseInt(m.date.slice(8,10),10),
+  event_text:m.text,
+  event_class: normalizeClass(m.class),
     notes:m.notes||'',
     is_tentative:false,
     created_at: nowISO
@@ -155,6 +155,13 @@ async function testConnection(){
     if(error) { log('Test failed status '+status+' '+JSON.stringify(error),'err'); }
     else { log('Test ok rows='+data.length,'ok'); }
   } catch(e){ log('Test exception '+(e.message||e),'err'); }
+}
+
+function normalizeClass(c){
+  const allowed = new Set(['2a','2b','3b','4b','ap','reflection']);
+  if(allowed.has(c)) return c;
+  if(c==='english') return 'reflection';
+  return 'reflection';
 }
 
 // wiring
