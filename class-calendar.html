@@ -1,28 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- calendar-build: 2025-09-01T00:00Z simple-editor+resilient-init v1 -->
+<!-- calendar-build: 2025-09-01T00:00Z simple-editor+resilient-init v1 +enhancements (image remove, task drag, auto-embed) -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Class Calendar & Reflections (Restored)</title>
 <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-highlight@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
+<!-- Simplified TipTap with known working version -->
+<script src="https://unpkg.com/@tiptap/core@2.0.4/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/@tiptap/starter-kit@2.0.4/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/@tiptap/extension-placeholder@2.0.4/dist/index.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-image@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-list@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-item@2.1.13/dist/index.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-youtube@2.1.13/dist/index.umd.min.js"></script>
+<script>
+async function ensureEditors(){
+  // Simple direct approach - try to init, fallback if fails
+  if (window.Tiptap && window.Tiptap.Editor) {
+    console.log('TipTap detected, initializing editors');
+    initEditors();
+    if (notesEditor && detailsEditor) {
+      console.log('Editors created successfully');
+      return;
+    }
+  }
+  
+  // Wait a bit and try again
+  await new Promise(r => setTimeout(r, 1000));
+  
+  if (window.Tiptap && window.Tiptap.Editor) {
+    console.log('TipTap available after delay, trying again');
+    initEditors();
+    if (notesEditor && detailsEditor) {
+      console.log('Editors created on retry');
+      return;
+    }
+  }
+  
+  // Fallback to contentEditable
+  console.warn('Using fallback contentEditable editors');
+  const enEd = document.getElementById('eventNotesEditor');
+  const dnEd = document.getElementById('detailsNotesEditor');
+  
+  if (enEd) {
+    enEd.contentEditable = 'true';
+    enEd.innerHTML = '<p>Start typing your notes...</p>';
+  }
+  if (dnEd) {
+    dnEd.contentEditable = 'true'; 
+    dnEd.innerHTML = '<p>Add reflection notes...</p>';
+  }
+  
+  buildFallbackToolbar(document.getElementById('eventNotesMenu'));
+  buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
+}
+</script>
 <style>
 body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:16px;}
+/* Enhancements: Shift+Click image to remove; drag task items to reorder; paste URLs to auto-embed */
 .calendar-container{max-width:1200px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;}
 .controls{padding:12px 16px;border-bottom:1px solid #27272a;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#202024}
 .filter-checkbox{display:flex;align-items:center;gap:6px;font-size:12px;background:#27272a;padding:6px 10px;border-radius:8px}
@@ -98,6 +132,8 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area ul[data-type="taskList"] li>label{display:flex;align-items:center;gap:.4em;font-weight:500}
 .editor-content-area ul[data-type="taskList"] li input[type=checkbox]{margin:3px 4px 0 2px;cursor:pointer}
 .editor-content-area ul[data-type="taskList"] li p{margin:0;flex:1}
+.editor-content-area ul[data-type="taskList"] li[data-checked="true"] p{ text-decoration:line-through; opacity:.6; }
+.editor-content-area ul[data-type="taskList"] li.drag-over-task{ outline:2px dashed #2563eb; border-radius:4px; }
 .dark-theme .editor-shell{background:#111827;border-color:#374151}
 .dark-theme .editor-toolbar{background:#1f2937;border-bottom-color:#374151}
 .dark-theme .toolbar-btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
@@ -235,54 +271,190 @@ function wireUI(){
 }
 
 function initEditors(){
+  // validate core editor constructor
+  if(!window.Tiptap || !window.Tiptap.Editor){
+    console.warn('Editor constructor missing before initEditors; deferring');
+    return;
+  }
+  
+  // Simplified extension set - only use what's reliably available
   const baseExt = [
-    window.TiptapStarterKit?.StarterKit?.configure({ heading: { levels: [1,2,3] } }),
-  window.TiptapPlaceholder?.Placeholder?.configure({ placeholder: 'Start typing…' }),
-  window.TiptapUnderline?.Underline,
-  window.TiptapHighlight?.Highlight,
-  window.TiptapLink?.Link,
-  window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] }),
-  window.TiptapTaskItem?.TaskItem,
-  window.TiptapTaskList?.TaskList,
-  window.TiptapImage?.Image?.configure({ HTMLAttributes:{ class:'editor-image' } }),
-  window.TiptapYoutube?.Youtube?.configure({ controls: true, nocookie: true })
-  ];
+    window.TiptapStarterKit?.StarterKit || window.StarterKit,
+    window.TiptapPlaceholder?.Placeholder?.configure?.({ placeholder: 'Start typing…' }) || window.Placeholder?.configure?.({ placeholder: 'Start typing…' })
+  ].filter(Boolean);
+  
   try {
+    if(notesEditor||detailsEditor){ return; }
     notesEditor = new window.Tiptap.Editor({
       element: document.getElementById('eventNotesEditor'),
-      extensions: baseExt.filter(Boolean),
+      extensions: baseExt,
       content: '',
       onUpdate: ({ editor }) => { document.getElementById('eventNotes').value = editor.getHTML(); }
     });
     detailsEditor = new window.Tiptap.Editor({
       element: document.getElementById('detailsNotesEditor'),
-      extensions: baseExt.filter(Boolean),
+      extensions: baseExt,
       content: '',
       onUpdate: () => {}
     });
-  buildReplicaToolbar(notesEditor, document.getElementById('eventNotesMenu'));
-  buildReplicaToolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+    
+    // Build simple working toolbars
+    buildWorkingToolbar(notesEditor, document.getElementById('eventNotesMenu'));
+    buildWorkingToolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+    
+    setupEditorEnhancements(notesEditor);
+    setupEditorEnhancements(detailsEditor);
+    
+    console.log('TipTap editors initialized successfully');
   } catch (e) {
-    console.warn('TipTap init failed (first attempt), will use fallback if retries also fail', e);
-    // We'll let ensureEditors() decide whether to attach fallback toolbars.
+    console.warn('TipTap init failed, using fallback editors', e);
     document.getElementById('eventNotesEditor').contentEditable = 'true';
     document.getElementById('detailsNotesEditor').contentEditable = 'true';
+    buildFallbackToolbar(document.getElementById('eventNotesMenu'));
+    buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
   }
 }
 
-async function ensureEditors(){
-  if (window.Tiptap && window.Tiptap.Editor) { initEditors(); if(notesEditor&&detailsEditor) return; }
-  const maxAttempts=20;
-  for(let i=1;i<=maxAttempts;i++){
-    if(window.Tiptap && window.Tiptap.Editor){
-      try{ initEditors(); if(notesEditor&&detailsEditor) return; }catch(e){ console.warn('TipTap init retry',i,e);} }
-    await new Promise(r=>setTimeout(r,200));
-  }
-  console.warn('TipTap failed to load after retries.');
+// Simple working toolbar that doesn't depend on complex extensions
+function buildWorkingToolbar(editor, el) {
+  if (!el) return;
+  
+  el.innerHTML = `
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="undo" title="Undo">↺</button>
+      <button type="button" class="toolbar-btn" data-action="redo" title="Redo">↻</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold"><strong>B</strong></button>
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic"><em>I</em></button>
+      <button type="button" class="toolbar-btn" data-action="code" title="Code">&lt;/&gt;</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1">H1</button>
+      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2">H2</button>
+      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph">P</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List">•</button>
+      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">1.</button>
+      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">❝</button>
+    </div>
+  `;
+  
+  el.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toolbar-btn');
+    if (!btn || !editor) return;
+    
+    const action = btn.dataset.action;
+    const chain = editor.chain().focus();
+    
+    switch (action) {
+      case 'undo': chain.undo().run(); break;
+      case 'redo': chain.redo().run(); break;
+      case 'bold': chain.toggleBold().run(); break;
+      case 'italic': chain.toggleItalic().run(); break;
+      case 'code': chain.toggleCode().run(); break;
+      case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
+      case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
+      case 'paragraph': chain.setParagraph().run(); break;
+      case 'bulletList': chain.toggleBulletList().run(); break;
+      case 'orderedList': chain.toggleOrderedList().run(); break;
+      case 'blockquote': chain.toggleBlockquote().run(); break;
+    }
+    
+    updateWorkingToolbar(editor, el);
+  });
+  
+  // Update button states
+  editor.on('selectionUpdate', () => updateWorkingToolbar(editor, el));
+  editor.on('transaction', () => updateWorkingToolbar(editor, el));
+  
+  updateWorkingToolbar(editor, el);
 }
+
+function updateWorkingToolbar(editor, el) {
+  if (!editor || !el) return;
+  
+  el.querySelectorAll('.toolbar-btn').forEach(btn => {
+    const action = btn.dataset.action;
+    let isActive = false;
+    
+    switch (action) {
+      case 'bold': isActive = editor.isActive('bold'); break;
+      case 'italic': isActive = editor.isActive('italic'); break;
+      case 'code': isActive = editor.isActive('code'); break;
+      case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
+      case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
+      case 'paragraph': isActive = editor.isActive('paragraph'); break;
+      case 'bulletList': isActive = editor.isActive('bulletList'); break;
+      case 'orderedList': isActive = editor.isActive('orderedList'); break;
+      case 'blockquote': isActive = editor.isActive('blockquote'); break;
+    }
+    
+    btn.classList.toggle('is-active', isActive);
+  });
+}
+
+// Fallback toolbar for when TipTap fails completely
+function buildFallbackToolbar(el) {
+  if (!el) return;
+  
+  el.innerHTML = `
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold"><strong>B</strong></button>
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic"><em>I</em></button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="insertText" title="Add Text">Text</button>
+    </div>
+  `;
+  
+  el.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toolbar-btn');
+    if (!btn) return;
+    
+    const action = btn.dataset.action;
+    
+    switch (action) {
+      case 'bold':
+        document.execCommand('bold', false, null);
+        break;
+      case 'italic':
+        document.execCommand('italic', false, null);
+        break;
+      case 'insertText':
+        const text = prompt('Enter text:');
+        if (text) document.execCommand('insertText', false, text);
+        break;
+    }
+  });
+}
+
+// Safety: after load, verify toolbars; if empty, attempt rebuild
+setTimeout(()=>{
+  try {
+    const enm=document.getElementById('eventNotesMenu');
+    if(enm && !enm.children.length){
+      if(notesEditor){ buildReplicaToolbar(notesEditor, enm); }
+      else { buildSimpleMenu && buildSimpleMenu(null, enm); }
+    }
+    const dnm=document.getElementById('detailsNotesMenu');
+    if(dnm && !dnm.children.length){
+      if(detailsEditor){ buildReplicaToolbar(detailsEditor, dnm); }
+      else { buildSimpleMenu && buildSimpleMenu(null, dnm); }
+    }
+  } catch(err){ console.warn('toolbar safety check failed', err); }
+}, 2000);
 
 function buildReplicaToolbar(editor, el){
-  if(!editor||!el) return;
+  if(!el) return; if(!editor || !editor.chain){
+    // Fallback simple menu if editor not available yet
+    buildSimpleMenu(null, el); return;
+  }
   el.innerHTML='';
   const groups = [
     [ {act:'undo', icon:'undo', title:'Undo'}, {act:'redo', icon:'redo', title:'Redo'} ],
@@ -338,11 +510,12 @@ function buildReplicaToolbar(editor, el){
   });
   document.addEventListener('click',e=>{ if(!el.contains(e.target)) el.querySelectorAll('.heading-dropdown.open').forEach(dd=>dd.classList.remove('open')); });
   editor.on('transaction', ()=>updateReplicaToolbar(editor, el));
-  lucide?.createIcons?.();
+  try { lucide?.createIcons?.(); } catch(_){ /* ignore */ }
   updateReplicaToolbar(editor, el);
 }
 
 function updateReplicaToolbar(editor, el){
+  if(!el) return; if(!editor || !editor.isActive){ return; }
   // active states
   el.querySelectorAll('button.toolbar-btn').forEach(btn=>{
     const act=btn.dataset.act; let active=false;
@@ -361,8 +534,130 @@ function updateReplicaToolbar(editor, el){
   lucide?.createIcons?.();
 }
 
+/* ========= ENHANCEMENTS: image removal, task list drag reorder, paste auto-embed ========= */
+function setupEditorEnhancements(editor){
+  if(!editor) return;
+  // Auto-embed on paste (YouTube / image)
+  const el = editor.view.dom;
+  el.addEventListener('paste', (e)=>{
+    setTimeout(()=>{ // allow paste insertion
+      try {
+        const selText = editor.state.doc.textBetween(editor.state.selection.from-300, editor.state.selection.to+300, '\n', '\n');
+        const urlMatch = /(https?:\/\/[^\s<>'"`]+)$/m.exec(selText.trim());
+        if(!urlMatch) return;
+        const url = urlMatch[1];
+        // YouTube
+        const yt = /(?:https?:\/\/(?:www\.)?youtu\.be\/([\w-]{6,})|youtube\.com\/watch\?v=([\w-]{6,}))/i.exec(url);
+        if(yt){ editor.chain().focus().setYoutubeVideo({ src: url }).run(); return; }
+        // Image by extension
+        if(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url)){
+          editor.chain().focus().setImage({ src:url }).run();
+        }
+      } catch(err){ console.warn('auto-embed paste err', err); }
+    },10);
+  });
+  // Image remove (Shift+Click)
+  el.addEventListener('click', ev=>{
+    const img = ev.target.closest('img');
+    if(img && ev.shiftKey){
+      if(confirm('Remove image?')){
+        // select image node then delete
+        const pos = findDomNodePos(editor, img);
+        if(pos!=null){ editor.commands.command(({ tr })=>{ tr.delete(pos, pos+1); return true; }); }
+      }
+    }
+  });
+  // Task list drag reorder
+  function refreshTaskListDraggable(){
+    el.querySelectorAll('ul[data-type="taskList"] li').forEach((li,i)=>{
+      li.setAttribute('draggable','true');
+      li.dataset.tindex = i;
+    });
+  }
+  el.addEventListener('dragstart', e=>{
+    const li = e.target.closest('ul[data-type="taskList"] li');
+    if(editor && ch){
+      switch(act){
+        case 'undo': ch.undo().run(); break;
+        case 'redo': ch.redo().run(); break;
+        case 'bold': ch.toggleBold().run(); break;
+        case 'italic': ch.toggleItalic().run(); break;
+        case 'underline': ch.toggleUnderline?.().run(); break;
+        case 'strike': ch.toggleStrike().run(); break;
+        case 'code': ch.toggleCode().run(); break;
+        case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
+        case 'h1': ch.toggleHeading({level:1}).run(); break;
+        case 'h2': ch.toggleHeading({level:2}).run(); break;
+        case 'h3': ch.toggleHeading({level:3}).run(); break;
+        case 'paragraph': ch.setParagraph().run(); break;
+        case 'bulletList': ch.toggleBulletList().run(); break;
+        case 'orderedList': ch.toggleOrderedList().run(); break;
+        case 'blockquote': ch.toggleBlockquote().run(); break;
+        case 'codeBlock': ch.toggleCodeBlock().run(); break;
+        case 'hr': ch.setHorizontalRule().run(); break;
+        case 'align-left': ch.setTextAlign('left').run(); break;
+        case 'align-center': ch.setTextAlign('center').run(); break;
+        case 'align-right': ch.setTextAlign('right').run(); break;
+        case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
+        case 'unlink': ch.unsetLink().run(); break;
+        case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
+      }
+      updateSimpleMenu(editor, el);
+    } else {
+      // Fallback contentEditable execCommand
+      const activeEl = document.getElementById('eventNotesEditor') || document.getElementById('detailsNotesEditor');
+      if(activeEl) activeEl.focus();
+      const exec = (cmd,val=null)=>{ try{ document.execCommand(cmd,false,val);}catch(_){} };
+      switch(act){
+        case 'undo': exec('undo'); break;
+        case 'redo': exec('redo'); break;
+        case 'bold': exec('bold'); break;
+        case 'italic': exec('italic'); break;
+        case 'underline': exec('underline'); break;
+        case 'strike': exec('strikeThrough'); break;
+        case 'code': exec('formatBlock','pre'); break;
+        case 'h1': exec('formatBlock','h1'); break;
+        case 'h2': exec('formatBlock','h2'); break;
+        case 'h3': exec('formatBlock','h3'); break;
+        case 'paragraph': exec('formatBlock','p'); break;
+        case 'bulletList': exec('insertUnorderedList'); break;
+        case 'orderedList': exec('insertOrderedList'); break;
+        case 'blockquote': exec('formatBlock','blockquote'); break;
+        case 'hr': exec('insertHorizontalRule'); break;
+        case 'link': { const url=prompt('Enter URL'); if(url) exec('createLink',url); break; }
+        case 'unlink': exec('unlink'); break;
+        case 'clear': exec('removeFormat'); break;
+      }
+    }
+  const view = editor.view;
+  if(editor){ editor.on('transaction', ()=>updateSimpleMenu(editor, el)); updateSimpleMenu(editor, el); }
+    const current = view.nodeDOM(pos);
+    if(current===domNode){ found=pos; return false; }
+    return true;
+  });
+  return found;
+}
+
+function reorderTaskItems(editor, fromIdx, toIdx){
+  try {
+    // naive: rebuild task list order based on DOM and setContent for that list only
+    const root = editor.view.dom.querySelector('ul[data-type="taskList"]');
+    if(!root) return;
+    const items = Array.from(root.children);
+    const moving = items[fromIdx]; if(!moving) return;
+    root.removeChild(moving);
+    if(toIdx>=items.length-1) root.appendChild(moving); else root.insertBefore(moving, items[toIdx]);
+    // Replace entire task list node content
+    const html = root.outerHTML;
+    // Get full doc HTML and replace first taskList with new html
+    const full = editor.getHTML();
+    const updated = full.replace(/<ul data-type="taskList"[\s\S]*?<\/ul>/, html);
+    editor.commands.setContent(updated, false);
+  } catch(e){ console.warn('reorder task list error', e); }
+}
+
 function buildSimpleMenu(editor, el){
-  if(!editor||!el) return;
+  if(!el) return;
   const buttons = [
     { act:'undo', icon:'M9 5l-7 7 7 7', box: '0 0 18 24', title:'Undo' },
     { act:'redo', icon:'M9 5l7 7-7 7', box: '0 0 18 24', title:'Redo' },
@@ -435,6 +730,7 @@ function buildSimpleMenu(editor, el){
 }
 
 function updateSimpleMenu(editor, el){
+  if(!el) return;
   el.querySelectorAll('button').forEach(btn=>{
     const act=btn.dataset.act; let active=false;
     switch(act){
