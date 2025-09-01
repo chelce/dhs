@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- calendar-build: 2025-09-01T00:00Z simple-editor+resilient-init v1.1 +enhancements (image remove, task drag, auto-embed) -->
+<!-- calendar-build: 2025-09-01T00:00Z TipTap-3.0-upgrade +lucide-icons +enhancements -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Class Calendar & Reflections (Restored)</title>
+<title>Class Calendar & Reflections (TipTap 3.0)</title>
 <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Simplified TipTap with known working version -->
-<script src="https://unpkg.com/@tiptap/core@2.0.4/dist/index.umd.min.js"></script>
-<script src="https://unpkg.com/@tiptap/starter-kit@2.0.4/dist/index.umd.min.js"></script>
-<script src="https://unpkg.com/@tiptap/extension-placeholder@2.0.4/dist/index.umd.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
+<!-- TipTap 3.0 with Lucide icons -->
+<script src="https://unpkg.com/@tiptap/core@3.0.0/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/@tiptap/starter-kit@3.0.0/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/@tiptap/extension-placeholder@3.0.0/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
 async function ensureEditors(){
-  // Simple direct approach - try to init, fallback if fails
+  // TipTap 3.0 direct approach
   if (window.Tiptap && window.Tiptap.Editor) {
-    console.log('TipTap detected, initializing editors');
+    console.log('TipTap 3.0 detected, initializing editors');
     initEditors();
     if (notesEditor && detailsEditor) {
-      console.log('Editors created successfully');
+      console.log('TipTap 3.0 editors created successfully');
       return;
     }
   }
@@ -28,16 +28,16 @@ async function ensureEditors(){
   await new Promise(r => setTimeout(r, 1000));
   
   if (window.Tiptap && window.Tiptap.Editor) {
-    console.log('TipTap available after delay, trying again');
+    console.log('TipTap 3.0 available after delay, trying again');
     initEditors();
     if (notesEditor && detailsEditor) {
-      console.log('Editors created on retry');
+      console.log('TipTap 3.0 editors created on retry');
       return;
     }
   }
   
   // Fallback to contentEditable
-  console.warn('Using fallback contentEditable editors');
+  console.warn('TipTap 3.0 unavailable, using fallback contentEditable editors');
   const enEd = document.getElementById('eventNotesEditor');
   const dnEd = document.getElementById('detailsNotesEditor');
   
@@ -102,6 +102,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .toolbar-btn:hover{background:#eef2f7}
 .toolbar-btn.is-active{background:#e0e7ff;border-color:#a5b4fc;color:#1d4ed8}
 .toolbar-btn i{width:16px;height:16px;display:block}
+.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2}
 .heading-dropdown{position:relative}
 .heading-trigger{display:inline-flex;align-items:center;gap:4px}
 .heading-menu{position:absolute;top:105%;left:0;z-index:200;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:4px;display:none;flex-direction:column;min-width:140px}
@@ -271,43 +272,45 @@ function wireUI(){
 }
 
 function initEditors(){
-  // validate core editor constructor
+  // TipTap 3.0 validation
   if(!window.Tiptap || !window.Tiptap.Editor){
-    console.warn('Editor constructor missing before initEditors; deferring');
+    console.warn('TipTap 3.0 Editor constructor missing; deferring');
     return;
   }
   
-  // Simplified extension set - only use what's reliably available
-  const baseExt = [
+  // TipTap 3.0 extensions - simplified for reliability
+  const extensions = [
     window.TiptapStarterKit?.StarterKit || window.StarterKit,
     window.TiptapPlaceholder?.Placeholder?.configure?.({ placeholder: 'Start typing…' }) || window.Placeholder?.configure?.({ placeholder: 'Start typing…' })
   ].filter(Boolean);
   
   try {
     if(notesEditor||detailsEditor){ return; }
+    
     notesEditor = new window.Tiptap.Editor({
       element: document.getElementById('eventNotesEditor'),
-      extensions: baseExt,
+      extensions: extensions,
       content: '',
       onUpdate: ({ editor }) => { document.getElementById('eventNotes').value = editor.getHTML(); }
     });
+    
     detailsEditor = new window.Tiptap.Editor({
       element: document.getElementById('detailsNotesEditor'),
-      extensions: baseExt,
+      extensions: extensions,
       content: '',
       onUpdate: () => {}
     });
     
-    // Build simple working toolbars
-    buildWorkingToolbar(notesEditor, document.getElementById('eventNotesMenu'));
-    buildWorkingToolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+    // Build TipTap 3.0 toolbars with Lucide icons
+    buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
+    buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
     
     setupEditorEnhancements(notesEditor);
     setupEditorEnhancements(detailsEditor);
     
-    console.log('TipTap editors initialized successfully');
+    console.log('TipTap 3.0 editors initialized successfully');
   } catch (e) {
-    console.warn('TipTap init failed, using fallback editors', e);
+    console.warn('TipTap 3.0 init failed, using fallback editors', e);
     document.getElementById('eventNotesEditor').contentEditable = 'true';
     document.getElementById('detailsNotesEditor').contentEditable = 'true';
     buildFallbackToolbar(document.getElementById('eventNotesMenu'));
@@ -396,6 +399,121 @@ function updateWorkingToolbar(editor, el) {
     
     btn.classList.toggle('is-active', isActive);
   });
+}
+
+// TipTap 3.0 Toolbar with Lucide Icons
+function buildTipTap3Toolbar(editor, el) {
+  if (!el || !editor) return;
+  
+  el.innerHTML = `
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="undo" title="Undo">
+        <i data-lucide="undo-2"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="redo" title="Redo">
+        <i data-lucide="redo-2"></i>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold">
+        <i data-lucide="bold"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic">
+        <i data-lucide="italic"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="code" title="Inline Code">
+        <i data-lucide="code"></i>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1">
+        <i data-lucide="heading-1"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2">
+        <i data-lucide="heading-2"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph">
+        <i data-lucide="pilcrow"></i>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List">
+        <i data-lucide="list"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">
+        <i data-lucide="list-ordered"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">
+        <i data-lucide="quote"></i>
+      </button>
+    </div>
+  `;
+  
+  el.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toolbar-btn');
+    if (!btn || !editor) return;
+    
+    const action = btn.dataset.action;
+    const chain = editor.chain().focus();
+    
+    switch (action) {
+      case 'undo': chain.undo().run(); break;
+      case 'redo': chain.redo().run(); break;
+      case 'bold': chain.toggleBold().run(); break;
+      case 'italic': chain.toggleItalic().run(); break;
+      case 'code': chain.toggleCode().run(); break;
+      case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
+      case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
+      case 'paragraph': chain.setParagraph().run(); break;
+      case 'bulletList': chain.toggleBulletList().run(); break;
+      case 'orderedList': chain.toggleOrderedList().run(); break;
+      case 'blockquote': chain.toggleBlockquote().run(); break;
+    }
+    
+    updateTipTap3Toolbar(editor, el);
+  });
+  
+  // Update button states initially
+  editor.on('selectionUpdate', () => updateTipTap3Toolbar(editor, el));
+  editor.on('transaction', () => updateTipTap3Toolbar(editor, el));
+  
+  // Initialize Lucide icons
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+  
+  updateTipTap3Toolbar(editor, el);
+}
+
+function updateTipTap3Toolbar(editor, el) {
+  if (!editor || !el) return;
+  
+  el.querySelectorAll('.toolbar-btn').forEach(btn => {
+    const action = btn.dataset.action;
+    let isActive = false;
+    
+    switch (action) {
+      case 'bold': isActive = editor.isActive('bold'); break;
+      case 'italic': isActive = editor.isActive('italic'); break;
+      case 'code': isActive = editor.isActive('code'); break;
+      case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
+      case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
+      case 'paragraph': isActive = editor.isActive('paragraph'); break;
+      case 'bulletList': isActive = editor.isActive('bulletList'); break;
+      case 'orderedList': isActive = editor.isActive('orderedList'); break;
+      case 'blockquote': isActive = editor.isActive('blockquote'); break;
+    }
+    
+    btn.classList.toggle('is-active', isActive);
+  });
+  
+  // Re-initialize icons after state changes
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
 }
 
 // Fallback toolbar for when TipTap fails completely
