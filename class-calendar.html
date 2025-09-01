@@ -53,11 +53,43 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-group label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
 .form-group input,.form-group select{width:100%;padding:8px 10px;border:1px solid #d0d0d4;border-radius:6px;font-size:13px}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-.editor-container{border:1px solid #d0d0d4;border-radius:8px;background:#fff;display:flex;flex-direction:column}
-.toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-bottom:1px solid #e2e2e7;background:#f6f7f8}
-.toolbar button{background:#fff;border:1px solid #cfd2d6;border-radius:4px;font-size:11px;padding:4px 6px;cursor:pointer}
-.toolbar button.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
-.tiptap{min-height:90px;max-height:220px;overflow:auto;padding:8px;font-size:13px;line-height:1.4;outline:none}
+/* === Simple Editor (TipTap template inspired) === */
+.simple-editor{border:1px solid #dadde1;border-radius:10px;overflow:hidden;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.simple-editor .menu-bar{display:flex;flex-wrap:wrap;gap:2px;padding:4px 6px;background:#f9fafb;border-bottom:1px solid #e5e7eb}
+.simple-editor .menu-bar button{background:transparent;border:0;display:inline-flex;align-items:center;justify-content:center;padding:6px 6px;border-radius:6px;cursor:pointer;color:#374151;font-size:12px;line-height:1;transition:background .15s,color .15s}
+.simple-editor .menu-bar button:hover{background:#e5e7eb}
+.simple-editor .menu-bar button.is-active{background:#e0e7ff;color:#1d4ed8}
+.simple-editor .menu-bar button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.simple-editor .content-area{position:relative}
+.simple-editor .tiptap{min-height:110px;max-height:260px;overflow:auto;padding:10px 14px;font-size:14px;line-height:1.5;outline:none}
+.simple-editor .tiptap p{margin:0 0 .85em}
+.simple-editor .tiptap h1,.simple-editor .tiptap h2,.simple-editor .tiptap h3{line-height:1.2;font-weight:600;margin:.9em 0 .4em}
+.simple-editor .tiptap h1{font-size:1.45rem}
+.simple-editor .tiptap h2{font-size:1.25rem}
+.simple-editor .tiptap h3{font-size:1.1rem}
+.simple-editor .tiptap ul{list-style:disc;padding-left:1.4em;margin:.5em 0 .9em}
+.simple-editor .tiptap ol{list-style:decimal;padding-left:1.4em;margin:.5em 0 .9em}
+.simple-editor .tiptap li{margin:.25em 0}
+.simple-editor .tiptap blockquote{margin:.9em 0;padding:.6em .9em;border-left:4px solid #6366f1;background:#f5f7ff;border-radius:4px;color:#374151;font-style:italic}
+.simple-editor .tiptap code{background:#1e293b;color:#f8fafc;padding:2px 5px;border-radius:4px;font-size:.85em}
+.simple-editor .tiptap pre{background:#1e293b;color:#f8fafc;font-family:ui-monospace,Menlo,Consolas,monospace;padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.35;margin:1em 0;position:relative}
+.simple-editor .tiptap pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
+.simple-editor .tiptap hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
+.simple-editor .tiptap a{color:#2563eb;text-decoration:underline}
+.simple-editor .tiptap p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
+.simple-editor .tiptap:focus{outline:none}
+.simple-editor .menu-separator{width:1px;height:20px;background:#e5e7eb;margin:0 4px}
+.simple-editor .menu-bar button[disabled]{opacity:.35;cursor:not-allowed}
+.dark-theme .simple-editor{background:#111827;border-color:#374151}
+.dark-theme .simple-editor .menu-bar{background:#1f2937;border-bottom-color:#374151}
+.dark-theme .simple-editor .menu-bar button{color:#cbd5e1}
+.dark-theme .simple-editor .menu-bar button:hover{background:#374151}
+.dark-theme .simple-editor .menu-bar button.is-active{background:#1d4ed8;color:#fff}
+.dark-theme .simple-editor .tiptap{color:#f1f5f9}
+.dark-theme .simple-editor .tiptap blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
+.dark-theme .simple-editor .tiptap code{background:#334155;color:#f1f5f9}
+.dark-theme .simple-editor .tiptap pre{background:#0f172a;color:#f1f5f9}
+.dark-theme .simple-editor .tiptap hr{border-top-color:#334155}
 .event-details-modal .modal-content{max-width:760px}
 .event-class-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
 .notes-section{margin-top:10px}
@@ -105,7 +137,10 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
       </div>
       <div class="form-group"><label>Notes</label>
-        <div class="editor-container"><div id="eventNotesToolbar" class="toolbar"></div><div id="eventNotesEditor" class="tiptap"></div></div>
+        <div class="simple-editor" id="eventNotesWrapper">
+          <div id="eventNotesMenu" class="menu-bar"></div>
+          <div class="content-area"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..."></div></div>
+        </div>
         <input type="hidden" id="eventNotes" />
       </div>
       <div class="form-actions"><button type="button" class="btn" data-close="eventModal">Cancel</button><button class="btn btn-primary" type="submit">Save</button></div>
@@ -120,7 +155,10 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
     <div class="notes-section">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
-      <div class="editor-container"><div id="detailsNotesToolbar" class="toolbar"></div><div id="detailsNotesEditor" class="tiptap"></div></div>
+      <div class="simple-editor" id="detailsNotesWrapper">
+        <div id="detailsNotesMenu" class="menu-bar"></div>
+        <div class="content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
+      </div>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save Notes</button></div>
   </div>
@@ -177,74 +215,71 @@ function wireUI(){
 }
 
 function initEditors(){
-  const baseExt=[
-    window.TiptapStarterKit?.StarterKit?.configure({heading:{levels:[1,2,3]}}),
-    window.TiptapPlaceholder?.Placeholder?.configure({placeholder:'Add notes...'}),
-    window.TiptapUnderline?.Underline,
-    window.TiptapHighlight?.Highlight,
-    window.TiptapLink?.Link,
-    window.TiptapTextStyle?.TextStyle,
-    window.TiptapColor?.Color,
-    window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] })
+  const baseExt = [
+    window.TiptapStarterKit?.StarterKit?.configure({ heading: { levels: [1,2,3] } }),
+    window.TiptapPlaceholder?.Placeholder?.configure({ placeholder: 'Start typing…' })
   ];
   try {
     notesEditor = new window.Tiptap.Editor({
       element: document.getElementById('eventNotesEditor'),
       extensions: baseExt.filter(Boolean),
-      content:'',
-      onUpdate:({editor})=>{document.getElementById('eventNotes').value=editor.getHTML();}
+      content: '',
+      onUpdate: ({ editor }) => { document.getElementById('eventNotes').value = editor.getHTML(); }
     });
     detailsEditor = new window.Tiptap.Editor({
       element: document.getElementById('detailsNotesEditor'),
       extensions: baseExt.filter(Boolean),
-      content:'',
-      onUpdate:()=>{}
+      content: '',
+      onUpdate: () => {}
     });
-    buildToolbar(notesEditor, document.getElementById('eventNotesToolbar'));
-    buildToolbar(detailsEditor, document.getElementById('detailsNotesToolbar'));
-  } catch(e){
-    document.getElementById('eventNotesEditor').contentEditable='true';
-    document.getElementById('detailsNotesEditor').contentEditable='true';
+    buildSimpleMenu(notesEditor, document.getElementById('eventNotesMenu'));
+    buildSimpleMenu(detailsEditor, document.getElementById('detailsNotesMenu'));
+  } catch (e) {
+    document.getElementById('eventNotesEditor').contentEditable = 'true';
+    document.getElementById('detailsNotesEditor').contentEditable = 'true';
   }
 }
 
-function buildToolbar(editor, toolbarEl){
-  if(!editor||!toolbarEl) return;
-  toolbarEl.innerHTML=`
-    <button data-act="undo" title="Undo">↺</button>
-    <button data-act="redo" title="Redo">↻</button>
-    <button data-act="bold" title="Bold"><b>B</b></button>
-    <button data-act="italic" title="Italic"><i>I</i></button>
-    <button data-act="underline" title="Underline"><u>U</u></button>
-    <button data-act="strike" title="Strikethrough"><s>S</s></button>
-    <button data-act="code" title="Inline Code">{;}</button>
-    <button data-act="highlight" title="Highlight">HL</button>
-    <button data-act="h1" title="H1">H1</button>
-    <button data-act="h2" title="H2">H2</button>
-    <button data-act="h3" title="H3">H3</button>
-    <button data-act="paragraph" title="Paragraph">P</button>
-    <button data-act="bulletList" title="Bullet List">• List</button>
-    <button data-act="orderedList" title="Numbered List">1.</button>
-    <button data-act="blockquote" title="Blockquote">❝❞</button>
-    <button data-act="codeBlock" title="Code Block">&lt;/&gt;</button>
-    <button data-act="hr" title="Horizontal Rule">HR</button>
-    <button data-act="align-left" title="Align Left">⯇</button>
-    <button data-act="align-center" title="Align Center">≡</button>
-    <button data-act="align-right" title="Align Right">⯈</button>
-    <button data-act="link" title="Add Link">Link</button>
-    <button data-act="unlink" title="Remove Link">Unlink</button>
-    <button data-act="clear" title="Clear Formatting">CLR</button>`;
-  toolbarEl.addEventListener('click', e=>{
-    const btn=e.target.closest('button'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+function buildSimpleMenu(editor, el){
+  if(!editor||!el) return;
+  const buttons = [
+    { act:'undo', icon:'M9 5l-7 7 7 7', box: '0 0 18 24', title:'Undo' },
+    { act:'redo', icon:'M9 5l7 7-7 7', box: '0 0 18 24', title:'Redo' },
+    'sep',
+    { act:'bold', icon:'M6 4h5.5a3.5 3.5 0 010 7H6zm0 7h6a3.5 3.5 0 010 7H6z', box:'0 0 18 24', title:'Bold' },
+    { act:'italic', icon:'M10 4L8 20', box:'0 0 18 24', title:'Italic' },
+    { act:'strike', icon:'M2 8h14M2 16h14M4 4h10M4 20h10', box:'0 0 18 24', title:'Strike' },
+    { act:'code', icon:'M6 8L2 12l4 4M12 8l4 4-4 4', box:'0 0 18 24', title:'Inline Code' },
+    'sep',
+    { act:'h1', label:'H1', title:'Heading 1' },
+    { act:'h2', label:'H2', title:'Heading 2' },
+    { act:'h3', label:'H3', title:'Heading 3' },
+    { act:'paragraph', label:'P', title:'Paragraph' },
+    'sep',
+    { act:'bulletList', icon:'M5 6h9M5 12h9M5 18h9M2 6h.01M2 12h.01M2 18h.01', box:'0 0 20 24', title:'Bullet List' },
+    { act:'orderedList', icon:'M4 6h10M4 12h10M4 18h10M1 6h.01M1 12h.01M1 18h.01', box:'0 0 18 24', title:'Ordered List' },
+    { act:'blockquote', icon:'M4 6h8v4H8v4h4v4H4V6zm8 0h4v12h-4', box:'0 0 20 24', title:'Blockquote' },
+    { act:'codeBlock', icon:'M6 8L2 12l4 4M12 8l4 4-4 4M9 5h2M9 19h2', box:'0 0 18 24', title:'Code Block' },
+    { act:'hr', icon:'M3 12h12', box:'0 0 18 24', title:'Horizontal Rule' },
+    { act:'clear', icon:'M4 4h10v4H8v4h6v8H4z', box:'0 0 18 24', title:'Clear Formatting' },
+  ];
+  el.innerHTML = '';
+  buttons.forEach(b=>{
+    if(b==='sep'){ const sep=document.createElement('div'); sep.className='menu-separator'; el.appendChild(sep); return; }
+    const btn=document.createElement('button'); btn.type='button'; btn.dataset.act=b.act; btn.title=b.title||'';
+    if(b.icon){ btn.innerHTML=`<svg viewBox="${b.box}" stroke-linecap="round" stroke-linejoin="round"><path d="${b.icon}" /></svg>`; }
+    else { btn.textContent=b.label; }
+    el.appendChild(btn);
+  });
+  el.addEventListener('click', ev=>{
+    const btn=ev.target.closest('button'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
     switch(act){
       case 'undo': ch.undo().run(); break;
       case 'redo': ch.redo().run(); break;
       case 'bold': ch.toggleBold().run(); break;
       case 'italic': ch.toggleItalic().run(); break;
-      case 'underline': ch.toggleUnderline?.().run(); break;
       case 'strike': ch.toggleStrike().run(); break;
       case 'code': ch.toggleCode().run(); break;
-      case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
       case 'h1': ch.toggleHeading({level:1}).run(); break;
       case 'h2': ch.toggleHeading({level:2}).run(); break;
       case 'h3': ch.toggleHeading({level:3}).run(); break;
@@ -254,29 +289,22 @@ function buildToolbar(editor, toolbarEl){
       case 'blockquote': ch.toggleBlockquote().run(); break;
       case 'codeBlock': ch.toggleCodeBlock().run(); break;
       case 'hr': ch.setHorizontalRule().run(); break;
-      case 'align-left': ch.setTextAlign('left').run(); break;
-      case 'align-center': ch.setTextAlign('center').run(); break;
-      case 'align-right': ch.setTextAlign('right').run(); break;
-      case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
-      case 'unlink': ch.unsetLink().run(); break;
       case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
     }
-    updateToolbarState(editor, toolbarEl);
+    updateSimpleMenu(editor, el);
   });
-  editor.on('transaction', ()=>updateToolbarState(editor, toolbarEl));
-  updateToolbarState(editor, toolbarEl);
+  editor.on('transaction', ()=>updateSimpleMenu(editor, el));
+  updateSimpleMenu(editor, el);
 }
 
-function updateToolbarState(editor, toolbarEl){
-  toolbarEl.querySelectorAll('button').forEach(btn=>{
+function updateSimpleMenu(editor, el){
+  el.querySelectorAll('button').forEach(btn=>{
     const act=btn.dataset.act; let active=false;
     switch(act){
       case 'bold': active=editor.isActive('bold'); break;
       case 'italic': active=editor.isActive('italic'); break;
-      case 'underline': active=editor.isActive('underline'); break;
       case 'strike': active=editor.isActive('strike'); break;
       case 'code': active=editor.isActive('code'); break;
-      case 'highlight': active=editor.isActive('highlight'); break;
       case 'h1': active=editor.isActive('heading',{level:1}); break;
       case 'h2': active=editor.isActive('heading',{level:2}); break;
       case 'h3': active=editor.isActive('heading',{level:3}); break;
@@ -285,12 +313,8 @@ function updateToolbarState(editor, toolbarEl){
       case 'orderedList': active=editor.isActive('orderedList'); break;
       case 'blockquote': active=editor.isActive('blockquote'); break;
       case 'codeBlock': active=editor.isActive('codeBlock'); break;
-      case 'align-left': active=editor.isActive({textAlign:'left'}); break;
-      case 'align-center': active=editor.isActive({textAlign:'center'}); break;
-      case 'align-right': active=editor.isActive({textAlign:'right'}); break;
-      case 'link': active=editor.isActive('link'); break;
     }
-    btn.classList.toggle('active', !!active);
+    btn.classList.toggle('is-active', !!active);
   });
 }
 
