@@ -16,6 +16,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-style@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
 body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:16px;}
 .calendar-container{max-width:1200px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;}
@@ -54,33 +55,47 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-group label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
 .form-group input,.form-group select{width:100%;padding:8px 10px;border:1px solid #d0d0d4;border-radius:6px;font-size:13px}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-/* === TipTap Simple Template (verbatim structure) === */
-.tiptap-simple-wrapper{border:1px solid #d1d5db;border-radius:10px;overflow:hidden;background:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;display:flex;flex-direction:column}
-.tiptap-simple-wrapper .editor__header{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #e5e7eb}
-.tiptap-simple-wrapper .editor__header button{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:500;color:#374151}
-.tiptap-simple-wrapper .editor__header button:hover{background:#eef2f7}
-.tiptap-simple-wrapper .editor__header button.is-active{background:#e0e7ff;border-color:#a5b4fc;color:#1d4ed8}
-.tiptap-simple-wrapper .editor__content{padding:10px 14px;min-height:110px;max-height:260px;overflow:auto;font-size:14px;line-height:1.45}
-.tiptap-simple-wrapper .editor__content:focus{outline:none}
-.tiptap-simple-wrapper .editor__content p{margin:0 0 .9em}
-.tiptap-simple-wrapper .editor__content h1{font-size:1.5rem;margin:1.1em 0 .5em;font-weight:600}
-.tiptap-simple-wrapper .editor__content h2{font-size:1.25rem;margin:1em 0 .5em;font-weight:600}
-.tiptap-simple-wrapper .editor__content h3{font-size:1.1rem;margin:.9em 0 .4em;font-weight:600}
-.tiptap-simple-wrapper .editor__content blockquote{margin:1em 0;padding:.6em .9em;border-left:4px solid #6366f1;background:#f5f7ff;border-radius:4px;font-style:italic}
-.tiptap-simple-wrapper .editor__content code{background:#1e293b;color:#f8fafc;padding:2px 5px;border-radius:4px;font-size:.85em}
-.tiptap-simple-wrapper .editor__content pre{background:#1e293b;color:#f8fafc;font-family:ui-monospace,Menlo,Consolas,monospace;padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.35;margin:1em 0}
-.tiptap-simple-wrapper .editor__content hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
-.tiptap-simple-wrapper .editor__content a{color:#2563eb;text-decoration:underline}
-.tiptap-simple-wrapper .editor__content p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
-.dark-theme .tiptap-simple-wrapper{background:#111827;border-color:#374151}
-.dark-theme .tiptap-simple-wrapper .editor__header{background:#1f2937;border-bottom-color:#374151}
-.dark-theme .tiptap-simple-wrapper .editor__header button{background:#1e293b;border-color:#334155;color:#cbd5e1}
-.dark-theme .tiptap-simple-wrapper .editor__header button:hover{background:#374151}
-.dark-theme .tiptap-simple-wrapper .editor__header button.is-active{background:#1d4ed8;color:#fff}
-.dark-theme .tiptap-simple-wrapper .editor__content{color:#f1f5f9}
-.dark-theme .tiptap-simple-wrapper .editor__content blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
-.dark-theme .tiptap-simple-wrapper .editor__content code{background:#334155;color:#f1f5f9}
-.dark-theme .tiptap-simple-wrapper .editor__content pre{background:#0f172a;color:#f1f5f9}
+/* === Simple Editor Replica (Lucide) === */
+.editor-shell{border:1px solid #d1d5db;border-radius:10px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #e5e7eb;align-items:center}
+.toolbar-group{display:inline-flex;gap:4px;align-items:center}
+.toolbar-divider{width:1px;height:24px;background:#d1d5db;margin:0 6px}
+.toolbar-btn{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:4px 6px;min-width:30px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#374151;font-size:12px;line-height:1;font-weight:500;transition:.15s background,.15s color}
+.toolbar-btn:hover{background:#eef2f7}
+.toolbar-btn.is-active{background:#e0e7ff;border-color:#a5b4fc;color:#1d4ed8}
+.toolbar-btn i{width:16px;height:16px;display:block}
+.heading-dropdown{position:relative}
+.heading-trigger{display:inline-flex;align-items:center;gap:4px}
+.heading-menu{position:absolute;top:105%;left:0;z-index:200;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:4px;display:none;flex-direction:column;min-width:140px}
+.heading-dropdown.open .heading-menu{display:flex}
+.heading-menu button{all:unset;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:13px;color:#374151;line-height:1.2}
+.heading-menu button:hover{background:#eef2f7}
+.editor-content-area{padding:10px 14px;min-height:110px;max-height:260px;overflow:auto;font-size:14px;line-height:1.5}
+.editor-content-area:focus{outline:none}
+.editor-content-area p{margin:0 0 .85em}
+.editor-content-area h1,.editor-content-area h2,.editor-content-area h3{line-height:1.2;font-weight:600;margin:.9em 0 .4em}
+.editor-content-area h1{font-size:1.45rem}
+.editor-content-area h2{font-size:1.25rem}
+.editor-content-area h3{font-size:1.1rem}
+.editor-content-area ul{list-style:disc;padding-left:1.4em;margin:.5em 0 .9em}
+.editor-content-area ol{list-style:decimal;padding-left:1.4em;margin:.5em 0 .9em}
+.editor-content-area li{margin:.25em 0}
+.editor-content-area blockquote{margin:.9em 0;padding:.6em .9em;border-left:4px solid #6366f1;background:#f5f7ff;border-radius:4px;color:#374151;font-style:italic}
+.editor-content-area code{background:#1e293b;color:#f8fafc;padding:2px 5px;border-radius:4px;font-size:.85em}
+.editor-content-area pre{background:#1e293b;color:#f8fafc;font-family:ui-monospace,Menlo,Consolas,monospace;padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.35;margin:1em 0;position:relative}
+.editor-content-area pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
+.editor-content-area hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
+.editor-content-area a{color:#2563eb;text-decoration:underline}
+.editor-content-area p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
+.dark-theme .editor-shell{background:#111827;border-color:#374151}
+.dark-theme .editor-toolbar{background:#1f2937;border-bottom-color:#374151}
+.dark-theme .toolbar-btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
+.dark-theme .toolbar-btn:hover{background:#374151}
+.dark-theme .toolbar-btn.is-active{background:#1d4ed8;color:#fff}
+.dark-theme .editor-content-area{color:#f1f5f9}
+.dark-theme .editor-content-area blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
+.dark-theme .editor-content-area code{background:#334155;color:#f1f5f9}
+.dark-theme .editor-content-area pre{background:#0f172a;color:#f1f5f9}
 .event-details-modal .modal-content{max-width:760px}
 .event-class-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
 .notes-section{margin-top:10px}
@@ -128,33 +143,9 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
       </div>
       <div class="form-group"><label>Notes</label>
-        <div class="tiptap-simple-wrapper" id="eventNotesWrapper">
-          <div class="editor__header" id="eventNotesMenu">
-            <button data-act="undo" title="Undo">Undo</button>
-            <button data-act="redo" title="Redo">Redo</button>
-            <button data-act="bold" title="Bold">Bold</button>
-            <button data-act="italic" title="Italic">Italic</button>
-            <button data-act="underline" title="Underline">Underline</button>
-            <button data-act="strike" title="Strikethrough">Strike</button>
-            <button data-act="code" title="Code">Code</button>
-            <button data-act="highlight" title="Highlight">HL</button>
-            <button data-act="h1" title="Heading 1">H1</button>
-            <button data-act="h2" title="Heading 2">H2</button>
-            <button data-act="h3" title="Heading 3">H3</button>
-            <button data-act="paragraph" title="Paragraph">P</button>
-            <button data-act="bulletList" title="Bullet List">• List</button>
-            <button data-act="orderedList" title="Ordered List">1. List</button>
-            <button data-act="blockquote" title="Blockquote">Quote</button>
-            <button data-act="codeBlock" title="Code Block">CodeBlk</button>
-            <button data-act="hr" title="Horizontal Rule">HR</button>
-            <button data-act="align-left" title="Align Left">Left</button>
-            <button data-act="align-center" title="Align Center">Center</button>
-            <button data-act="align-right" title="Align Right">Right</button>
-            <button data-act="link" title="Add Link">Link</button>
-            <button data-act="unlink" title="Remove Link">Unlink</button>
-            <button data-act="clear" title="Clear Formatting">Clear</button>
-          </div>
-          <div class="editor__content" id="eventNotesEditor" data-placeholder="Add notes..."></div>
+        <div class="editor-shell" id="eventNotesWrapper">
+          <div id="eventNotesMenu" class="editor-toolbar"></div>
+          <div class="editor-content-area"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..."></div></div>
         </div>
         <input type="hidden" id="eventNotes" />
       </div>
@@ -170,33 +161,9 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
     <div class="notes-section">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
-      <div class="tiptap-simple-wrapper" id="detailsNotesWrapper">
-        <div class="editor__header" id="detailsNotesMenu">
-            <button data-act="undo" title="Undo">Undo</button>
-            <button data-act="redo" title="Redo">Redo</button>
-            <button data-act="bold" title="Bold">Bold</button>
-            <button data-act="italic" title="Italic">Italic</button>
-            <button data-act="underline" title="Underline">Underline</button>
-            <button data-act="strike" title="Strikethrough">Strike</button>
-            <button data-act="code" title="Code">Code</button>
-            <button data-act="highlight" title="Highlight">HL</button>
-            <button data-act="h1" title="Heading 1">H1</button>
-            <button data-act="h2" title="Heading 2">H2</button>
-            <button data-act="h3" title="Heading 3">H3</button>
-            <button data-act="paragraph" title="Paragraph">P</button>
-            <button data-act="bulletList" title="Bullet List">• List</button>
-            <button data-act="orderedList" title="Ordered List">1. List</button>
-            <button data-act="blockquote" title="Blockquote">Quote</button>
-            <button data-act="codeBlock" title="Code Block">CodeBlk</button>
-            <button data-act="hr" title="Horizontal Rule">HR</button>
-            <button data-act="align-left" title="Align Left">Left</button>
-            <button data-act="align-center" title="Align Center">Center</button>
-            <button data-act="align-right" title="Align Right">Right</button>
-            <button data-act="link" title="Add Link">Link</button>
-            <button data-act="unlink" title="Remove Link">Unlink</button>
-            <button data-act="clear" title="Clear Formatting">Clear</button>
-        </div>
-        <div class="editor__content" id="detailsNotesEditor" data-placeholder="Add reflection notes..."></div>
+      <div class="editor-shell" id="detailsNotesWrapper">
+        <div id="detailsNotesMenu" class="editor-toolbar"></div>
+        <div class="editor-content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
       </div>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save Notes</button></div>
@@ -278,8 +245,8 @@ function initEditors(){
       content: '',
       onUpdate: () => {}
     });
-  wireTemplateMenu(notesEditor, document.getElementById('eventNotesMenu'));
-  wireTemplateMenu(detailsEditor, document.getElementById('detailsNotesMenu'));
+  buildReplicaToolbar(notesEditor, document.getElementById('eventNotesMenu'));
+  buildReplicaToolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
   } catch (e) {
     console.warn('TipTap init failed (first attempt), will use fallback if retries also fail', e);
     // We'll let ensureEditors() decide whether to attach fallback toolbars.
@@ -296,40 +263,78 @@ async function ensureEditors(){
       try{ initEditors(); if(notesEditor&&detailsEditor) return; }catch(e){ console.warn('TipTap init retry',i,e);} }
     await new Promise(r=>setTimeout(r,200));
   }
-  console.warn('TipTap failed to load after retries; static buttons inert.');
+  console.warn('TipTap failed to load after retries.');
 }
 
-function wireTemplateMenu(editor, menuEl){
-  if(!editor||!menuEl) return;
-  const acts = Array.from(menuEl.querySelectorAll('button[data-act]'));
-  menuEl.addEventListener('click', ev=>{
-    const btn=ev.target.closest('button[data-act]'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+function buildReplicaToolbar(editor, el){
+  if(!editor||!el) return;
+  el.innerHTML='';
+  const groups = [
+    [ {act:'undo', icon:'undo', title:'Undo'}, {act:'redo', icon:'redo', title:'Redo'} ],
+    [ {act:'bold', icon:'bold', title:'Bold'}, {act:'italic', icon:'italic', title:'Italic'}, {act:'underline', icon:'underline', title:'Underline'}, {act:'strike', icon:'strikethrough', title:'Strikethrough'}, {act:'code', icon:'code', title:'Inline Code'}, {act:'highlight', icon:'highlighter', title:'Highlight'} ],
+    [ {dropdown:'heading'} ],
+    [ {act:'paragraph', icon:'pilcrow', title:'Paragraph'}, {act:'bulletList', icon:'list', title:'Bullet List'}, {act:'orderedList', icon:'list-ordered', title:'Ordered List'}, {act:'blockquote', icon:'quote', title:'Blockquote'}, {act:'codeBlock', icon:'file-code-2', title:'Code Block'}, {act:'hr', icon:'minus', title:'Horizontal Rule'} ],
+    [ {act:'align-left', icon:'align-left', title:'Align Left'}, {act:'align-center', icon:'align-center', title:'Align Center'}, {act:'align-right', icon:'align-right', title:'Align Right'} ],
+    [ {act:'link', icon:'link', title:'Add Link'}, {act:'unlink', icon:'unlink-2', title:'Remove Link'}, {act:'clear', icon:'eraser', title:'Clear Formatting'} ]
+  ];
+  groups.forEach((grp,i)=>{
+    const wrap=document.createElement('div'); wrap.className='toolbar-group';
+    grp.forEach(item=>{
+      if(item.dropdown==='heading'){
+        const dd=document.createElement('div'); dd.className='heading-dropdown';
+        const btn=document.createElement('button'); btn.type='button'; btn.className='toolbar-btn heading-trigger'; btn.innerHTML='<i data-lucide="type"></i><span class="current-heading">Text</span>';
+        btn.addEventListener('click',()=>{ dd.classList.toggle('open'); });
+        const menu=document.createElement('div'); menu.className='heading-menu';
+        [['Paragraph','paragraph'],['Heading 1','h1'],['Heading 2','h2'],['Heading 3','h3']].forEach(([label,mode])=>{
+          const mb=document.createElement('button'); mb.textContent=label; mb.dataset.mode=mode; mb.addEventListener('click',()=>{
+            dd.classList.remove('open');
+            const ch=editor.chain().focus();
+            if(mode==='paragraph') ch.setParagraph().run(); else ch.toggleHeading({level:parseInt(mode.slice(1),10)}).run();
+            updateReplicaToolbar(editor, el);
+          }); menu.appendChild(mb); });
+        dd.appendChild(btn); dd.appendChild(menu); wrap.appendChild(dd);
+      } else {
+        const b=document.createElement('button'); b.type='button'; b.className='toolbar-btn'; b.dataset.act=item.act; b.title=item.title||''; b.innerHTML=`<i data-lucide="${item.icon}"></i>`; wrap.appendChild(b);
+      }
+    });
+    el.appendChild(wrap);
+    if(i<groups.length-1){ const div=document.createElement('div'); div.className='toolbar-divider'; el.appendChild(div); }
+  });
+  el.addEventListener('click', ev=>{
+    const btn=ev.target.closest('button.toolbar-btn'); if(!btn||!btn.dataset.act) return; const act=btn.dataset.act; const ch=editor.chain().focus();
     switch(act){
       case 'undo': ch.undo().run(); break; case 'redo': ch.redo().run(); break;
       case 'bold': ch.toggleBold().run(); break; case 'italic': ch.toggleItalic().run(); break; case 'underline': ch.toggleUnderline?.().run(); break; case 'strike': ch.toggleStrike().run(); break; case 'code': ch.toggleCode().run(); break; case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
-      case 'h1': ch.toggleHeading({level:1}).run(); break; case 'h2': ch.toggleHeading({level:2}).run(); break; case 'h3': ch.toggleHeading({level:3}).run(); break; case 'paragraph': ch.setParagraph().run(); break;
-      case 'bulletList': ch.toggleBulletList().run(); break; case 'orderedList': ch.toggleOrderedList().run(); break; case 'blockquote': ch.toggleBlockquote().run(); break; case 'codeBlock': ch.toggleCodeBlock().run(); break; case 'hr': ch.setHorizontalRule().run(); break;
+      case 'paragraph': ch.setParagraph().run(); break; case 'bulletList': ch.toggleBulletList().run(); break; case 'orderedList': ch.toggleOrderedList().run(); break; case 'blockquote': ch.toggleBlockquote().run(); break; case 'codeBlock': ch.toggleCodeBlock().run(); break; case 'hr': ch.setHorizontalRule().run(); break;
       case 'align-left': ch.setTextAlign('left').run(); break; case 'align-center': ch.setTextAlign('center').run(); break; case 'align-right': ch.setTextAlign('right').run(); break;
       case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
       case 'unlink': ch.unsetLink().run(); break; case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
     }
-    updateTemplateMenu(editor, menuEl);
+    updateReplicaToolbar(editor, el);
   });
-  editor.on('transaction', ()=>updateTemplateMenu(editor, menuEl));
-  updateTemplateMenu(editor, menuEl);
+  document.addEventListener('click',e=>{ if(!el.contains(e.target)) el.querySelectorAll('.heading-dropdown.open').forEach(dd=>dd.classList.remove('open')); });
+  editor.on('transaction', ()=>updateReplicaToolbar(editor, el));
+  lucide?.createIcons?.();
+  updateReplicaToolbar(editor, el);
 }
 
-function updateTemplateMenu(editor, menuEl){
-  menuEl.querySelectorAll('button[data-act]').forEach(btn=>{
+function updateReplicaToolbar(editor, el){
+  // active states
+  el.querySelectorAll('button.toolbar-btn').forEach(btn=>{
     const act=btn.dataset.act; let active=false;
     switch(act){
-      case 'bold': active=editor.isActive('bold'); break; case 'italic': active=editor.isActive('italic'); break; case 'underline': active=editor.isActive('underline'); break; case 'strike': active=editor.isActive('strike'); break; case 'code': active=editor.isActive('code'); break; case 'highlight': active=editor.isActive('highlight'); break;
-      case 'h1': active=editor.isActive('heading',{level:1}); break; case 'h2': active=editor.isActive('heading',{level:2}); break; case 'h3': active=editor.isActive('heading',{level:3}); break; case 'paragraph': active=editor.isActive('paragraph'); break;
-      case 'bulletList': active=editor.isActive('bulletList'); break; case 'orderedList': active=editor.isActive('orderedList'); break; case 'blockquote': active=editor.isActive('blockquote'); break; case 'codeBlock': active=editor.isActive('codeBlock'); break;
-      case 'align-left': active=editor.isActive({textAlign:'left'}); break; case 'align-center': active=editor.isActive({textAlign:'center'}); break; case 'align-right': active=editor.isActive({textAlign:'right'}); break; case 'link': active=editor.isActive('link'); break;
+      case 'bold': active=editor.isActive('bold'); break; case 'italic': active=editor.isActive('italic'); break; case 'underline': active=editor.isActive('underline'); break; case 'strike': active=editor.isActive('strike'); break; case 'code': active=editor.isActive('code'); break; case 'highlight': active=editor.isActive('highlight'); break; case 'paragraph': active=editor.isActive('paragraph'); break; case 'bulletList': active=editor.isActive('bulletList'); break; case 'orderedList': active=editor.isActive('orderedList'); break; case 'blockquote': active=editor.isActive('blockquote'); break; case 'codeBlock': active=editor.isActive('codeBlock'); break; case 'align-left': active=editor.isActive({textAlign:'left'}); break; case 'align-center': active=editor.isActive({textAlign:'center'}); break; case 'align-right': active=editor.isActive({textAlign:'right'}); break; case 'link': active=editor.isActive('link'); break;
     }
     btn.classList.toggle('is-active', !!active);
   });
+  const currentHeading = el.querySelector('.current-heading');
+  if(currentHeading){
+    if(editor.isActive('heading',{level:1})) currentHeading.textContent='H1';
+    else if(editor.isActive('heading',{level:2})) currentHeading.textContent='H2';
+    else if(editor.isActive('heading',{level:3})) currentHeading.textContent='H3';
+    else currentHeading.textContent='Text';
+  }
+  lucide?.createIcons?.();
 }
 
 function buildSimpleMenu(editor, el){
