@@ -110,6 +110,22 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .event[data-class="2a"]{background:#8e44ad}.event[data-class="2b"]{background:#2980b9}.event[data-class="3b"]{background:#229954}.event[data-class="ap"]{background:#d35400}.event[data-class="4b"]{background:#c2185b}.event[data-class="reflection"]{background:#6c3483}
 .event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
 .event:hover .delete-btn{display:block}
+/* CSS for drag safety indicators */
+.drag-safety-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #059669;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.drag-error-indicator {
+  background: #dc2626 !important;
+}
 .day-cell.drag-over{outline:2px dashed #3b82f6;background:#22344a}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:flex-start;justify-content:center;padding-top:60px}
 .modal-content{background:#fff;color:#111;border-radius:12px;padding:18px;max-width:520px;width:92%;box-shadow:0 20px 40px -10px rgba(0,0,0,.55)}
@@ -1068,17 +1084,230 @@ function saveDetailsNotes(){
   closeModal('detailsModal');
 }
 
-/* ========= DRAG & DROP ========= */
+/* ========= DRAG & DROP WITH SAFETY MEASURES ========= */
+// Backup system for safe drag and drop
+let dragBackupState = null;
+let dragInProgress = false;
+
+// Visual feedback for drag operations
+function showDragIndicator(message, isError = false) {
+  // Remove existing indicator
+  const existing = document.querySelector('.drag-safety-indicator');
+  if (existing) existing.remove();
+  
+  // Create new indicator
+  const indicator = document.createElement('div');
+  indicator.className = 'drag-safety-indicator';
+  if (isError) indicator.classList.add('drag-error-indicator');
+  indicator.textContent = message;
+  document.body.appendChild(indicator);
+  
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    if (indicator.parentNode) indicator.remove();
+  }, 3000);
+}
+
+function createDragBackup() {
+  dragBackupState = {
+    events: JSON.parse(JSON.stringify(events)),
+    timestamp: Date.now()
+  };
+  console.log('Drag backup created with', events.length, 'events');
+}
+
+function restoreDragBackup() {
+  if (!dragBackupState) {
+    console.error('No drag backup available!');
+    return false;
+  }
+  
+  events = dragBackupState.events;
+  saveLocalEvents();
+  render();
+  console.log('Restored from drag backup - recovered', events.length, 'events');
+  return true;
+}
+
 function setupDrag(el){
-  el.addEventListener('dragstart',e=>{ const ev=events.find(x=>x.id===el.dataset.id); if(!ev) return; e.dataTransfer.setData('text/plain', JSON.stringify({id:ev.id})); el.classList.add('dragging'); });
-  el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+  el.addEventListener('dragstart',e=>{ 
+    if (dragInProgress) {
+      e.preventDefault();
+      console.warn('Drag already in progress - preventing new drag');
+      return;
+    }
+    
+    const ev=events.find(x=>x.id===el.dataset.id); 
+    if(!ev) {
+      console.error('Event not found for drag:', el.dataset.id);
+      e.preventDefault();
+      return;
+    }
+    
+    // Create backup before starting drag
+    createDragBackup();
+    dragInProgress = true;
+    showDragIndicator('🛡️ Backup created - drag safely!');
+    
+    e.dataTransfer.setData('text/plain', JSON.stringify({id:ev.id, originalDate: ev.date})); 
+    el.classList.add('dragging'); 
+    console.log('Drag started for event:', ev.text, 'from date:', ev.date);
+  });
+  
+  el.addEventListener('dragend',()=>{
+    el.classList.remove('dragging');
+    setTimeout(() => {
+      dragInProgress = false;
+      console.log('Drag ended - system ready for next operation');
+    }, 100);
+  });
 }
 function setupDayDropZone(dayCell){
   dayCell.addEventListener('dragover',e=>{e.preventDefault(); dayCell.classList.add('drag-over');});
   dayCell.addEventListener('dragleave',e=>{ if(!dayCell.contains(e.relatedTarget)) dayCell.classList.remove('drag-over'); });
-  dayCell.addEventListener('drop',e=>{ e.preventDefault(); dayCell.classList.remove('drag-over'); const data=e.dataTransfer.getData('text/plain'); if(!data) return; try { const {id}=JSON.parse(data); moveEvent(id, dayCell.dataset.date); } catch(err){ console.warn('Drop parse',err);} });
+  dayCell.addEventListener('drop',e=>{ 
+    e.preventDefault(); 
+    dayCell.classList.remove('drag-over'); 
+    
+    if (!dragInProgress) {
+      console.warn('Drop detected but no drag in progress');
+      return;
+    }
+    
+    const data=e.dataTransfer.getData('text/plain'); 
+    if(!data) {
+      console.warn('No drag data received');
+      return;
+    }
+    
+    try { 
+      const {id, originalDate}=JSON.parse(data); 
+      const targetDate = dayCell.dataset.date;
+      console.log('Drop attempt - moving event', id, 'from', originalDate, 'to', targetDate);
+      
+      if (safeMoveEvent(id, targetDate, originalDate)) {
+        console.log('✅ Event moved successfully');
+        showDragIndicator('✅ Event moved successfully!');
+      } else {
+        console.error('❌ Event move failed - backup may have been restored');
+        showDragIndicator('❌ Move failed - restored backup', true);
+      }
+    } catch(err){ 
+      console.error('Drop parse error:', err);
+      showDragIndicator('❌ Drop error - restored backup', true);
+      restoreDragBackup();
+    }
+  });
 }
-function moveEvent(id,newDate){ const ev=events.find(e=>e.id===id); if(!ev || ev.isHardcoded) return; if(ev.date===newDate) return; const old=ev.date; ev.date=newDate; saveLocalEvents(); if(supabase){ supabase.from('calendar_events').update({ event_date:newDate, year:parseInt(newDate.slice(0,4),10), month:parseInt(newDate.slice(5,7),10)-1, day:parseInt(newDate.slice(8,10),10) }).eq('event_date',old).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); } render(); }
+
+function safeMoveEvent(id, newDate, originalDate) {
+  // Pre-flight checks
+  if (!id || !newDate || !originalDate) {
+    console.error('Missing required parameters for move:', {id, newDate, originalDate});
+    restoreDragBackup();
+    return false;
+  }
+  
+  // Validate date format
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+    console.error('Invalid date format:', newDate);
+    restoreDragBackup();
+    return false;
+  }
+  
+  // Find the event
+  const ev = events.find(e => e.id === id);
+  if (!ev) {
+    console.error('Event not found:', id);
+    restoreDragBackup();
+    return false;
+  }
+  
+  // Safety checks
+  if (ev.isHardcoded) {
+    console.warn('Cannot move hardcoded event:', ev.text);
+    return false; // Don't restore backup for this - it's expected behavior
+  }
+  
+  if (ev.date === newDate) {
+    console.log('Event already on target date - no move needed');
+    return true; // Not an error
+  }
+  
+  // Confirm the original date matches (sanity check)
+  if (ev.date !== originalDate) {
+    console.warn('Event date changed during drag operation. Expected:', originalDate, 'Found:', ev.date);
+    // Continue anyway - this might be OK
+  }
+  
+  // Store the old date for rollback
+  const oldDate = ev.date;
+  
+  try {
+    // Update the event
+    ev.date = newDate;
+    console.log('Updated event date in memory');
+    
+    // Save locally first
+    saveLocalEvents();
+    console.log('Saved to localStorage');
+    
+    // Update the UI
+    render();
+    console.log('UI updated');
+    
+    // Update database if available (async - don't wait for it)
+    if (supabase) {
+      console.log('Updating database...');
+      supabase.from('calendar_events').update({ 
+        event_date: newDate, 
+        year: parseInt(newDate.slice(0,4),10), 
+        month: parseInt(newDate.slice(5,7),10)-1, 
+        day: parseInt(newDate.slice(8,10),10) 
+      })
+      .eq('event_date', oldDate)
+      .eq('event_text', ev.text)
+      .eq('event_class', ev.class)
+      .then(result => {
+        console.log('Database update result:', result);
+      })
+      .catch(dbError => {
+        console.warn('Database update failed (but local move succeeded):', dbError);
+      });
+    }
+    
+    return true;
+    
+  } catch (error) {
+    console.error('Error during move operation:', error);
+    
+    // Restore from backup
+    if (restoreDragBackup()) {
+      console.log('Successfully restored from backup after error');
+    } else {
+      console.error('Failed to restore backup - manual recovery needed');
+    }
+    
+    return false;
+  }
+}
+
+// Emergency recovery function - call from browser console if needed
+window.emergencyRestoreCalendar = function() {
+  if (restoreDragBackup()) {
+    alert('Calendar restored from backup!');
+    return true;
+  } else {
+    alert('No backup available - try refreshing the page');
+    return false;
+  }
+};
+
+function moveEvent(id,newDate){ 
+  // Legacy function - redirect to safe version
+  console.warn('Legacy moveEvent called - redirecting to safeMoveEvent');
+  return safeMoveEvent(id, newDate, 'unknown');
+}
 
 /* ========= UTIL ========= */
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
