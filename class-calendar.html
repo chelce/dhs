@@ -1092,8 +1092,16 @@
         
         // Initialize Supabase (will be set up after you create the project)
         function initSupabase() {
-            if (SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            try {
+                if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && window.supabase) {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                    console.log('Supabase client initialized');
+                } else {
+                    console.log('Supabase not available, using localStorage only');
+                }
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                supabase = null;
             }
         }
         
@@ -1148,40 +1156,65 @@
         
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, starting calendar initialization...');
+            
+            // Always generate calendar first - this is the most important part
             try {
-                console.log('Initializing calendar...');
-                initSupabase();
+                console.log('Generating calendar...');
                 generateCalendar();
-                
-                // Load calendar data after generation
+                console.log('Calendar generated successfully');
+            } catch (calendarError) {
+                console.error('CRITICAL: Failed to generate calendar:', calendarError);
+                // Try a simple fallback
+                const calendarGrid = document.getElementById('calendarGrid');
+                if (calendarGrid) {
+                    calendarGrid.innerHTML = '<div style="color: red; padding: 20px;">Calendar generation failed. Please refresh the page.</div>';
+                }
+            }
+            
+            // Initialize Supabase (non-blocking)
+            try {
+                console.log('Initializing Supabase...');
+                initSupabase();
+            } catch (supabaseError) {
+                console.error('Supabase initialization failed:', supabaseError);
+            }
+            
+            // Load calendar data (non-blocking)
+            setTimeout(() => {
                 loadCalendarData().then(() => {
                     console.log('Calendar data loaded');
                 }).catch(error => {
                     console.error('Error loading calendar data:', error);
                 });
-                
+            }, 100);
+            
+            // Setup other components (non-blocking)
+            try {
                 setupFilterListeners();
-                
-                // Initialize TipTap editors after a short delay to ensure libraries are loaded
-                setTimeout(() => {
-                    initTipTapEditors();
-                }, 100);
-                
-                // Setup click handlers for day cells after calendar is generated
-                setTimeout(() => {
-                    setupDayCellClickHandlers();
-                }, 200);
-                
-                console.log('Calendar initialized successfully');
-            } catch (error) {
-                console.error('Error initializing calendar:', error);
-                // Still try to generate basic calendar
-                try {
-                    generateCalendar();
-                } catch (fallbackError) {
-                    console.error('Failed to generate fallback calendar:', fallbackError);
-                }
+            } catch (filterError) {
+                console.error('Filter setup failed:', filterError);
             }
+            
+            // Initialize TipTap editors
+            setTimeout(() => {
+                try {
+                    initTipTapEditors();
+                } catch (editorError) {
+                    console.error('TipTap editor initialization failed:', editorError);
+                }
+            }, 200);
+            
+            // Setup click handlers
+            setTimeout(() => {
+                try {
+                    setupDayCellClickHandlers();
+                } catch (clickError) {
+                    console.error('Click handler setup failed:', clickError);
+                }
+            }, 300);
+            
+            console.log('Calendar initialization completed');
         });
         
         // Initialize TipTap editors
