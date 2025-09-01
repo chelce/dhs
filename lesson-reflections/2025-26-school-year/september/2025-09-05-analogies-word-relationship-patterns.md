@@ -17,6 +17,10 @@ Students will:
 - **Medium Tier**: Relationship sorting bins, analogy creation templates
 - **Hard Tier**: Complex relationship challenge cards, sentence integration examples
 
+### 📱 **Interactive Digital Resources**
+- **Student Task Cards**: https://chelce.github.io/dhs/analogies-relationship-patterns-task-cards-complete.html
+- **Teacher Answer Key**: https://chelce.github.io/dhs/analogies-relationship-patterns-answer-key.html
+
 ## Class Structure (74 minutes)
 
 ### Opening Activity (7 minutes)
@@ -150,6 +154,15 @@ Groups share one interesting pattern they discovered or created
   - Communicating complex ideas through comparison
 
 ## Materials List for Implementation
+
+### Digital Resources (Primary)
+- **Interactive Task Cards**: https://chelce.github.io/dhs/analogies-relationship-patterns-task-cards-complete.html
+  - Three difficulty levels with carousel navigation
+  - Completion challenges for Hard level
+  - Self-contained activities with all instructions included
+- **Teacher Answer Key**: https://chelce.github.io/dhs/analogies-relationship-patterns-answer-key.html
+  - Complete solutions for all difficulty levels
+  - Same carousel format as student version for easy reference
 
 ### Teacher Preparation Needed
 1. **Relationship Reference Charts**: Visual guides for each tier
