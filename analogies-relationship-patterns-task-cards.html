@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogies & Word Relationship Patterns - Task Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        .task-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            min-height: 600px;
+        }
+
+        .card-header {
+            padding: 25px;
+            color: white;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+        }
+
+        .easy-header { background: linear-gradient(135deg, #28a745, #20c997); }
+        .medium-header { background: linear-gradient(135deg, #fd7e14, #ffc107); }
+        .hard-header { background: linear-gradient(135deg, #dc3545, #6f42c1); }
+
+        .card-content {
+            padding: 30px;
+        }
+
+        .instructions {
+            background: #e9f7ef;
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .categories-section {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .categories-title {
+            font-size: 1.4em;
+            color: #856404;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .category-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .category-name {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        .category-example {
+            font-style: italic;
+            color: #6c757d;
+            font-size: 0.95em;
+        }
+
+        .analogies-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .analogies-title {
+            font-size: 1.4em;
+            color: #495057;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .analogies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .analogy-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #dee2e6;
+            text-align: center;
+            font-size: 1.1em;
+            font-family: monospace;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .analogy-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+        }
+
+        .creation-section {
+            background: #e7f3ff;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .creation-title {
+            font-size: 1.3em;
+            color: #0056b3;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .creation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .creation-prompt {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+            color: #0056b3;
+        }
+
+        .navigation-hint {
+            text-align: center;
+            margin-top: 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        @media (max-width: 1200px) {
+            .analogies-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 800px) {
+            .analogies-grid {
+                grid-template-columns: 1fr;
+            }
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Analogies & Word Relationship Patterns</h1>
+            <p>Self-Contained Task Cards for Smartboard Display</p>
+        </div>
+
+        <div class="card-grid">
+            <!-- EASY CARD -->
+            <div class="task-card" id="easy-card">
+                <div class="card-header easy-header">
+                    🎯 EASY LEVEL
+                </div>
+                <div class="card-content">
+                    <div class="instructions">
+                        <strong>Task:</strong> Sort the 12 analogies below into the 4 relationship categories. Work with your group on the whiteboard to organize them.
+                    </div>
+
+                    <div class="categories-section">
+                        <div class="categories-title">📋 The 4 Relationship Categories</div>
+                        <div class="categories-grid">
+                            <div class="category-item">
+                                <div class="category-name">Part/Whole</div>
+                                <div class="category-example">Wheel : Car</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Synonyms</div>
+                                <div class="category-example">Happy : Joyful</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Antonyms</div>
+                                <div class="category-example">Hot : Cold</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Function</div>
+                                <div class="category-example">Hammer : Nail</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analogies-section">
+                        <div class="analogies-title">🎲 Sort These 12 Analogies</div>
+                        <div class="analogies-grid">
+                            <div class="analogy-item">Bird : Nest :: Person : House</div>
+                            <div class="analogy-item">Big : Large :: Small : Tiny</div>
+                            <div class="analogy-item">Up : Down :: In : Out</div>
+                            <div class="analogy-item">Key : Lock :: Pen : Paper</div>
+                            <div class="analogy-item">Hand : Body :: Leaf : Tree</div>
+                            <div class="analogy-item">Fast : Quick :: Slow : Sluggish</div>
+                            <div class="analogy-item">Light : Dark :: Loud : Quiet</div>
+                            <div class="analogy-item">Brush : Hair :: Broom : Floor</div>
+                            <div class="analogy-item">Page : Book :: Slice : Pizza</div>
+                            <div class="analogy-item">Happy : Sad :: Win : Lose</div>
+                            <div class="analogy-item">Spoon : Soup :: Fork : Salad</div>
+                            <div class="analogy-item">Toe : Foot :: Finger : Hand</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEDIUM CARD -->
+            <div class="task-card" id="medium-card">
+                <div class="card-header medium-header">
+                    🎲 MEDIUM LEVEL
+                </div>
+                <div class="card-content">
+                    <div class="instructions">
+                        <strong>Task:</strong> Sort the 18 analogies into the 8 relationship categories, then create 2 new analogies for each category (16 total new analogies).
+                    </div>
+
+                    <div class="categories-section">
+                        <div class="categories-title">📋 The 8 Relationship Categories</div>
+                        <div class="categories-grid">
+                            <div class="category-item">
+                                <div class="category-name">Part/Whole</div>
+                                <div class="category-example">Wheel : Car :: Page : Book</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Synonyms</div>
+                                <div class="category-example">Happy : Joyful :: Sad : Melancholy</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Antonyms</div>
+                                <div class="category-example">Hot : Cold :: Light : Dark</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Function</div>
+                                <div class="category-example">Hammer : Nail :: Pen : Paper</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Cause/Effect</div>
+                                <div class="category-example">Rain : Flood :: Study : Knowledge</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Category/Example</div>
+                                <div class="category-example">Fruit : Apple :: Sport : Soccer</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Worker/Tool</div>
+                                <div class="category-example">Teacher : Whiteboard :: Chef : Knife</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Location</div>
+                                <div class="category-example">Fish : Ocean :: Bird : Sky</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analogies-section">
+                        <div class="analogies-title">🎲 Sort These 18 Analogies</div>
+                        <div class="analogies-grid">
+                            <div class="analogy-item">Exercise : Health :: Practice : Improvement</div>
+                            <div class="analogy-item">Author : Novel :: Composer : Symphony</div>
+                            <div class="analogy-item">Chair : Furniture :: Rose : Flower</div>
+                            <div class="analogy-item">Doctor : Stethoscope :: Painter : Brush</div>
+                            <div class="analogy-item">Brave : Courageous :: Smart : Intelligent</div>
+                            <div class="analogy-item">Lion : Jungle :: Polar Bear : Arctic</div>
+                            <div class="analogy-item">Hot : Cold :: Rough : Smooth</div>
+                            <div class="analogy-item">Heart : Body :: Engine : Car</div>
+                            <div class="analogy-item">Seed : Growth :: Match : Fire</div>
+                            <div class="analogy-item">Strong : Weak :: Tall : Short</div>
+                            <div class="analogy-item">Carpenter : Hammer :: Surgeon : Scalpel</div>
+                            <div class="analogy-item">Dog : Mammal :: Eagle : Bird</div>
+                            <div class="analogy-item">Shark : Ocean :: Camel : Desert</div>
+                            <div class="analogy-item">Smile : Happiness :: Tears : Sadness</div>
+                            <div class="analogy-item">Scissors : Paper :: Can Opener : Can</div>
+                            <div class="analogy-item">Angry : Furious :: Tired : Exhausted</div>
+                            <div class="analogy-item">Petal : Flower :: Chapter : Book</div>
+                            <div class="analogy-item">Success : Hard Work :: Failure : Laziness</div>
+                        </div>
+                    </div>
+
+                    <div class="creation-section">
+                        <div class="creation-title">✍️ Create 2 New Analogies for Each Category (16 total)</div>
+                        <div class="creation-grid">
+                            <div class="creation-prompt">Part/Whole: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Synonyms: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Antonyms: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Function: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Cause/Effect: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Category/Example: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Worker/Tool: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Location: _____ : _____ :: _____ : _____</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HARD CARD -->
+            <div class="task-card" id="hard-card">
+                <div class="card-header hard-header">
+                    🚀 HARD LEVEL
+                </div>
+                <div class="card-content">
+                    <div class="instructions">
+                        <strong>Task:</strong> Identify relationships in 20 complex analogies using 12 advanced categories, then create analogy chains showing the same pattern.
+                    </div>
+
+                    <div class="categories-section">
+                        <div class="categories-title">📋 The 12 Advanced Relationship Categories</div>
+                        <div class="categories-grid">
+                            <div class="category-item">
+                                <div class="category-name">Part/Whole</div>
+                                <div class="category-example">Neuron : Brain :: Cell : Organism</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Synonyms</div>
+                                <div class="category-example">Eloquent : Articulate :: Pensive : Thoughtful</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Antonyms</div>
+                                <div class="category-example">Meticulous : Careless :: Abundant : Scarce</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Function/Purpose</div>
+                                <div class="category-example">Catalyst : Reaction :: Mentor : Growth</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Cause/Effect</div>
+                                <div class="category-example">Drought : Famine :: Innovation : Progress</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Category/Example</div>
+                                <div class="category-example">Philosophy : Stoicism :: Literature : Romanticism</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Creator/Creation</div>
+                                <div class="category-example">Architect : Blueprint :: Choreographer : Dance</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Degree/Intensity</div>
+                                <div class="category-example">Whisper : Shout :: Drizzle : Downpour</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Sequential/Process</div>
+                                <div class="category-example">Seed : Harvest :: Hypothesis : Conclusion</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Symbol/Meaning</div>
+                                <div class="category-example">Dove : Peace :: Scales : Justice</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Problem/Solution</div>
+                                <div class="category-example">Disease : Medicine :: Ignorance : Education</div>
+                            </div>
+                            <div class="category-item">
+                                <div class="category-name">Characteristic/Trait</div>
+                                <div class="category-example">Diamond : Hardness :: Feather : Lightness</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analogies-section">
+                        <div class="analogies-title">🧠 Analyze These 20 Complex Analogies</div>
+                        <div class="analogies-grid">
+                            <div class="analogy-item">Procrastination : Failure :: Preparation : Success</div>
+                            <div class="analogy-item">Playwright : Script :: Conductor : Score</div>
+                            <div class="analogy-item">Democracy : Tyranny :: Collaboration : Domination</div>
+                            <div class="analogy-item">Lens : Clarity :: Filter : Purity</div>
+                            <div class="analogy-item">Curiosity : Discovery :: Perseverance : Achievement</div>
+                            <div class="analogy-item">Skepticism : Philosophy :: Empiricism : Science</div>
+                            <div class="analogy-item">Sculptor : Marble :: Editor : Manuscript</div>
+                            <div class="analogy-item">Murmur : Roar :: Glimmer : Blaze</div>
+                            <div class="analogy-item">Acorn : Forest :: Idea : Movement</div>
+                            <div class="analogy-item">Phoenix : Rebirth :: Anchor : Stability</div>
+                            <div class="analogy-item">Ignorance : Prejudice :: Knowledge : Tolerance</div>
+                            <div class="analogy-item">Steel : Strength :: Silk : Elegance</div>
+                            <div class="analogy-item">Generous : Miserly :: Optimistic : Pessimistic</div>
+                            <div class="analogy-item">Theory : Application :: Blueprint : Construction</div>
+                            <div class="analogy-item">Conflict : Resolution :: Question : Answer</div>
+                            <div class="analogy-item">Virus : Antidote :: Confusion : Clarification</div>
+                            <div class="analogy-item">Renaissance : Art :: Enlightenment : Philosophy</div>
+                            <div class="analogy-item">Synapse : Thought :: Foundation : Structure</div>
+                            <div class="analogy-item">Betrayal : Trust :: Pollution : Environment</div>
+                            <div class="analogy-item">Catalyst : Change :: Bridge : Connection</div>
+                        </div>
+                    </div>
+
+                    <div class="creation-section">
+                        <div class="creation-title">⚡ Create Analogy Chains (A : B :: C : D :: E : F)</div>
+                        <div class="creation-grid">
+                            <div class="creation-prompt">Degree Chain: _____ : _____ :: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Creator Chain: _____ : _____ :: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Process Chain: _____ : _____ :: _____ : _____ :: _____ : _____</div>
+                            <div class="creation-prompt">Symbol Chain: _____ : _____ :: _____ : _____ :: _____ : _____</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation-hint">
+            💡 <strong>Smartboard Display:</strong> Show all three cards simultaneously, or cycle through difficulty levels as needed
+        </div>
+    </div>
+</body>
+</html>
