@@ -135,13 +135,147 @@
         .medium-header { background: linear-gradient(135deg, #fd7e14, #ffc107); }
         .hard-header { background: linear-gradient(135deg, #dc3545, #6f42c1); }
 
+        /* Easy Level Colors - Light Green Theme */
+        .task-card:has(.easy-header) .instructions {
+            background: #e9f7ef;
+            border-left-color: #28a745;
+        }
+        
+        .task-card:has(.easy-header) .categories-section {
+            background: #e9f7ef;
+            border-color: #28a745;
+        }
+        
+        .task-card:has(.easy-header) .categories-title {
+            color: #155724;
+        }
+        
+        .task-card:has(.easy-header) .category-item {
+            border-left-color: #28a745;
+        }
+        
+        .task-card:has(.easy-header) .category-name {
+            color: #155724;
+        }
+        
+        .task-card:has(.easy-header) .analogy-item {
+            color: #28a745;
+        }
+        
+        .task-card:has(.easy-header) .analogy-item:hover {
+            border-color: #28a745;
+            box-shadow: 0 4px 8px rgba(40,167,69,0.2);
+        }
+        
+        .task-card:has(.easy-header) .creation-section {
+            background: #e9f7ef;
+            border-color: #28a745;
+        }
+        
+        .task-card:has(.easy-header) .creation-title {
+            color: #155724;
+        }
+        
+        .task-card:has(.easy-header) .creation-prompt {
+            color: #28a745;
+        }
+
+        /* Medium Level Colors - Orange Theme */
+        .task-card:has(.medium-header) .instructions {
+            background: #fff3cd;
+            border-left-color: #fd7e14;
+        }
+        
+        .task-card:has(.medium-header) .categories-section {
+            background: #fff3cd;
+            border-color: #fd7e14;
+        }
+        
+        .task-card:has(.medium-header) .categories-title {
+            color: #856404;
+        }
+        
+        .task-card:has(.medium-header) .category-item {
+            border-left-color: #fd7e14;
+        }
+        
+        .task-card:has(.medium-header) .category-name {
+            color: #856404;
+        }
+        
+        .task-card:has(.medium-header) .analogy-item {
+            color: #fd7e14;
+        }
+        
+        .task-card:has(.medium-header) .analogy-item:hover {
+            border-color: #fd7e14;
+            box-shadow: 0 4px 8px rgba(253,126,20,0.2);
+        }
+        
+        .task-card:has(.medium-header) .creation-section {
+            background: #fff3cd;
+            border-color: #fd7e14;
+        }
+        
+        .task-card:has(.medium-header) .creation-title {
+            color: #856404;
+        }
+        
+        .task-card:has(.medium-header) .creation-prompt {
+            color: #fd7e14;
+        }
+
+        /* Hard Level Colors - Red/Purple Theme */
+        .task-card:has(.hard-header) .instructions {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        
+        .task-card:has(.hard-header) .categories-section {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .task-card:has(.hard-header) .categories-title {
+            color: #721c24;
+        }
+        
+        .task-card:has(.hard-header) .category-item {
+            border-left-color: #dc3545;
+        }
+        
+        .task-card:has(.hard-header) .category-name {
+            color: #721c24;
+        }
+        
+        .task-card:has(.hard-header) .analogy-item {
+            color: #dc3545;
+        }
+        
+        .task-card:has(.hard-header) .analogy-item:hover {
+            border-color: #dc3545;
+            box-shadow: 0 4px 8px rgba(220,53,69,0.2);
+        }
+        
+        .task-card:has(.hard-header) .creation-section {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .task-card:has(.hard-header) .creation-title {
+            color: #721c24;
+        }
+        
+        .task-card:has(.hard-header) .creation-prompt {
+            color: #dc3545;
+        }
+
         .card-content {
             padding: 30px;
         }
 
         .instructions {
-            background: #e9f7ef;
-            border-left: 5px solid #28a745;
+            border-left: 5px solid;
             padding: 20px;
             margin-bottom: 25px;
             font-size: 1.2em;
@@ -149,8 +283,7 @@
         }
 
         .categories-section {
-            background: #fff3cd;
-            border: 2px solid #ffc107;
+            border: 2px solid;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
@@ -158,7 +291,6 @@
 
         .categories-title {
             font-size: 1.4em;
-            color: #856404;
             margin-bottom: 15px;
             font-weight: bold;
         }
@@ -173,12 +305,11 @@
             background: white;
             padding: 12px;
             border-radius: 8px;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid;
         }
 
         .category-name {
             font-weight: bold;
-            color: #856404;
             margin-bottom: 5px;
         }
 
@@ -216,18 +347,11 @@
             text-align: center;
             font-size: 1.1em;
             font-family: monospace;
-            color: #007bff;
             font-weight: bold;
         }
 
-        .analogy-item:hover {
-            border-color: #007bff;
-            box-shadow: 0 4px 8px rgba(0,123,255,0.2);
-        }
-
         .creation-section {
-            background: #e7f3ff;
-            border: 2px solid #007bff;
+            border: 2px solid;
             border-radius: 10px;
             padding: 20px;
             margin-top: 20px;
@@ -235,7 +359,6 @@
 
         .creation-title {
             font-size: 1.3em;
-            color: #0056b3;
             margin-bottom: 15px;
             font-weight: bold;
         }
@@ -252,7 +375,6 @@
             border-radius: 6px;
             font-weight: bold;
             text-align: center;
-            color: #0056b3;
         }
 
         .navigation-hint {
