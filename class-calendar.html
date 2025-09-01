@@ -107,6 +107,8 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .day-number{font-weight:700;font-size:12px;margin-bottom:4px}
 .event{background:#333;border-left:4px solid #555;margin:0 0 4px;padding:4px 20px 4px 6px;border-radius:6px;line-height:1.2;position:relative;font-size:11px;color:#fff;user-select:none;cursor:move}
 .event.tentative{opacity:.6;border-style:dashed}
+.event.hardcoded{cursor:default;opacity:.8;border-left-style:double;border-left-width:6px}
+.event.hardcoded::before{content:'🔒';position:absolute;right:22px;top:2px;font-size:10px;opacity:.7}
 .event[data-class="2a"]{background:#8e44ad}.event[data-class="2b"]{background:#2980b9}.event[data-class="3b"]{background:#229954}.event[data-class="ap"]{background:#d35400}.event[data-class="4b"]{background:#c2185b}.event[data-class="reflection"]{background:#6c3483}
 .event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
 .event:hover .delete-btn{display:block}
@@ -1133,10 +1135,39 @@ async function persistNewEvent(ev){
 }
 
 function addEventElement(parent, ev){
-  const div=document.createElement('div'); div.className='event'; if(ev.isTentative) div.classList.add('tentative'); div.dataset.id=ev.id; div.dataset.class=ev.class; div.setAttribute('draggable','true');
+  const div=document.createElement('div'); 
+  div.className='event'; 
+  if(ev.isTentative) div.classList.add('tentative');
+  
+  div.dataset.id=ev.id; 
+  div.dataset.class=ev.class; 
+  
+  // Visual indication for hardcoded events
+  if(ev.isHardcoded) {
+    div.classList.add('hardcoded');
+    div.title = '🔒 Curriculum event - cannot be moved or deleted';
+    div.setAttribute('draggable','false'); // Prevent dragging
+  } else {
+    div.setAttribute('draggable','true');
+    div.title = 'Drag to move this event';
+  }
+  
   div.innerHTML=`<span>${ev.text}</span><button class="delete-btn" title="Delete">×</button>`;
-  div.addEventListener('click', (e)=>{ if(e.target.classList.contains('delete-btn')){ e.stopPropagation(); deleteEvent(ev.id); } else { openDetails(ev.id); e.stopPropagation(); } });
-  setupDrag(div);
+  div.addEventListener('click', (e)=>{ 
+    if(e.target.classList.contains('delete-btn')){ 
+      e.stopPropagation(); 
+      deleteEvent(ev.id); 
+    } else { 
+      openDetails(ev.id); 
+      e.stopPropagation(); 
+    } 
+  });
+  
+  // Only setup drag for non-hardcoded events
+  if (!ev.isHardcoded) {
+    setupDrag(div);
+  }
+  
   parent.appendChild(div);
 }
 
@@ -1286,6 +1317,14 @@ function setupDrag(el){
       return;
     }
     
+    // Double-check: prevent dragging hardcoded events
+    if(ev.isHardcoded) {
+      console.warn('Attempted to drag hardcoded event - preventing');
+      showDragIndicator('🔒 Cannot move curriculum event', true);
+      e.preventDefault();
+      return;
+    }
+    
     // Create backup before starting drag
     createDragBackup();
     dragInProgress = true;
@@ -1368,6 +1407,7 @@ function safeMoveEvent(id, newDate, originalDate) {
   // Safety checks
   if (ev.isHardcoded) {
     console.warn('Cannot move hardcoded event:', ev.text);
+    showDragIndicator('🔒 Cannot move curriculum event', false);
     return false; // Don't restore backup for this - it's expected behavior
   }
   
