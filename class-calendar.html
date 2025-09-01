@@ -1156,76 +1156,68 @@
         
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM loaded, starting calendar initialization...');
+            console.log('🚀 Calendar initialization starting...');
             
-            // PRIORITY 1: Generate calendar IMMEDIATELY - this is the most important part
+            // STEP 1: ALWAYS generate calendar first - nothing can stop this
             try {
-                console.log('📅 Generating calendar (priority operation)...');
+                console.log('📅 Generating calendar (PRIORITY #1)...');
                 generateCalendar();
-                console.log('✅ Calendar generated successfully!');
-            } catch (calendarError) {
-                console.error('❌ CRITICAL: Failed to generate calendar:', calendarError);
+                console.log('✅ Calendar grid generated successfully!');
+                
+                // STEP 2: Set up basic UI immediately
+                setTimeout(() => {
+                    try {
+                        setupFilterListeners();
+                        setupDayCellClickHandlers();
+                        console.log('✅ Basic UI ready');
+                    } catch (uiError) {
+                        console.error('⚠️ UI setup failed (non-critical):', uiError);
+                    }
+                }, 50);
+                
+                // STEP 3: Initialize database connection (isolated)
+                setTimeout(() => {
+                    try {
+                        console.log('�️ Initializing database connection...');
+                        initSupabase();
+                        console.log('✅ Database connection ready');
+                    } catch (dbError) {
+                        console.error('⚠️ Database initialization failed:', dbError);
+                    }
+                }, 100);
+                
+                // STEP 4: Load calendar data with corruption handling (fully isolated)
+                setTimeout(() => {
+                    console.log('� Loading calendar data (with corruption protection)...');
+                    loadCalendarDataSafely().then(() => {
+                        console.log('✅ Calendar data loaded successfully');
+                    }).catch(dataError => {
+                        console.error('⚠️ Calendar data loading failed (calendar still works):', dataError);
+                        // Calendar continues to work even if data loading fails
+                    });
+                }, 150);
+                
+                // STEP 5: Initialize rich text editors last (least important)
+                setTimeout(() => {
+                    try {
+                        console.log('📝 Initializing editors...');
+                        initTipTapEditors();
+                        console.log('✅ Editors ready');
+                    } catch (editorError) {
+                        console.error('⚠️ Editor initialization failed (non-critical):', editorError);
+                    }
+                }, 200);
+                
+            } catch (criticalError) {
+                console.error('❌ CRITICAL ERROR in calendar generation:', criticalError);
                 // Emergency fallback
                 const calendarGrid = document.getElementById('calendarGrid');
                 if (calendarGrid) {
-                    calendarGrid.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">Calendar generation failed. Please refresh the page.</div>';
+                    calendarGrid.innerHTML = '<div style="color: red; padding: 20px; text-align: center; background: #2a2a2a;">Calendar generation failed. Please refresh the page or contact support.</div>';
                 }
-                return; // Don't continue if calendar generation fails
             }
             
-            // PRIORITY 2: Set up basic functionality with delays to avoid blocking
-            setTimeout(() => {
-                try {
-                    console.log('🔧 Setting up filters...');
-                    setupFilterListeners();
-                    console.log('✅ Filters ready');
-                } catch (filterError) {
-                    console.error('⚠️ Filter setup failed (non-critical):', filterError);
-                }
-            }, 50);
-            
-            setTimeout(() => {
-                try {
-                    console.log('👆 Setting up click handlers...');
-                    setupDayCellClickHandlers();
-                    console.log('✅ Click handlers ready');
-                } catch (clickError) {
-                    console.error('⚠️ Click handler setup failed (non-critical):', clickError);
-                }
-            }, 100);
-            
-            // PRIORITY 3: Initialize external dependencies (with error isolation)
-            setTimeout(() => {
-                try {
-                    console.log('🗄️ Initializing Supabase...');
-                    initSupabase();
-                    console.log('✅ Supabase initialized');
-                } catch (supabaseError) {
-                    console.error('⚠️ Supabase initialization failed (non-critical):', supabaseError);
-                }
-            }, 150);
-            
-            setTimeout(() => {
-                try {
-                    console.log('📝 Initializing TipTap editors...');
-                    initTipTapEditors();
-                    console.log('✅ TipTap editors initialized');
-                } catch (editorError) {
-                    console.error('⚠️ TipTap editor initialization failed (non-critical):', editorError);
-                }
-            }, 200);
-            
-            // PRIORITY 4: Load calendar data (with error isolation)
-            setTimeout(() => {
-                console.log('📊 Loading calendar data...');
-                loadCalendarData().then(() => {
-                    console.log('✅ Calendar data loaded successfully');
-                }).catch(dataError => {
-                    console.error('⚠️ Calendar data loading failed (non-critical):', dataError);
-                });
-            }, 250);
-            
-            console.log('🎯 Calendar initialization sequence started');
+            console.log('🎯 Calendar initialization sequence completed');
         });
         
         // Initialize TipTap editors
@@ -2451,6 +2443,137 @@
                     loadFromLocalStorage();
                 } catch (localError) {
                     console.error('Error loading from localStorage as fallback:', localError);
+                }
+            }
+        }
+
+        // Safe version of loadCalendarData that handles corruption and never breaks calendar
+        async function loadCalendarDataSafely() {
+            console.log('🔒 Safe calendar data loading starting...');
+            
+            try {
+                if (!supabase) {
+                    console.log('📁 No database connection, using localStorage only');
+                    loadFromLocalStorage();
+                    return;
+                }
+
+                console.log('🗄️ Querying database for calendar events...');
+                
+                // Get current date range with error handling
+                let weeks;
+                try {
+                    weeks = generateWeeks();
+                } catch (weekError) {
+                    console.error('❌ Error generating weeks for data query:', weekError);
+                    return;
+                }
+                
+                const startDate = weeks[0][0].date;
+                const endDate = weeks[6][6].date;
+                
+                // Query database with timeout and error handling
+                const { data, error } = await Promise.race([
+                    supabase
+                        .from('calendar_events')
+                        .select('*')
+                        .gte('event_date', startDate.toISOString().split('T')[0])
+                        .lte('event_date', endDate.toISOString().split('T')[0]),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Database query timeout')), 5000)
+                    )
+                ]);
+
+                if (error) {
+                    console.error('📊 Database query error:', error);
+                    throw error;
+                }
+
+                console.log(`📋 Found ${data ? data.length : 0} events in database`);
+                
+                // Clear existing non-hardcoded events safely
+                try {
+                    document.querySelectorAll('.event').forEach(event => {
+                        if (!event.hasAttribute('data-hardcoded')) {
+                            event.remove();
+                        }
+                    });
+                } catch (clearError) {
+                    console.error('⚠️ Error clearing events (non-critical):', clearError);
+                }
+
+                // Process each event with individual error handling
+                if (data && data.length > 0) {
+                    let successCount = 0;
+                    let errorCount = 0;
+                    
+                    for (const eventData of data) {
+                        try {
+                            // Validate event data
+                            if (!eventData.event_date || !eventData.event_text) {
+                                console.warn('⚠️ Skipping invalid event:', eventData);
+                                errorCount++;
+                                continue;
+                            }
+                            
+                            const eventDateString = eventData.event_date;
+                            console.log(`📅 Processing event: "${eventData.event_text}" for date: ${eventDateString}`);
+                            
+                            // Find target cell with error handling
+                            const dayCells = document.querySelectorAll('.day-cell');
+                            let targetCell = null;
+                            
+                            dayCells.forEach(cell => {
+                                const cellDate = cell.getAttribute('data-date');
+                                if (cellDate === eventDateString) {
+                                    targetCell = cell;
+                                }
+                            });
+                            
+                            if (targetCell) {
+                                addEventElement(
+                                    targetCell, 
+                                    eventData.event_text, 
+                                    eventData.event_class || 'default', 
+                                    eventData.is_tentative || false, 
+                                    false, 
+                                    eventData.notes || ''
+                                );
+                                successCount++;
+                                console.log(`✅ Event "${eventData.event_text}" added successfully`);
+                            } else {
+                                console.warn(`⚠️ Could not find cell for date: ${eventDateString}, event: ${eventData.event_text}`);
+                                errorCount++;
+                            }
+                            
+                        } catch (eventError) {
+                            console.error('❌ Error processing individual event:', eventData, eventError);
+                            errorCount++;
+                        }
+                    }
+                    
+                    console.log(`📊 Event loading complete: ${successCount} successful, ${errorCount} errors`);
+                }
+
+                // Update visibility safely
+                setTimeout(() => {
+                    try {
+                        updateEventVisibility();
+                        console.log('✅ Event visibility updated');
+                    } catch (visibilityError) {
+                        console.error('⚠️ Event visibility update failed (non-critical):', visibilityError);
+                    }
+                }, 100);
+
+                console.log('✅ Safe calendar data loading completed');
+
+            } catch (error) {
+                console.error('❌ Safe calendar data loading failed, trying localStorage fallback:', error);
+                try {
+                    loadFromLocalStorage();
+                    console.log('✅ Fallback to localStorage successful');
+                } catch (fallbackError) {
+                    console.error('❌ All data loading methods failed (calendar still works):', fallbackError);
                 }
             }
         }
