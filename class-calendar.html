@@ -298,8 +298,18 @@ async function init(){
   wireUI();
   await ensureEditors();
   loadHardcoded();
-  await loadRemoteEvents();
-  loadLocalEvents();
+  
+  // CLOUD-FIRST APPROACH: Only use localStorage as fallback
+  const remoteLoaded = await loadRemoteEvents();
+  if (!remoteLoaded || !supabase) {
+    console.warn('🔄 Cloud unavailable - falling back to local storage');
+    loadLocalEvents();
+  } else {
+    console.log('☁️ Cloud data loaded successfully - skipping localStorage');
+    // Clear any stale local data since we have cloud data
+    localStorage.removeItem('calendar_events_user');
+  }
+  
   render();
 }
 
@@ -954,35 +964,84 @@ function normalizeExistingHardcodedNotes(){
 
 /* ========= REMOTE LOAD ========= */
 async function loadRemoteEvents(){
-  if(!supabase) return;
+  if(!supabase) {
+    console.warn('Supabase not available - cannot load from cloud');
+    return false;
+  }
+  
   try {
     const startRange = new Date(); startRange.setDate(startRange.getDate()-21);
     const endRange = new Date(); endRange.setDate(endRange.getDate()+21);
+    console.log('☁️ Loading events from cloud database...');
+    
     const { data, error } = await supabase.from('calendar_events').select('*').gte('event_date',fmtDate(startRange)).lte('event_date',fmtDate(endRange));
-    if(error){console.warn('Remote fetch error',error);return;}
+    
+    if(error){
+      console.error('❌ Remote fetch error:', error);
+      return false;
+    }
+    
+    console.log(`✅ Loaded ${data.length} events from cloud`);
+    
     data.forEach(r=>{
       // avoid duplicates of hardcoded
       if(!events.some(e=>!e.isHardcoded && e.id===r.id)){
         events.push({
           id: r.id || 'db-'+r.event_date+'-'+r.event_text.replace(/\s+/g,'_'),
           date: r.event_date,
-            text: r.event_text,
-            class: r.event_class,
-            isTentative: !!r.is_tentative,
-            isHardcoded: false,
-            notes: r.notes || '',
-            createdAt: r.created_at || r.event_date
+          text: r.event_text,
+          class: r.event_class,
+          isTentative: !!r.is_tentative,
+          isHardcoded: false,
+          notes: r.notes || '',
+          createdAt: r.created_at || r.event_date
         });
       }
     });
-  } catch(e){ console.warn('Remote load fail', e); }
+    
+    return true; // Success
+    
+  } catch(e){ 
+    console.error('❌ Remote load failed:', e); 
+    return false;
+  }
 }
 
-/* ========= LOCAL STORAGE ========= */
+/* ========= LOCAL STORAGE (FALLBACK ONLY) ========= */
 function loadLocalEvents(){
-  try { const raw=localStorage.getItem('calendar_events_user'); if(!raw) return; const arr=JSON.parse(raw); arr.forEach(ev=>{ if(!events.some(e=>e.id===ev.id)) events.push(ev);}); } catch(e){console.warn('Local load error',e);} }
+  try { 
+    const raw=localStorage.getItem('calendar_events_user'); 
+    if(!raw) {
+      console.log('No local events found');
+      return;
+    }
+    
+    const arr=JSON.parse(raw); 
+    console.log(`📱 Loading ${arr.length} events from local storage (fallback mode)`);
+    
+    arr.forEach(ev=>{ 
+      if(!events.some(e=>e.id===ev.id)) {
+        events.push(ev);
+      }
+    }); 
+  } catch(e){
+    console.warn('Local load error:', e);
+  } 
+}
+
 function saveLocalEvents(){
-  try { const userEvents = events.filter(e=>!e.isHardcoded); localStorage.setItem('calendar_events_user',JSON.stringify(userEvents)); } catch(e){ console.warn('Local save error',e); }
+  // CLOUD-FIRST: Only save locally as emergency backup
+  if (!supabase) {
+    console.log('💾 Saving to localStorage (cloud unavailable)');
+    try { 
+      const userEvents = events.filter(e=>!e.isHardcoded); 
+      localStorage.setItem('calendar_events_user', JSON.stringify(userEvents)); 
+    } catch(e){ 
+      console.warn('Local save error:', e); 
+    }
+  } else {
+    console.log('☁️ Cloud available - skipping localStorage save');
+  }
 }
 
 /* ========= RENDER ========= */
@@ -1034,17 +1093,44 @@ function saveNewEvent(e){
   if(!notes && !notesEditor) notes=document.getElementById('eventNotesEditor').innerHTML;
   const ev={id:'u-'+Date.now()+'-'+Math.random().toString(36).slice(2),date,text,class:cls,isTentative:tentative,isHardcoded:false,notes,createdAt:new Date().toISOString()};
   events.push(ev);
+  
+  // CLOUD-FIRST: Save to cloud, only use localStorage as emergency backup
   persistNewEvent(ev);
-  saveLocalEvents();
+  saveLocalEvents(); // Only saves locally if cloud is unavailable
+  
   closeModal('eventModal');
   render();
 }
 
 async function persistNewEvent(ev){
-  if(!supabase) return;
-  try { const { error } = await supabase.from('calendar_events').insert({
-    event_date: ev.date, year: parseInt(ev.date.slice(0,4),10), month: parseInt(ev.date.slice(5,7),10)-1, day: parseInt(ev.date.slice(8,10),10), event_text: ev.text, event_class: ev.class, notes: ev.notes, is_tentative: ev.isTentative, created_at: ev.createdAt
-  }); if(error) console.warn('DB insert error', error); } catch(e){ console.warn('Persist fail',e);} }
+  if(!supabase) {
+    console.warn('☁️ Cloud unavailable - event saved locally only');
+    return;
+  }
+  
+  try { 
+    console.log('☁️ Saving new event to cloud database...');
+    const { error } = await supabase.from('calendar_events').insert({
+      event_date: ev.date, 
+      year: parseInt(ev.date.slice(0,4),10), 
+      month: parseInt(ev.date.slice(5,7),10)-1, 
+      day: parseInt(ev.date.slice(8,10),10), 
+      event_text: ev.text, 
+      event_class: ev.class, 
+      notes: ev.notes, 
+      is_tentative: ev.isTentative, 
+      created_at: ev.createdAt
+    }); 
+    
+    if(error) {
+      console.error('❌ Cloud save error:', error);
+    } else {
+      console.log('✅ Event saved to cloud successfully');
+    }
+  } catch(e){ 
+    console.error('❌ Cloud persist failed:', e);
+  }
+}
 
 function addEventElement(parent, ev){
   const div=document.createElement('div'); div.className='event'; if(ev.isTentative) div.classList.add('tentative'); div.dataset.id=ev.id; div.dataset.class=ev.class; div.setAttribute('draggable','true');
@@ -1069,18 +1155,74 @@ function openDetails(id){
 }
 
 function deleteEvent(id){
-  const idx=events.findIndex(e=>e.id===id); if(idx===-1) return; const ev=events[idx]; if(ev.isHardcoded){alert('Hardcoded event locked.'); return;}
-  events.splice(idx,1); saveLocalEvents(); if(supabase){ supabase.from('calendar_events').delete().eq('event_date',ev.date).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); }
+  const idx=events.findIndex(e=>e.id===id); 
+  if(idx===-1) return; 
+  
+  const ev=events[idx]; 
+  if(ev.isHardcoded){
+    alert('Hardcoded event locked.'); 
+    return;
+  }
+  
+  // Remove from memory
+  events.splice(idx,1); 
+  
+  // CLOUD-FIRST: Delete from cloud, backup locally only if cloud unavailable
+  if(supabase){ 
+    console.log('☁️ Deleting event from cloud database...');
+    supabase.from('calendar_events')
+      .delete()
+      .eq('event_date',ev.date)
+      .eq('event_text',ev.text)
+      .eq('event_class',ev.class)
+      .then(result => {
+        console.log('✅ Event deleted from cloud:', result);
+      })
+      .catch(error => {
+        console.error('❌ Cloud delete failed:', error);
+      });
+  } else {
+    console.warn('☁️ Cloud unavailable - updating local backup only');
+  }
+  
+  saveLocalEvents(); // Only saves locally if cloud unavailable
   render();
 }
 
 function deleteCurrentEvent(){ if(currentEditId){ deleteEvent(currentEditId); closeModal('detailsModal'); } }
 
 function saveDetailsNotes(){
-  if(!currentEditId) return; const ev=events.find(e=>e.id===currentEditId); if(!ev) return; if(ev.isHardcoded){closeModal('detailsModal'); return;}
+  if(!currentEditId) return; 
+  
+  const ev=events.find(e=>e.id===currentEditId); 
+  if(!ev) return; 
+  
+  if(ev.isHardcoded){
+    closeModal('detailsModal'); 
+    return;
+  }
+  
   ev.notes = detailsEditor ? detailsEditor.getHTML() : document.getElementById('detailsNotesEditor').innerHTML;
-  saveLocalEvents();
-  if(supabase){ supabase.from('calendar_events').update({ notes: ev.notes }).eq('event_date',ev.date).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); }
+  
+  // CLOUD-FIRST: Save to cloud, backup locally only if cloud unavailable
+  if(supabase){ 
+    console.log('☁️ Saving notes to cloud database...');
+    supabase.from('calendar_events')
+      .update({ notes: ev.notes })
+      .eq('event_date',ev.date)
+      .eq('event_text',ev.text)
+      .eq('event_class',ev.class)
+      .then(result => {
+        console.log('✅ Notes saved to cloud:', result);
+      })
+      .catch(error => {
+        console.error('❌ Cloud notes save failed:', error);
+      });
+  } else {
+    console.warn('☁️ Cloud unavailable - saving notes locally only');
+  }
+  
+  saveLocalEvents(); // Only saves locally if cloud unavailable
   closeModal('detailsModal');
 }
 
@@ -1249,8 +1391,8 @@ function safeMoveEvent(id, newDate, originalDate) {
     console.log('Updated event date in memory');
     
     // Save locally first
-    saveLocalEvents();
-    console.log('Saved to localStorage');
+    saveLocalEvents(); // Only saves locally if cloud unavailable
+    console.log('Updated local backup (if needed)');
     
     // Update the UI
     render();
@@ -1258,7 +1400,7 @@ function safeMoveEvent(id, newDate, originalDate) {
     
     // Update database if available (async - don't wait for it)
     if (supabase) {
-      console.log('Updating database...');
+      console.log('☁️ Updating cloud database...');
       supabase.from('calendar_events').update({ 
         event_date: newDate, 
         year: parseInt(newDate.slice(0,4),10), 
@@ -1269,11 +1411,13 @@ function safeMoveEvent(id, newDate, originalDate) {
       .eq('event_text', ev.text)
       .eq('event_class', ev.class)
       .then(result => {
-        console.log('Database update result:', result);
+        console.log('✅ Cloud database updated successfully:', result);
       })
       .catch(dbError => {
-        console.warn('Database update failed (but local move succeeded):', dbError);
+        console.error('❌ Cloud update failed:', dbError);
       });
+    } else {
+      console.warn('☁️ Cloud unavailable - move saved locally only');
     }
     
     return true;
