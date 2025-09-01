@@ -14,6 +14,15 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
 async function ensureEditors(){
+  // Debug: Log what's available
+  console.log('TipTap globals available:', {
+    Tiptap: !!window.Tiptap,
+    Editor: !!window.Tiptap?.Editor,
+    StarterKit: !!window.TiptapStarterKit?.StarterKit,
+    Placeholder: !!window.TiptapPlaceholder?.Placeholder,
+    lucide: !!window.lucide
+  });
+  
   // TipTap 3.0 direct approach
   if (window.Tiptap && window.Tiptap.Editor) {
     console.log('TipTap 3.0 detected, initializing editors');
@@ -25,7 +34,15 @@ async function ensureEditors(){
   }
   
   // Wait a bit and try again
+  console.log('Waiting 1s for scripts to load...');
   await new Promise(r => setTimeout(r, 1000));
+  
+  console.log('After delay - TipTap globals:', {
+    Tiptap: !!window.Tiptap,
+    Editor: !!window.Tiptap?.Editor,
+    StarterKit: !!window.TiptapStarterKit?.StarterKit,
+    Placeholder: !!window.TiptapPlaceholder?.Placeholder
+  });
   
   if (window.Tiptap && window.Tiptap.Editor) {
     console.log('TipTap 3.0 available after delay, trying again');
@@ -274,34 +291,69 @@ function wireUI(){
 function initEditors(){
   // TipTap 3.0 validation
   if(!window.Tiptap || !window.Tiptap.Editor){
-    console.warn('TipTap 3.0 Editor constructor missing; deferring');
+    console.error('TipTap 3.0 Editor constructor missing; check script loading');
     return;
   }
+
+  console.log('Attempting to initialize TipTap 3.0 editors...');
   
-  // TipTap 3.0 extensions - simplified for reliability
-  const extensions = [
-    window.TiptapStarterKit?.StarterKit || window.StarterKit,
-    window.TiptapPlaceholder?.Placeholder?.configure?.({ placeholder: 'Start typing…' }) || window.Placeholder?.configure?.({ placeholder: 'Start typing…' })
-  ].filter(Boolean);
+  // TipTap 3.0 extensions - check what's available
+  console.log('Available extensions:', {
+    StarterKit: window.TiptapStarterKit?.StarterKit,
+    Placeholder: window.TiptapPlaceholder?.Placeholder
+  });
+  
+  const extensions = [];
+  
+  // Add StarterKit if available
+  if (window.TiptapStarterKit?.StarterKit) {
+    extensions.push(window.TiptapStarterKit.StarterKit);
+    console.log('Added StarterKit extension');
+  }
+  
+  // Add Placeholder if available
+  if (window.TiptapPlaceholder?.Placeholder) {
+    extensions.push(window.TiptapPlaceholder.Placeholder.configure({ 
+      placeholder: 'Start typing…' 
+    }));
+    console.log('Added Placeholder extension');
+  }
+  
+  if (extensions.length === 0) {
+    console.error('No TipTap extensions available - falling back to basic setup');
+    extensions.push(window.Tiptap.Editor.extensions.Document);
+    extensions.push(window.Tiptap.Editor.extensions.Paragraph);
+    extensions.push(window.Tiptap.Editor.extensions.Text);
+  }
   
   try {
-    if(notesEditor||detailsEditor){ return; }
+    if(notesEditor||detailsEditor){ 
+      console.log('Editors already exist, skipping initialization');
+      return; 
+    }
     
+    console.log('Creating notesEditor...');
     notesEditor = new window.Tiptap.Editor({
       element: document.getElementById('eventNotesEditor'),
       extensions: extensions,
-      content: '',
-      onUpdate: ({ editor }) => { document.getElementById('eventNotes').value = editor.getHTML(); }
+      content: '<p></p>',
+      onUpdate: ({ editor }) => { 
+        document.getElementById('eventNotes').value = editor.getHTML(); 
+      }
     });
+    console.log('notesEditor created successfully');
     
+    console.log('Creating detailsEditor...');
     detailsEditor = new window.Tiptap.Editor({
       element: document.getElementById('detailsNotesEditor'),
       extensions: extensions,
-      content: '',
+      content: '<p></p>',
       onUpdate: () => {}
     });
+    console.log('detailsEditor created successfully');
     
     // Build TipTap 3.0 toolbars with Lucide icons
+    console.log('Building toolbars...');
     buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
     buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
     
@@ -310,7 +362,13 @@ function initEditors(){
     
     console.log('TipTap 3.0 editors initialized successfully');
   } catch (e) {
-    console.warn('TipTap 3.0 init failed, using fallback editors', e);
+    console.error('TipTap 3.0 init failed:', e);
+    console.warn('Using fallback contentEditable editors');
+    
+    // Clear any partial initialization
+    notesEditor = null;
+    detailsEditor = null;
+    
     document.getElementById('eventNotesEditor').contentEditable = 'true';
     document.getElementById('detailsNotesEditor').contentEditable = 'true';
     buildFallbackToolbar(document.getElementById('eventNotesMenu'));
