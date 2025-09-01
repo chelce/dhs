@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Calendar Migration Utility</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:24px;line-height:1.4}
+.panel{max-width:960px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;padding:28px}
+ h1{margin-top:0;font-size:28px;letter-spacing:-.5px}
+ button{background:#2563eb;border:1px solid #2563eb;color:#fff;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;letter-spacing:-0.3px}
+ button:hover{background:#1d4ed8}
+ button.secondary{background:#27272a;border-color:#3a3a42}
+ button.secondary:hover{background:#32323a}
+ .btn-row{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
+ pre{background:#111827;padding:16px;border-radius:10px;overflow:auto;font-size:12px;max-height:340px}
+ .status{font-family:monospace;font-size:12px;white-space:pre-wrap;background:#111827;border:1px solid #27272a;padding:12px;border-radius:10px;min-height:120px}
+ .tag{display:inline-block;background:#27272a;padding:2px 8px;border-radius:999px;font-size:11px;margin-right:6px}
+ table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+ th,td{padding:6px 8px;border:1px solid #27272a;vertical-align:top}
+ th{background:#202024}
+ .ok{color:#16a34a}.warn{color:#f59e0b}.err{color:#dc2626}
+</style>
+</head>
+<body>
+<div class="panel">
+  <h1>Calendar Migration & Backfill Utility</h1>
+  <p>This page helps you: <strong>1)</strong> Backfill hardcoded events into Supabase if missing and <strong>2)</strong> Export current Supabase + hardcoded data to JSON (for updating <code>hardcoded-events.json</code> or archiving).</p>
+  <div class="btn-row">
+    <button id="btnLoad">1. Load Current Data</button>
+    <button id="btnBackfill" disabled>2. Backfill Hardcoded → DB</button>
+    <button id="btnExportMerged" disabled>Export Merged (All Events)</button>
+    <button id="btnExportHardcoded" disabled>Export Updated Hardcoded Only</button>
+    <button id="btnExportSnapshot" disabled class="secondary">Export Raw DB Snapshot</button>
+  </div>
+  <div id="summary"></div>
+  <h3>Status & Log</h3>
+  <div id="log" class="status"></div>
+  <h3>Diff (Missing in DB)</h3>
+  <table id="missingTable" style="display:none"><thead><tr><th>Date</th><th>Class</th><th>Title</th></tr></thead><tbody></tbody></table>
+</div>
+<script>
+const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk';
+let supabase; try { supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);} catch(e){ log('ERR creating Supabase client '+e, 'err'); }
+
+let hardcoded=[]; let dbEvents=[]; let merged=[]; let missing=[]; let hardcodedUpdated=[];
+
+const logEl=document.getElementById('log');
+function log(msg, cls){ const time=new Date().toISOString().split('T')[1].split('.')[0]; const span=document.createElement('div'); if(cls) span.className=cls; span.textContent='['+time+'] '+msg; logEl.appendChild(span); logEl.scrollTop=logEl.scrollHeight; }
+
+function byKey(ev){ return ev.date+'__'+ev.class+'__'+ev.text; }
+
+async function loadData(){
+  log('Loading hardcoded-events.json...');
+  try { const res=await fetch('hardcoded-events.json?ts='+(Date.now())); if(!res.ok) throw new Error(res.status); hardcoded=await res.json(); log('Loaded hardcoded: '+hardcoded.length,'ok'); } catch(e){ log('Failed to load hardcoded '+e,'err'); return; }
+  log('Querying Supabase calendar_events...');
+  try {
+    const { data, error } = await supabase.from('calendar_events').select('*');
+    if(error) throw error; dbEvents=data||[]; log('Loaded DB events: '+dbEvents.length,'ok');
+  } catch(e){ log('DB load failed '+e,'err'); return; }
+  // merge sets
+  const map=new Map();
+  hardcoded.forEach(h=>{ map.set(byKey(h), { ...h, source:'hardcoded'}); });
+  dbEvents.forEach(d=>{ const k=byKey({date:d.event_date,text:d.event_text,class:d.event_class}); if(map.has(k)){ const entry=map.get(k); // prefer DB notes if longer
+      const dbNotes=d.notes||''; const hcNotes=entry.notes||''; if(dbNotes.length>hcNotes.length){ entry.notes=dbNotes; entry._notesFrom='db'; } else if(dbNotes.length<hcNotes.length){ entry._notesFrom='hardcoded'; } }
+    else { map.set(k,{date:d.event_date,text:d.event_text,class:d.event_class,notes:d.notes||'',source:'db'}); }
+  });
+  merged=[...map.values()];
+  // identify missing in DB
+  const dbSet=new Set(dbEvents.map(d=>byKey({date:d.event_date,text:d.event_text,class:d.event_class})));
+  missing = hardcoded.filter(h=>!dbSet.has(byKey(h)));
+  // identify hardcoded improved by DB notes
+  hardcodedUpdated = merged.filter(m=>m.source==='hardcoded' || m._notesFrom==='db').map(m=>({date:m.date,text:m.text,class:m.class,notes:m.notes}));
+  renderMissing();
+  updateSummary();
+  enableButtons();
+}
+
+function renderMissing(){
+  const tbl=document.getElementById('missingTable'); const tb=tbl.querySelector('tbody'); tb.innerHTML='';
+  if(!missing.length){ tbl.style.display='none'; return; }
+  missing.forEach(m=>{ const tr=document.createElement('tr'); tr.innerHTML='<td>'+m.date+'</td><td>'+m.class+'</td><td>'+m.text+'</td>'; tb.appendChild(tr); });
+  tbl.style.display='table';
+}
+
+function updateSummary(){
+  document.getElementById('summary').innerHTML=`<p><span class=tag>Hardcoded: ${hardcoded.length}</span><span class=tag>DB: ${dbEvents.length}</span><span class=tag>Merged: ${merged.length}</span><span class=tag>Missing in DB: ${missing.length}</span></p>`;
+}
+
+function enableButtons(){
+  document.getElementById('btnBackfill').disabled = missing.length===0;
+  document.getElementById('btnExportMerged').disabled = merged.length===0;
+  document.getElementById('btnExportHardcoded').disabled = hardcodedUpdated.length===0;
+  document.getElementById('btnExportSnapshot').disabled = dbEvents.length===0;
+}
+
+async function backfill(){
+  if(!missing.length){ log('No missing hardcoded events to backfill','warn'); return; }
+  log('Backfilling '+missing.length+' hardcoded events...');
+  const payload = missing.map(m=>({event_date:m.date, year:parseInt(m.date.slice(0,4),10), month:parseInt(m.date.slice(5,7),10)-1, day:parseInt(m.date.slice(8,10),10), event_text:m.text, event_class:m.class, notes:m.notes||'', is_tentative:false, created_at:new Date().toISOString()}));
+  try { const { error } = await supabase.from('calendar_events').insert(payload); if(error) throw error; log('Inserted '+payload.length+' events','ok'); } catch(e){ log('Backfill error '+e,'err'); return; }
+  // reload
+  await loadData();
+}
+
+function download(name, obj){ const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},100); }
+
+function exportMerged(){ download('calendar-merged-'+dateStamp()+'.json', merged.map(m=>({date:m.date,text:m.text,class:m.class,notes:m.notes||''}))); }
+function exportHardcoded(){ download('hardcoded-events-updated-'+dateStamp()+'.json', hardcodedUpdated); }
+function exportSnapshot(){ download('calendar-db-snapshot-'+dateStamp()+'.json', dbEvents); }
+function dateStamp(){ return new Date().toISOString().slice(0,10); }
+
+// wiring
+ document.getElementById('btnLoad').onclick=loadData;
+ document.getElementById('btnBackfill').onclick=backfill;
+ document.getElementById('btnExportMerged').onclick=exportMerged;
+ document.getElementById('btnExportHardcoded').onclick=exportHardcoded;
+ document.getElementById('btnExportSnapshot').onclick=exportSnapshot;
+
+log('Ready. Click "Load Current Data" to begin.', 'ok');
+</script>
+</body>
+</html>
