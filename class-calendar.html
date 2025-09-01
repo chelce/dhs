@@ -224,7 +224,7 @@
             margin-bottom: 6px !important;
             color: white !important;
             font-weight: 600 !important;
-            cursor: pointer !important;
+            cursor: move !important;
             transition: var(--cult-transition) !important;
             box-shadow: var(--cult-shadow) !important;
             display: block !important;
@@ -233,11 +233,24 @@
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px) !important;
             letter-spacing: -0.01em !important;
+            position: relative !important;
         }
 
         .event:hover {
             transform: translateY(-2px) scale(1.02) !important;
             box-shadow: var(--cult-shadow-lg) !important;
+        }
+
+        .event.dragging {
+            opacity: 0.5 !important;
+            transform: rotate(2deg) scale(1.05) !important;
+            z-index: 1000 !important;
+        }
+
+        .day-cell.drag-over {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border: 2px dashed var(--cult-accent) !important;
+            transform: scale(1.02) !important;
         }
         
         .class-reflection {
@@ -1640,6 +1653,9 @@
                     // Add click handler
                     dayCell.onclick = () => addEvent(dayInfo.date);
                     
+                    // Setup drag and drop functionality
+                    setupDayDropZone(dayCell);
+                    
                     // Add day number
                     const dayNumber = document.createElement('div');
                     dayNumber.className = 'day-number';
@@ -1725,6 +1741,7 @@
             eventDiv.className = `event class-${eventClass}`;
             eventDiv.setAttribute('data-class', eventClass);
             eventDiv.setAttribute('data-notes', notes || '');
+            eventDiv.draggable = true;
             
             if (isTentative) {
                 eventDiv.classList.add('tentative');
@@ -1733,6 +1750,9 @@
             if (isHardcoded) {
                 eventDiv.setAttribute('data-hardcoded', 'true');
             }
+            
+            // Add drag and drop event listeners
+            setupDragAndDrop(eventDiv);
             
             // Add click handler to show details
             eventDiv.addEventListener('click', (e) => {
@@ -1752,6 +1772,160 @@
             parentCell.appendChild(eventDiv);
             console.log('Event element added to parent cell successfully');
             console.log('Parent cell now has', parentCell.children.length, 'children');
+        }
+
+        // Setup drag and drop functionality for an event
+        function setupDragAndDrop(eventDiv) {
+            // Drag start - store the event data
+            eventDiv.addEventListener('dragstart', (e) => {
+                e.stopPropagation();
+                eventDiv.classList.add('dragging');
+                
+                // Store event data for transfer
+                const eventData = {
+                    text: eventDiv.textContent.replace('×', '').trim(), // Remove the delete button text
+                    eventClass: eventDiv.getAttribute('data-class'),
+                    notes: eventDiv.getAttribute('data-notes') || '',
+                    isHardcoded: eventDiv.getAttribute('data-hardcoded') === 'true',
+                    isTentative: eventDiv.classList.contains('tentative')
+                };
+                
+                e.dataTransfer.setData('text/plain', JSON.stringify(eventData));
+                e.dataTransfer.effectAllowed = 'move';
+                
+                console.log('Drag started for event:', eventData);
+            });
+            
+            // Drag end - clean up
+            eventDiv.addEventListener('dragend', (e) => {
+                eventDiv.classList.remove('dragging');
+            });
+        }
+
+        // Setup day cells to accept drops
+        function setupDayDropZone(dayCell) {
+            // Prevent default to allow drop
+            dayCell.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                dayCell.classList.add('drag-over');
+            });
+            
+            // Remove visual feedback when drag leaves
+            dayCell.addEventListener('dragleave', (e) => {
+                // Only remove if we're actually leaving the cell (not just entering a child)
+                if (!dayCell.contains(e.relatedTarget)) {
+                    dayCell.classList.remove('drag-over');
+                }
+            });
+            
+            // Handle the drop
+            dayCell.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dayCell.classList.remove('drag-over');
+                
+                try {
+                    const eventData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    const newDate = dayCell.getAttribute('data-date');
+                    
+                    console.log('Drop event:', eventData, 'on date:', newDate);
+                    
+                    // Find and remove the dragged event from its original location
+                    const draggingEvent = document.querySelector('.event.dragging');
+                    if (draggingEvent) {
+                        const originalDate = draggingEvent.closest('.day-cell').getAttribute('data-date');
+                        
+                        // Don't move if dropping on the same day
+                        if (originalDate === newDate) {
+                            console.log('Dropped on same day, no action needed');
+                            return;
+                        }
+                        
+                        // Remove from original location
+                        draggingEvent.remove();
+                        
+                        // Add to new location
+                        addEventElement(dayCell, eventData.text, eventData.eventClass, eventData.isTentative, eventData.isHardcoded, eventData.notes);
+                        
+                        // Update event in database if it's not hardcoded
+                        if (!eventData.isHardcoded) {
+                            updateEventDate(eventData, originalDate, newDate);
+                        }
+                        
+                        console.log(`Event moved from ${originalDate} to ${newDate}`);
+                    }
+                } catch (error) {
+                    console.error('Error handling drop:', error);
+                }
+            });
+        }
+
+        // Update event date in database
+        async function updateEventDate(eventData, originalDate, newDate) {
+            try {
+                if (supabase) {
+                    // First, try to find existing event in database
+                    const { data: existingEvents, error: fetchError } = await supabase
+                        .from('calendar_events')
+                        .select('*')
+                        .eq('event_date', originalDate)
+                        .eq('event_text', eventData.text)
+                        .eq('event_class', eventData.eventClass);
+                    
+                    if (fetchError) {
+                        console.error('Error fetching event for update:', fetchError);
+                        return;
+                    }
+                    
+                    if (existingEvents && existingEvents.length > 0) {
+                        // Update existing event
+                        const newDateObj = new Date(newDate);
+                        const { error: updateError } = await supabase
+                            .from('calendar_events')
+                            .update({ 
+                                event_date: newDate,
+                                year: newDateObj.getFullYear(),
+                                month: newDateObj.getMonth(),
+                                day: newDateObj.getDate()
+                            })
+                            .eq('id', existingEvents[0].id);
+                        
+                        if (updateError) {
+                            console.error('Error updating event date:', updateError);
+                        } else {
+                            console.log('Event date updated in database');
+                        }
+                    } else {
+                        // Create new event record if it doesn't exist
+                        const newDateObj = new Date(newDate);
+                        const { error: insertError } = await supabase
+                            .from('calendar_events')
+                            .insert({
+                                event_date: newDate,
+                                year: newDateObj.getFullYear(),
+                                month: newDateObj.getMonth(),
+                                day: newDateObj.getDate(),
+                                event_text: eventData.text,
+                                event_class: eventData.eventClass,
+                                notes: eventData.notes,
+                                is_tentative: eventData.isTentative,
+                                created_at: new Date().toISOString()
+                            });
+                        
+                        if (insertError) {
+                            console.error('Error creating new event record:', insertError);
+                        } else {
+                            console.log('New event record created in database');
+                        }
+                    }
+                }
+                
+                // Save to localStorage as backup
+                saveCalendarData();
+                
+            } catch (error) {
+                console.error('Error updating event date:', error);
+            }
         }
         
         // Show event details modal
