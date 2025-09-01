@@ -1156,107 +1156,123 @@
         
         // Initialize calendar on load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, starting calendar initialization...');
+            console.log('🚀 DOM loaded, starting calendar initialization...');
             
-            // Always generate calendar first - this is the most important part
+            // PRIORITY 1: Generate calendar IMMEDIATELY - this is the most important part
             try {
-                console.log('Generating calendar...');
+                console.log('📅 Generating calendar (priority operation)...');
                 generateCalendar();
-                console.log('Calendar generated successfully');
+                console.log('✅ Calendar generated successfully!');
             } catch (calendarError) {
-                console.error('CRITICAL: Failed to generate calendar:', calendarError);
-                // Try a simple fallback
+                console.error('❌ CRITICAL: Failed to generate calendar:', calendarError);
+                // Emergency fallback
                 const calendarGrid = document.getElementById('calendarGrid');
                 if (calendarGrid) {
-                    calendarGrid.innerHTML = '<div style="color: red; padding: 20px;">Calendar generation failed. Please refresh the page.</div>';
+                    calendarGrid.innerHTML = '<div style="color: red; padding: 20px; text-align: center;">Calendar generation failed. Please refresh the page.</div>';
                 }
+                return; // Don't continue if calendar generation fails
             }
             
-            // Initialize Supabase (non-blocking)
-            try {
-                console.log('Initializing Supabase...');
-                initSupabase();
-            } catch (supabaseError) {
-                console.error('Supabase initialization failed:', supabaseError);
-            }
-            
-            // Load calendar data (non-blocking)
-            setTimeout(() => {
-                loadCalendarData().then(() => {
-                    console.log('Calendar data loaded');
-                }).catch(error => {
-                    console.error('Error loading calendar data:', error);
-                });
-            }, 100);
-            
-            // Setup other components (non-blocking)
-            try {
-                setupFilterListeners();
-            } catch (filterError) {
-                console.error('Filter setup failed:', filterError);
-            }
-            
-            // Initialize TipTap editors
+            // PRIORITY 2: Set up basic functionality with delays to avoid blocking
             setTimeout(() => {
                 try {
+                    console.log('🔧 Setting up filters...');
+                    setupFilterListeners();
+                    console.log('✅ Filters ready');
+                } catch (filterError) {
+                    console.error('⚠️ Filter setup failed (non-critical):', filterError);
+                }
+            }, 50);
+            
+            setTimeout(() => {
+                try {
+                    console.log('👆 Setting up click handlers...');
+                    setupDayCellClickHandlers();
+                    console.log('✅ Click handlers ready');
+                } catch (clickError) {
+                    console.error('⚠️ Click handler setup failed (non-critical):', clickError);
+                }
+            }, 100);
+            
+            // PRIORITY 3: Initialize external dependencies (with error isolation)
+            setTimeout(() => {
+                try {
+                    console.log('🗄️ Initializing Supabase...');
+                    initSupabase();
+                    console.log('✅ Supabase initialized');
+                } catch (supabaseError) {
+                    console.error('⚠️ Supabase initialization failed (non-critical):', supabaseError);
+                }
+            }, 150);
+            
+            setTimeout(() => {
+                try {
+                    console.log('📝 Initializing TipTap editors...');
                     initTipTapEditors();
+                    console.log('✅ TipTap editors initialized');
                 } catch (editorError) {
-                    console.error('TipTap editor initialization failed:', editorError);
+                    console.error('⚠️ TipTap editor initialization failed (non-critical):', editorError);
                 }
             }, 200);
             
-            // Setup click handlers
+            // PRIORITY 4: Load calendar data (with error isolation)
             setTimeout(() => {
-                try {
-                    setupDayCellClickHandlers();
-                } catch (clickError) {
-                    console.error('Click handler setup failed:', clickError);
-                }
-            }, 300);
+                console.log('📊 Loading calendar data...');
+                loadCalendarData().then(() => {
+                    console.log('✅ Calendar data loaded successfully');
+                }).catch(dataError => {
+                    console.error('⚠️ Calendar data loading failed (non-critical):', dataError);
+                });
+            }, 250);
             
-            console.log('Calendar initialization completed');
+            console.log('🎯 Calendar initialization sequence started');
         });
         
         // Initialize TipTap editors
         function initTipTapEditors() {
-            console.log('Initializing editors...');
-            
-            // Always create toolbars regardless of TipTap availability
-            createBasicToolbar('eventNotesToolbar');
-            createBasicToolbar('eventDetailsToolbar');
-            
             try {
+                console.log('🔍 Checking TipTap availability...');
+                
+                // Always create basic toolbars first
+                createBasicToolbar('eventNotesToolbar');
+                createBasicToolbar('eventDetailsToolbar');
+                
                 // Check if TipTap is available
                 if (!window.Tiptap || !window.TiptapStarterKit || !window.TiptapPlaceholder) {
-                    console.warn('TipTap libraries not loaded, using fallback editors');
+                    console.warn('⚠️ TipTap libraries not fully loaded, using fallback editors');
                     setupFallbackEditors();
                     return;
                 }
 
-                console.log('Available TipTap extensions:', {
-                    Tiptap: !!window.Tiptap,
-                    StarterKit: !!window.TiptapStarterKit,
-                    Placeholder: !!window.TiptapPlaceholder,
-                    Underline: !!window.TiptapUnderline,
-                    TextAlign: !!window.TiptapTextAlign,
-                    Highlight: !!window.TiptapHighlight,
-                    Link: !!window.TiptapLink,
-                    TextStyle: !!window.TiptapTextStyle,
-                    Color: !!window.TiptapColor
-                });
+                console.log('✅ TipTap available, initializing rich text editors...');
 
                 // Editor for adding/editing events
                 const eventNotesElement = document.getElementById('eventNotesEditor');
                 if (eventNotesElement) {
-                    notesEditor = new window.Tiptap.Editor({
-                        element: eventNotesElement,
-                        extensions: [
-                            window.TiptapStarterKit.StarterKit.configure({ heading: { levels: [1,2,3] } }),
-                            window.TiptapUnderline.Underline,
-                            window.TiptapStrike.Strike,
-                            window.TiptapLink.Link.configure({ openOnClick: true }),
-                            window.TiptapImage?.Image || null,
-                            window.TiptapHighlight?.Highlight || null,
+                    try {
+                        notesEditor = new window.Tiptap.Editor({
+                            element: eventNotesElement,
+                            extensions: [
+                                window.TiptapStarterKit.StarterKit.configure({ heading: { levels: [1,2,3] } }),
+                                window.TiptapUnderline?.Underline,
+                                window.TiptapLink?.Link?.configure({ openOnClick: true }),
+                                window.TiptapHighlight?.Highlight,
+                                window.TiptapPlaceholder.Placeholder.configure({
+                                    placeholder: 'Add notes for this event...'
+                                })
+                            ].filter(Boolean), // Remove null/undefined extensions
+                            content: '',
+                            editable: true,
+                            inlineToolbar: true
+                        });
+                        console.log('✅ Notes editor initialized');
+                    } catch (notesError) {
+                        console.error('❌ Notes editor failed, using fallback:', notesError);
+                        eventNotesElement.innerHTML = '<textarea placeholder="Add notes for this event..." style="width: 100%; height: 100px; background: #2a2a2a; color: white; border: 1px solid #555; padding: 10px;"></textarea>';
+                    }
+                } else {
+                    console.warn('⚠️ Notes editor element not found');
+                }
                             window.TiptapTaskList?.TaskList || null,
                             window.TiptapTaskItem?.TaskItem || null,
                             window.TiptapPlaceholder.Placeholder.configure({
