@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- calendar-build: 2025-09-01T00:00Z simple-editor+resilient-init v1 -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Class Calendar & Reflections (Restored)</title>
@@ -186,12 +187,15 @@ const CLASS_META = {
 };
 
 /* ========= INIT ========= */
-init();
+// Defer immediate init to DOMContentLoaded for safer script ordering
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => init());
+} else { init(); }
 
 async function init(){
   initSupabase();
   wireUI();
-  initEditors();
+  await ensureEditors();
   loadHardcoded();
   await loadRemoteEvents();
   loadLocalEvents();
@@ -239,9 +243,82 @@ function initEditors(){
     buildSimpleMenu(notesEditor, document.getElementById('eventNotesMenu'));
     buildSimpleMenu(detailsEditor, document.getElementById('detailsNotesMenu'));
   } catch (e) {
+    console.warn('TipTap init failed (first attempt), will use fallback if retries also fail', e);
+    // We'll let ensureEditors() decide whether to attach fallback toolbars.
     document.getElementById('eventNotesEditor').contentEditable = 'true';
     document.getElementById('detailsNotesEditor').contentEditable = 'true';
   }
+}
+
+async function ensureEditors(){
+  // If TipTap already available just init.
+  if (window.Tiptap && window.Tiptap.Editor) {
+    initEditors();
+    if (notesEditor && detailsEditor) return;
+  }
+  // Retry a few times (network latency / CDN hiccups) before falling back.
+  const maxAttempts = 15; // ~3.75s at 250ms intervals
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (window.Tiptap && window.Tiptap.Editor) {
+      try {
+        initEditors();
+        if (notesEditor && detailsEditor) return;
+      } catch (e) {
+        console.warn('TipTap init attempt', attempt, 'failed', e);
+      }
+    }
+    await new Promise(r=>setTimeout(r,250));
+  }
+  console.warn('TipTap not available after retries; enabling fallback editor toolbar.');
+  enableFallbackEditors();
+}
+
+function enableFallbackEditors(){
+  // Make editable if not already
+  const addEl = document.getElementById('eventNotesEditor');
+  const detEl = document.getElementById('detailsNotesEditor');
+  if (addEl) addEl.contentEditable = 'true';
+  if (detEl) detEl.contentEditable = 'true';
+  // Basic fallback buttons replicating core formatting via execCommand (still widely supported)
+  const fallbackButtons = [
+    {act:'bold', label:'B'},
+    {act:'italic', label:'I'},
+    {act:'underline', label:'U'},
+    {act:'strikeThrough', label:'S'},
+    {act:'insertUnorderedList', label:'• List'},
+    {act:'insertOrderedList', label:'1. List'},
+    {act:'formatBlock', label:'H2', value:'h2'},
+    {act:'removeFormat', label:'Clear'}
+  ];
+  function wireFallback(menuEl, targetEl){
+    if(!menuEl || !targetEl) return;
+    if(menuEl.dataset.fallbackBuilt) return; // avoid duplicate
+    menuEl.dataset.fallbackBuilt = '1';
+    menuEl.innerHTML='';
+    fallbackButtons.forEach(btnDef=>{
+      const b=document.createElement('button');
+      b.type='button';
+      b.textContent=btnDef.label;
+      b.style.minWidth='38px';
+      b.addEventListener('click',()=>{
+        targetEl.focus();
+        if(btnDef.act==='formatBlock'){
+          document.execCommand(btnDef.act,false,btnDef.value);
+        } else {
+          document.execCommand(btnDef.act,false,null);
+        }
+      });
+      menuEl.appendChild(b);
+    });
+    const note=document.createElement('span');
+    note.style.fontSize='10px';
+    note.style.marginLeft='8px';
+    note.style.opacity='0.7';
+    note.textContent='(Fallback editor)';
+    menuEl.appendChild(note);
+  }
+  wireFallback(document.getElementById('eventNotesMenu'), addEl);
+  wireFallback(document.getElementById('detailsNotesMenu'), detEl);
 }
 
 function buildSimpleMenu(editor, el){
