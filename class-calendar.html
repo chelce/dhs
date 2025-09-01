@@ -138,6 +138,11 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .heading-menu button:hover{background:#eef2f7}
 .editor-content-area{padding:10px 14px;min-height:110px;max-height:260px;overflow:auto;font-size:14px;line-height:1.5}
 .editor-content-area:focus{outline:none}
+/* Remove TipTap focus outlines */
+.editor-content-area .tiptap{outline:none !important}
+.editor-content-area .tiptap:focus{outline:none !important;border:none !important;box-shadow:none !important}
+.editor-content-area .ProseMirror{outline:none !important}
+.editor-content-area .ProseMirror:focus{outline:none !important;border:none !important;box-shadow:none !important}
 .editor-content-area p{margin:0 0 .85em}
 .editor-content-area h1,.editor-content-area h2,.editor-content-area h3{line-height:1.2;font-weight:600;margin:.9em 0 .4em}
 .editor-content-area h1{font-size:1.45rem}
