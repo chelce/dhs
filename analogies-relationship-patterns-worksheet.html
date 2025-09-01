@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogy Relationship Patterns - Student Worksheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .worksheet {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            font-size: 2.2em;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-field {
+            display: flex;
+            align-items: center;
+        }
+
+        .info-field label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #495057;
+        }
+
+        .info-field input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .section {
+            margin-bottom: 35px;
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: -20px -20px 20px -20px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .reference-item {
+            background: #e7f3ff;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+        }
+
+        .reference-type {
+            font-weight: bold;
+            color: #0056b3;
+            margin-bottom: 5px;
+        }
+
+        .reference-example {
+            font-style: italic;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        .skill-check {
+            background: #fff9c4;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .skill-check-title {
+            color: #856404;
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 5px solid #007bff;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .analogy-display {
+            font-family: monospace;
+            font-size: 1.2em;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px 0;
+            color: #007bff;
+        }
+
+        .answer-space {
+            margin-top: 15px;
+        }
+
+        .answer-space label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .answer-space input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .answer-space textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .multiple-choice {
+            margin-top: 10px;
+        }
+
+        .choice {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .choice input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .tier-indicator {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tier-easy { background: #d4edda; color: #155724; }
+        .tier-medium { background: #fff3cd; color: #856404; }
+        .tier-hard { background: #f8d7da; color: #721c24; }
+
+        .time-indicator {
+            float: right;
+            background: #6c757d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .creation-section {
+            background: #f0f8ff;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .creation-title {
+            color: #007bff;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .analogy-template {
+            font-family: monospace;
+            font-size: 1.1em;
+            background: white;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .template-blank {
+            background: #ffffcc;
+            padding: 2px 10px;
+            border-radius: 3px;
+            border: 1px dashed #999;
+        }
+
+        .success-criteria {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .success-criteria h4 {
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .criteria-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .criteria-item {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .criteria-item::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        @media print {
+            body { background: white; }
+            .worksheet { box-shadow: none; }
+        }
+
+        @media (max-width: 600px) {
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+            .reference-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="worksheet">
+        <div class="header">
+            <h1>📝 Analogy Relationship Patterns</h1>
+            <div class="subtitle">Student Worksheet & Skill Check</div>
+        </div>
+
+        <div class="student-info">
+            <div class="info-field">
+                <label>Name:</label>
+                <input type="text" name="student-name">
+            </div>
+            <div class="info-field">
+                <label>Date:</label>
+                <input type="text" name="date">
+            </div>
+            <div class="info-field">
+                <label>Class:</label>
+                <input type="text" name="class">
+            </div>
+            <div class="info-field">
+                <label>Difficulty Level:</label>
+                <input type="text" name="tier" placeholder="Easy / Medium / Hard">
+            </div>
+        </div>
+
+        <!-- Reference Section -->
+        <div class="section">
+            <div class="section-title">📚 Relationship Types Reference</div>
+            <div class="reference-grid">
+                <div class="reference-item">
+                    <div class="reference-type">Part/Whole</div>
+                    <div class="reference-example">Wheel : Car :: Page : Book</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-type">Synonyms</div>
+                    <div class="reference-example">Happy : Joyful :: Sad : Melancholy</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-type">Antonyms</div>
+                    <div class="reference-example">Hot : Cold :: Light : Dark</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-type">Function</div>
+                    <div class="reference-example">Hammer : Nail :: Pen : Paper</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-type">Cause/Effect</div>
+                    <div class="reference-example">Rain : Flood :: Study : Knowledge</div>
+                </div>
+                <div class="reference-item">
+                    <div class="reference-type">Category/Example</div>
+                    <div class="reference-example">Fruit : Apple :: Sport : Soccer</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Level Skill Check -->
+        <div class="skill-check">
+            <div class="skill-check-title">
+                <span class="tier-indicator tier-easy">EASY LEVEL</span>
+                <span class="time-indicator">4-5 minutes</span>
+                🎯 Skill Check A: Identify the Relationship
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 1:</div>
+                <div class="analogy-display">Bird : Nest :: Person : House</div>
+                <div class="answer-space">
+                    <label>What type of relationship is this?</label>
+                    <div class="multiple-choice">
+                        <div class="choice">
+                            <input type="radio" name="q1" value="part-whole" id="q1a">
+                            <label for="q1a">Part/Whole</label>
+                        </div>
+                        <div class="choice">
+                            <input type="radio" name="q1" value="function" id="q1b">
+                            <label for="q1b">Function</label>
+                        </div>
+                        <div class="choice">
+                            <input type="radio" name="q1" value="synonyms" id="q1c">
+                            <label for="q1c">Synonyms</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 2:</div>
+                <div class="analogy-display">Big : Large :: Small : Tiny</div>
+                <div class="answer-space">
+                    <label>What type of relationship is this?</label>
+                    <div class="multiple-choice">
+                        <div class="choice">
+                            <input type="radio" name="q2" value="antonyms" id="q2a">
+                            <label for="q2a">Antonyms</label>
+                        </div>
+                        <div class="choice">
+                            <input type="radio" name="q2" value="synonyms" id="q2b">
+                            <label for="q2b">Synonyms</label>
+                        </div>
+                        <div class="choice">
+                            <input type="radio" name="q2" value="cause-effect" id="q2c">
+                            <label for="q2c">Cause/Effect</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 3:</div>
+                <div class="analogy-display">Dog : Animal :: Rose : Flower</div>
+                <div class="answer-space">
+                    <label>What type of relationship is this?</label>
+                    <input type="text" placeholder="Write your answer here...">
+                </div>
+            </div>
+
+            <div class="success-criteria">
+                <h4>Success Criteria:</h4>
+                <ul class="criteria-list">
+                    <li class="criteria-item">Answer at least 2 out of 3 questions correctly</li>
+                    <li class="criteria-item">Use vocabulary from the reference chart</li>
+                    <li class="criteria-item">Complete within 5 minutes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Medium Level Skill Check -->
+        <div class="skill-check">
+            <div class="skill-check-title">
+                <span class="tier-indicator tier-medium">MEDIUM LEVEL</span>
+                <span class="time-indicator">5-6 minutes</span>
+                🎲 Skill Check B: Apply and Create
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 1:</div>
+                <div class="analogy-display">Exercise : Health :: Practice : Improvement</div>
+                <div class="answer-space">
+                    <label>What type of relationship is this, and why?</label>
+                    <textarea placeholder="Explain the relationship type and your reasoning..."></textarea>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 2:</div>
+                <div class="creation-section">
+                    <div class="creation-title">Create Your Own Analogy</div>
+                    <p>Create a <strong>function</strong> analogy using this template:</p>
+                    <div class="analogy-template">
+                        <span class="template-blank">_____</span> : <span class="template-blank">_____</span> :: <span class="template-blank">_____</span> : <span class="template-blank">_____</span>
+                    </div>
+                    <div class="answer-space">
+                        <label>Your function analogy:</label>
+                        <input type="text" placeholder="Example: Key : Lock :: Password : Computer">
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 3:</div>
+                <p>Complete this analogy and identify the relationship:</p>
+                <div class="analogy-display">Author : Novel :: _____ : Symphony</div>
+                <div class="answer-space">
+                    <label>Missing word:</label>
+                    <input type="text">
+                    <label>Relationship type:</label>
+                    <input type="text">
+                </div>
+            </div>
+
+            <div class="success-criteria">
+                <h4>Success Criteria:</h4>
+                <ul class="criteria-list">
+                    <li class="criteria-item">Correctly identify and explain relationship types</li>
+                    <li class="criteria-item">Create an original analogy that follows the pattern</li>
+                    <li class="criteria-item">Complete analogies with logical answers</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Hard Level Skill Check -->
+        <div class="skill-check">
+            <div class="skill-check-title">
+                <span class="tier-indicator tier-hard">HARD LEVEL</span>
+                <span class="time-indicator">6-8 minutes</span>
+                🚀 Skill Check C: Analyze and Synthesize
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 1:</div>
+                <div class="analogy-display">Whisper : Shout :: Drizzle : Downpour</div>
+                <div class="answer-space">
+                    <label>Analyze this complex relationship. What pattern connects all four words?</label>
+                    <textarea placeholder="Explain the degree/intensity relationship and how each pair demonstrates this pattern..."></textarea>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 2:</div>
+                <div class="creation-section">
+                    <div class="creation-title">Create an Analogy Chain</div>
+                    <p>Create a three-part analogy chain that shows the same relationship pattern:</p>
+                    <div class="analogy-template">
+                        A : B :: C : D :: E : F
+                    </div>
+                    <div class="answer-space">
+                        <label>Your analogy chain:</label>
+                        <input type="text" placeholder="Example: Seed : Tree :: Egg : Bird :: Idea : Innovation">
+                        <label>Explain the pattern that connects all three pairs:</label>
+                        <textarea placeholder="Describe how each pair demonstrates the same relationship..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <div class="question-number">Question 3:</div>
+                <p>Write a sentence that uses an analogy to explain a complex concept:</p>
+                <div class="answer-space">
+                    <label>Your explanatory sentence with analogy:</label>
+                    <textarea placeholder="Example: Learning a language is like building a house: you need a strong foundation of basic vocabulary before you can construct complex sentences..."></textarea>
+                </div>
+            </div>
+
+            <div class="success-criteria">
+                <h4>Success Criteria:</h4>
+                <ul class="criteria-list">
+                    <li class="criteria-item">Analyze complex relationships with sophisticated reasoning</li>
+                    <li class="criteria-item">Create original analogy chains with clear patterns</li>
+                    <li class="criteria-item">Use analogies effectively in explanatory writing</li>
+                    <li class="criteria-item">Demonstrate advanced vocabulary and reasoning skills</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Cultural Connection Section -->
+        <div class="section">
+            <div class="section-title">🌍 Cultural Connections Bonus</div>
+            <div class="creation-section">
+                <div class="creation-title">Share Your Cultural Knowledge</div>
+                <p>Create an analogy that reflects your cultural background, family traditions, or community experiences:</p>
+                <div class="answer-space">
+                    <label>Your cultural analogy:</label>
+                    <input type="text" placeholder="Example: Abuela : Wisdom :: Library : Knowledge">
+                    <label>Explain why this analogy is meaningful to your culture or community:</label>
+                    <textarea placeholder="Describe the cultural significance and how it connects to the analogy pattern..."></textarea>
+                </div>
+                <p style="font-style: italic; margin-top: 15px; color: #666;">
+                    💰 <strong>Bonus Earnings:</strong> Complete this section for +$5 cultural connection bonus!
+                </p>
+            </div>
+        </div>
+
+        <!-- Self-Reflection Section -->
+        <div class="section">
+            <div class="section-title">🤔 Self-Reflection</div>
+            <div class="question">
+                <div class="answer-space">
+                    <label>Which relationship type was easiest for you to understand? Why?</label>
+                    <textarea placeholder="Reflect on your learning..."></textarea>
+                </div>
+            </div>
+            <div class="question">
+                <div class="answer-space">
+                    <label>Which relationship type was most challenging? What strategy helped you understand it?</label>
+                    <textarea placeholder="Think about your problem-solving process..."></textarea>
+                </div>
+            </div>
+            <div class="question">
+                <div class="answer-space">
+                    <label>How might recognizing analogy patterns help you in other subjects or real life?</label>
+                    <textarea placeholder="Connect this learning to other areas..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

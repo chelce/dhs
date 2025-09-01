@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogies & Word Relationship Patterns - Interactive Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .tier-selection {
+            display: flex;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .tier-btn {
+            margin: 0 10px;
+            padding: 12px 24px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tier-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .tier-btn.easy { background: #28a745; }
+        .tier-btn.medium { background: #fd7e14; }
+        .tier-btn.hard { background: #dc3545; }
+
+        .tier-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .tier-content {
+            display: none;
+        }
+
+        .tier-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .relationship-reference {
+            background: #e9f7ef;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .relationship-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .relationship-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .relationship-type {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .analogy-example {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+
+        .explanation {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .task-section {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .task-title {
+            font-size: 1.5em;
+            color: #856404;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            flex: 1;
+        }
+
+        .analogy-work-area {
+            background: #f8f9fa;
+            border: 2px dashed #6c757d;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .work-prompt {
+            font-size: 1.2em;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .analogy-template {
+            font-family: monospace;
+            font-size: 1.3em;
+            color: #007bff;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .success-criteria {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .success-title {
+            font-weight: bold;
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .criteria-list {
+            list-style: none;
+        }
+
+        .criteria-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .criteria-item::before {
+            content: "✓";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .economy-box {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .economy-title {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .earnings-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .earning-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .cultural-examples {
+            background: #fff2e6;
+            border: 2px solid #fd7e14;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .cultural-title {
+            color: #e8590c;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .example-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+
+        .cultural-analogy {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-style: italic;
+            text-align: center;
+            border: 1px solid #fd7e14;
+        }
+
+        .print-friendly {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+            text-align: center;
+        }
+
+        .print-btn {
+            background: #6f42c1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            background: #563d7c;
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; }
+            .tier-selection { display: none; }
+            .print-friendly { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .tier-selection {
+                flex-direction: column;
+                align-items: center;
+            }
+            .tier-btn {
+                margin: 5px 0;
+                width: 200px;
+            }
+            .relationship-grid {
+                grid-template-columns: 1fr;
+            }
+            .earnings-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Analogies & Word Relationship Patterns</h1>
+            <div class="subtitle">Discover the patterns that make analogies work!</div>
+        </div>
+
+        <div class="tier-selection">
+            <button class="tier-btn easy" onclick="showTier('easy')">🎯 Easy Level</button>
+            <button class="tier-btn medium" onclick="showTier('medium')">🎲 Medium Level</button>
+            <button class="tier-btn hard" onclick="showTier('hard')">🚀 Hard Level</button>
+        </div>
+
+        <div class="content-area">
+            <!-- Relationship Reference (shown for all tiers) -->
+            <div class="relationship-reference">
+                <h3>📋 Analogy Relationship Types - Quick Reference</h3>
+                <div class="relationship-grid">
+                    <div class="relationship-card">
+                        <div class="relationship-type">Part/Whole</div>
+                        <div class="analogy-example">Wheel : Car :: Page : Book</div>
+                        <div class="explanation">One item is part of the larger whole</div>
+                    </div>
+                    <div class="relationship-card">
+                        <div class="relationship-type">Synonyms</div>
+                        <div class="analogy-example">Happy : Joyful :: Sad : Melancholy</div>
+                        <div class="explanation">Words with similar meanings</div>
+                    </div>
+                    <div class="relationship-card">
+                        <div class="relationship-type">Antonyms</div>
+                        <div class="analogy-example">Hot : Cold :: Light : Dark</div>
+                        <div class="explanation">Words with opposite meanings</div>
+                    </div>
+                    <div class="relationship-card">
+                        <div class="relationship-type">Function</div>
+                        <div class="analogy-example">Hammer : Nail :: Pen : Paper</div>
+                        <div class="explanation">Tool used with specific object</div>
+                    </div>
+                    <div class="relationship-card">
+                        <div class="relationship-type">Cause/Effect</div>
+                        <div class="analogy-example">Rain : Flood :: Study : Knowledge</div>
+                        <div class="explanation">One thing leads to another</div>
+                    </div>
+                    <div class="relationship-card">
+                        <div class="relationship-type">Category/Example</div>
+                        <div class="analogy-example">Fruit : Apple :: Sport : Soccer</div>
+                        <div class="explanation">General category and specific example</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Easy Tier Content -->
+            <div id="easy-content" class="tier-content">
+                <div class="task-section">
+                    <div class="task-title">🎯 Analogy Detective - Pattern Matching</div>
+                    
+                    <div class="instructions">
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Work with your group to look at the 12 analogy cards your teacher gives you</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Use the relationship reference above to figure out what type each analogy is</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Sort the analogy cards into the 6 colored bins (each relationship type has its own color)</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Check your answers with your partner before turning in</div>
+                        </div>
+                    </div>
+
+                    <div class="analogy-work-area">
+                        <div class="work-prompt">💭 Example analogies you might see:</div>
+                        <div class="analogy-template">
+                            Bird : Nest :: Person : House<br>
+                            <small>(What type of relationship is this?)</small>
+                        </div>
+                        <div class="analogy-template">
+                            Teacher : Student :: Coach : Player<br>
+                            <small>(What pattern do you notice?)</small>
+                        </div>
+                    </div>
+
+                    <div class="success-criteria">
+                        <div class="success-title">🏆 Success Criteria:</div>
+                        <ul class="criteria-list">
+                            <li class="criteria-item">Sort at least 8 out of 12 analogies correctly</li>
+                            <li class="criteria-item">Explain the relationship using vocabulary from reference chart</li>
+                            <li class="criteria-item">Work together respectfully with your group</li>
+                            <li class="criteria-item">Ask for help when you need it</li>
+                        </ul>
+                    </div>
+
+                    <div class="economy-box">
+                        <div class="economy-title">💰 Easy Level Earnings</div>
+                        <div class="earnings-info">
+                            <div class="earning-item">$3 per correct relationship type</div>
+                            <div class="earning-item">$1 bonus for perfect teamwork</div>
+                            <div class="earning-item">$2 bonus for helping other groups</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medium Tier Content -->
+            <div id="medium-content" class="tier-content">
+                <div class="task-section">
+                    <div class="task-title">🎲 Pattern Builder Challenge</div>
+                    
+                    <div class="instructions">
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Sort your 18 analogy cards into the 6 relationship types (no color coding this time!)</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Create 2 NEW analogies for each relationship type using the template below</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Have your partner check that your new analogies follow the correct patterns</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Be ready to share your most creative analogy with the class</div>
+                        </div>
+                    </div>
+
+                    <div class="analogy-work-area">
+                        <div class="work-prompt">✍️ Use this template to create your analogies:</div>
+                        <div class="analogy-template">
+                            _____ : _____ :: _____ : _____
+                        </div>
+                        <div class="work-prompt">💡 Example for "Function" relationship:</div>
+                        <div class="analogy-template">
+                            Brush : Hair :: Broom : Floor
+                        </div>
+                    </div>
+
+                    <div class="success-criteria">
+                        <div class="success-title">🏆 Success Criteria:</div>
+                        <ul class="criteria-list">
+                            <li class="criteria-item">Sort at least 14 out of 18 analogies correctly</li>
+                            <li class="criteria-item">Create at least 10 out of 12 new analogies that follow the patterns</li>
+                            <li class="criteria-item">Explain why your analogies work when asked</li>
+                            <li class="criteria-item">Use creative and appropriate vocabulary</li>
+                        </ul>
+                    </div>
+
+                    <div class="economy-box">
+                        <div class="economy-title">💰 Medium Level Earnings</div>
+                        <div class="earnings-info">
+                            <div class="earning-item">$5 per relationship category completed</div>
+                            <div class="earning-item">$2 bonus for creative examples</div>
+                            <div class="earning-item">$3 bonus for perfect peer checking</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hard Tier Content -->
+            <div id="hard-content" class="tier-content">
+                <div class="task-section">
+                    <div class="task-title">🚀 Advanced Pattern Master</div>
+                    
+                    <div class="instructions">
+                        <div class="instruction-step">
+                            <div class="step-number">1</div>
+                            <div class="step-text">Identify relationships in 20 complex analogies (includes degree, location, worker/tool types)</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Create 3 sophisticated analogies per relationship type using advanced vocabulary</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Write 2 sentences that use analogies to explain complex concepts</div>
+                        </div>
+                        <div class="instruction-step">
+                            <div class="step-number">4</div>
+                            <div class="step-text">CHALLENGE: Create an analogy chain (A:B :: C:D :: E:F)</div>
+                        </div>
+                    </div>
+
+                    <div class="analogy-work-area">
+                        <div class="work-prompt">🧠 Advanced relationship examples:</div>
+                        <div class="analogy-template">
+                            Whisper : Shout :: Drizzle : Downpour<br>
+                            <small>(Degree relationship - intensity levels)</small>
+                        </div>
+                        <div class="analogy-template">
+                            Author : Novel :: Composer : Symphony :: Artist : Painting<br>
+                            <small>(Analogy chain showing creator:creation pattern)</small>
+                        </div>
+                    </div>
+
+                    <div class="success-criteria">
+                        <div class="success-title">🏆 Success Criteria:</div>
+                        <ul class="criteria-list">
+                            <li class="criteria-item">Correctly identify relationships in 16+ out of 20 complex analogies</li>
+                            <li class="criteria-item">Create sophisticated analogies with advanced vocabulary</li>
+                            <li class="criteria-item">Successfully integrate analogies into explanatory writing</li>
+                            <li class="criteria-item">Complete analogy chain challenge with logical connections</li>
+                        </ul>
+                    </div>
+
+                    <div class="economy-box">
+                        <div class="economy-title">💰 Hard Level Earnings</div>
+                        <div class="earnings-info">
+                            <div class="earning-item">$8 per advanced relationship mastered</div>
+                            <div class="earning-item">$5 bonus for analogy chains</div>
+                            <div class="earning-item">$4 bonus for excellent writing integration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cultural Examples Section (shown for all tiers) -->
+            <div class="cultural-examples">
+                <div class="cultural-title">🌍 Cultural Connection Examples</div>
+                <div class="example-list">
+                    <div class="cultural-analogy">Abuela : Wisdom :: Teacher : Knowledge</div>
+                    <div class="cultural-analogy">Quinceañera : Celebration :: Graduation : Achievement</div>
+                    <div class="cultural-analogy">Tamale : Corn :: Brigadeiro : Chocolate</div>
+                    <div class="cultural-analogy">Soccer : Passion :: Music : Emotion</div>
+                    <div class="cultural-analogy">Family : Support :: Team : Cooperation</div>
+                    <div class="cultural-analogy">Spanish : Español :: English : Inglés</div>
+                </div>
+                <p style="margin-top: 15px; font-style: italic;">Use your own cultural knowledge to create analogies that reflect your experiences and community!</p>
+            </div>
+        </div>
+
+        <div class="print-friendly">
+            <button class="print-btn" onclick="window.print()">🖨️ Print This Activity</button>
+        </div>
+    </div>
+
+    <script>
+        function showTier(tier) {
+            // Hide all tier contents
+            const contents = document.querySelectorAll('.tier-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tier-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tier content
+            document.getElementById(tier + '-content').classList.add('active');
+            
+            // Add active class to clicked button
+            document.querySelector('.tier-btn.' + tier).classList.add('active');
+        }
+
+        // Show easy tier by default
+        document.addEventListener('DOMContentLoaded', function() {
+            showTier('easy');
+        });
+
+        // Add some interactivity for engagement
+        document.addEventListener('DOMContentLoaded', function() {
+            const relationshipCards = document.querySelectorAll('.relationship-card');
+            relationshipCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
