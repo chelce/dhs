@@ -54,43 +54,33 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-group label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
 .form-group input,.form-group select{width:100%;padding:8px 10px;border:1px solid #d0d0d4;border-radius:6px;font-size:13px}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-/* === Simple Editor (TipTap template inspired) === */
-.simple-editor{border:1px solid #dadde1;border-radius:10px;overflow:hidden;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.simple-editor .menu-bar{display:flex;flex-wrap:wrap;gap:2px;padding:4px 6px;background:#f9fafb;border-bottom:1px solid #e5e7eb}
-.simple-editor .menu-bar button{background:transparent;border:0;display:inline-flex;align-items:center;justify-content:center;padding:6px 6px;border-radius:6px;cursor:pointer;color:#374151;font-size:12px;line-height:1;transition:background .15s,color .15s}
-.simple-editor .menu-bar button:hover{background:#e5e7eb}
-.simple-editor .menu-bar button.is-active{background:#e0e7ff;color:#1d4ed8}
-.simple-editor .menu-bar button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.simple-editor .content-area{position:relative}
-.simple-editor .tiptap{min-height:110px;max-height:260px;overflow:auto;padding:10px 14px;font-size:14px;line-height:1.5;outline:none}
-.simple-editor .tiptap p{margin:0 0 .85em}
-.simple-editor .tiptap h1,.simple-editor .tiptap h2,.simple-editor .tiptap h3{line-height:1.2;font-weight:600;margin:.9em 0 .4em}
-.simple-editor .tiptap h1{font-size:1.45rem}
-.simple-editor .tiptap h2{font-size:1.25rem}
-.simple-editor .tiptap h3{font-size:1.1rem}
-.simple-editor .tiptap ul{list-style:disc;padding-left:1.4em;margin:.5em 0 .9em}
-.simple-editor .tiptap ol{list-style:decimal;padding-left:1.4em;margin:.5em 0 .9em}
-.simple-editor .tiptap li{margin:.25em 0}
-.simple-editor .tiptap blockquote{margin:.9em 0;padding:.6em .9em;border-left:4px solid #6366f1;background:#f5f7ff;border-radius:4px;color:#374151;font-style:italic}
-.simple-editor .tiptap code{background:#1e293b;color:#f8fafc;padding:2px 5px;border-radius:4px;font-size:.85em}
-.simple-editor .tiptap pre{background:#1e293b;color:#f8fafc;font-family:ui-monospace,Menlo,Consolas,monospace;padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.35;margin:1em 0;position:relative}
-.simple-editor .tiptap pre code{background:transparent;padding:0;color:inherit;font-size:inherit}
-.simple-editor .tiptap hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
-.simple-editor .tiptap a{color:#2563eb;text-decoration:underline}
-.simple-editor .tiptap p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
-.simple-editor .tiptap:focus{outline:none}
-.simple-editor .menu-separator{width:1px;height:20px;background:#e5e7eb;margin:0 4px}
-.simple-editor .menu-bar button[disabled]{opacity:.35;cursor:not-allowed}
-.dark-theme .simple-editor{background:#111827;border-color:#374151}
-.dark-theme .simple-editor .menu-bar{background:#1f2937;border-bottom-color:#374151}
-.dark-theme .simple-editor .menu-bar button{color:#cbd5e1}
-.dark-theme .simple-editor .menu-bar button:hover{background:#374151}
-.dark-theme .simple-editor .menu-bar button.is-active{background:#1d4ed8;color:#fff}
-.dark-theme .simple-editor .tiptap{color:#f1f5f9}
-.dark-theme .simple-editor .tiptap blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
-.dark-theme .simple-editor .tiptap code{background:#334155;color:#f1f5f9}
-.dark-theme .simple-editor .tiptap pre{background:#0f172a;color:#f1f5f9}
-.dark-theme .simple-editor .tiptap hr{border-top-color:#334155}
+/* === TipTap Simple Template (verbatim structure) === */
+.tiptap-simple-wrapper{border:1px solid #d1d5db;border-radius:10px;overflow:hidden;background:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;display:flex;flex-direction:column}
+.tiptap-simple-wrapper .editor__header{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #e5e7eb}
+.tiptap-simple-wrapper .editor__header button{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:12px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;gap:4px;font-weight:500;color:#374151}
+.tiptap-simple-wrapper .editor__header button:hover{background:#eef2f7}
+.tiptap-simple-wrapper .editor__header button.is-active{background:#e0e7ff;border-color:#a5b4fc;color:#1d4ed8}
+.tiptap-simple-wrapper .editor__content{padding:10px 14px;min-height:110px;max-height:260px;overflow:auto;font-size:14px;line-height:1.45}
+.tiptap-simple-wrapper .editor__content:focus{outline:none}
+.tiptap-simple-wrapper .editor__content p{margin:0 0 .9em}
+.tiptap-simple-wrapper .editor__content h1{font-size:1.5rem;margin:1.1em 0 .5em;font-weight:600}
+.tiptap-simple-wrapper .editor__content h2{font-size:1.25rem;margin:1em 0 .5em;font-weight:600}
+.tiptap-simple-wrapper .editor__content h3{font-size:1.1rem;margin:.9em 0 .4em;font-weight:600}
+.tiptap-simple-wrapper .editor__content blockquote{margin:1em 0;padding:.6em .9em;border-left:4px solid #6366f1;background:#f5f7ff;border-radius:4px;font-style:italic}
+.tiptap-simple-wrapper .editor__content code{background:#1e293b;color:#f8fafc;padding:2px 5px;border-radius:4px;font-size:.85em}
+.tiptap-simple-wrapper .editor__content pre{background:#1e293b;color:#f8fafc;font-family:ui-monospace,Menlo,Consolas,monospace;padding:14px 16px;border-radius:8px;overflow:auto;font-size:13px;line-height:1.35;margin:1em 0}
+.tiptap-simple-wrapper .editor__content hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
+.tiptap-simple-wrapper .editor__content a{color:#2563eb;text-decoration:underline}
+.tiptap-simple-wrapper .editor__content p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
+.dark-theme .tiptap-simple-wrapper{background:#111827;border-color:#374151}
+.dark-theme .tiptap-simple-wrapper .editor__header{background:#1f2937;border-bottom-color:#374151}
+.dark-theme .tiptap-simple-wrapper .editor__header button{background:#1e293b;border-color:#334155;color:#cbd5e1}
+.dark-theme .tiptap-simple-wrapper .editor__header button:hover{background:#374151}
+.dark-theme .tiptap-simple-wrapper .editor__header button.is-active{background:#1d4ed8;color:#fff}
+.dark-theme .tiptap-simple-wrapper .editor__content{color:#f1f5f9}
+.dark-theme .tiptap-simple-wrapper .editor__content blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
+.dark-theme .tiptap-simple-wrapper .editor__content code{background:#334155;color:#f1f5f9}
+.dark-theme .tiptap-simple-wrapper .editor__content pre{background:#0f172a;color:#f1f5f9}
 .event-details-modal .modal-content{max-width:760px}
 .event-class-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
 .notes-section{margin-top:10px}
@@ -138,9 +128,33 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
       </div>
       <div class="form-group"><label>Notes</label>
-        <div class="simple-editor" id="eventNotesWrapper">
-          <div id="eventNotesMenu" class="menu-bar"></div>
-          <div class="content-area"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..."></div></div>
+        <div class="tiptap-simple-wrapper" id="eventNotesWrapper">
+          <div class="editor__header" id="eventNotesMenu">
+            <button data-act="undo" title="Undo">Undo</button>
+            <button data-act="redo" title="Redo">Redo</button>
+            <button data-act="bold" title="Bold">Bold</button>
+            <button data-act="italic" title="Italic">Italic</button>
+            <button data-act="underline" title="Underline">Underline</button>
+            <button data-act="strike" title="Strikethrough">Strike</button>
+            <button data-act="code" title="Code">Code</button>
+            <button data-act="highlight" title="Highlight">HL</button>
+            <button data-act="h1" title="Heading 1">H1</button>
+            <button data-act="h2" title="Heading 2">H2</button>
+            <button data-act="h3" title="Heading 3">H3</button>
+            <button data-act="paragraph" title="Paragraph">P</button>
+            <button data-act="bulletList" title="Bullet List">• List</button>
+            <button data-act="orderedList" title="Ordered List">1. List</button>
+            <button data-act="blockquote" title="Blockquote">Quote</button>
+            <button data-act="codeBlock" title="Code Block">CodeBlk</button>
+            <button data-act="hr" title="Horizontal Rule">HR</button>
+            <button data-act="align-left" title="Align Left">Left</button>
+            <button data-act="align-center" title="Align Center">Center</button>
+            <button data-act="align-right" title="Align Right">Right</button>
+            <button data-act="link" title="Add Link">Link</button>
+            <button data-act="unlink" title="Remove Link">Unlink</button>
+            <button data-act="clear" title="Clear Formatting">Clear</button>
+          </div>
+          <div class="editor__content" id="eventNotesEditor" data-placeholder="Add notes..."></div>
         </div>
         <input type="hidden" id="eventNotes" />
       </div>
@@ -156,9 +170,33 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
     <div class="notes-section">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
-      <div class="simple-editor" id="detailsNotesWrapper">
-        <div id="detailsNotesMenu" class="menu-bar"></div>
-        <div class="content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
+      <div class="tiptap-simple-wrapper" id="detailsNotesWrapper">
+        <div class="editor__header" id="detailsNotesMenu">
+            <button data-act="undo" title="Undo">Undo</button>
+            <button data-act="redo" title="Redo">Redo</button>
+            <button data-act="bold" title="Bold">Bold</button>
+            <button data-act="italic" title="Italic">Italic</button>
+            <button data-act="underline" title="Underline">Underline</button>
+            <button data-act="strike" title="Strikethrough">Strike</button>
+            <button data-act="code" title="Code">Code</button>
+            <button data-act="highlight" title="Highlight">HL</button>
+            <button data-act="h1" title="Heading 1">H1</button>
+            <button data-act="h2" title="Heading 2">H2</button>
+            <button data-act="h3" title="Heading 3">H3</button>
+            <button data-act="paragraph" title="Paragraph">P</button>
+            <button data-act="bulletList" title="Bullet List">• List</button>
+            <button data-act="orderedList" title="Ordered List">1. List</button>
+            <button data-act="blockquote" title="Blockquote">Quote</button>
+            <button data-act="codeBlock" title="Code Block">CodeBlk</button>
+            <button data-act="hr" title="Horizontal Rule">HR</button>
+            <button data-act="align-left" title="Align Left">Left</button>
+            <button data-act="align-center" title="Align Center">Center</button>
+            <button data-act="align-right" title="Align Right">Right</button>
+            <button data-act="link" title="Add Link">Link</button>
+            <button data-act="unlink" title="Remove Link">Unlink</button>
+            <button data-act="clear" title="Clear Formatting">Clear</button>
+        </div>
+        <div class="editor__content" id="detailsNotesEditor" data-placeholder="Add reflection notes..."></div>
       </div>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save Notes</button></div>
@@ -240,8 +278,8 @@ function initEditors(){
       content: '',
       onUpdate: () => {}
     });
-    buildSimpleMenu(notesEditor, document.getElementById('eventNotesMenu'));
-    buildSimpleMenu(detailsEditor, document.getElementById('detailsNotesMenu'));
+  wireTemplateMenu(notesEditor, document.getElementById('eventNotesMenu'));
+  wireTemplateMenu(detailsEditor, document.getElementById('detailsNotesMenu'));
   } catch (e) {
     console.warn('TipTap init failed (first attempt), will use fallback if retries also fail', e);
     // We'll let ensureEditors() decide whether to attach fallback toolbars.
@@ -251,74 +289,47 @@ function initEditors(){
 }
 
 async function ensureEditors(){
-  // If TipTap already available just init.
-  if (window.Tiptap && window.Tiptap.Editor) {
-    initEditors();
-    if (notesEditor && detailsEditor) return;
+  if (window.Tiptap && window.Tiptap.Editor) { initEditors(); if(notesEditor&&detailsEditor) return; }
+  const maxAttempts=20;
+  for(let i=1;i<=maxAttempts;i++){
+    if(window.Tiptap && window.Tiptap.Editor){
+      try{ initEditors(); if(notesEditor&&detailsEditor) return; }catch(e){ console.warn('TipTap init retry',i,e);} }
+    await new Promise(r=>setTimeout(r,200));
   }
-  // Retry a few times (network latency / CDN hiccups) before falling back.
-  const maxAttempts = 15; // ~3.75s at 250ms intervals
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    if (window.Tiptap && window.Tiptap.Editor) {
-      try {
-        initEditors();
-        if (notesEditor && detailsEditor) return;
-      } catch (e) {
-        console.warn('TipTap init attempt', attempt, 'failed', e);
-      }
-    }
-    await new Promise(r=>setTimeout(r,250));
-  }
-  console.warn('TipTap not available after retries; enabling fallback editor toolbar.');
-  enableFallbackEditors();
+  console.warn('TipTap failed to load after retries; static buttons inert.');
 }
 
-function enableFallbackEditors(){
-  // Make editable if not already
-  const addEl = document.getElementById('eventNotesEditor');
-  const detEl = document.getElementById('detailsNotesEditor');
-  if (addEl) addEl.contentEditable = 'true';
-  if (detEl) detEl.contentEditable = 'true';
-  // Basic fallback buttons replicating core formatting via execCommand (still widely supported)
-  const fallbackButtons = [
-    {act:'bold', label:'B'},
-    {act:'italic', label:'I'},
-    {act:'underline', label:'U'},
-    {act:'strikeThrough', label:'S'},
-    {act:'insertUnorderedList', label:'• List'},
-    {act:'insertOrderedList', label:'1. List'},
-    {act:'formatBlock', label:'H2', value:'h2'},
-    {act:'removeFormat', label:'Clear'}
-  ];
-  function wireFallback(menuEl, targetEl){
-    if(!menuEl || !targetEl) return;
-    if(menuEl.dataset.fallbackBuilt) return; // avoid duplicate
-    menuEl.dataset.fallbackBuilt = '1';
-    menuEl.innerHTML='';
-    fallbackButtons.forEach(btnDef=>{
-      const b=document.createElement('button');
-      b.type='button';
-      b.textContent=btnDef.label;
-      b.style.minWidth='38px';
-      b.addEventListener('click',()=>{
-        targetEl.focus();
-        if(btnDef.act==='formatBlock'){
-          document.execCommand(btnDef.act,false,btnDef.value);
-        } else {
-          document.execCommand(btnDef.act,false,null);
-        }
-      });
-      menuEl.appendChild(b);
-    });
-    const note=document.createElement('span');
-    note.style.fontSize='10px';
-    note.style.marginLeft='8px';
-    note.style.opacity='0.7';
-    note.textContent='(Fallback editor)';
-    menuEl.appendChild(note);
-  }
-  wireFallback(document.getElementById('eventNotesMenu'), addEl);
-  wireFallback(document.getElementById('detailsNotesMenu'), detEl);
+function wireTemplateMenu(editor, menuEl){
+  if(!editor||!menuEl) return;
+  const acts = Array.from(menuEl.querySelectorAll('button[data-act]'));
+  menuEl.addEventListener('click', ev=>{
+    const btn=ev.target.closest('button[data-act]'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+    switch(act){
+      case 'undo': ch.undo().run(); break; case 'redo': ch.redo().run(); break;
+      case 'bold': ch.toggleBold().run(); break; case 'italic': ch.toggleItalic().run(); break; case 'underline': ch.toggleUnderline?.().run(); break; case 'strike': ch.toggleStrike().run(); break; case 'code': ch.toggleCode().run(); break; case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
+      case 'h1': ch.toggleHeading({level:1}).run(); break; case 'h2': ch.toggleHeading({level:2}).run(); break; case 'h3': ch.toggleHeading({level:3}).run(); break; case 'paragraph': ch.setParagraph().run(); break;
+      case 'bulletList': ch.toggleBulletList().run(); break; case 'orderedList': ch.toggleOrderedList().run(); break; case 'blockquote': ch.toggleBlockquote().run(); break; case 'codeBlock': ch.toggleCodeBlock().run(); break; case 'hr': ch.setHorizontalRule().run(); break;
+      case 'align-left': ch.setTextAlign('left').run(); break; case 'align-center': ch.setTextAlign('center').run(); break; case 'align-right': ch.setTextAlign('right').run(); break;
+      case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
+      case 'unlink': ch.unsetLink().run(); break; case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
+    }
+    updateTemplateMenu(editor, menuEl);
+  });
+  editor.on('transaction', ()=>updateTemplateMenu(editor, menuEl));
+  updateTemplateMenu(editor, menuEl);
+}
+
+function updateTemplateMenu(editor, menuEl){
+  menuEl.querySelectorAll('button[data-act]').forEach(btn=>{
+    const act=btn.dataset.act; let active=false;
+    switch(act){
+      case 'bold': active=editor.isActive('bold'); break; case 'italic': active=editor.isActive('italic'); break; case 'underline': active=editor.isActive('underline'); break; case 'strike': active=editor.isActive('strike'); break; case 'code': active=editor.isActive('code'); break; case 'highlight': active=editor.isActive('highlight'); break;
+      case 'h1': active=editor.isActive('heading',{level:1}); break; case 'h2': active=editor.isActive('heading',{level:2}); break; case 'h3': active=editor.isActive('heading',{level:3}); break; case 'paragraph': active=editor.isActive('paragraph'); break;
+      case 'bulletList': active=editor.isActive('bulletList'); break; case 'orderedList': active=editor.isActive('orderedList'); break; case 'blockquote': active=editor.isActive('blockquote'); break; case 'codeBlock': active=editor.isActive('codeBlock'); break;
+      case 'align-left': active=editor.isActive({textAlign:'left'}); break; case 'align-center': active=editor.isActive({textAlign:'center'}); break; case 'align-right': active=editor.isActive({textAlign:'right'}); break; case 'link': active=editor.isActive('link'); break;
+    }
+    btn.classList.toggle('is-active', !!active);
+  });
 }
 
 function buildSimpleMenu(editor, el){
