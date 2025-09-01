@@ -217,7 +217,11 @@ function wireUI(){
 function initEditors(){
   const baseExt = [
     window.TiptapStarterKit?.StarterKit?.configure({ heading: { levels: [1,2,3] } }),
-    window.TiptapPlaceholder?.Placeholder?.configure({ placeholder: 'Start typing…' })
+  window.TiptapPlaceholder?.Placeholder?.configure({ placeholder: 'Start typing…' }),
+  window.TiptapUnderline?.Underline,
+  window.TiptapHighlight?.Highlight,
+  window.TiptapLink?.Link,
+  window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] })
   ];
   try {
     notesEditor = new window.Tiptap.Editor({
@@ -248,8 +252,10 @@ function buildSimpleMenu(editor, el){
     'sep',
     { act:'bold', icon:'M6 4h5.5a3.5 3.5 0 010 7H6zm0 7h6a3.5 3.5 0 010 7H6z', box:'0 0 18 24', title:'Bold' },
     { act:'italic', icon:'M10 4L8 20', box:'0 0 18 24', title:'Italic' },
+  { act:'underline', label:'U', title:'Underline' },
     { act:'strike', icon:'M2 8h14M2 16h14M4 4h10M4 20h10', box:'0 0 18 24', title:'Strike' },
     { act:'code', icon:'M6 8L2 12l4 4M12 8l4 4-4 4', box:'0 0 18 24', title:'Inline Code' },
+  { act:'highlight', label:'HL', title:'Highlight' },
     'sep',
     { act:'h1', label:'H1', title:'Heading 1' },
     { act:'h2', label:'H2', title:'Heading 2' },
@@ -261,6 +267,13 @@ function buildSimpleMenu(editor, el){
     { act:'blockquote', icon:'M4 6h8v4H8v4h4v4H4V6zm8 0h4v12h-4', box:'0 0 20 24', title:'Blockquote' },
     { act:'codeBlock', icon:'M6 8L2 12l4 4M12 8l4 4-4 4M9 5h2M9 19h2', box:'0 0 18 24', title:'Code Block' },
     { act:'hr', icon:'M3 12h12', box:'0 0 18 24', title:'Horizontal Rule' },
+  'sep',
+  { act:'align-left', label:'⯇', title:'Align Left' },
+  { act:'align-center', label:'≡', title:'Align Center' },
+  { act:'align-right', label:'⯈', title:'Align Right' },
+  'sep',
+  { act:'link', label:'Link', title:'Add Link' },
+  { act:'unlink', label:'Unlink', title:'Remove Link' },
     { act:'clear', icon:'M4 4h10v4H8v4h6v8H4z', box:'0 0 18 24', title:'Clear Formatting' },
   ];
   el.innerHTML = '';
@@ -278,8 +291,10 @@ function buildSimpleMenu(editor, el){
       case 'redo': ch.redo().run(); break;
       case 'bold': ch.toggleBold().run(); break;
       case 'italic': ch.toggleItalic().run(); break;
+  case 'underline': ch.toggleUnderline?.().run(); break;
       case 'strike': ch.toggleStrike().run(); break;
       case 'code': ch.toggleCode().run(); break;
+  case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
       case 'h1': ch.toggleHeading({level:1}).run(); break;
       case 'h2': ch.toggleHeading({level:2}).run(); break;
       case 'h3': ch.toggleHeading({level:3}).run(); break;
@@ -289,6 +304,11 @@ function buildSimpleMenu(editor, el){
       case 'blockquote': ch.toggleBlockquote().run(); break;
       case 'codeBlock': ch.toggleCodeBlock().run(); break;
       case 'hr': ch.setHorizontalRule().run(); break;
+  case 'align-left': ch.setTextAlign('left').run(); break;
+  case 'align-center': ch.setTextAlign('center').run(); break;
+  case 'align-right': ch.setTextAlign('right').run(); break;
+  case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
+  case 'unlink': ch.unsetLink().run(); break;
       case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
     }
     updateSimpleMenu(editor, el);
@@ -303,8 +323,10 @@ function updateSimpleMenu(editor, el){
     switch(act){
       case 'bold': active=editor.isActive('bold'); break;
       case 'italic': active=editor.isActive('italic'); break;
+  case 'underline': active=editor.isActive('underline'); break;
       case 'strike': active=editor.isActive('strike'); break;
       case 'code': active=editor.isActive('code'); break;
+  case 'highlight': active=editor.isActive('highlight'); break;
       case 'h1': active=editor.isActive('heading',{level:1}); break;
       case 'h2': active=editor.isActive('heading',{level:2}); break;
       case 'h3': active=editor.isActive('heading',{level:3}); break;
@@ -313,6 +335,10 @@ function updateSimpleMenu(editor, el){
       case 'orderedList': active=editor.isActive('orderedList'); break;
       case 'blockquote': active=editor.isActive('blockquote'); break;
       case 'codeBlock': active=editor.isActive('codeBlock'); break;
+  case 'align-left': active=editor.isActive({textAlign:'left'}); break;
+  case 'align-center': active=editor.isActive({textAlign:'center'}); break;
+  case 'align-right': active=editor.isActive({textAlign:'right'}); break;
+  case 'link': active=editor.isActive('link'); break;
     }
     btn.classList.toggle('is-active', !!active);
   });
