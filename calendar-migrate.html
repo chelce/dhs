@@ -34,6 +34,7 @@ body{margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a
     <button id="btnExportMerged" disabled>Export Merged (All Events)</button>
     <button id="btnExportHardcoded" disabled>Export Updated Hardcoded Only</button>
     <button id="btnExportSnapshot" disabled class="secondary">Export Raw DB Snapshot</button>
+  <button id="btnTest" class="secondary">Test Connection</button>
   </div>
   <div id="summary"></div>
   <h3>Status & Log</h3>
@@ -99,10 +100,29 @@ function enableButtons(){
 
 async function backfill(){
   if(!missing.length){ log('No missing hardcoded events to backfill','warn'); return; }
-  log('Backfilling '+missing.length+' hardcoded events...');
-  const payload = missing.map(m=>({event_date:m.date, year:parseInt(m.date.slice(0,4),10), month:parseInt(m.date.slice(5,7),10)-1, day:parseInt(m.date.slice(8,10),10), event_text:m.text, event_class:m.class, notes:m.notes||'', is_tentative:false, created_at:new Date().toISOString()}));
-  try { const { error } = await supabase.from('calendar_events').insert(payload); if(error) throw error; log('Inserted '+payload.length+' events','ok'); } catch(e){ log('Backfill error '+e,'err'); return; }
-  // reload
+  log('Backfilling '+missing.length+' hardcoded events (chunked upsert)...');
+  const nowISO=new Date().toISOString();
+  const all = missing.map(m=>({
+    event_date:m.date,
+    year:parseInt(m.date.slice(0,4),10),
+    month:parseInt(m.date.slice(5,7),10)-1,
+    day:parseInt(m.date.slice(8,10),10),
+    event_text:m.text,
+    event_class:m.class,
+    notes:m.notes||'',
+    is_tentative:false,
+    created_at: nowISO
+  }));
+  const chunkSize=50; let inserted=0; let failed=0;
+  for(let i=0;i<all.length;i+=chunkSize){
+    const chunk=all.slice(i,i+chunkSize);
+    try {
+      const { error, status } = await supabase.from('calendar_events').upsert(chunk,{ignoreDuplicates:true});
+      if(error){ failed+=chunk.length; log('Chunk error status '+status+' -> '+JSON.stringify(error),'err'); }
+      else { inserted+=chunk.length; log('Upserted chunk size '+chunk.length,'ok'); }
+    } catch(ex){ failed+=chunk.length; log('Exception chunk '+(i/chunkSize)+': '+(ex.message||ex),'err'); }
+  }
+  log('Backfill complete inserted='+inserted+' failed='+failed, failed? 'warn':'ok');
   await loadData();
 }
 
@@ -113,12 +133,21 @@ function exportHardcoded(){ download('hardcoded-events-updated-'+dateStamp()+'.j
 function exportSnapshot(){ download('calendar-db-snapshot-'+dateStamp()+'.json', dbEvents); }
 function dateStamp(){ return new Date().toISOString().slice(0,10); }
 
+async function testConnection(){
+  log('Testing simple select (LIMIT 1)...');
+  try { const { data, error, status } = await supabase.from('calendar_events').select('*').limit(1);
+    if(error) { log('Test failed status '+status+' '+JSON.stringify(error),'err'); }
+    else { log('Test ok rows='+data.length,'ok'); }
+  } catch(e){ log('Test exception '+(e.message||e),'err'); }
+}
+
 // wiring
  document.getElementById('btnLoad').onclick=loadData;
  document.getElementById('btnBackfill').onclick=backfill;
  document.getElementById('btnExportMerged').onclick=exportMerged;
  document.getElementById('btnExportHardcoded').onclick=exportHardcoded;
  document.getElementById('btnExportSnapshot').onclick=exportSnapshot;
+ document.getElementById('btnTest').onclick=testConnection;
 
 log('Ready. Click "Load Current Data" to begin.', 'ok');
 </script>
