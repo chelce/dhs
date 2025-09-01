@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Class Calendar & Reflections (Restored)</title>
+<link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/core@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/starter-kit@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-placeholder@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-link@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-underline@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-highlight@2.1.13/dist/index.umd.min.js"></script>
+<style>
+body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:16px;}
+.calendar-container{max-width:1200px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;}
+.controls{padding:12px 16px;border-bottom:1px solid #27272a;display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#202024}
+.filter-checkbox{display:flex;align-items:center;gap:6px;font-size:12px;background:#27272a;padding:6px 10px;border-radius:8px}
+.filter-checkbox input{accent-color:#3b82f6}
+.btn{background:#27272a;color:#fff;border:1px solid #3a3a42;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:-0.3px;display:inline-flex;gap:6px;align-items:center}
+.btn-primary{background:#3b82f6;border-color:#3b82f6}
+.btn-primary:hover{background:#2563eb}
+.btn:hover{background:#32323a}
+.calendar-header{padding:20px 20px 10px;text-align:center}
+.month-year{font-size:32px;font-weight:700;margin:0 0 4px}
+.week-range{font-size:12px;color:#a1a1aa;margin-top:4px}
+.class-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;background:#27272a;padding:6px 10px;border-radius:8px;font-size:12px}
+.color-box{width:14px;height:14px;border-radius:4px}
+.class-2a{background:#8e44ad}.class-2b{background:#2980b9}.class-3b{background:#229954}.class-ap{background:#d35400}.class-4b{background:#c2185b}.class-reflection{background:#6c3483}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#27272a;padding:1px}
+.day-header{background:#27272a;text-align:center;font-size:11px;font-weight:600;padding:6px 4px;color:#a1a1aa}
+.day-cell{background:#18181b;min-height:110px;padding:6px 6px 4px;position:relative;cursor:pointer;font-size:11px;overflow:hidden}
+.day-cell.today{outline:2px solid #3b82f6}
+.day-cell.current-week{background:#1f2530}
+.day-number{font-weight:700;font-size:12px;margin-bottom:4px}
+.event{background:#333;border-left:4px solid #555;margin:0 0 4px;padding:4px 20px 4px 6px;border-radius:6px;line-height:1.2;position:relative;font-size:11px;color:#fff;user-select:none;cursor:move}
+.event.tentative{opacity:.6;border-style:dashed}
+.event[data-class="2a"]{background:#8e44ad}.event[data-class="2b"]{background:#2980b9}.event[data-class="3b"]{background:#229954}.event[data-class="ap"]{background:#d35400}.event[data-class="4b"]{background:#c2185b}.event[data-class="reflection"]{background:#6c3483}
+.event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
+.event:hover .delete-btn{display:block}
+.day-cell.drag-over{outline:2px dashed #3b82f6;background:#22344a}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:flex-start;justify-content:center;padding-top:60px}
+.modal-content{background:#fff;color:#111;border-radius:12px;padding:18px;max-width:520px;width:92%;box-shadow:0 20px 40px -10px rgba(0,0,0,.55)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.modal-title{font-size:18px;font-weight:600}
+.close{cursor:pointer;font-size:24px;line-height:1}
+.form-group{margin:10px 0}
+.form-group label{font-size:13px;font-weight:600;display:block;margin-bottom:4px}
+.form-group input,.form-group select{width:100%;padding:8px 10px;border:1px solid #d0d0d4;border-radius:6px;font-size:13px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.editor-container{border:1px solid #d0d0d4;border-radius:8px;background:#fff;display:flex;flex-direction:column}
+.toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-bottom:1px solid #e2e2e7;background:#f6f7f8}
+.toolbar button{background:#fff;border:1px solid #cfd2d6;border-radius:4px;font-size:11px;padding:4px 6px;cursor:pointer}
+.toolbar button.active{background:#3b82f6;color:#fff;border-color:#3b82f6}
+.tiptap{min-height:90px;max-height:220px;overflow:auto;padding:8px;font-size:13px;line-height:1.4;outline:none}
+.event-details-modal .modal-content{max-width:760px}
+.event-class-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
+.notes-section{margin-top:10px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="calendar-container">
+  <div class="controls">
+    <div class="filter-checkbox"><input type="checkbox" id="show-2a" checked><label for="show-2a">2A</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-2b" checked><label for="show-2b">2B</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-3b" checked><label for="show-3b">3B</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-ap" checked><label for="show-ap">AP</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-4b" checked><label for="show-4b">4B</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-reflection" checked><label for="show-reflection">Reflection</label></div>
+    <button class="btn btn-primary" id="addEventBtn">Add Event</button>
+    <button class="btn" id="resetViewBtn">Today</button>
+  </div>
+  <div class="calendar-header">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <button class="btn" id="prevWeekBtn">◀ Prev Week</button>
+      <div>
+        <h1 class="month-year" id="monthYear">7-Week View</h1>
+        <div class="week-range" id="weekRange"></div>
+      </div>
+      <button class="btn" id="nextWeekBtn">Next Week ▶</button>
+    </div>
+    <div class="class-legend" id="legend"></div>
+  </div>
+  <div class="calendar-grid" id="calendarGrid"></div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal" id="eventModal">
+  <div class="modal-content">
+    <div class="modal-header"><span class="modal-title" id="eventModalTitle">Add Event</span><span class="close" data-close="eventModal">×</span></div>
+    <form id="eventForm" autocomplete="off">
+      <div class="form-group"><label for="eventText">Title</label><input id="eventText" required maxlength="140" /></div>
+      <div class="form-group"><label for="eventClass">Class</label>
+        <select id="eventClass" required>
+          <option value="2a">2A</option><option value="2b">2B</option><option value="3b">3B</option><option value="ap">AP</option><option value="4b">4B</option><option value="reflection">Reflection</option>
+        </select>
+      </div>
+      <div class="form-group"><label for="eventType">Type</label>
+        <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
+      </div>
+      <div class="form-group"><label>Notes</label>
+        <div class="editor-container"><div id="eventNotesToolbar" class="toolbar"></div><div id="eventNotesEditor" class="tiptap"></div></div>
+        <input type="hidden" id="eventNotes" />
+      </div>
+      <div class="form-actions"><button type="button" class="btn" data-close="eventModal">Cancel</button><button class="btn btn-primary" type="submit">Save</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal event-details-modal" id="detailsModal">
+  <div class="modal-content">
+    <div class="modal-header"><span class="modal-title" id="detailsTitle"></span><span class="close" data-close="detailsModal">×</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
+    <div class="notes-section">
+      <label style="font-size:12px;font-weight:600">Reflection Notes</label>
+      <div class="editor-container"><div id="detailsNotesToolbar" class="toolbar"></div><div id="detailsNotesEditor" class="tiptap"></div></div>
+    </div>
+    <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save Notes</button></div>
+  </div>
+</div>
+
+<script>
+/* ========= CONFIG ========= */
+const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk';
+
+/* ========= STATE ========= */
+let supabase = null;
+let weekOffset = 0; // 0 is current week block center
+let events = []; // {id,date(YYYY-MM-DD),text,class,isTentative,isHardcoded,notes,createdAt}
+let currentEditId = null; // for details modal
+let notesEditor = null; let detailsEditor = null;
+
+const CLASS_META = {
+  '2a': { label:'2A', color:'#8e44ad'},
+  '2b': { label:'2B', color:'#2980b9'},
+  '3b': { label:'3B', color:'#229954'},
+  'ap': { label:'AP', color:'#d35400'},
+  '4b': { label:'4B', color:'#c2185b'},
+  'reflection': { label:'Reflection', color:'#6c3483'}
+};
+
+/* ========= INIT ========= */
+init();
+
+async function init(){
+  initSupabase();
+  wireUI();
+  initEditors();
+  loadHardcoded();
+  await loadRemoteEvents();
+  loadLocalEvents();
+  render();
+}
+
+function initSupabase(){
+  try { supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.warn('Supabase init failed', e); supabase = null; }
+}
+
+function wireUI(){
+  document.getElementById('prevWeekBtn').onclick=()=>{weekOffset--;render();};
+  document.getElementById('nextWeekBtn').onclick=()=>{weekOffset++;render();};
+  document.getElementById('resetViewBtn').onclick=()=>{weekOffset=0;render();};
+  document.getElementById('addEventBtn').onclick=()=>openAddModal();
+  document.querySelectorAll('.filter-checkbox input').forEach(cb=>cb.addEventListener('change',applyFilters));
+  document.querySelectorAll('.close,[data-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.getAttribute('data-close'))));
+  document.getElementById('eventForm').addEventListener('submit',saveNewEvent);
+  document.getElementById('saveDetailsBtn').addEventListener('click',saveDetailsNotes);
+  document.getElementById('deleteEventBtn').addEventListener('click',deleteCurrentEvent);
+}
+
+function initEditors(){
+  const baseExt=[window.TiptapStarterKit?.StarterKit?.configure({heading:{levels:[1,2,3]}}), window.TiptapPlaceholder?.Placeholder?.configure({placeholder:'Add notes...'}), window.TiptapUnderline?.Underline, window.TiptapHighlight?.Highlight, window.TiptapLink?.Link];
+  try {
+    notesEditor = new window.Tiptap.Editor({ element: document.getElementById('eventNotesEditor'), extensions: baseExt.filter(Boolean), content:'' , onUpdate:({editor})=>{document.getElementById('eventNotes').value=editor.getHTML();}});
+    detailsEditor = new window.Tiptap.Editor({ element: document.getElementById('detailsNotesEditor'), extensions: baseExt.filter(Boolean), content:'', onUpdate:({editor})=>{/* live editing allowed */} });
+  } catch(e){
+    // fallback contentEditable
+    document.getElementById('eventNotesEditor').contentEditable='true';
+    document.getElementById('detailsNotesEditor').contentEditable='true';
+  }
+}
+
+/* ========= DATE / CALC ========= */
+function mondayOfThisWeek(baseDate=new Date()){
+  const d=new Date(baseDate); const dow=d.getDay(); const monIdx=dow===0?6:dow-1; d.setDate(d.getDate()-monIdx); return d;
+}
+function buildWeeks(){
+  const centerMonday = mondayOfThisWeek();
+  // apply offset in blocks of 1 week (movement shifts center week)
+  centerMonday.setDate(centerMonday.getDate()+weekOffset*7);
+  const weeks=[]; // 7 weeks: -3 .. +3 around center
+  for(let w=-3; w<=3; w++){
+    const start=new Date(centerMonday); start.setDate(centerMonday.getDate()+w*7);
+    const week=[]; for(let i=0;i<7;i++){const d=new Date(start); d.setDate(start.getDate()+i); week.push({date:d,isToday:isSameDay(d,new Date()),isCenter:(w===0)});} weeks.push(week);
+  }
+  return weeks;
+}
+function isSameDay(a,b){return a.toISOString().slice(0,10)===b.toISOString().slice(0,10);} 
+function fmtDate(d){return d.toISOString().slice(0,10);} 
+
+/* ========= HARD CODED EVENTS ========= */
+function loadHardcoded(){
+  const add=(day,text,cls,notes='')=>{events.push({id:'hard-'+cls+'-'+day+'-'+text.replace(/\s+/g,'_'),date:day,text,class:cls,isTentative:false,isHardcoded:true,notes,createdAt:day});};
+  const hc=[
+    ['2025-09-01','LABOR DAY','reflection','<p>No reflection notes yet.</p>'],
+    ['2025-09-01','Breakfast','reflection','<p>Breakfast is happening.</p>'],
+    ['2025-08-23','Logic Puzzle Opening Activity','2a','<p>Scattergories success; logic puzzles engaged.</p>'],
+    ["2025-08-23","Baker's Problem Activity",'2a','<p>Challenging; add scaffolding next time.</p>'],
+    ['2025-08-28','Analogies Introduction','ap','<p>AP grasped basics; need more examples.</p>'],
+    ['2025-08-28','Analogies Introduction','2a','<p>Needed more explanation; add visuals.</p>'],
+    ['2025-08-29','ABC Game + Analogies','2a','<p>Continue next class.</p>'],
+    ['2025-08-29','Rhetorical Situation Lesson','ap','<p>Triangle & profiling covered.</p>'],
+    ['2025-08-29','ABC Game + Analogies','4b','<p>Need more content for fast finishers.</p>'],
+    ['2025-08-29','Hearts & Dollars Launch','reflection','<p>Launched; enforce adherence.</p>'],
+    ['2025-09-02','Analogies & Word Relationship Patterns','2a','<p>Identify & create patterns.</p>'],
+    ['2025-09-04','Advertisement Analysis: Audience & Purpose','ap','<p>Audience appeals; HW: ad analysis.</p>'],
+    ['2025-09-05','Analogies & Word Relationship Patterns','english','<p>Pattern recognition tiers.</p>']
+  ];
+  hc.forEach(h=>add(...h));
+}
+
+/* ========= REMOTE LOAD ========= */
+async function loadRemoteEvents(){
+  if(!supabase) return;
+  try {
+    const startRange = new Date(); startRange.setDate(startRange.getDate()-21);
+    const endRange = new Date(); endRange.setDate(endRange.getDate()+21);
+    const { data, error } = await supabase.from('calendar_events').select('*').gte('event_date',fmtDate(startRange)).lte('event_date',fmtDate(endRange));
+    if(error){console.warn('Remote fetch error',error);return;}
+    data.forEach(r=>{
+      // avoid duplicates of hardcoded
+      if(!events.some(e=>!e.isHardcoded && e.id===r.id)){
+        events.push({
+          id: r.id || 'db-'+r.event_date+'-'+r.event_text.replace(/\s+/g,'_'),
+          date: r.event_date,
+            text: r.event_text,
+            class: r.event_class,
+            isTentative: !!r.is_tentative,
+            isHardcoded: false,
+            notes: r.notes || '',
+            createdAt: r.created_at || r.event_date
+        });
+      }
+    });
+  } catch(e){ console.warn('Remote load fail', e); }
+}
+
+/* ========= LOCAL STORAGE ========= */
+function loadLocalEvents(){
+  try { const raw=localStorage.getItem('calendar_events_user'); if(!raw) return; const arr=JSON.parse(raw); arr.forEach(ev=>{ if(!events.some(e=>e.id===ev.id)) events.push(ev);}); } catch(e){console.warn('Local load error',e);} }
+function saveLocalEvents(){
+  try { const userEvents = events.filter(e=>!e.isHardcoded); localStorage.setItem('calendar_events_user',JSON.stringify(userEvents)); } catch(e){ console.warn('Local save error',e); }
+}
+
+/* ========= RENDER ========= */
+function render(){
+  const grid=document.getElementById('calendarGrid'); grid.innerHTML='';
+  // headers
+  const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  dayNames.forEach(n=>{const h=document.createElement('div');h.className='day-header';h.textContent=n;grid.appendChild(h);});
+  const weeks=buildWeeks();
+  // week labels + days
+  weeks.forEach(week=>{
+    week.forEach(dayInfo=>{
+      const cell=document.createElement('div'); cell.className='day-cell';
+      if(dayInfo.isToday) cell.classList.add('today');
+      if(week[0].isCenter) cell.classList.add('current-week');
+      const ds=fmtDate(dayInfo.date); cell.dataset.date=ds;
+      const dn=document.createElement('div'); dn.className='day-number'; dn.textContent=dayInfo.date.getDate(); cell.appendChild(dn);
+      // events for this day
+      events.filter(e=>e.date===ds).forEach(ev=>addEventElement(cell,ev));
+      setupDayDropZone(cell);
+      cell.addEventListener('click',()=>openAddModal(ds));
+      grid.appendChild(cell);
+    });
+  });
+  updateWeekRange(weeks);
+  applyFilters();
+}
+
+function updateWeekRange(weeks){
+  const first=weeks[0][0].date; const last=weeks[weeks.length-1][6].date;
+  document.getElementById('weekRange').textContent = `${first.getMonth()+1}/${first.getDate()}/${first.getFullYear()} - ${last.getMonth()+1}/${last.getDate()}/${last.getFullYear()}`;
+  document.getElementById('monthYear').textContent = '7-Week View';
+}
+
+/* ========= EVENTS CRUD ========= */
+function openAddModal(prefillDate){
+  currentEditId=null; document.getElementById('eventForm').reset(); document.getElementById('eventModalTitle').textContent='Add Event';
+  if(prefillDate) document.getElementById('eventForm').dataset.date=prefillDate; else delete document.getElementById('eventForm').dataset.date;
+  document.getElementById('eventModal').style.display='flex';
+}
+function closeModal(id){ if(!id){document.querySelectorAll('.modal').forEach(m=>m.style.display='none');return;} document.getElementById(id).style.display='none'; }
+
+function saveNewEvent(e){
+  e.preventDefault();
+  const form=e.target; const date=form.dataset.date || fmtDate(new Date());
+  const text=document.getElementById('eventText').value.trim(); if(!text) return;
+  const cls=document.getElementById('eventClass').value; const tentative=document.getElementById('eventType').value==='tentative';
+  let notes=document.getElementById('eventNotes').value;
+  if(!notes && !notesEditor) notes=document.getElementById('eventNotesEditor').innerHTML;
+  const ev={id:'u-'+Date.now()+'-'+Math.random().toString(36).slice(2),date,text,class:cls,isTentative:tentative,isHardcoded:false,notes,createdAt:new Date().toISOString()};
+  events.push(ev);
+  persistNewEvent(ev);
+  saveLocalEvents();
+  closeModal('eventModal');
+  render();
+}
+
+async function persistNewEvent(ev){
+  if(!supabase) return;
+  try { const { error } = await supabase.from('calendar_events').insert({
+    event_date: ev.date, year: parseInt(ev.date.slice(0,4),10), month: parseInt(ev.date.slice(5,7),10)-1, day: parseInt(ev.date.slice(8,10),10), event_text: ev.text, event_class: ev.class, notes: ev.notes, is_tentative: ev.isTentative, created_at: ev.createdAt
+  }); if(error) console.warn('DB insert error', error); } catch(e){ console.warn('Persist fail',e);} }
+
+function addEventElement(parent, ev){
+  const div=document.createElement('div'); div.className='event'; if(ev.isTentative) div.classList.add('tentative'); div.dataset.id=ev.id; div.dataset.class=ev.class; div.setAttribute('draggable','true');
+  div.innerHTML=`<span>${ev.text}</span><button class="delete-btn" title="Delete">×</button>`;
+  div.addEventListener('click', (e)=>{ if(e.target.classList.contains('delete-btn')){ e.stopPropagation(); deleteEvent(ev.id); } else { openDetails(ev.id); e.stopPropagation(); } });
+  setupDrag(div);
+  parent.appendChild(div);
+}
+
+function applyFilters(){
+  const enabled={}; Object.keys(CLASS_META).forEach(k=>{const cb=document.getElementById('show-'+k); if(cb) enabled[k]=cb.checked;});
+  document.querySelectorAll('.event').forEach(ev=>{const cls=ev.dataset.class; ev.style.display = enabled[cls] ? '' : 'none';});
+}
+
+function openDetails(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return; currentEditId=id;
+  document.getElementById('detailsTitle').textContent=ev.text;
+  const b=document.getElementById('detailsBadge'); b.textContent=CLASS_META[ev.class]?.label||ev.class; b.style.background=CLASS_META[ev.class]?.color||'#555';
+  document.getElementById('detailsDate').textContent=ev.date;
+  if(detailsEditor){ detailsEditor.commands.setContent(ev.notes||'<p></p>'); } else { document.getElementById('detailsNotesEditor').innerHTML=ev.notes||''; }
+  document.getElementById('detailsModal').style.display='flex';
+}
+
+function deleteEvent(id){
+  const idx=events.findIndex(e=>e.id===id); if(idx===-1) return; const ev=events[idx]; if(ev.isHardcoded){alert('Hardcoded event locked.'); return;}
+  events.splice(idx,1); saveLocalEvents(); if(supabase){ supabase.from('calendar_events').delete().eq('event_date',ev.date).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); }
+  render();
+}
+
+function deleteCurrentEvent(){ if(currentEditId){ deleteEvent(currentEditId); closeModal('detailsModal'); } }
+
+function saveDetailsNotes(){
+  if(!currentEditId) return; const ev=events.find(e=>e.id===currentEditId); if(!ev) return; if(ev.isHardcoded){closeModal('detailsModal'); return;}
+  ev.notes = detailsEditor ? detailsEditor.getHTML() : document.getElementById('detailsNotesEditor').innerHTML;
+  saveLocalEvents();
+  if(supabase){ supabase.from('calendar_events').update({ notes: ev.notes }).eq('event_date',ev.date).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); }
+  closeModal('detailsModal');
+}
+
+/* ========= DRAG & DROP ========= */
+function setupDrag(el){
+  el.addEventListener('dragstart',e=>{ const ev=events.find(x=>x.id===el.dataset.id); if(!ev) return; e.dataTransfer.setData('text/plain', JSON.stringify({id:ev.id})); el.classList.add('dragging'); });
+  el.addEventListener('dragend',()=>el.classList.remove('dragging'));
+}
+function setupDayDropZone(dayCell){
+  dayCell.addEventListener('dragover',e=>{e.preventDefault(); dayCell.classList.add('drag-over');});
+  dayCell.addEventListener('dragleave',e=>{ if(!dayCell.contains(e.relatedTarget)) dayCell.classList.remove('drag-over'); });
+  dayCell.addEventListener('drop',e=>{ e.preventDefault(); dayCell.classList.remove('drag-over'); const data=e.dataTransfer.getData('text/plain'); if(!data) return; try { const {id}=JSON.parse(data); moveEvent(id, dayCell.dataset.date); } catch(err){ console.warn('Drop parse',err);} });
+}
+function moveEvent(id,newDate){ const ev=events.find(e=>e.id===id); if(!ev || ev.isHardcoded) return; if(ev.date===newDate) return; const old=ev.date; ev.date=newDate; saveLocalEvents(); if(supabase){ supabase.from('calendar_events').update({ event_date:newDate, year:parseInt(newDate.slice(0,4),10), month:parseInt(newDate.slice(5,7),10)-1, day:parseInt(newDate.slice(8,10),10) }).eq('event_date',old).eq('event_text',ev.text).eq('event_class',ev.class).then(()=>{}); } render(); }
+
+/* ========= UTIL ========= */
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
+
+</script>
+</body>
+</html>
