@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar Diagnostic</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #1a1a1a; 
+            color: white; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        .diagnostic { 
+            background: #2d2d2d; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #4CAF50; 
+        }
+        .error { border-left-color: #f44336; }
+        .warning { border-left-color: #ff9800; }
+        .calendar-grid { 
+            display: grid; 
+            grid-template-columns: 100px repeat(7, 1fr); 
+            gap: 1px; 
+            background-color: #444; 
+            margin: 20px 0; 
+        }
+        .day-header, .week-label, .day-cell {
+            background: #2a2a2a;
+            padding: 10px;
+            border: 1px solid #555;
+            min-height: 80px;
+        }
+        .day-header { background: #3d3d3d; text-align: center; min-height: 30px; }
+        .week-label { background: #2d2d2d; writing-mode: vertical-rl; }
+        .day-number { font-weight: bold; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Calendar Diagnostic Tool</h1>
+    <div id="log"></div>
+    <div class="calendar-grid" id="calendarGrid">
+        <div style="grid-column: 1 / -1; padding: 20px; text-align: center; background: #444;">
+            Diagnostic calendar loading...
+        </div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = 'diagnostic ' + (type !== 'info' ? type : '');
+            div.innerHTML = `<strong>[${new Date().toLocaleTimeString()}]</strong> ${message}`;
+            log.appendChild(div);
+            console.log(message);
+        }
+
+        // Test basic functionality step by step
+        addLog('🚀 Starting diagnostic sequence...');
+
+        // Test 1: Basic DOM manipulation
+        try {
+            const testDiv = document.createElement('div');
+            testDiv.textContent = 'DOM manipulation works';
+            addLog('✅ Test 1: Basic DOM manipulation - PASS');
+        } catch (e) {
+            addLog('❌ Test 1: Basic DOM manipulation - FAIL: ' + e.message, 'error');
+        }
+
+        // Test 2: Date calculations
+        try {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const mondayBased = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            addLog(`✅ Test 2: Date calculations - PASS (today: ${today.toDateString()}, monday-based: ${mondayBased})`);
+        } catch (e) {
+            addLog('❌ Test 2: Date calculations - FAIL: ' + e.message, 'error');
+        }
+
+        // Test 3: Calendar grid element access
+        try {
+            const calendarGrid = document.getElementById('calendarGrid');
+            if (calendarGrid) {
+                addLog('✅ Test 3: Calendar grid element found - PASS');
+            } else {
+                addLog('❌ Test 3: Calendar grid element not found - FAIL', 'error');
+            }
+        } catch (e) {
+            addLog('❌ Test 3: Calendar grid access - FAIL: ' + e.message, 'error');
+        }
+
+        // Test 4: Simple calendar generation
+        function testCalendarGeneration() {
+            try {
+                addLog('🔄 Test 4: Starting calendar generation...');
+                
+                const calendarGrid = document.getElementById('calendarGrid');
+                calendarGrid.innerHTML = '';
+                
+                // Add corner
+                const corner = document.createElement('div');
+                corner.className = 'day-header';
+                corner.textContent = '';
+                calendarGrid.appendChild(corner);
+                
+                // Add day headers
+                ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach(day => {
+                    const header = document.createElement('div');
+                    header.className = 'day-header';
+                    header.textContent = day;
+                    calendarGrid.appendChild(header);
+                });
+                
+                // Add 3 weeks for testing
+                for (let week = 0; week < 3; week++) {
+                    const weekLabel = document.createElement('div');
+                    weekLabel.className = 'week-label';
+                    weekLabel.textContent = `Week ${week + 1}`;
+                    calendarGrid.appendChild(weekLabel);
+                    
+                    for (let day = 0; day < 7; day++) {
+                        const dayCell = document.createElement('div');
+                        dayCell.className = 'day-cell';
+                        
+                        const dayNumber = document.createElement('div');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = (week * 7 + day + 1);
+                        
+                        dayCell.appendChild(dayNumber);
+                        calendarGrid.appendChild(dayCell);
+                    }
+                }
+                
+                addLog('✅ Test 4: Simple calendar generation - PASS');
+                return true;
+            } catch (e) {
+                addLog('❌ Test 4: Calendar generation - FAIL: ' + e.message, 'error');
+                return false;
+            }
+        }
+
+        // Test 5: Copy main calendar functions one by one
+        function testMainCalendarFunctions() {
+            addLog('🔄 Test 5: Testing main calendar functions...');
+            
+            // Copy critical functions from main calendar and test them
+            try {
+                // Test monthNames array
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+                addLog(`✅ Month names array: ${monthNames.length} items`);
+                
+                // Test dayNames array  
+                const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                addLog(`✅ Day names array: ${dayNames.length} items`);
+                
+                // Test getCurrentWeekBounds function
+                function getCurrentWeekBounds() {
+                    const today = new Date();
+                    const currentDayOfWeek = today.getDay();
+                    const mondayBasedDayOfWeek = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1;
+                    const startOfWeek = new Date(today);
+                    startOfWeek.setDate(today.getDate() - mondayBasedDayOfWeek);
+                    return startOfWeek;
+                }
+                
+                const weekBounds = getCurrentWeekBounds();
+                addLog(`✅ getCurrentWeekBounds: ${weekBounds.toDateString()}`);
+                
+                // Test generateWeeks function
+                function generateWeeks() {
+                    const weeks = [];
+                    const startDate = getCurrentWeekBounds();
+                    
+                    for (let weekIndex = 0; weekIndex < 7; weekIndex++) {
+                        const week = [];
+                        for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                            const date = new Date(startDate);
+                            date.setDate(startDate.getDate() + (weekIndex * 7) + dayIndex);
+                            
+                            week.push({
+                                date: date,
+                                dayNumber: date.getDate(),
+                                isCurrentWeek: weekIndex === 0,
+                                isToday: date.toDateString() === new Date().toDateString(),
+                                isCurrentMonth: date.getMonth() === new Date().getMonth()
+                            });
+                        }
+                        weeks.push(week);
+                    }
+                    return weeks;
+                }
+                
+                const weeks = generateWeeks();
+                addLog(`✅ generateWeeks: Generated ${weeks.length} weeks, first week starts ${weeks[0][0].date.toDateString()}`);
+                
+                addLog('✅ Test 5: Main calendar functions - PASS');
+                return { weeks, dayNames };
+                
+            } catch (e) {
+                addLog('❌ Test 5: Main calendar functions - FAIL: ' + e.message, 'error');
+                return null;
+            }
+        }
+
+        // Test 6: Generate calendar with real dates
+        function testRealCalendarGeneration() {
+            try {
+                addLog('🔄 Test 6: Generating calendar with real dates...');
+                
+                const result = testMainCalendarFunctions();
+                if (!result) {
+                    addLog('❌ Cannot generate real calendar - functions failed', 'error');
+                    return false;
+                }
+                
+                const { weeks, dayNames } = result;
+                const calendarGrid = document.getElementById('calendarGrid');
+                calendarGrid.innerHTML = '';
+                
+                // Corner
+                const corner = document.createElement('div');
+                corner.className = 'day-header';
+                calendarGrid.appendChild(corner);
+                
+                // Day headers
+                dayNames.forEach(dayName => {
+                    const header = document.createElement('div');
+                    header.className = 'day-header';
+                    header.textContent = dayName.substring(0, 3);
+                    calendarGrid.appendChild(header);
+                });
+                
+                // Generate weeks with real dates
+                weeks.forEach((week, weekIndex) => {
+                    // Week label
+                    const weekLabel = document.createElement('div');
+                    weekLabel.className = 'week-label';
+                    weekLabel.textContent = `Week ${weekIndex + 1}`;
+                    calendarGrid.appendChild(weekLabel);
+                    
+                    // Days
+                    week.forEach(dayData => {
+                        const dayCell = document.createElement('div');
+                        dayCell.className = 'day-cell';
+                        
+                        if (dayData.isToday) {
+                            dayCell.style.background = '#4a4a4a';
+                            dayCell.style.border = '2px solid #666';
+                        }
+                        
+                        const dayNumber = document.createElement('div');
+                        dayNumber.className = 'day-number';
+                        dayNumber.textContent = dayData.dayNumber;
+                        
+                        dayCell.appendChild(dayNumber);
+                        calendarGrid.appendChild(dayCell);
+                    });
+                });
+                
+                addLog('✅ Test 6: Real calendar generation - PASS');
+                return true;
+                
+            } catch (e) {
+                addLog('❌ Test 6: Real calendar generation - FAIL: ' + e.message, 'error');
+                return false;
+            }
+        }
+
+        // Run all tests
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('📋 DOM loaded, running diagnostic tests...');
+            
+            setTimeout(() => {
+                if (testCalendarGeneration()) {
+                    setTimeout(() => {
+                        testRealCalendarGeneration();
+                        addLog('🎯 Diagnostic complete! If you see a calendar above, the core functions work.');
+                    }, 1000);
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html>
