@@ -7,25 +7,35 @@
 <title>Class Calendar & Reflections (TipTap 3.0)</title>
 <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- TipTap 3.0 with Lucide icons -->
-<script src="https://unpkg.com/@tiptap/core@3.0.0/dist/index.umd.min.js"></script>
-<script src="https://unpkg.com/@tiptap/starter-kit@3.0.0/dist/index.umd.min.js"></script>
-<script src="https://unpkg.com/@tiptap/extension-placeholder@3.0.0/dist/index.umd.min.js"></script>
+<!-- Lucide icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script type="module">
+// TipTap 3.0 ES Module imports
+import { Editor } from 'https://esm.sh/@tiptap/core';
+import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
+import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+
+// Make TipTap available globally for the rest of the script
+window.TiptapEditor = Editor;
+window.TiptapStarterKit = StarterKit;
+window.TiptapPlaceholder = Placeholder;
+window.tiptapLoaded = true;
+console.log('TipTap 3.0 ES modules loaded successfully');
+</script>
 <script>
 async function ensureEditors(){
   // Debug: Log what's available
   console.log('TipTap globals available:', {
-    Tiptap: !!window.Tiptap,
-    Editor: !!window.Tiptap?.Editor,
-    StarterKit: !!window.TiptapStarterKit?.StarterKit,
-    Placeholder: !!window.TiptapPlaceholder?.Placeholder,
+    TiptapEditor: !!window.TiptapEditor,
+    TiptapStarterKit: !!window.TiptapStarterKit,
+    TiptapPlaceholder: !!window.TiptapPlaceholder,
+    tiptapLoaded: !!window.tiptapLoaded,
     lucide: !!window.lucide
   });
   
-  // TipTap 3.0 direct approach
-  if (window.Tiptap && window.Tiptap.Editor) {
-    console.log('TipTap 3.0 detected, initializing editors');
+  // TipTap 3.0 ES module approach
+  if (window.tiptapLoaded && window.TiptapEditor) {
+    console.log('TipTap 3.0 ES modules detected, initializing editors');
     initEditors();
     if (notesEditor && detailsEditor) {
       console.log('TipTap 3.0 editors created successfully');
@@ -33,18 +43,18 @@ async function ensureEditors(){
     }
   }
   
-  // Wait a bit and try again
-  console.log('Waiting 1s for scripts to load...');
-  await new Promise(r => setTimeout(r, 1000));
+  // Wait a bit for modules to load
+  console.log('Waiting 2s for ES modules to load...');
+  await new Promise(r => setTimeout(r, 2000));
   
   console.log('After delay - TipTap globals:', {
-    Tiptap: !!window.Tiptap,
-    Editor: !!window.Tiptap?.Editor,
-    StarterKit: !!window.TiptapStarterKit?.StarterKit,
-    Placeholder: !!window.TiptapPlaceholder?.Placeholder
+    TiptapEditor: !!window.TiptapEditor,
+    TiptapStarterKit: !!window.TiptapStarterKit,
+    TiptapPlaceholder: !!window.TiptapPlaceholder,
+    tiptapLoaded: !!window.tiptapLoaded
   });
   
-  if (window.Tiptap && window.Tiptap.Editor) {
+  if (window.tiptapLoaded && window.TiptapEditor) {
     console.log('TipTap 3.0 available after delay, trying again');
     initEditors();
     if (notesEditor && detailsEditor) {
@@ -290,40 +300,38 @@ function wireUI(){
 
 function initEditors(){
   // TipTap 3.0 validation
-  if(!window.Tiptap || !window.Tiptap.Editor){
-    console.error('TipTap 3.0 Editor constructor missing; check script loading');
+  if(!window.TiptapEditor){
+    console.error('TipTap 3.0 Editor constructor missing; check ES module loading');
     return;
   }
 
   console.log('Attempting to initialize TipTap 3.0 editors...');
   
-  // TipTap 3.0 extensions - check what's available
+  // TipTap 3.0 extensions
   console.log('Available extensions:', {
-    StarterKit: window.TiptapStarterKit?.StarterKit,
-    Placeholder: window.TiptapPlaceholder?.Placeholder
+    StarterKit: !!window.TiptapStarterKit,
+    Placeholder: !!window.TiptapPlaceholder
   });
   
   const extensions = [];
   
-  // Add StarterKit if available
-  if (window.TiptapStarterKit?.StarterKit) {
-    extensions.push(window.TiptapStarterKit.StarterKit);
+  // Add StarterKit
+  if (window.TiptapStarterKit) {
+    extensions.push(window.TiptapStarterKit);
     console.log('Added StarterKit extension');
   }
   
-  // Add Placeholder if available
-  if (window.TiptapPlaceholder?.Placeholder) {
-    extensions.push(window.TiptapPlaceholder.Placeholder.configure({ 
+  // Add Placeholder
+  if (window.TiptapPlaceholder) {
+    extensions.push(window.TiptapPlaceholder.configure({ 
       placeholder: 'Start typing…' 
     }));
     console.log('Added Placeholder extension');
   }
   
   if (extensions.length === 0) {
-    console.error('No TipTap extensions available - falling back to basic setup');
-    extensions.push(window.Tiptap.Editor.extensions.Document);
-    extensions.push(window.Tiptap.Editor.extensions.Paragraph);
-    extensions.push(window.Tiptap.Editor.extensions.Text);
+    console.error('No TipTap extensions available - this will likely fail');
+    return;
   }
   
   try {
@@ -333,7 +341,7 @@ function initEditors(){
     }
     
     console.log('Creating notesEditor...');
-    notesEditor = new window.Tiptap.Editor({
+    notesEditor = new window.TiptapEditor({
       element: document.getElementById('eventNotesEditor'),
       extensions: extensions,
       content: '<p></p>',
@@ -344,7 +352,7 @@ function initEditors(){
     console.log('notesEditor created successfully');
     
     console.log('Creating detailsEditor...');
-    detailsEditor = new window.Tiptap.Editor({
+    detailsEditor = new window.TiptapEditor({
       element: document.getElementById('detailsNotesEditor'),
       extensions: extensions,
       content: '<p></p>',
