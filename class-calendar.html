@@ -17,6 +17,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-color@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-text-align@2.1.13/dist/index.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-image@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-list@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-task-item@2.1.13/dist/index.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tiptap/extension-youtube@2.1.13/dist/index.umd.min.js"></script>
 <style>
 body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0a0b;color:#fafafa;padding:16px;}
 .calendar-container{max-width:1200px;margin:0 auto;background:#18181b;border:1px solid #27272a;border-radius:16px;overflow:hidden;}
@@ -87,6 +91,13 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
 .editor-content-area a{color:#2563eb;text-decoration:underline}
 .editor-content-area p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
+.editor-content-area img{max-width:100%;height:auto;display:block;margin:.4em 0}
+/* Task list styling */
+.editor-content-area ul[data-type="taskList"]{list-style:none;padding-left:0;margin:.6em 0 .9em}
+.editor-content-area ul[data-type="taskList"] li{display:flex;align-items:flex-start;gap:.4em;margin:.35em 0}
+.editor-content-area ul[data-type="taskList"] li>label{display:flex;align-items:center;gap:.4em;font-weight:500}
+.editor-content-area ul[data-type="taskList"] li input[type=checkbox]{margin:3px 4px 0 2px;cursor:pointer}
+.editor-content-area ul[data-type="taskList"] li p{margin:0;flex:1}
 .dark-theme .editor-shell{background:#111827;border-color:#374151}
 .dark-theme .editor-toolbar{background:#1f2937;border-bottom-color:#374151}
 .dark-theme .toolbar-btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
@@ -230,7 +241,11 @@ function initEditors(){
   window.TiptapUnderline?.Underline,
   window.TiptapHighlight?.Highlight,
   window.TiptapLink?.Link,
-  window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] })
+  window.TiptapTextAlign?.TextAlign?.configure({ types:['heading','paragraph'] }),
+  window.TiptapTaskItem?.TaskItem,
+  window.TiptapTaskList?.TaskList,
+  window.TiptapImage?.Image?.configure({ HTMLAttributes:{ class:'editor-image' } }),
+  window.TiptapYoutube?.Youtube?.configure({ controls: true, nocookie: true })
   ];
   try {
     notesEditor = new window.Tiptap.Editor({
@@ -273,9 +288,10 @@ function buildReplicaToolbar(editor, el){
     [ {act:'undo', icon:'undo', title:'Undo'}, {act:'redo', icon:'redo', title:'Redo'} ],
     [ {act:'bold', icon:'bold', title:'Bold'}, {act:'italic', icon:'italic', title:'Italic'}, {act:'underline', icon:'underline', title:'Underline'}, {act:'strike', icon:'strikethrough', title:'Strikethrough'}, {act:'code', icon:'code', title:'Inline Code'}, {act:'highlight', icon:'highlighter', title:'Highlight'} ],
     [ {dropdown:'heading'} ],
-    [ {act:'paragraph', icon:'pilcrow', title:'Paragraph'}, {act:'bulletList', icon:'list', title:'Bullet List'}, {act:'orderedList', icon:'list-ordered', title:'Ordered List'}, {act:'blockquote', icon:'quote', title:'Blockquote'}, {act:'codeBlock', icon:'file-code-2', title:'Code Block'}, {act:'hr', icon:'minus', title:'Horizontal Rule'} ],
-    [ {act:'align-left', icon:'align-left', title:'Align Left'}, {act:'align-center', icon:'align-center', title:'Align Center'}, {act:'align-right', icon:'align-right', title:'Align Right'} ],
-    [ {act:'link', icon:'link', title:'Add Link'}, {act:'unlink', icon:'unlink-2', title:'Remove Link'}, {act:'clear', icon:'eraser', title:'Clear Formatting'} ]
+  [ {act:'paragraph', icon:'pilcrow', title:'Paragraph'}, {act:'bulletList', icon:'list', title:'Bullet List'}, {act:'orderedList', icon:'list-ordered', title:'Ordered List'}, {act:'taskList', icon:'check-square', title:'Task List'}, {act:'blockquote', icon:'quote', title:'Blockquote'}, {act:'codeBlock', icon:'file-code-2', title:'Code Block'}, {act:'hr', icon:'minus', title:'Horizontal Rule'} ],
+  [ {act:'align-left', icon:'align-left', title:'Align Left'}, {act:'align-center', icon:'align-center', title:'Align Center'}, {act:'align-right', icon:'align-right', title:'Align Right'}, {act:'align-justify', icon:'align-justify', title:'Justify'} ],
+  [ {act:'image-file', icon:'image', title:'Insert Image (Upload)'}, {act:'image-url', icon:'link-2', title:'Insert Image (URL)'}, {act:'youtube', icon:'video', title:'Embed YouTube'}, ],
+  [ {act:'link', icon:'link', title:'Add Link'}, {act:'unlink', icon:'unlink-2', title:'Remove Link'}, {act:'clear', icon:'eraser', title:'Clear Formatting'} ]
   ];
   groups.forEach((grp,i)=>{
     const wrap=document.createElement('div'); wrap.className='toolbar-group';
@@ -300,13 +316,21 @@ function buildReplicaToolbar(editor, el){
     el.appendChild(wrap);
     if(i<groups.length-1){ const div=document.createElement('div'); div.className='toolbar-divider'; el.appendChild(div); }
   });
+  // hidden file input for image uploads
+  const fileInput=document.createElement('input'); fileInput.type='file'; fileInput.accept='image/*'; fileInput.style.display='none';
+  fileInput.addEventListener('change',()=>{
+    const f=fileInput.files?.[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>{ const src=reader.result; if(src) { editor.chain().focus().setImage({src}).run(); updateReplicaToolbar(editor, el);} }; reader.readAsDataURL(f); fileInput.value=''; });
+  el.appendChild(fileInput);
   el.addEventListener('click', ev=>{
     const btn=ev.target.closest('button.toolbar-btn'); if(!btn||!btn.dataset.act) return; const act=btn.dataset.act; const ch=editor.chain().focus();
     switch(act){
       case 'undo': ch.undo().run(); break; case 'redo': ch.redo().run(); break;
       case 'bold': ch.toggleBold().run(); break; case 'italic': ch.toggleItalic().run(); break; case 'underline': ch.toggleUnderline?.().run(); break; case 'strike': ch.toggleStrike().run(); break; case 'code': ch.toggleCode().run(); break; case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
-      case 'paragraph': ch.setParagraph().run(); break; case 'bulletList': ch.toggleBulletList().run(); break; case 'orderedList': ch.toggleOrderedList().run(); break; case 'blockquote': ch.toggleBlockquote().run(); break; case 'codeBlock': ch.toggleCodeBlock().run(); break; case 'hr': ch.setHorizontalRule().run(); break;
-      case 'align-left': ch.setTextAlign('left').run(); break; case 'align-center': ch.setTextAlign('center').run(); break; case 'align-right': ch.setTextAlign('right').run(); break;
+      case 'paragraph': ch.setParagraph().run(); break; case 'bulletList': ch.toggleBulletList().run(); break; case 'orderedList': ch.toggleOrderedList().run(); break; case 'taskList': ch.toggleTaskList().run(); break; case 'blockquote': ch.toggleBlockquote().run(); break; case 'codeBlock': ch.toggleCodeBlock().run(); break; case 'hr': ch.setHorizontalRule().run(); break;
+      case 'align-left': ch.setTextAlign('left').run(); break; case 'align-center': ch.setTextAlign('center').run(); break; case 'align-right': ch.setTextAlign('right').run(); break; case 'align-justify': ch.setTextAlign('justify').run(); break;
+      case 'image-file': fileInput.click(); break;
+      case 'image-url': { const url=prompt('Image URL'); if(url) ch.setImage({src:url}).run(); break; }
+      case 'youtube': { const yUrl=prompt('YouTube URL'); if(yUrl){ ch.setYoutubeVideo({ src:yUrl }).run(); } break; }
       case 'link': { const url=prompt('Enter URL'); if(url) ch.setLink({href:url}).run(); break; }
       case 'unlink': ch.unsetLink().run(); break; case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
     }
@@ -323,7 +347,7 @@ function updateReplicaToolbar(editor, el){
   el.querySelectorAll('button.toolbar-btn').forEach(btn=>{
     const act=btn.dataset.act; let active=false;
     switch(act){
-      case 'bold': active=editor.isActive('bold'); break; case 'italic': active=editor.isActive('italic'); break; case 'underline': active=editor.isActive('underline'); break; case 'strike': active=editor.isActive('strike'); break; case 'code': active=editor.isActive('code'); break; case 'highlight': active=editor.isActive('highlight'); break; case 'paragraph': active=editor.isActive('paragraph'); break; case 'bulletList': active=editor.isActive('bulletList'); break; case 'orderedList': active=editor.isActive('orderedList'); break; case 'blockquote': active=editor.isActive('blockquote'); break; case 'codeBlock': active=editor.isActive('codeBlock'); break; case 'align-left': active=editor.isActive({textAlign:'left'}); break; case 'align-center': active=editor.isActive({textAlign:'center'}); break; case 'align-right': active=editor.isActive({textAlign:'right'}); break; case 'link': active=editor.isActive('link'); break;
+  case 'bold': active=editor.isActive('bold'); break; case 'italic': active=editor.isActive('italic'); break; case 'underline': active=editor.isActive('underline'); break; case 'strike': active=editor.isActive('strike'); break; case 'code': active=editor.isActive('code'); break; case 'highlight': active=editor.isActive('highlight'); break; case 'paragraph': active=editor.isActive('paragraph'); break; case 'bulletList': active=editor.isActive('bulletList'); break; case 'orderedList': active=editor.isActive('orderedList'); break; case 'taskList': active=editor.isActive('taskList'); break; case 'blockquote': active=editor.isActive('blockquote'); break; case 'codeBlock': active=editor.isActive('codeBlock'); break; case 'align-left': active=editor.isActive({textAlign:'left'}); break; case 'align-center': active=editor.isActive({textAlign:'center'}); break; case 'align-right': active=editor.isActive({textAlign:'right'}); break; case 'align-justify': active=editor.isActive({textAlign:'justify'}); break; case 'link': active=editor.isActive('link'); break;
     }
     btn.classList.toggle('is-active', !!active);
   });
