@@ -107,7 +107,15 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .day-number{font-weight:700;font-size:12px;margin-bottom:4px}
 .event{background:#333;border-left:4px solid #555;margin:0 0 4px;padding:4px 20px 4px 6px;border-radius:6px;line-height:1.2;position:relative;font-size:11px;color:#fff;user-select:none;cursor:move}
 .event.tentative{opacity:.6;border-style:dashed}
-.event[data-class="2a"]{background:#8e44ad}.event[data-class="2b"]{background:#2980b9}.event[data-class="3b"]{background:#229954}.event[data-class="ap"]{background:#d35400}.event[data-class="4b"]{background:#c2185b}.event[data-class="reflection"]{background:#6c3483}
+.event[data-class="2a"]{background:#8e44ad}.event[data-class="3a"]{background:#00c851}.event[data-class="2b"]{background:#17a2b8}.event[data-class="ap"]{background:#ff6f00}.event[data-class="4b"]{background:#e91e63}.event[data-class="other"]{background:#455a64}.event[data-class="dhs"]{background:#1565c0}.event[data-class="reflection"]{background:#6c3483}
+/* Shared lesson indicators - left border shows shared class color */
+.event.shared-with-2a{border-left-color:#8e44ad !important}
+.event.shared-with-3a{border-left-color:#00c851 !important}
+.event.shared-with-2b{border-left-color:#17a2b8 !important}
+.event.shared-with-ap{border-left-color:#ff6f00 !important}
+.event.shared-with-4b{border-left-color:#e91e63 !important}
+.event.shared-with-other{border-left-color:#455a64 !important}
+.event.shared-with-dhs{border-left-color:#1565c0 !important}
 .event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
 .event:hover .delete-btn{display:block}
 /* CSS for drag safety indicators */
@@ -196,16 +204,24 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .event-class-badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;color:#fff}
 .notes-section{margin-top:10px}
 .hidden{display:none!important}
+/* Upcoming events section */
+.upcoming-event{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #e5e5e5}
+.upcoming-event:last-child{border-bottom:none}
+.upcoming-date{font-size:11px;font-weight:600;color:#666;min-width:45px}
+.upcoming-class{font-size:10px;padding:2px 6px;border-radius:10px;color:#fff;font-weight:600}
+.upcoming-text{flex:1;font-size:13px;color:#333}
 </style>
 </head>
 <body>
 <div class="calendar-container">
   <div class="controls">
     <div class="filter-checkbox"><input type="checkbox" id="show-2a" checked><label for="show-2a">2A</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-3a" checked><label for="show-3a">3A</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-2b" checked><label for="show-2b">2B</label></div>
-    <div class="filter-checkbox"><input type="checkbox" id="show-3b" checked><label for="show-3b">3B</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-ap" checked><label for="show-ap">AP</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-4b" checked><label for="show-4b">4B</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-other" checked><label for="show-other">Other</label></div>
+    <div class="filter-checkbox"><input type="checkbox" id="show-dhs" checked><label for="show-dhs">DHS</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-reflection" checked><label for="show-reflection">Reflection</label></div>
     <button class="btn btn-primary" id="addEventBtn">Add Event</button>
     <button class="btn" id="resetViewBtn">Today</button>
@@ -224,6 +240,16 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
+<!-- Upcoming Events Section -->
+<div class="calendar-container" style="margin-top: 20px;">
+  <div class="calendar-header">
+    <h2 style="margin: 0; color: #333;">Upcoming This Week</h2>
+  </div>
+  <div id="upcomingEvents" style="padding: 15px; background: #f8f9fa; border-radius: 8px; min-height: 60px;">
+    <div style="color: #666; font-style: italic;">Loading upcoming events...</div>
+  </div>
+</div>
+
 <!-- Add/Edit Modal -->
 <div class="modal" id="eventModal">
   <div class="modal-content">
@@ -232,7 +258,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
       <div class="form-group"><label for="eventText">Title</label><input id="eventText" required maxlength="140" /></div>
       <div class="form-group"><label for="eventClass">Class</label>
         <select id="eventClass" required>
-          <option value="2a">2A</option><option value="2b">2B</option><option value="3b">3B</option><option value="ap">AP</option><option value="4b">4B</option><option value="reflection">Reflection</option>
+          <option value="2a">2A</option><option value="3a">3A</option><option value="2b">2B</option><option value="ap">AP</option><option value="4b">4B</option><option value="other">Other</option><option value="dhs">DHS</option><option value="reflection">Reflection</option>
         </select>
       </div>
       <div class="form-group"><label for="eventType">Type</label>
@@ -279,11 +305,13 @@ let currentEditId = null; // for details modal
 let notesEditor = null; let detailsEditor = null;
 
 const CLASS_META = {
-  '2a': { label:'2A', color:'#8e44ad'},
-  '2b': { label:'2B', color:'#2980b9'},
-  '3b': { label:'3B', color:'#229954'},
-  'ap': { label:'AP', color:'#d35400'},
-  '4b': { label:'4B', color:'#c2185b'},
+  '2a': { label:'2A', color:'#8e44ad'},        // purple
+  '3a': { label:'3A', color:'#00c851'},        // bright/gem green
+  '2b': { label:'2B', color:'#17a2b8'},        // teal/turquoise  
+  'ap': { label:'AP', color:'#ff6f00'},        // orange
+  '4b': { label:'4B', color:'#e91e63'},        // hot pink
+  'other': { label:'Other', color:'#455a64'},  // dark slate grey
+  'dhs': { label:'DHS', color:'#1565c0'},      // royal blue
   'reflection': { label:'Reflection', color:'#6c3483'}
 };
 
@@ -1015,6 +1043,9 @@ function saveLocalEvents(){
 
 /* ========= RENDER ========= */
 function render(){
+  // Detect shared lessons before rendering
+  detectSharedLessons();
+  
   const grid=document.getElementById('calendarGrid'); grid.innerHTML='';
   // headers
   const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -1037,6 +1068,73 @@ function render(){
   });
   updateWeekRange(weeks);
   applyFilters();
+  renderUpcomingEvents();
+}
+
+/* ========= SHARED LESSONS & UPCOMING EVENTS ========= */
+function detectSharedLessons() {
+  // Group events by date and text to find shared lessons
+  const eventsByDateAndText = {};
+  events.forEach(ev => {
+    const key = `${ev.date}|${ev.text.toLowerCase().trim()}`;
+    if (!eventsByDateAndText[key]) {
+      eventsByDateAndText[key] = [];
+    }
+    eventsByDateAndText[key].push(ev);
+  });
+  
+  // Mark events that are shared
+  events.forEach(ev => {
+    ev.sharedWith = null; // Reset
+    const key = `${ev.date}|${ev.text.toLowerCase().trim()}`;
+    const sameEvents = eventsByDateAndText[key];
+    
+    if (sameEvents.length > 1) {
+      // Find the other class this lesson is shared with
+      const otherEvent = sameEvents.find(other => other.class !== ev.class);
+      if (otherEvent) {
+        ev.sharedWith = otherEvent.class;
+      }
+    }
+  });
+}
+
+function renderUpcomingEvents() {
+  const today = new Date();
+  const nextWeek = new Date(today);
+  nextWeek.setDate(today.getDate() + 7);
+  
+  const upcoming = events
+    .filter(ev => {
+      const eventDate = new Date(ev.date);
+      return eventDate >= today && eventDate <= nextWeek;
+    })
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(0, 8); // Show max 8 events
+  
+  const container = document.getElementById('upcomingEvents');
+  
+  if (upcoming.length === 0) {
+    container.innerHTML = '<div style="color: #666; font-style: italic;">No upcoming events this week</div>';
+    return;
+  }
+  
+  const html = upcoming.map(ev => {
+    const eventDate = new Date(ev.date);
+    const dayName = eventDate.toLocaleDateString('en', { weekday: 'short' });
+    const monthDay = `${eventDate.getMonth() + 1}/${eventDate.getDate()}`;
+    const classColor = CLASS_META[ev.class]?.color || '#666';
+    
+    return `
+      <div class="upcoming-event">
+        <div class="upcoming-date">${dayName}<br>${monthDay}</div>
+        <div class="upcoming-class" style="background: ${classColor}">${CLASS_META[ev.class]?.label || ev.class}</div>
+        <div class="upcoming-text">${ev.text}</div>
+      </div>
+    `;
+  }).join('');
+  
+  container.innerHTML = html;
 }
 
 function updateWeekRange(weeks){
@@ -1108,6 +1206,11 @@ function addEventElement(parent, ev){
   
   div.dataset.id=ev.id; 
   div.dataset.class=ev.class; 
+  
+  // Add shared lesson styling if applicable
+  if (ev.sharedWith) {
+    div.classList.add(`shared-with-${ev.sharedWith}`);
+  }
   
   // All events are now draggable
   div.setAttribute('draggable','true');
