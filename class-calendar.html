@@ -1196,7 +1196,7 @@ function saveNewEvent(e){
   const tentative=document.getElementById('eventType').value==='tentative';
   let notes=document.getElementById('eventNotes').value;
   if(!notes && !notesEditor) notes=document.getElementById('eventNotesEditor').innerHTML;
-  const ev={id:'u-'+Date.now()+'-'+Math.random().toString(36).slice(2),date,text,classes:selectedClasses,isTentative:tentative,notes,createdAt:new Date().toISOString()};
+  const ev={id:generateUUID(),date,text,classes:selectedClasses,isTentative:tentative,notes,createdAt:new Date().toISOString()};
   events.push(ev);
   
   // CLOUD-FIRST: Save to cloud, only use localStorage as emergency backup
@@ -1205,6 +1205,14 @@ function saveNewEvent(e){
   
   closeModal('eventModal');
   render();
+}
+
+// Generate a proper UUID v4 format for database compatibility
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 async function persistNewEvent(ev){
@@ -1216,10 +1224,15 @@ async function persistNewEvent(ev){
   try { 
     console.log('☁️ Saving new event to cloud database...');
     
-    // Generate a unique ID for the event if it doesn't have one
-    const eventId = ev.id || ('evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+    // Generate a proper UUID if the event doesn't have a UUID format ID
+    let eventId = ev.id;
+    if (!eventId || !eventId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      eventId = generateUUID();
+      // Update the event object with the proper UUID
+      ev.id = eventId;
+    }
     
-    // Prepare the event data - provide the ID since database expects it
+    // Prepare the event data - provide the UUID since database expects it
     const eventData = {
       id: eventId,
       event_date: ev.date, 
