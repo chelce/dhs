@@ -1014,6 +1014,12 @@ async function loadRemoteEvents(){
     }
     
     console.log(`✅ Loaded ${data.length} events from cloud`);
+    if (data.length > 0) {
+      console.log('📋 ACTUAL DATABASE SCHEMA - Sample event structure:', data[0]);
+      console.log('📋 Database event keys:', Object.keys(data[0]));
+    } else {
+      console.log('📋 No events in database to examine schema');
+    }
     
     data.forEach(r=>{
       // avoid duplicates
@@ -1209,23 +1215,37 @@ async function persistNewEvent(ev){
   
   try { 
     console.log('☁️ Saving new event to cloud database...');
-    const { error } = await supabase.from('calendar_events').insert({
+    
+    // Prepare the event data - let Supabase auto-generate the id
+    const eventData = {
       event_date: ev.date, 
       year: parseInt(ev.date.slice(0,4),10), 
       month: parseInt(ev.date.slice(5,7),10)-1, 
       day: parseInt(ev.date.slice(8,10),10), 
       event_text: ev.text, 
-      event_class: ev.classes ? ev.classes[0] : 'other', // Primary class for backwards compatibility
-      event_classes: JSON.stringify(ev.classes || [ev.class]), // All classes as JSON
-      notes: ev.notes, 
-      is_tentative: ev.isTentative, 
-      created_at: ev.createdAt
-    }); 
+      event_class: ev.classes ? ev.classes[0] : (ev.class || 'other'), // Primary class for backwards compatibility
+      event_classes: JSON.stringify(ev.classes || [ev.class || 'other']), // All classes as JSON
+      notes: ev.notes || '<p>No notes yet...</p>', 
+      is_tentative: ev.isTentative || false
+    };
+    
+    // Only add created_at if it exists
+    if (ev.createdAt) {
+      eventData.created_at = ev.createdAt;
+    }
+    
+    console.log('📤 Event data being sent:', eventData);
+    console.log('📤 Event object structure:', Object.keys(eventData));
+    
+    const { data, error } = await supabase
+      .from('calendar_events')
+      .insert(eventData)
+      .select(); // Return the inserted data to see what was created
     
     if(error) {
       console.error('❌ Cloud save error:', error);
     } else {
-      console.log('✅ Event saved to cloud successfully');
+      console.log('✅ Event saved to cloud successfully:', data);
     }
   } catch(e){ 
     console.error('❌ Cloud persist failed:', e);
