@@ -298,6 +298,22 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   <div class="modal-content">
     <div class="modal-header"><span class="modal-title" id="detailsTitle"></span><span class="close" data-close="detailsModal">×</span></div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
+    
+    <!-- Classes Section -->
+    <div class="form-group" style="margin-bottom:15px;">
+      <label style="font-size:12px;font-weight:600">Classes</label>
+      <div class="class-checkboxes" id="detailsClassCheckboxes">
+        <div class="class-checkbox"><input type="checkbox" id="details-class-2a" value="2a"><label for="details-class-2a">2A</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-3a" value="3a"><label for="details-class-3a">3A</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-2b" value="2b"><label for="details-class-2b">2B</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-ap" value="ap"><label for="details-class-ap">AP</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-4b" value="4b"><label for="details-class-4b">4B</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-other" value="other"><label for="details-class-other">Other</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-dhs" value="dhs"><label for="details-class-dhs">DHS</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-reflection" value="reflection"><label for="details-class-reflection">Reflection</label></div>
+      </div>
+    </div>
+    
     <div class="notes-section">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
       <div class="editor-shell" id="detailsNotesWrapper">
@@ -305,7 +321,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <div class="editor-content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
       </div>
     </div>
-    <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save Notes</button></div>
+    <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save</button></div>
   </div>
 </div>
 
@@ -1298,6 +1314,12 @@ function openDetails(id){
     b.style.background = CLASS_META[primaryClass]?.color || '#555';
   }
   document.getElementById('detailsDate').textContent=ev.date;
+  
+  // Set class checkboxes based on current event classes
+  document.querySelectorAll('#detailsClassCheckboxes input[type="checkbox"]').forEach(cb => {
+    cb.checked = eventClasses.includes(cb.value);
+  });
+  
   if(detailsEditor){ detailsEditor.commands.setContent(ev.notes||'<p></p>'); } else { document.getElementById('detailsNotesEditor').innerHTML=ev.notes||''; }
   document.getElementById('detailsModal').style.display='flex';
 }
@@ -1341,19 +1363,34 @@ function saveDetailsNotes(){
   const ev=events.find(e=>e.id===currentEditId); 
   if(!ev) return; 
   
+  // Update notes
   ev.notes = detailsEditor ? detailsEditor.getHTML() : document.getElementById('detailsNotesEditor').innerHTML;
+  
+  // Update classes from checkboxes
+  const selectedClasses = Array.from(document.querySelectorAll('#detailsClassCheckboxes input:checked')).map(cb => cb.value);
+  if (selectedClasses.length === 0) {
+    alert('Please select at least one class.');
+    return;
+  }
+  
+  ev.classes = selectedClasses;
+  ev.class = selectedClasses[0]; // Keep for backwards compatibility
   
   // CLOUD-FIRST: Save to cloud, backup locally only if cloud unavailable
   if(supabase){ 
-    console.log('☁️ Saving notes to cloud database...');
+    console.log('☁️ Saving event changes to cloud database...');
     supabase.from('calendar_events')
-      .update({ notes: ev.notes })
+      .update({ 
+        notes: ev.notes,
+        event_class: ev.classes[0], // Primary class for backwards compatibility
+        event_classes: JSON.stringify(ev.classes) // All classes as JSON
+      })
       .eq('id', ev.id) // Use ID for more precise matching
       .then(result => {
-        console.log('✅ Notes saved to cloud:', result);
+        console.log('✅ Event changes saved to cloud:', result);
       })
       .catch(error => {
-        console.error('❌ Cloud notes save failed:', error);
+        console.error('❌ Cloud save failed:', error);
       });
   } else {
     console.warn('☁️ Cloud unavailable - saving notes locally only');
@@ -1361,6 +1398,7 @@ function saveDetailsNotes(){
   
   saveLocalEvents(); // Only saves locally if cloud unavailable
   closeModal('detailsModal');
+  render(); // Re-render to show class changes
 }
 
 /* ========= DRAG & DROP WITH SAFETY MEASURES ========= */
