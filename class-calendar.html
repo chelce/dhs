@@ -216,8 +216,16 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .class-checkbox input[type="checkbox"]{margin:0}
 .class-checkbox label{font-size:13px;margin:0;cursor:pointer}
 /* Multi-class event cards */
-.event.multi-class{position:relative;overflow:hidden}
-.event.multi-class::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom, var(--class-colors))}
+.event.multi-class{position:relative;overflow:hidden;padding-left:16px} /* Add left padding to prevent text bleeding */
+.event.multi-class::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:4px; /* Made thinner for cleaner look */
+  background:var(--secondary-class-color); /* Use secondary class color, not gradient */
+}
 .event .class-badges{position:absolute;top:2px;right:25px;display:flex;gap:2px}
 .event .class-badge{width:8px;height:8px;border-radius:50%;display:inline-block}
 </style>
@@ -1155,9 +1163,9 @@ function renderUpcomingEvents() {
     const eventClasses = ev.classes || [ev.class];
     const classLabels = eventClasses.map(cls => CLASS_META[cls]?.label || cls).join(', ');
     
-    // For multi-class events, show gradient or first class color
+    // For multi-class events, show secondary class color (not gradient)
     const classColor = eventClasses.length > 1 
-      ? `linear-gradient(to right, ${eventClasses.map(cls => CLASS_META[cls]?.color || '#666').join(', ')})` 
+      ? CLASS_META[eventClasses[1]]?.color || '#666' // Use secondary class color
       : CLASS_META[eventClasses[0]]?.color || '#666';
     
     return `
@@ -1286,9 +1294,10 @@ function addEventElement(parent, ev){
   if (eventClasses.length > 1) {
     div.classList.add('multi-class');
     
-    // Create color gradient for left border
-    const colors = eventClasses.map(cls => CLASS_META[cls]?.color || '#666');
-    div.style.setProperty('--class-colors', colors.join(', '));
+    // Use the color of the secondary (non-primary) class for the left border
+    const secondaryClass = eventClasses[1]; // Get the second class (first non-primary)
+    const secondaryColor = CLASS_META[secondaryClass]?.color || '#666';
+    div.style.setProperty('--secondary-class-color', secondaryColor);
     
     // Add class badges
     const badgesHtml = eventClasses.map(cls => 
@@ -1345,7 +1354,7 @@ function openDetails(id){
   
   if (eventClasses.length > 1) {
     b.textContent = eventClasses.map(cls => CLASS_META[cls]?.label || cls).join(', ');
-    b.style.background = `linear-gradient(to right, ${eventClasses.map(cls => CLASS_META[cls]?.color || '#666').join(', ')})`;
+    b.style.background = CLASS_META[eventClasses[1]]?.color || '#666'; // Use secondary class color, not gradient
   } else {
     const primaryClass = eventClasses[0];
     b.textContent = CLASS_META[primaryClass]?.label || primaryClass;
