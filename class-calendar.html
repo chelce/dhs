@@ -1216,8 +1216,12 @@ async function persistNewEvent(ev){
   try { 
     console.log('☁️ Saving new event to cloud database...');
     
-    // Prepare the event data - let Supabase auto-generate the id
+    // Generate a unique ID for the event if it doesn't have one
+    const eventId = ev.id || ('evt_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+    
+    // Prepare the event data - provide the ID since database expects it
     const eventData = {
+      id: eventId,
       event_date: ev.date, 
       year: parseInt(ev.date.slice(0,4),10), 
       month: parseInt(ev.date.slice(5,7),10)-1, 
@@ -1226,13 +1230,9 @@ async function persistNewEvent(ev){
       event_class: ev.classes ? ev.classes[0] : (ev.class || 'other'), // Primary class for backwards compatibility
       event_classes: JSON.stringify(ev.classes || [ev.class || 'other']), // All classes as JSON
       notes: ev.notes || '<p>No notes yet...</p>', 
-      is_tentative: ev.isTentative || false
+      is_tentative: ev.isTentative || false,
+      created_at: ev.createdAt || new Date().toISOString()
     };
-    
-    // Only add created_at if it exists
-    if (ev.createdAt) {
-      eventData.created_at = ev.createdAt;
-    }
     
     console.log('📤 Event data being sent:', eventData);
     console.log('📤 Event object structure:', Object.keys(eventData));
