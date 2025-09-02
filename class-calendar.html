@@ -359,11 +359,16 @@ async function init(){
   wireUI();
   await ensureEditors();
   
-  // CLOUD-FIRST APPROACH: Only use localStorage as fallback
+  // CLOUD-FIRST APPROACH: Try cloud, then localStorage, then hardcoded events
   const remoteLoaded = await loadRemoteEvents();
   if (!remoteLoaded || !supabase) {
     console.warn('🔄 Cloud unavailable - falling back to local storage');
     loadLocalEvents();
+    // If we still have no events, try loading hardcoded events
+    if (events.length === 0) {
+      console.warn('📄 No local events found - loading hardcoded events');
+      await loadHardcodedEvents();
+    }
   } else {
     console.log('☁️ Cloud data loaded successfully - skipping localStorage');
     // Clear any stale local data since we have cloud data
@@ -1661,5 +1666,398 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.target.style.display='none'; });
 
 </script>
+
+<!-- ========= CLASS STATUS SECTION ========= -->
+<div id="classStatusSection" class="class-status-container">
+  <h2>📚 Class Progress & Next Steps</h2>
+  <div class="class-status-grid">
+    
+    <div class="class-status-card class-2a">
+      <div class="class-header">
+        <h3>📖 English 2A</h3>
+        <div class="class-indicator">2A</div>
+      </div>
+      <div class="status-content">
+        <div class="where-we-are">
+          <h4>📍 Where We Left Off:</h4>
+          <p id="status-2a-current">Completed categories game (categories worked well, but game mechanics need streamlining for answer reading). Started working on analogies - some groups excelled with hard analogies, most groups did well with easy ones. Explained money logistics and heart system.</p>
+        </div>
+        <div class="where-were-going">
+          <h4>🎯 Where We're Heading:</h4>
+          <p id="status-2a-next">Continue with second set of analogy tasks on Thursday (sorting and creating analogies). Groups are ready to advance to more complex analogy work.</p>
+        </div>
+        <div class="last-updated">
+          <small>Last updated: <span id="status-2a-date">September 2, 2025</span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-status-card class-2b">
+      <div class="class-header">
+        <h3>📖 English 2B</h3>
+        <div class="class-indicator">2B</div>
+      </div>
+      <div class="status-content">
+        <div class="where-we-are">
+          <h4>📍 Where We Left Off:</h4>
+          <p id="status-2b-current">Starting the school year - introductory activities and classroom procedures</p>
+        </div>
+        <div class="where-were-going">
+          <h4>🎯 Where We're Heading:</h4>
+          <p id="status-2b-next">Continue building classroom community and begin literature introductions</p>
+        </div>
+        <div class="last-updated">
+          <small>Last updated: <span id="status-2b-date">September 2, 2025</span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-status-card class-4b">
+      <div class="class-header">
+        <h3>📖 English 4B</h3>
+        <div class="class-indicator">4B</div>
+      </div>
+      <div class="status-content">
+        <div class="where-we-are">
+          <h4>📍 Where We Left Off:</h4>
+          <p id="status-4b-current">Starting the school year - introductory activities and classroom procedures</p>
+        </div>
+        <div class="where-were-going">
+          <h4>🎯 Where We're Heading:</h4>
+          <p id="status-4b-next">Continue building classroom community and begin literature introductions</p>
+        </div>
+        <div class="last-updated">
+          <small>Last updated: <span id="status-4b-date">September 2, 2025</span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-status-card class-3a">
+      <div class="class-header">
+        <h3>� English 3A</h3>
+        <div class="class-indicator">3A</div>
+      </div>
+      <div class="status-content">
+        <div class="where-we-are">
+          <h4>📍 Where We Left Off:</h4>
+          <p id="status-3a-current">Completed categories game (took much longer than expected, struggled with group formation). Did not get to analogies work due to time constraints. Explained money logistics and heart system.</p>
+        </div>
+        <div class="where-were-going">
+          <h4>🎯 Where We're Heading:</h4>
+          <p id="status-3a-next">Start with first set of analogy cards on Thursday. Focus on efficient group transitions and time management.</p>
+        </div>
+        <div class="last-updated">
+          <small>Last updated: <span id="status-3a-date">September 2, 2025</span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="class-status-card class-ap">
+      <div class="class-header">
+        <h3>📚 AP Language (3B)</h3>
+        <div class="class-indicator">AP</div>
+      </div>
+      <div class="status-content">
+        <div class="where-we-are">
+          <h4>📍 Where We Left Off:</h4>
+          <p id="status-ap-current">Starting the school year - AP Language expectations and initial coursework</p>
+        </div>
+        <div class="where-were-going">
+          <h4>🎯 Where We're Heading:</h4>
+          <p id="status-ap-next">Begin intensive rhetorical analysis and argument construction work</p>
+        </div>
+        <div class="last-updated">
+          <small>Last updated: <span id="status-ap-date">September 2, 2025</span></small>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+  <div class="status-actions">
+    <button onclick="updateClassStatus()" class="btn-update-status">✏️ Update Class Status</button>
+    <button onclick="toggleStatusSection()" class="btn-toggle-status">👁️ Hide/Show Status</button>
+  </div>
+</div>
+
+<style>
+/* ========= CLASS STATUS STYLES ========= */
+.class-status-container {
+  margin: 30px auto;
+  max-width: 1200px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 2px solid #dee2e6;
+}
+
+.class-status-container h2 {
+  text-align: center;
+  color: #495057;
+  margin-bottom: 25px;
+  font-size: 1.8em;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.class-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.class-status-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  border-left: 6px solid;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.class-status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+/* Class-specific colors */
+.class-2a {
+  border-left-color: #6f42c1;
+  background: linear-gradient(135deg, #ffffff 0%, #faf8ff 100%);
+}
+
+.class-2b {
+  border-left-color: #17a2b8;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fdfe 100%);
+}
+
+.class-3a {
+  border-left-color: #90ee90;
+  background: linear-gradient(135deg, #ffffff 0%, #fafffa 100%);
+}
+
+.class-4b {
+  border-left-color: #ff1493;
+  background: linear-gradient(135deg, #ffffff 0%, #fff8fc 100%);
+}
+
+.class-ap {
+  border-left-color: #ff8c00;
+  background: linear-gradient(135deg, #ffffff 0%, #fffaf5 100%);
+}
+
+.class-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.class-header h3 {
+  margin: 0;
+  color: #495057;
+  font-size: 1.2em;
+}
+
+.class-indicator {
+  background: #495057;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.class-2a .class-indicator { background: #6f42c1; }
+.class-2b .class-indicator { background: #17a2b8; }
+.class-3a .class-indicator { background: #90ee90; color: #333; }
+.class-4b .class-indicator { background: #ff1493; }
+.class-ap .class-indicator { background: #ff8c00; color: #333; }
+
+.status-content h4 {
+  margin: 15px 0 8px 0;
+  color: #6c757d;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.status-content p {
+  margin: 0 0 15px 0;
+  color: #495057;
+  line-height: 1.4;
+  font-size: 0.95em;
+}
+
+.where-we-are {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 3px solid #6c757d;
+}
+
+.where-were-going {
+  background: #fff3cd;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 3px solid #856404;
+}
+
+.last-updated {
+  text-align: right;
+  color: #6c757d;
+  font-style: italic;
+  padding-top: 10px;
+  border-top: 1px solid #e9ecef;
+}
+
+.status-actions {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #dee2e6;
+}
+
+.btn-update-status, .btn-toggle-status {
+  background: #495057;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  margin: 0 10px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-update-status:hover, .btn-toggle-status:hover {
+  background: #343a40;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.btn-update-status {
+  background: #28a745;
+}
+
+.btn-update-status:hover {
+  background: #218838;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .class-status-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .class-status-container {
+    margin: 20px 10px;
+    padding: 15px;
+  }
+  
+  .status-actions {
+    margin-top: 15px;
+  }
+  
+  .btn-update-status, .btn-toggle-status {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+  }
+}
+
+/* Hidden state */
+.class-status-container.hidden {
+  display: none;
+}
+</style>
+
+<script>
+// ========= CLASS STATUS FUNCTIONS =========
+function updateClassStatus() {
+  alert('Class status updates will be handled through daily debriefs with the AI assistant.\n\nDuring your debrief, mention what happened in each class and where you want to head next, and the AI will update this section accordingly.');
+}
+
+function toggleStatusSection() {
+  const section = document.getElementById('classStatusSection');
+  const btn = document.querySelector('.btn-toggle-status');
+  
+  if (section.classList.contains('hidden')) {
+    section.classList.remove('hidden');
+    btn.textContent = '👁️ Hide Status';
+  } else {
+    section.classList.add('hidden');
+    btn.textContent = '👁️ Show Status';
+  }
+  
+  // Save preference to localStorage
+  localStorage.setItem('statusSectionHidden', section.classList.contains('hidden'));
+}
+
+// Restore status section visibility on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const isHidden = localStorage.getItem('statusSectionHidden') === 'true';
+  if (isHidden) {
+    document.getElementById('classStatusSection').classList.add('hidden');
+    document.querySelector('.btn-toggle-status').textContent = '👁️ Show Status';
+  }
+});
+
+// Function to update individual class status (called by AI during debriefs)
+function updateIndividualClassStatus(classCode, currentStatus, nextSteps) {
+  const currentElement = document.getElementById(`status-${classCode}-current`);
+  const nextElement = document.getElementById(`status-${classCode}-next`);
+  const dateElement = document.getElementById(`status-${classCode}-date`);
+  
+  if (currentElement) currentElement.textContent = currentStatus;
+  if (nextElement) nextElement.textContent = nextSteps;
+  if (dateElement) dateElement.textContent = new Date().toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+  
+  // Save to localStorage for persistence
+  const statusData = {
+    current: currentStatus,
+    next: nextSteps,
+    date: new Date().toISOString()
+  };
+  localStorage.setItem(`classStatus-${classCode}`, JSON.stringify(statusData));
+}
+
+// Load saved status data on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const classes = ['2a', '2b', '3a', '4b', 'ap'];
+  
+  classes.forEach(classCode => {
+    const saved = localStorage.getItem(`classStatus-${classCode}`);
+    if (saved) {
+      const data = JSON.parse(saved);
+      const currentElement = document.getElementById(`status-${classCode}-current`);
+      const nextElement = document.getElementById(`status-${classCode}-next`);
+      const dateElement = document.getElementById(`status-${classCode}-date`);
+      
+      if (currentElement) currentElement.textContent = data.current;
+      if (nextElement) nextElement.textContent = data.next;
+      if (dateElement) {
+        const date = new Date(data.date);
+        dateElement.textContent = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+    }
+  });
+});
+</script>
+
 </body>
 </html>
