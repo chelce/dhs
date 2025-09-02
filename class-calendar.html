@@ -210,6 +210,16 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .upcoming-date{font-size:11px;font-weight:600;color:#666;min-width:45px}
 .upcoming-class{font-size:10px;padding:2px 6px;border-radius:10px;color:#fff;font-weight:600}
 .upcoming-text{flex:1;font-size:13px;color:#333}
+/* Multi-class event styling */
+.class-checkboxes{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
+.class-checkbox{display:flex;align-items:center;gap:4px}
+.class-checkbox input[type="checkbox"]{margin:0}
+.class-checkbox label{font-size:13px;margin:0;cursor:pointer}
+/* Multi-class event cards */
+.event.multi-class{position:relative;overflow:hidden}
+.event.multi-class::before{content:'';position:absolute;left:0;top:0;bottom:0;width:8px;background:linear-gradient(to bottom, var(--class-colors))}
+.event .class-badges{position:absolute;top:2px;right:25px;display:flex;gap:2px}
+.event .class-badge{width:8px;height:8px;border-radius:50%;display:inline-block}
 </style>
 </head>
 <body>
@@ -256,10 +266,17 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
     <div class="modal-header"><span class="modal-title" id="eventModalTitle">Add Event</span><span class="close" data-close="eventModal">×</span></div>
     <form id="eventForm" autocomplete="off">
       <div class="form-group"><label for="eventText">Title</label><input id="eventText" required maxlength="140" /></div>
-      <div class="form-group"><label for="eventClass">Class</label>
-        <select id="eventClass" required>
-          <option value="2a">2A</option><option value="3a">3A</option><option value="2b">2B</option><option value="ap">AP</option><option value="4b">4B</option><option value="other">Other</option><option value="dhs">DHS</option><option value="reflection">Reflection</option>
-        </select>
+      <div class="form-group"><label>Classes</label>
+        <div class="class-checkboxes" id="eventClassCheckboxes">
+          <div class="class-checkbox"><input type="checkbox" id="class-2a" value="2a"><label for="class-2a">2A</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-3a" value="3a"><label for="class-3a">3A</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-2b" value="2b"><label for="class-2b">2B</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-ap" value="ap"><label for="class-ap">AP</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-4b" value="4b"><label for="class-4b">4B</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-other" value="other"><label for="class-other">Other</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-dhs" value="dhs"><label for="class-dhs">DHS</label></div>
+          <div class="class-checkbox"><input type="checkbox" id="class-reflection" value="reflection"><label for="class-reflection">Reflection</label></div>
+        </div>
       </div>
       <div class="form-group"><label for="eventType">Type</label>
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
@@ -300,7 +317,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 /* ========= STATE ========= */
 let supabase = null;
 let weekOffset = 0; // 0 is current week block center
-let events = []; // {id,date(YYYY-MM-DD),text,class,isTentative,notes,createdAt}
+let events = []; // {id,date(YYYY-MM-DD),text,classes[],isTentative,notes,createdAt}
 let currentEditId = null; // for details modal
 let notesEditor = null; let detailsEditor = null;
 
@@ -985,11 +1002,25 @@ async function loadRemoteEvents(){
     data.forEach(r=>{
       // avoid duplicates
       if(!events.some(e=>e.id===r.id)){
+        // Handle both old single-class events and new multi-class events
+        let eventClasses = [];
+        if (r.event_classes) {
+          try {
+            eventClasses = JSON.parse(r.event_classes);
+          } catch(e) {
+            console.warn('Failed to parse event_classes, falling back to single class');
+            eventClasses = [r.event_class];
+          }
+        } else {
+          eventClasses = [r.event_class];
+        }
+        
         events.push({
           id: r.id || 'db-'+r.event_date+'-'+r.event_text.replace(/\s+/g,'_'),
           date: r.event_date,
           text: r.event_text,
-          class: r.event_class,
+          classes: eventClasses,
+          class: eventClasses[0], // Keep for backwards compatibility
           isTentative: !!r.is_tentative,
           notes: r.notes || '',
           createdAt: r.created_at || r.event_date
@@ -1043,9 +1074,6 @@ function saveLocalEvents(){
 
 /* ========= RENDER ========= */
 function render(){
-  // Detect shared lessons before rendering
-  detectSharedLessons();
-  
   const grid=document.getElementById('calendarGrid'); grid.innerHTML='';
   // headers
   const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -1071,34 +1099,7 @@ function render(){
   renderUpcomingEvents();
 }
 
-/* ========= SHARED LESSONS & UPCOMING EVENTS ========= */
-function detectSharedLessons() {
-  // Group events by date and text to find shared lessons
-  const eventsByDateAndText = {};
-  events.forEach(ev => {
-    const key = `${ev.date}|${ev.text.toLowerCase().trim()}`;
-    if (!eventsByDateAndText[key]) {
-      eventsByDateAndText[key] = [];
-    }
-    eventsByDateAndText[key].push(ev);
-  });
-  
-  // Mark events that are shared
-  events.forEach(ev => {
-    ev.sharedWith = null; // Reset
-    const key = `${ev.date}|${ev.text.toLowerCase().trim()}`;
-    const sameEvents = eventsByDateAndText[key];
-    
-    if (sameEvents.length > 1) {
-      // Find the other class this lesson is shared with
-      const otherEvent = sameEvents.find(other => other.class !== ev.class);
-      if (otherEvent) {
-        ev.sharedWith = otherEvent.class;
-      }
-    }
-  });
-}
-
+/* ========= UPCOMING EVENTS ========= */
 function renderUpcomingEvents() {
   const today = new Date();
   const nextWeek = new Date(today);
@@ -1123,12 +1124,19 @@ function renderUpcomingEvents() {
     const eventDate = new Date(ev.date);
     const dayName = eventDate.toLocaleDateString('en', { weekday: 'short' });
     const monthDay = `${eventDate.getMonth() + 1}/${eventDate.getDate()}`;
-    const classColor = CLASS_META[ev.class]?.color || '#666';
+    
+    const eventClasses = ev.classes || [ev.class];
+    const classLabels = eventClasses.map(cls => CLASS_META[cls]?.label || cls).join(', ');
+    
+    // For multi-class events, show gradient or first class color
+    const classColor = eventClasses.length > 1 
+      ? `linear-gradient(to right, ${eventClasses.map(cls => CLASS_META[cls]?.color || '#666').join(', ')})` 
+      : CLASS_META[eventClasses[0]]?.color || '#666';
     
     return `
       <div class="upcoming-event">
         <div class="upcoming-date">${dayName}<br>${monthDay}</div>
-        <div class="upcoming-class" style="background: ${classColor}">${CLASS_META[ev.class]?.label || ev.class}</div>
+        <div class="upcoming-class" style="background: ${classColor}">${classLabels}</div>
         <div class="upcoming-text">${ev.text}</div>
       </div>
     `;
@@ -1155,10 +1163,18 @@ function saveNewEvent(e){
   e.preventDefault();
   const form=e.target; const date=form.dataset.date || fmtDate(new Date());
   const text=document.getElementById('eventText').value.trim(); if(!text) return;
-  const cls=document.getElementById('eventClass').value; const tentative=document.getElementById('eventType').value==='tentative';
+  
+  // Get selected classes from checkboxes
+  const selectedClasses = Array.from(document.querySelectorAll('#eventClassCheckboxes input:checked')).map(cb => cb.value);
+  if (selectedClasses.length === 0) {
+    alert('Please select at least one class.');
+    return;
+  }
+  
+  const tentative=document.getElementById('eventType').value==='tentative';
   let notes=document.getElementById('eventNotes').value;
   if(!notes && !notesEditor) notes=document.getElementById('eventNotesEditor').innerHTML;
-  const ev={id:'u-'+Date.now()+'-'+Math.random().toString(36).slice(2),date,text,class:cls,isTentative:tentative,notes,createdAt:new Date().toISOString()};
+  const ev={id:'u-'+Date.now()+'-'+Math.random().toString(36).slice(2),date,text,classes:selectedClasses,isTentative:tentative,notes,createdAt:new Date().toISOString()};
   events.push(ev);
   
   // CLOUD-FIRST: Save to cloud, only use localStorage as emergency backup
@@ -1183,7 +1199,8 @@ async function persistNewEvent(ev){
       month: parseInt(ev.date.slice(5,7),10)-1, 
       day: parseInt(ev.date.slice(8,10),10), 
       event_text: ev.text, 
-      event_class: ev.class, 
+      event_class: ev.classes ? ev.classes[0] : 'other', // Primary class for backwards compatibility
+      event_classes: JSON.stringify(ev.classes || [ev.class]), // All classes as JSON
       notes: ev.notes, 
       is_tentative: ev.isTentative, 
       created_at: ev.createdAt
@@ -1204,19 +1221,35 @@ function addEventElement(parent, ev){
   div.className='event'; 
   if(ev.isTentative) div.classList.add('tentative');
   
-  div.dataset.id=ev.id; 
-  div.dataset.class=ev.class; 
+  // Handle both old single-class and new multi-class events
+  const eventClasses = ev.classes || [ev.class];
+  const primaryClass = eventClasses[0];
   
-  // Add shared lesson styling if applicable
-  if (ev.sharedWith) {
-    div.classList.add(`shared-with-${ev.sharedWith}`);
+  div.dataset.id=ev.id; 
+  div.dataset.class=primaryClass; 
+  
+  // Multi-class styling
+  if (eventClasses.length > 1) {
+    div.classList.add('multi-class');
+    
+    // Create color gradient for left border
+    const colors = eventClasses.map(cls => CLASS_META[cls]?.color || '#666');
+    div.style.setProperty('--class-colors', colors.join(', '));
+    
+    // Add class badges
+    const badgesHtml = eventClasses.map(cls => 
+      `<span class="class-badge" style="background: ${CLASS_META[cls]?.color || '#666'}" title="${CLASS_META[cls]?.label || cls}"></span>`
+    ).join('');
+    
+    div.innerHTML = `<span>${ev.text}</span><div class="class-badges">${badgesHtml}</div><button class="delete-btn" title="Delete">×</button>`;
+  } else {
+    div.innerHTML = `<span>${ev.text}</span><button class="delete-btn" title="Delete">×</button>`;
   }
   
   // All events are now draggable
   div.setAttribute('draggable','true');
   div.title = 'Drag to move this event';
   
-  div.innerHTML=`<span>${ev.text}</span><button class="delete-btn" title="Delete">×</button>`;
   div.addEventListener('click', (e)=>{ 
     if(e.target.classList.contains('delete-btn')){ 
       e.stopPropagation(); 
@@ -1235,13 +1268,35 @@ function addEventElement(parent, ev){
 
 function applyFilters(){
   const enabled={}; Object.keys(CLASS_META).forEach(k=>{const cb=document.getElementById('show-'+k); if(cb) enabled[k]=cb.checked;});
-  document.querySelectorAll('.event').forEach(ev=>{const cls=ev.dataset.class; ev.style.display = enabled[cls] ? '' : 'none';});
+  document.querySelectorAll('.event').forEach(eventDiv => {
+    const eventId = eventDiv.dataset.id;
+    const event = events.find(e => e.id === eventId);
+    
+    if (event) {
+      const eventClasses = event.classes || [event.class];
+      // Show event if ANY of its classes are enabled
+      const shouldShow = eventClasses.some(cls => enabled[cls]);
+      eventDiv.style.display = shouldShow ? '' : 'none';
+    }
+  });
 }
 
 function openDetails(id){
   const ev=events.find(e=>e.id===id); if(!ev) return; currentEditId=id;
   document.getElementById('detailsTitle').textContent=ev.text;
-  const b=document.getElementById('detailsBadge'); b.textContent=CLASS_META[ev.class]?.label||ev.class; b.style.background=CLASS_META[ev.class]?.color||'#555';
+  
+  // Handle multi-class events in details modal
+  const eventClasses = ev.classes || [ev.class];
+  const b=document.getElementById('detailsBadge'); 
+  
+  if (eventClasses.length > 1) {
+    b.textContent = eventClasses.map(cls => CLASS_META[cls]?.label || cls).join(', ');
+    b.style.background = `linear-gradient(to right, ${eventClasses.map(cls => CLASS_META[cls]?.color || '#666').join(', ')})`;
+  } else {
+    const primaryClass = eventClasses[0];
+    b.textContent = CLASS_META[primaryClass]?.label || primaryClass;
+    b.style.background = CLASS_META[primaryClass]?.color || '#555';
+  }
   document.getElementById('detailsDate').textContent=ev.date;
   if(detailsEditor){ detailsEditor.commands.setContent(ev.notes||'<p></p>'); } else { document.getElementById('detailsNotesEditor').innerHTML=ev.notes||''; }
   document.getElementById('detailsModal').style.display='flex';
@@ -1293,9 +1348,7 @@ function saveDetailsNotes(){
     console.log('☁️ Saving notes to cloud database...');
     supabase.from('calendar_events')
       .update({ notes: ev.notes })
-      .eq('event_date',ev.date)
-      .eq('event_text',ev.text)
-      .eq('event_class',ev.class)
+      .eq('id', ev.id) // Use ID for more precise matching
       .then(result => {
         console.log('✅ Notes saved to cloud:', result);
       })
