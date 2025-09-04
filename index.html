@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Card Sets Gallery</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * {
             margin: 0;
@@ -118,7 +119,12 @@
         }
 
         .card-count::before {
-            content: '🎴';
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3crect width='7' height='7' x='3' y='3' rx='1'/%3e%3crect width='7' height='7' x='14' y='3' rx='1'/%3e%3crect width='7' height='7' x='14' y='14' rx='1'/%3e%3crect width='7' height='7' x='3' y='14' rx='1'/%3e%3c/svg%3e");
+            background-size: contain;
+            opacity: 0.7;
         }
 
         .difficulty {
@@ -128,19 +134,26 @@
         }
 
         .difficulty.beginner::before {
-            content: '⭐';
+            content: '';
+            width: 16px;
+            height: 16px;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='gold' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolygon points='12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26'/%3e%3c/svg%3e");
+            background-size: contain;
         }
 
         .difficulty.intermediate::before {
-            content: '⭐⭐';
+            content: '★★';
+            color: gold;
         }
 
         .difficulty.advanced::before {
-            content: '⭐⭐⭐';
+            content: '★★★';
+            color: gold;
         }
 
         .difficulty.mixed::before {
-            content: '⭐⭐';
+            content: '★★';
+            color: gold;
         }
 
         .add-new {
@@ -172,6 +185,20 @@
             font-weight: bold;
         }
 
+        /* Lucide icon styling */
+        .set-number i[data-lucide] {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+        }
+
+        .header h1 i[data-lucide] {
+            width: 48px;
+            height: 48px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
         @media (max-width: 768px) {
             .gallery {
                 grid-template-columns: 1fr;
@@ -191,7 +218,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🧩 Logic Puzzle Gallery</h1>
+            <h1><i data-lucide="puzzle"></i> Logic Puzzle Gallery</h1>
             <p>Interactive logic puzzles for 9th Grade ELA - Developing critical thinking and problem-solving skills</p>
         </div>
 
@@ -213,7 +240,7 @@
 
             <!-- Analogies Interactive Task Cards -->
             <a href="analogies-relationship-patterns-task-cards-complete.html" class="card-set">
-                <div class="set-number">🆕 Interactive</div>
+                <div class="set-number"><i data-lucide="zap"></i> Interactive</div>
                 <div class="set-title">Analogies & Word Relationships - Task Cards</div>
                 <div class="set-description">
                     Interactive carousel task cards with three difficulty levels (Easy, Medium, Hard). Features 
@@ -228,7 +255,7 @@
 
             <!-- Analogies Answer Key -->
             <a href="analogies-relationship-patterns-answer-key.html" class="card-set" style="border: 2px solid #27ae60; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
-                <div class="set-number">📋 Answer Key</div>
+                <div class="set-number"><i data-lucide="clipboard-check"></i> Answer Key</div>
                 <div class="set-title">Analogies & Word Relationships - Answer Key</div>
                 <div class="set-description">
                     Complete answer key for all analogy task cards with solutions provided. Interactive carousel format 
@@ -238,6 +265,81 @@
                 <div class="set-meta">
                     <div class="card-count">All Solutions</div>
                     <div class="difficulty mixed">Teacher Reference</div>
+                </div>
+            </a>
+
+            <!-- Analogies Interactive Cards (Alternative Version) -->
+            <a href="analogies-relationship-patterns-interactive-cards.html" class="card-set">
+                <div class="set-number"><i data-lucide="gamepad-2"></i> Interactive</div>
+                <div class="set-title">Analogies - Interactive Cards (Alternative)</div>
+                <div class="set-description">
+                    Alternative interactive version of analogies cards with enhanced user interface. Features dynamic 
+                    interactions, visual feedback, and engaging transitions. Great for variety in classroom presentation 
+                    and student engagement with different interaction styles.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">Interactive Set</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Analogies Task Cards (Base Version) -->
+            <a href="analogies-relationship-patterns-task-cards.html" class="card-set">
+                <div class="set-number"><i data-lucide="layers"></i> Base</div>
+                <div class="set-title">Analogies & Word Relationships - Base Cards</div>
+                <div class="set-description">
+                    Base version of the relationship patterns task cards without advanced interactive features. 
+                    Clean, straightforward presentation ideal for focused practice and assessment. Perfect for 
+                    situations where simpler navigation is preferred.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">Core Set</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Analogies Worksheet -->
+            <a href="analogies-relationship-patterns-worksheet.html" class="card-set">
+                <div class="set-number"><i data-lucide="file-edit"></i> Worksheet</div>
+                <div class="set-title">Analogies & Word Relationships - Worksheet</div>
+                <div class="set-description">
+                    Printable worksheet format of the analogies and word relationships content. Perfect for 
+                    independent practice, homework assignments, or assessment purposes. Clean layout optimized 
+                    for printing and traditional paper-based work.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">Printable</div>
+                    <div class="difficulty mixed">All Levels</div>
+                </div>
+            </a>
+
+            <!-- Original Analogies Task Cards -->
+            <a href="analogies-task-cards.html" class="card-set">
+                <div class="set-number"><i data-lucide="book-open"></i> Original</div>
+                <div class="set-title">Original Analogies Task Cards</div>
+                <div class="set-description">
+                    The original set of analogy task cards focusing on fundamental word relationships and patterns. 
+                    Classic format with clear examples and structured practice. Great for introducing analogical reasoning 
+                    concepts before moving to the interactive versions.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">Classic Set</div>
+                    <div class="difficulty beginner">Foundation</div>
+                </div>
+            </a>
+
+            <!-- Original Analogies Answers -->
+            <a href="analogies-answers.html" class="card-set" style="border: 2px solid #e74c3c; background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                <div class="set-number"><i data-lucide="file-text"></i> Solutions</div>
+                <div class="set-title">Original Analogies - Answer Key</div>
+                <div class="set-description">
+                    Answer key for the original analogies task cards. Simple, straightforward format with all solutions 
+                    clearly displayed. Perfect for quick reference when using the original analogies set for instruction 
+                    or assessment.
+                </div>
+                <div class="set-meta">
+                    <div class="card-count">All Answers</div>
+                    <div class="difficulty beginner">Teacher Reference</div>
                 </div>
             </a>
 
@@ -298,7 +400,7 @@
         // Add click handler for the "add new" card
         document.querySelector('.add-new').addEventListener('click', function(e) {
             e.preventDefault();
-            alert('Future logic puzzle expansion! 🧩\n\nPlanned additions:\n• Advanced Mystery Puzzles\n• Word Logic Challenges\n• Mathematical Reasoning Cards\n• Cross-Curricular Logic Problems');
+            alert('Future logic puzzle expansion!\n\nPlanned additions:\n• Advanced Mystery Puzzles\n• Word Logic Challenges\n• Mathematical Reasoning Cards\n• Cross-Curricular Logic Problems');
         });
 
         // Add some interactive elements
@@ -311,6 +413,9 @@
                 this.style.background = 'white';
             });
         });
+
+        // Initialize Lucide icons
+        lucide.createIcons();
     </script>
 </body>
 </html>

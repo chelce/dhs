@@ -1,5 +1,14 @@
 # Lesson Reflections & Documentation System
 
+## 🚨 **CRITICAL REFERENCES**
+
+### **📋 Calendar Event Creation Guide**
+- **File**: `../documentation/CALENDAR-EVENT-CREATION-GUIDE.md`
+- **Purpose**: Step-by-step guide for adding events to the cloud-based calendar
+- **⚠️ IMPORTANT**: Follow this guide exactly to avoid debugging issues
+
+---
+
 ## Purpose
 This folder system tracks how different lessons, activities, and teaching strategies performed throughout the school year. The documentation serves as a valuable reference for future lesson planning and year-over-year improvement.
 

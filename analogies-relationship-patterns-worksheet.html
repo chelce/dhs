@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analogy Relationship Patterns - Student Worksheet</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * {
             margin: 0;
@@ -306,7 +307,7 @@
 <body>
     <div class="worksheet">
         <div class="header">
-            <h1>📝 Analogy Relationship Patterns</h1>
+            <h1><i data-lucide="file-text"></i> Analogy Relationship Patterns</h1>
             <div class="subtitle">Student Worksheet & Skill Check</div>
         </div>
 
@@ -331,7 +332,7 @@
 
         <!-- Reference Section -->
         <div class="section">
-            <div class="section-title">📚 Relationship Types Reference</div>
+            <div class="section-title"><i data-lucide="book-open"></i> Relationship Types Reference</div>
             <div class="reference-grid">
                 <div class="reference-item">
                     <div class="reference-type">Part/Whole</div>
@@ -365,7 +366,7 @@
             <div class="skill-check-title">
                 <span class="tier-indicator tier-easy">EASY LEVEL</span>
                 <span class="time-indicator">4-5 minutes</span>
-                🎯 Skill Check A: Identify the Relationship
+                <i data-lucide="target"></i> Skill Check A: Identify the Relationship
             </div>
 
             <div class="question">
@@ -580,5 +581,11 @@
             </div>
         </div>
     </div>
+    <script>
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
 </body>
 </html>
