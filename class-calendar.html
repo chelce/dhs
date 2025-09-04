@@ -1676,6 +1676,40 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
 
 </script>
 
+<!-- ========= TASK MANAGEMENT PANEL ========= -->
+<div id="taskPanel" class="task-panel collapsed">
+  <div class="task-panel-header" onclick="toggleTaskPanel()">
+    <div class="task-panel-title">
+      <i data-lucide="clipboard-list"></i>
+      <span>Task Management</span>
+    </div>
+    <div class="task-panel-toggle">
+      <i data-lucide="chevron-right" id="taskPanelChevron"></i>
+    </div>
+  </div>
+  
+  <div class="task-panel-content">
+    <div class="task-panel-toolbar">
+      <button onclick="addNewTask()" class="task-add-btn">
+        <i data-lucide="plus"></i>
+        Add Task
+      </button>
+      <div class="task-filter-buttons">
+        <button onclick="filterTasks('all')" class="task-filter-btn active" data-filter="all">All</button>
+        <button onclick="filterTasks('2a')" class="task-filter-btn" data-filter="2a">2A</button>
+        <button onclick="filterTasks('2b')" class="task-filter-btn" data-filter="2b">2B</button>
+        <button onclick="filterTasks('3a')" class="task-filter-btn" data-filter="3a">3A</button>
+        <button onclick="filterTasks('4b')" class="task-filter-btn" data-filter="4b">4B</button>
+        <button onclick="filterTasks('ap')" class="task-filter-btn" data-filter="ap">AP</button>
+      </div>
+    </div>
+    
+    <div class="task-list" id="taskList">
+      <!-- Tasks will be dynamically added here -->
+    </div>
+  </div>
+</div>
+
 <!-- ========= CLASS STATUS SECTION ========= -->
 <div id="classStatusSection" class="class-status-container">
   <h2>📚 Class Progress & Next Steps</h2>
@@ -1985,6 +2019,279 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
 .class-status-container.hidden {
   display: none;
 }
+
+/* ========= TASK PANEL STYLES ========= */
+.task-panel {
+  margin: 20px auto;
+  max-width: 1200px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 2px solid #dee2e6;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.task-panel-header {
+  background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+  color: white;
+  padding: 15px 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+
+.task-panel-header:hover {
+  background: linear-gradient(135deg, #343a40 0%, #212529 100%);
+}
+
+.task-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.task-panel-title i {
+  width: 20px;
+  height: 20px;
+}
+
+.task-panel-toggle {
+  transition: transform 0.3s ease;
+}
+
+.task-panel-toggle i {
+  width: 20px;
+  height: 20px;
+}
+
+.task-panel.collapsed .task-panel-toggle {
+  transform: rotate(0deg);
+}
+
+.task-panel:not(.collapsed) .task-panel-toggle {
+  transform: rotate(90deg);
+}
+
+.task-panel-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.task-panel:not(.collapsed) .task-panel-content {
+  max-height: 600px;
+}
+
+.task-panel-toolbar {
+  background: #f8f9fa;
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.task-add-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease;
+}
+
+.task-add-btn:hover {
+  background: #218838;
+}
+
+.task-add-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+.task-filter-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.task-filter-btn {
+  background: white;
+  border: 1px solid #dee2e6;
+  padding: 6px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.task-filter-btn:hover {
+  background: #e9ecef;
+}
+
+.task-filter-btn.active {
+  background: #495057;
+  color: white;
+  border-color: #495057;
+}
+
+/* Class-specific filter button colors when active */
+.task-filter-btn.active[data-filter="2a"] { background: #6f42c1; border-color: #6f42c1; }
+.task-filter-btn.active[data-filter="2b"] { background: #17a2b8; border-color: #17a2b8; }
+.task-filter-btn.active[data-filter="3a"] { background: #90ee90; border-color: #90ee90; color: #333; }
+.task-filter-btn.active[data-filter="4b"] { background: #ff1493; border-color: #ff1493; }
+.task-filter-btn.active[data-filter="ap"] { background: #ff8c00; border-color: #ff8c00; color: #333; }
+
+.task-list {
+  padding: 20px;
+  min-height: 100px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.task-item {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.task-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.task-header {
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-title-input {
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: 1em;
+  flex: 1;
+  margin-right: 10px;
+  outline: none;
+}
+
+.task-class-selector {
+  border: 1px solid #dee2e6;
+  border-radius: 15px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  font-weight: 500;
+  background: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 10px;
+}
+
+.task-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #6c757d;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.task-action-btn:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.task-action-btn.delete:hover {
+  color: #dc3545;
+}
+
+.task-action-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+.task-notes {
+  padding: 15px;
+}
+
+.task-notes-editor {
+  min-height: 60px;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.task-notes-editor:focus {
+  outline: none;
+  border-color: #495057;
+  box-shadow: 0 0 0 2px rgba(73, 80, 87, 0.1);
+}
+
+/* Task item class indicators */
+.task-item[data-class="2a"] .task-header { background: linear-gradient(135deg, #faf8ff 0%, #f3f0ff 100%); border-left: 4px solid #6f42c1; }
+.task-item[data-class="2b"] .task-header { background: linear-gradient(135deg, #f8fdfe 0%, #e6f9fc 100%); border-left: 4px solid #17a2b8; }
+.task-item[data-class="3a"] .task-header { background: linear-gradient(135deg, #fafffa 0%, #f0fff0 100%); border-left: 4px solid #90ee90; }
+.task-item[data-class="4b"] .task-header { background: linear-gradient(135deg, #fff8fc 0%, #ffe6f3 100%); border-left: 4px solid #ff1493; }
+.task-item[data-class="ap"] .task-header { background: linear-gradient(135deg, #fffaf5 0%, #fff0e6 100%); border-left: 4px solid #ff8c00; }
+
+.empty-tasks {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .task-panel-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .task-filter-buttons {
+    justify-content: center;
+  }
+  
+  .task-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .task-actions {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+}
 </style>
 
 <script>
@@ -2065,6 +2372,335 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   });
+});
+
+// ========= TASK PANEL FUNCTIONS =========
+let taskCounter = 0;
+let currentFilter = 'all';
+
+function toggleTaskPanel() {
+  const panel = document.getElementById('taskPanel');
+  const chevron = document.getElementById('taskPanelChevron');
+  
+  panel.classList.toggle('collapsed');
+  
+  // Save state to localStorage
+  localStorage.setItem('taskPanelCollapsed', panel.classList.contains('collapsed'));
+}
+
+function addNewTask() {
+  taskCounter++;
+  const taskId = `task-${taskCounter}`;
+  
+  const taskItem = document.createElement('div');
+  taskItem.className = 'task-item';
+  taskItem.setAttribute('data-class', '2a'); // Default class
+  taskItem.setAttribute('data-task-id', taskId);
+  
+  taskItem.innerHTML = `
+    <div class="task-header">
+      <input type="text" class="task-title-input" placeholder="Enter task title..." 
+             onchange="saveTask('${taskId}')" onblur="saveTask('${taskId}')">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <select class="task-class-selector" onchange="updateTaskClass('${taskId}', this.value)">
+          <option value="2a">2A</option>
+          <option value="2b">2B</option>
+          <option value="3a">3A</option>
+          <option value="4b">4B</option>
+          <option value="ap">AP</option>
+        </select>
+        <div class="task-actions">
+          <button class="task-action-btn" onclick="duplicateTask('${taskId}')" title="Duplicate">
+            <i data-lucide="copy"></i>
+          </button>
+          <button class="task-action-btn delete" onclick="deleteTask('${taskId}')" title="Delete">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="task-notes">
+      <div class="task-notes-editor" contenteditable="true" 
+           placeholder="Add notes for this task..."
+           onblur="saveTask('${taskId}')"
+           oninput="autoSaveTask('${taskId}')"></div>
+    </div>
+  `;
+  
+  const taskList = document.getElementById('taskList');
+  const emptyMessage = taskList.querySelector('.empty-tasks');
+  if (emptyMessage) {
+    emptyMessage.remove();
+  }
+  
+  taskList.appendChild(taskItem);
+  
+  // Focus on the title input
+  const titleInput = taskItem.querySelector('.task-title-input');
+  titleInput.focus();
+  
+  // Initialize Lucide icons for the new task
+  lucide.createIcons();
+  
+  // Save task
+  saveTask(taskId);
+  
+  // Apply current filter
+  applyTaskFilter();
+}
+
+function updateTaskClass(taskId, classCode) {
+  const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
+  if (taskItem) {
+    taskItem.setAttribute('data-class', classCode);
+    saveTask(taskId);
+    applyTaskFilter();
+  }
+}
+
+function deleteTask(taskId) {
+  if (confirm('Are you sure you want to delete this task?')) {
+    const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (taskItem) {
+      taskItem.remove();
+      
+      // Remove from localStorage
+      localStorage.removeItem(`task-${taskId}`);
+      
+      // Show empty message if no tasks left
+      const taskList = document.getElementById('taskList');
+      if (taskList.children.length === 0) {
+        showEmptyTasksMessage();
+      }
+    }
+  }
+}
+
+function duplicateTask(taskId) {
+  const originalTask = document.querySelector(`[data-task-id="${taskId}"]`);
+  if (originalTask) {
+    const title = originalTask.querySelector('.task-title-input').value;
+    const classCode = originalTask.getAttribute('data-class');
+    const notes = originalTask.querySelector('.task-notes-editor').innerHTML;
+    
+    taskCounter++;
+    const newTaskId = `task-${taskCounter}`;
+    
+    const taskItem = document.createElement('div');
+    taskItem.className = 'task-item';
+    taskItem.setAttribute('data-class', classCode);
+    taskItem.setAttribute('data-task-id', newTaskId);
+    
+    taskItem.innerHTML = `
+      <div class="task-header">
+        <input type="text" class="task-title-input" value="${title} (Copy)" 
+               onchange="saveTask('${newTaskId}')" onblur="saveTask('${newTaskId}')">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <select class="task-class-selector" onchange="updateTaskClass('${newTaskId}', this.value)">
+            <option value="2a" ${classCode === '2a' ? 'selected' : ''}>2A</option>
+            <option value="2b" ${classCode === '2b' ? 'selected' : ''}>2B</option>
+            <option value="3a" ${classCode === '3a' ? 'selected' : ''}>3A</option>
+            <option value="4b" ${classCode === '4b' ? 'selected' : ''}>4B</option>
+            <option value="ap" ${classCode === 'ap' ? 'selected' : ''}>AP</option>
+          </select>
+          <div class="task-actions">
+            <button class="task-action-btn" onclick="duplicateTask('${newTaskId}')" title="Duplicate">
+              <i data-lucide="copy"></i>
+            </button>
+            <button class="task-action-btn delete" onclick="deleteTask('${newTaskId}')" title="Delete">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="task-notes">
+        <div class="task-notes-editor" contenteditable="true" 
+             placeholder="Add notes for this task..."
+             onblur="saveTask('${newTaskId}')"
+             oninput="autoSaveTask('${newTaskId}')">${notes}</div>
+      </div>
+    `;
+    
+    const taskList = document.getElementById('taskList');
+    // Insert after the original task
+    originalTask.insertAdjacentElement('afterend', taskItem);
+    
+    // Initialize Lucide icons
+    lucide.createIcons();
+    
+    // Save task
+    saveTask(newTaskId);
+    
+    // Apply current filter
+    applyTaskFilter();
+  }
+}
+
+function filterTasks(filterClass) {
+  currentFilter = filterClass;
+  
+  // Update filter button states
+  document.querySelectorAll('.task-filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`[data-filter="${filterClass}"]`).classList.add('active');
+  
+  applyTaskFilter();
+  
+  // Save filter preference
+  localStorage.setItem('taskFilter', filterClass);
+}
+
+function applyTaskFilter() {
+  const tasks = document.querySelectorAll('.task-item');
+  let visibleCount = 0;
+  
+  tasks.forEach(task => {
+    const taskClass = task.getAttribute('data-class');
+    if (currentFilter === 'all' || taskClass === currentFilter) {
+      task.style.display = 'block';
+      visibleCount++;
+    } else {
+      task.style.display = 'none';
+    }
+  });
+  
+  // Show/hide empty message
+  const taskList = document.getElementById('taskList');
+  const emptyMessage = taskList.querySelector('.empty-tasks');
+  
+  if (visibleCount === 0 && !emptyMessage) {
+    showEmptyTasksMessage();
+  } else if (visibleCount > 0 && emptyMessage) {
+    emptyMessage.remove();
+  }
+}
+
+function showEmptyTasksMessage() {
+  const taskList = document.getElementById('taskList');
+  const emptyMessage = document.createElement('div');
+  emptyMessage.className = 'empty-tasks';
+  emptyMessage.textContent = currentFilter === 'all' 
+    ? 'No tasks yet. Click "Add Task" to get started!'
+    : `No tasks for ${currentFilter.toUpperCase()} class.`;
+  taskList.appendChild(emptyMessage);
+}
+
+function saveTask(taskId) {
+  const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
+  if (taskItem) {
+    const title = taskItem.querySelector('.task-title-input').value;
+    const classCode = taskItem.getAttribute('data-class');
+    const notes = taskItem.querySelector('.task-notes-editor').innerHTML;
+    
+    const taskData = {
+      id: taskId,
+      title: title,
+      class: classCode,
+      notes: notes,
+      created: new Date().toISOString()
+    };
+    
+    localStorage.setItem(`task-${taskId}`, JSON.stringify(taskData));
+  }
+}
+
+// Auto-save with debouncing
+let autoSaveTimeout;
+function autoSaveTask(taskId) {
+  clearTimeout(autoSaveTimeout);
+  autoSaveTimeout = setTimeout(() => {
+    saveTask(taskId);
+  }, 1000); // Save after 1 second of inactivity
+}
+
+function loadSavedTasks() {
+  const taskList = document.getElementById('taskList');
+  let maxCounter = 0;
+  
+  // Load all tasks from localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith('task-')) {
+      const taskData = JSON.parse(localStorage.getItem(key));
+      
+      // Extract counter from task ID for next task numbering
+      const idNum = parseInt(taskData.id.replace('task-', ''));
+      if (idNum > maxCounter) maxCounter = idNum;
+      
+      // Create task element
+      const taskItem = document.createElement('div');
+      taskItem.className = 'task-item';
+      taskItem.setAttribute('data-class', taskData.class);
+      taskItem.setAttribute('data-task-id', taskData.id);
+      
+      taskItem.innerHTML = `
+        <div class="task-header">
+          <input type="text" class="task-title-input" value="${taskData.title}" 
+                 onchange="saveTask('${taskData.id}')" onblur="saveTask('${taskData.id}')">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <select class="task-class-selector" onchange="updateTaskClass('${taskData.id}', this.value)">
+              <option value="2a" ${taskData.class === '2a' ? 'selected' : ''}>2A</option>
+              <option value="2b" ${taskData.class === '2b' ? 'selected' : ''}>2B</option>
+              <option value="3a" ${taskData.class === '3a' ? 'selected' : ''}>3A</option>
+              <option value="4b" ${taskData.class === '4b' ? 'selected' : ''}>4B</option>
+              <option value="ap" ${taskData.class === 'ap' ? 'selected' : ''}>AP</option>
+            </select>
+            <div class="task-actions">
+              <button class="task-action-btn" onclick="duplicateTask('${taskData.id}')" title="Duplicate">
+                <i data-lucide="copy"></i>
+              </button>
+              <button class="task-action-btn delete" onclick="deleteTask('${taskData.id}')" title="Delete">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="task-notes">
+          <div class="task-notes-editor" contenteditable="true" 
+               placeholder="Add notes for this task..."
+               onblur="saveTask('${taskData.id}')"
+               oninput="autoSaveTask('${taskData.id}')">${taskData.notes}</div>
+        </div>
+      `;
+      
+      taskList.appendChild(taskItem);
+    }
+  }
+  
+  // Set counter for next new task
+  taskCounter = maxCounter;
+  
+  // Show empty message if no tasks
+  if (taskList.children.length === 0) {
+    showEmptyTasksMessage();
+  }
+}
+
+// Initialize task panel on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Restore panel state
+  const isCollapsed = localStorage.getItem('taskPanelCollapsed') === 'true';
+  const panel = document.getElementById('taskPanel');
+  if (isCollapsed) {
+    panel.classList.add('collapsed');
+  } else {
+    panel.classList.remove('collapsed');
+  }
+  
+  // Restore filter state
+  const savedFilter = localStorage.getItem('taskFilter') || 'all';
+  currentFilter = savedFilter;
+  filterTasks(savedFilter);
+  
+  // Load saved tasks
+  loadSavedTasks();
+  
+  // Apply current filter
+  applyTaskFilter();
+  
+  // Initialize Lucide icons
+  lucide.createIcons();
 });
 </script>
 
