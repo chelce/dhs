@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Landing Page</title>
-    <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -25,16 +24,16 @@
         }
 
         body {
-            font-family: 'HarmonyOS Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: var(--primary-color);
-            background-color: white;
+            background-color: var(--light-gray);
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 10px;
+            padding: 20px;
         }
 
         .header {
@@ -153,8 +152,7 @@
             padding: 20px;
             box-shadow: var(--shadow);
             transition: all 0.3s ease;
-            border-top: 4px solid #ff6b35;
-            cursor: pointer;
+            border-top: 4px solid var(--secondary-color);
         }
 
         .card:hover {
@@ -195,6 +193,11 @@
 
         .card-type.activity {
             background: var(--warning-color);
+            color: var(--white);
+        }
+
+        .card-type.opportunity {
+            background: #9b59b6;
             color: var(--white);
         }
 
@@ -257,7 +260,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="header" style="display: none;">
+        <div class="header">
             <h1 id="pageTitle">Class Landing Page</h1>
             <p id="pageSubtitle">Stay updated with announcements and resources</p>
             
@@ -273,7 +276,7 @@
             </div>
         </div>
 
-        <div class="announcements" style="display: none;">
+        <div class="announcements">
             <h2 class="section-title">📢 Announcements</h2>
             <div id="announcementsContainer">
                 <!-- Announcements will be populated by JavaScript -->
@@ -281,6 +284,7 @@
         </div>
 
         <div class="cards-section">
+            <h2 class="section-title">📚 Resources & Activities</h2>
             <div class="cards-grid" id="cardsContainer">
                 <!-- Cards will be populated by JavaScript -->
             </div>
@@ -308,19 +312,99 @@
             }
 
             loadSampleData() {
-                // Announcements data (hidden but kept for future use)
-                this.announcements = [];
+                // Sample announcements data
+                this.announcements = [
+                    {
+                        id: 1,
+                        title: "Quiz Next Week",
+                        content: "Don't forget about the upcoming quiz on Chapter 5. Review your notes and practice problems.",
+                        date: "2025-08-29",
+                        priority: "high",
+                        classes: ["2a", "3a", "ap"]
+                    },
+                    {
+                        id: 2,
+                        title: "New Resource Available",
+                        content: "I've uploaded additional practice worksheets to help with homework assignments.",
+                        date: "2025-08-28",
+                        priority: "medium",
+                        classes: ["all"]
+                    },
+                    {
+                        id: 3,
+                        title: "Lab Safety Reminder",
+                        content: "Please remember to bring safety goggles for next week's lab activities.",
+                        date: "2025-08-27",
+                        priority: "high",
+                        classes: ["2b", "4b", "cp"]
+                    },
+                    {
+                        id: 4,
+                        title: "Office Hours Extended",
+                        content: "I'll be available for extra help on Thursdays until 4:30 PM this month.",
+                        date: "2025-08-26",
+                        priority: "low",
+                        classes: ["honors", "ap"]
+                    }
+                ];
 
-                // Cards data
+                // Sample cards data
                 this.cards = [
                     {
                         id: 1,
-                        title: "AP Vocab #1",
-                        content: "Study flashcards for AP vocabulary set #1. Click to open Quizlet in a new tab.",
+                        title: "WCSU College Visit Opportunity",
+                        content: "Western Connecticut State University is hosting a college information session. Great opportunity for AP students to learn about college programs and admissions. <a href='https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress&fit=max' target='_blank' style='color: #3498db; text-decoration: underline;'>View Full Details</a>",
+                        type: "opportunity",
+                        date: "2025-09-05",
+                        classes: ["ap"]
+                    },
+                    {
+                        id: 2,
+                        title: "Chapter 5 Study Guide",
+                        content: "Comprehensive study guide with key concepts and practice questions.",
                         type: "resource",
                         date: "2025-08-29",
-                        classes: ["ap"],
-                        link: "https://quizlet.com/1069617159/ap-1-vocab-flash-cards/?i=1bpfrv&x=1jqt"
+                        classes: ["2a", "3a", "ap"]
+                    },
+                    {
+                        id: 3,
+                        title: "Lab Report Assignment",
+                        content: "Complete the lab report for the chemical reactions experiment. Due next Friday.",
+                        type: "assignment",
+                        date: "2025-08-28",
+                        classes: ["2b", "4b", "cp"]
+                    },
+                    {
+                        id: 4,
+                        title: "Interactive Periodic Table",
+                        content: "Online tool to help you memorize element properties and trends.",
+                        type: "resource",
+                        date: "2025-08-27",
+                        classes: ["all"]
+                    },
+                    {
+                        id: 5,
+                        title: "Group Problem Solving",
+                        content: "Work in teams to solve complex stoichiometry problems.",
+                        type: "activity",
+                        date: "2025-08-26",
+                        classes: ["honors", "ap"]
+                    },
+                    {
+                        id: 6,
+                        title: "Homework Set 3",
+                        content: "Practice problems covering balancing equations and mole calculations.",
+                        type: "assignment",
+                        date: "2025-08-25",
+                        classes: ["2a", "2b"]
+                    },
+                    {
+                        id: 7,
+                        title: "Virtual Lab Simulation",
+                        content: "Explore chemical reactions in a safe virtual environment.",
+                        type: "activity",
+                        date: "2025-08-24",
+                        classes: ["3a", "cp", "honors"]
                     }
                 ];
             }
@@ -398,15 +482,9 @@
                 container.innerHTML = filteredCards
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .map(card => `
-                        <div class="card" ${card.link ? `onclick="window.open('${card.link}', '_blank')"` : ''}>
+                        <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; margin-right: 8px; vertical-align: middle;">
-                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                    </svg>
-                                    ${card.title}
-                                </h3>
+                                <h3 class="card-title">${card.title}</h3>
                                 <span class="card-type ${card.type}">${card.type}</span>
                             </div>
                             <div class="card-content">${card.content}</div>
