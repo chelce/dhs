@@ -266,84 +266,108 @@
             return content;
         }
 
-        // Fetch data from Coda API using multiple CORS proxy options
+        // Fetch data from Coda API using multiple approaches
         async function fetchCodaData() {
             const container = document.getElementById('cardsContainer');
-            container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>';
+            container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards from Coda...</div>';
 
-            // Multiple CORS proxy options to try
+            // Try direct API first (will fail due to CORS, but worth trying)
+            try {
+                console.log('Trying direct Coda API...');
+                const directUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
+                const directResponse = await fetch(directUrl, {
+                    headers: {
+                        'Authorization': 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (directResponse.ok) {
+                    const data = await directResponse.json();
+                    const posts = processCodaPosts(data.items);
+                    renderCards(posts);
+                    console.log('Success with direct API!');
+                    return;
+                }
+            } catch (error) {
+                console.log('Direct API failed (expected due to CORS):', error.message);
+            }
+
+            // Try CORS proxies with better error handling
             const corsProxies = [
-                'https://api.allorigins.win/raw?url=',
-                'https://cors-anywhere.herokuapp.com/',
-                'https://corsproxy.io/?'
+                { name: 'AllOrigins', url: 'https://api.allorigins.win/get?url=', needsAuth: false },
+                { name: 'CORS-Anywhere', url: 'https://cors-anywhere.herokuapp.com/', needsAuth: true },
+                { name: 'CORSProxy', url: 'https://corsproxy.io/?', needsAuth: true }
             ];
 
             const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
             
             for (let proxy of corsProxies) {
                 try {
-                    console.log(`Trying proxy: ${proxy}`);
+                    console.log(`Trying ${proxy.name}...`);
                     
                     let fetchUrl;
-                    let headers;
+                    let headers = { 'X-Requested-With': 'XMLHttpRequest' };
                     
-                    if (proxy.includes('allorigins')) {
-                        // allorigins requires URL encoding and different approach
-                        fetchUrl = proxy + encodeURIComponent(apiUrl);
-                        headers = {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        };
+                    if (proxy.needsAuth) {
+                        fetchUrl = proxy.url + apiUrl;
+                        headers['Authorization'] = 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm';
+                        headers['Content-Type'] = 'application/json';
                     } else {
-                        fetchUrl = proxy + apiUrl;
-                        headers = {
-                            'Authorization': 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
-                            'Content-Type': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        };
+                        fetchUrl = proxy.url + encodeURIComponent(apiUrl + '?Authorization=Bearer%20coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm');
                     }
 
                     const response = await fetch(fetchUrl, { headers });
 
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
 
                     let data;
-                    if (proxy.includes('allorigins')) {
-                        const text = await response.text();
-                        data = JSON.parse(text);
+                    if (proxy.name === 'AllOrigins') {
+                        const result = await response.json();
+                        if (result.status.http_code !== 200) {
+                            throw new Error(`API returned ${result.status.http_code}`);
+                        }
+                        data = JSON.parse(result.contents);
                     } else {
                         data = await response.json();
                     }
 
-                    // Debug: Log the first item to see all available columns
+                    // Debug: Log the response
+                    console.log(`${proxy.name} response:`, data);
+
                     if (data.items && data.items.length > 0) {
-                        console.log('Available columns in first row:', Object.keys(data.items[0].values));
-                        console.log('First row data:', data.items[0].values);
+                        const posts = processCodaPosts(data.items);
+                        renderCards(posts);
+                        console.log(`Success with ${proxy.name}!`);
+                        return;
+                    } else {
+                        throw new Error('No items returned from API');
                     }
 
-                    const posts = processCodaPosts(data.items);
-                    renderCards(posts);
-                    console.log(`Success with proxy: ${proxy}`);
-                    return; // Success, exit the loop
-
                 } catch (error) {
-                    console.error(`Error with proxy ${proxy}:`, error);
-                    continue; // Try next proxy
+                    console.error(`${proxy.name} failed:`, error.message);
+                    continue;
                 }
             }
 
-            // If all proxies fail, show error and fallback to static data
-            console.error('All CORS proxies failed, using fallback data');
+            // If all methods fail, show helpful error and fallback data
+            console.error('All API methods failed, showing fallback data');
             container.innerHTML = `
-                <div style="text-align: center; color: #f39c12; padding: 20px;">
-                    <p>Using cached data (live sync temporarily unavailable)</p>
-                    <p style="font-size: 12px;">CORS proxies not accessible - showing demo content</p>
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>⚠️ Live sync temporarily unavailable</strong><br>
+                    Showing cached content. <button onclick="fetchCodaData()" style="background: #ffc107; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Retry</button>
                 </div>
             `;
             
-            // Fallback to last known good data with enhanced content
+            // Enhanced fallback data that demonstrates both methods
             const fallbackPosts = [
+                {
+                    title: "Welcome to Your Dynamic Class Page! 🎉",
+                    content: "This page automatically syncs with your **Coda table** to display announcements and resources.\n\n**Two ways to add content:**\n- Simple text (auto-converts to HTML)\n- Custom HTML in your HTML column\n\n*Currently showing demo content since live sync is temporarily unavailable.*",
+                    classes: "all"
+                },
                 {
                     title: "WCSU Enrollment Flyer",
                     content: "https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress&fit=max",
@@ -357,19 +381,23 @@
                 },
                 {
                     title: "Rich Text Demo",
-                    content: "This demonstrates **bold text**, *italic text*, and `code snippets`.\n\nBullet points:\n- First item\n- Second item\n- Third item\n\nAnd a numbered list:\n1. Step one\n2. Step two\n3. Step three\n\nPlus a link: https://example.com",
+                    content: "This demonstrates **bold text**, *italic text*, and `code snippets`.\n\nBullet points:\n- First item with **bold**\n- Second item with *italics*\n- Third item with `code`\n\nNumbered list:\n1. Step one\n2. Step two  \n3. Step three\n\nAuto-linked: https://example.com\nEmail: teacher@school.edu",
                     classes: "all"
                 },
                 {
-                    title: "HTML Column Ready!",
-                    content: "Your page is now set up to use both:\n\n**Auto-conversion** from regular text\n**OR**\n**Custom HTML** from your HTML column\n\n`Need to find the HTML column ID first`",
+                    title: "HTML Column Demo",
+                    content: '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;"><h3 style="margin: 0; font-size: 20px;">🎨 Custom HTML Example</h3><p style="margin: 10px 0;">This card uses custom HTML with gradients, styling, and layout!</p><div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin-top: 10px;"><strong>Perfect for:</strong> Special announcements, events, branded content</div></div>',
                     classes: "all"
                 }
             ];
-            renderCards(fallbackPosts.map(post => ({
+            
+            // Process fallback content through our auto-conversion system
+            const processedFallback = fallbackPosts.map(post => ({
                 ...post,
-                content: autoGenerateHTML(processImageContent(post.content))
-            })));
+                content: post.content.startsWith('<') ? post.content : autoGenerateHTML(processImageContent(post.content))
+            }));
+            
+            renderCards(processedFallback);
         }
 
         // Process raw Coda data into card format
