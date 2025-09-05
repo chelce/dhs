@@ -33,6 +33,68 @@
             border-left: 4px solid #3498db;
             transition: all 0.2s ease;
             height: fit-content;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            padding-right: 40px;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
         }
 
         .card:hover {
@@ -147,17 +209,17 @@
                 return;
             }
 
-            container.innerHTML = posts.map(post => {
+            container.innerHTML = posts.map((post, index) => {
                 const processedContent = autoGenerateHTML(post.content);
                 
                 let cardHTML = `
-                    <div class="card">
+                    <div class="card" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}')">
                         <div class="card-title">${post.title || 'No Title'}</div>
                         <div class="card-content">${processedContent}</div>
                 `;
 
                 if (post.link) {
-                    cardHTML += `<a href="${post.link}" target="_blank" class="card-link">Open Link</a>`;
+                    cardHTML += `<a href="${post.link}" target="_blank" class="card-link" onclick="event.stopPropagation()">Open Link</a>`;
                 }
 
                 cardHTML += `
@@ -172,7 +234,19 @@
         // Direct API call using fetch with proper error handling
         async function fetchCodaData() {
             const container = document.getElementById('cardsContainer');
-            container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>';
+            container.innerHTML = '    <div id="cardsContainer">
+        <div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>
+    </div>
+
+    <!-- Modal for expanded content -->
+    <div id="cardModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
+        </div>
+    </div>';
 
             try {
                 const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
@@ -479,6 +553,53 @@
                 })
                 .filter(post => post !== null);
         }
+
+        // Modal functionality
+        function openModal(title, content, link) {
+            const modal = document.getElementById('cardModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            const modalFooter = document.getElementById('modalFooter');
+            
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            
+            // Add link if available
+            if (link) {
+                modalFooter.innerHTML = `<a href="${link}" target="_blank" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px;">Open Link</a>`;
+            } else {
+                modalFooter.innerHTML = '';
+            }
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('cardModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        // Event listeners for modal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Close modal when clicking the X
+            document.querySelector('.modal-close').addEventListener('click', closeModal);
+            
+            // Close modal when clicking outside of it
+            document.getElementById('cardModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        });
 
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
