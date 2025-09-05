@@ -198,3 +198,11 @@ Groups share one interesting pattern they discovered or created
 5. How can this pattern recognition transfer to other skills?
 
 This lesson design honors your constructivist approach while providing the concrete, collaborative structure your students need to succeed.
+
+## Lesson Reflection - End of Day
+
+**2B (CP)**: Students worked on analogies and took the skill check. Majority passed and are ready to move on from analogies. Did not get assigned the first vocab list.
+
+**3B (AP)**: AP worked on the app project the whole block. Towards the end a couple of groups started fizzling, but for the most part, groups used the time well. Told them they were allowed to use AI in the ways that are most helpful for them. Told them that NEXT CLASS we will have the Intellectual Devotional Week 9 and Vocab List #1 quiz, and that they will have the rest of the class time to finish their pitches. Pitches are due at the end of next class.
+
+**4B (Honors)**: Students took the skill check, and the majority passed. They are definitely ready to move on from analogies. Gave them their first vocab list and showed them how to access it. Told them they would have a quiz in a few weeks. Also talked with Lily about the fact that we're doing Hamilton for our first unit; she got very excited.
