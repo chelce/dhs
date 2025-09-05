@@ -128,7 +128,7 @@
         const CODA_CONFIG = {
             docId: 'xmloQUGg-g',
             tableId: 'grid-c2mxIgdn3y',
-            apiToken: 'coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
+            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
             columns: {
                 title: 'c-vVaiuGSXY0',
                 subhead: 'c-_hxFWzFw6Q', 
@@ -344,7 +344,7 @@
                 const directUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
                 const directResponse = await fetch(directUrl, {
                     headers: {
-                        'Authorization': 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
+                        'Authorization': 'Bearer 3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
                         'Content-Type': 'application/json'
                     }
                 });
@@ -378,10 +378,10 @@
                     
                     if (proxy.needsAuth) {
                         fetchUrl = proxy.url + apiUrl;
-                        headers['Authorization'] = 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm';
+                        headers['Authorization'] = 'Bearer 3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
                         headers['Content-Type'] = 'application/json';
                     } else {
-                        fetchUrl = proxy.url + encodeURIComponent(apiUrl + '?Authorization=Bearer%20coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm');
+                        fetchUrl = proxy.url + encodeURIComponent(apiUrl + '?Authorization=Bearer%203f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c');
                     }
 
                     const response = await fetch(fetchUrl, { headers });
