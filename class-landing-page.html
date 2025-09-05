@@ -422,49 +422,12 @@
             // If all methods fail, show helpful error and fallback data
             console.error('All API methods failed, showing fallback data');
             container.innerHTML = `
-                <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
                     <strong>⚠️ Live sync temporarily unavailable</strong><br>
-                    Showing cached content. <button onclick="fetchCodaData()" style="background: #ffc107; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-left: 10px;">Retry</button>
+                    Unable to load content from your Coda table. Please check your connection and try again.
+                    <br><button onclick="fetchCodaData()" style="background: #ffc107; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-top: 10px;">🔄 Retry</button>
                 </div>
             `;
-            
-            // Enhanced fallback data that demonstrates both methods
-            const fallbackPosts = [
-                {
-                    title: "Welcome to Your Dynamic Class Page! 🎉",
-                    content: "This page automatically syncs with your **Coda table** to display announcements and resources.\n\n**Two ways to add content:**\n- Simple text (auto-converts to HTML)\n- Custom HTML in your HTML column\n\n*Currently showing demo content since live sync is temporarily unavailable.*",
-                    classes: "all"
-                },
-                {
-                    title: "WCSU Enrollment Flyer",
-                    content: "https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress&fit=max",
-                    classes: "ap"
-                },
-                {
-                    title: "AP Vocab #1 - Quizlet",
-                    content: "Practice your first AP vocabulary set with **interactive flashcards** and games.\n\n*Click the link below to get started!*",
-                    link: "https://quizlet.com/your-vocab-set",
-                    classes: "ap"
-                },
-                {
-                    title: "Rich Text Demo",
-                    content: "This demonstrates **bold text**, *italic text*, and `code snippets`.\n\nBullet points:\n- First item with **bold**\n- Second item with *italics*\n- Third item with `code`\n\nNumbered list:\n1. Step one\n2. Step two  \n3. Step three\n\nAuto-linked: https://example.com\nEmail: teacher@school.edu",
-                    classes: "all"
-                },
-                {
-                    title: "HTML Column Demo",
-                    content: '<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center;"><h3 style="margin: 0; font-size: 20px;">🎨 Custom HTML Example</h3><p style="margin: 10px 0;">This card uses custom HTML with gradients, styling, and layout!</p><div style="background: rgba(255,255,255,0.2); padding: 10px; border-radius: 5px; margin-top: 10px;"><strong>Perfect for:</strong> Special announcements, events, branded content</div></div>',
-                    classes: "all"
-                }
-            ];
-            
-            // Process fallback content through our auto-conversion system
-            const processedFallback = fallbackPosts.map(post => ({
-                ...post,
-                content: post.content.startsWith('<') ? post.content : autoGenerateHTML(processImageContent(post.content))
-            }));
-            
-            renderCards(processedFallback);
         }
 
         // Process raw Coda data into card format
