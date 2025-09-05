@@ -338,10 +338,11 @@
             container.innerHTML = `
                 <div style="text-align: center; color: #f39c12; padding: 20px;">
                     <p>Using cached data (live sync temporarily unavailable)</p>
+                    <p style="font-size: 12px;">CORS proxies not accessible - showing demo content</p>
                 </div>
             `;
             
-            // Fallback to last known good data
+            // Fallback to last known good data with enhanced content
             const fallbackPosts = [
                 {
                     title: "WCSU Enrollment Flyer",
@@ -357,6 +358,11 @@
                 {
                     title: "Rich Text Demo",
                     content: "This demonstrates **bold text**, *italic text*, and `code snippets`.\n\nBullet points:\n- First item\n- Second item\n- Third item\n\nAnd a numbered list:\n1. Step one\n2. Step two\n3. Step three\n\nPlus a link: https://example.com",
+                    classes: "all"
+                },
+                {
+                    title: "HTML Column Ready!",
+                    content: "Your page is now set up to use both:\n\n**Auto-conversion** from regular text\n**OR**\n**Custom HTML** from your HTML column\n\n`Need to find the HTML column ID first`",
                     classes: "all"
                 }
             ];
@@ -456,4 +462,5 @@
     </script>
 </body>
 </html>
+
 
