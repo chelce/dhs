@@ -124,6 +124,7 @@
                 title: 'c-vVaiuGSXY0',
                 subhead: 'c-_hxFWzFw6Q', 
                 content: 'c-dA-y5r4f_H',
+                html: 'c-YOUR_HTML_COLUMN_ID', // We'll need to update this with the actual ID
                 link: 'c-BgwwlV4K1D',
                 classes: 'c-Qcz-VEgR-F'
             }
@@ -315,6 +316,12 @@
                         data = await response.json();
                     }
 
+                    // Debug: Log the first item to see all available columns
+                    if (data.items && data.items.length > 0) {
+                        console.log('Available columns in first row:', Object.keys(data.items[0].values));
+                        console.log('First row data:', data.items[0].values);
+                    }
+
                     const posts = processCodaPosts(data.items);
                     renderCards(posts);
                     console.log(`Success with proxy: ${proxy}`);
@@ -368,19 +375,30 @@
                     const values = item.values;
                     const title = values[CODA_CONFIG.columns.title] || '';
                     const subhead = values[CODA_CONFIG.columns.subhead] || '';
-                    let content = values[CODA_CONFIG.columns.content] || '';
+                    const rawContent = values[CODA_CONFIG.columns.content] || '';
+                    const htmlContent = values[CODA_CONFIG.columns.html] || '';
                     const link = values[CODA_CONFIG.columns.link] || '';
                     const classes = values[CODA_CONFIG.columns.classes] || 'all';
 
                     // Skip empty rows
                     if (!title) return null;
 
-                    // Process content through rich text converter and auto-HTML generator
-                    content = convertCodaRichTextToHTML(content);
-                    content = processImageContent(content);
+                    let content;
                     
-                    // If there's a subhead, add it to the content
-                    if (subhead) {
+                    // Priority: Use HTML column if it has content, otherwise auto-convert regular content
+                    if (htmlContent && htmlContent.trim()) {
+                        // HTML column has content - use it directly (assuming it's already formatted)
+                        content = htmlContent;
+                        console.log(`Using HTML column for: ${title}`);
+                    } else {
+                        // No HTML column content - auto-convert the regular content
+                        content = convertCodaRichTextToHTML(rawContent);
+                        content = processImageContent(content);
+                        console.log(`Auto-converting content for: ${title}`);
+                    }
+                    
+                    // If there's a subhead, add it to the content (unless it's already in HTML)
+                    if (subhead && !htmlContent) {
                         content = `<div style="font-style: italic; color: #7f8c8d; margin-bottom: 10px;">${subhead}</div>${content}`;
                     }
 
@@ -391,7 +409,8 @@
                         content: content,
                         link: link,
                         classes: classes.split(',').map(c => c.trim()),
-                        date: new Date().toISOString().split('T')[0]
+                        date: new Date().toISOString().split('T')[0],
+                        source: htmlContent ? 'html-column' : 'auto-converted'
                     };
                 })
                 .filter(post => post !== null);
