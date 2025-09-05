@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogies Fill-in-the-Blank Task Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .navigation {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-link:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .instructions h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .instructions p {
+            color: #34495e;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .difficulty {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .difficulty.easy {
+            background: linear-gradient(135deg, #4CAF50, #2d5a3d);
+        }
+        
+        .difficulty.medium {
+            background: linear-gradient(135deg, #FF9800, #d17000);
+        }
+        
+        .difficulty.hard {
+            background: linear-gradient(135deg, #F44336, #c44569);
+        }
+        
+        .analogy-container {
+            margin-bottom: 30px;
+        }
+        
+        .analogy-prompt {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        
+        .analogy-blank {
+            background: #fff3cd;
+            color: #856404;
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: 2px dashed #ffc107;
+            font-weight: bold;
+        }
+        
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, #3498db, #9b59b6);
+            border-radius: 2px;
+            margin: 25px 0;
+        }
+        
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            color: #666;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .task-card {
+                padding: 20px;
+            }
+            
+            .analogy-prompt {
+                font-size: 1.2em;
+                padding: 15px;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .navigation, .instructions {
+                break-after: avoid;
+            }
+            
+            .task-card {
+                break-inside: avoid;
+                box-shadow: 0 0 0 1px #ddd;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Analogies Fill-in-the-Blank</h1>
+            <p>Complete the analogy by finding the missing word</p>
+        </div>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-link">← Back to Gallery</a>
+            <a href="analogies-fill-in-blank-answers.html" class="nav-link">View Answer Key</a>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to Complete These Analogies</h2>
+            <p><strong>Format:</strong> A : B :: C : ______</p>
+            <p><strong>Instructions:</strong> Think about how the first two words are related, then find a word that creates the same relationship with the third word.</p>
+            <p><strong>Example:</strong> Hot : Cold :: Day : <em>Night</em> (opposites)</p>
+        </div>
+        
+        <div class="card-grid">
+            <!-- Easy Level Cards -->
+            <div class="task-card">
+                <div class="card-number">Card 1</div>
+                <div class="difficulty easy">Easy Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        cat : kitten :: dog : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        big : small :: hot : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 2</div>
+                <div class="difficulty easy">Easy Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        hand : glove :: foot : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        book : read :: song : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 3</div>
+                <div class="difficulty easy">Easy Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        sun : day :: moon : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        bird : fly :: fish : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 4</div>
+                <div class="difficulty easy">Easy Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        happy : sad :: up : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        teacher : school :: doctor : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Medium Level Cards -->
+            <div class="task-card">
+                <div class="card-number">Card 5</div>
+                <div class="difficulty medium">Medium Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        painter : brush :: writer : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        library : books :: museum : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 6</div>
+                <div class="difficulty medium">Medium Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        captain : ship :: pilot : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        foundation : building :: roots : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 7</div>
+                <div class="difficulty medium">Medium Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        orchestra : conductor :: team : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        telescope : distant :: microscope : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 8</div>
+                <div class="difficulty medium">Medium Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        architect : blueprint :: chef : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        chapter : book :: scene : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hard Level Cards -->
+            <div class="task-card">
+                <div class="card-number">Card 9</div>
+                <div class="difficulty hard">Hard Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        catalyst : reaction :: inspiration : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        eloquent : speech :: graceful : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 10</div>
+                <div class="difficulty hard">Hard Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        meticulous : precision :: spontaneous : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        symbiosis : mutual :: parasitism : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 11</div>
+                <div class="difficulty hard">Hard Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        ephemeral : duration :: ubiquitous : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        cacophony : harmonious :: chaos : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task-card">
+                <div class="card-number">Card 12</div>
+                <div class="difficulty hard">Hard Level</div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        intrepid : courage :: astute : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+                
+                <div class="divider"></div>
+                
+                <div class="analogy-container">
+                    <div class="analogy-prompt">
+                        verbose : concise :: opaque : <span class="analogy-blank">_______</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

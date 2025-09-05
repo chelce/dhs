@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analogies Fill-in-the-Blank - Answer Key</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-family: 'Bebas Neue', cursive;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.3em;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .difficulty-section {
+            margin-bottom: 50px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .difficulty-header {
+            padding: 25px;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .difficulty-header.easy {
+            background: linear-gradient(135deg, #4CAF50, #2d5a3d);
+        }
+
+        .difficulty-header.medium {
+            background: linear-gradient(135deg, #FF9800, #d17000);
+        }
+
+        .difficulty-header.hard {
+            background: linear-gradient(135deg, #F44336, #c44569);
+        }
+
+        .answers-content {
+            background: white;
+            padding: 30px;
+        }
+
+        .card-answers {
+            margin-bottom: 35px;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            background: #f8f9fa;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+
+        .analogy-answer {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .analogy-text {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        .answer {
+            color: #e74c3c;
+            font-weight: bold;
+            background: #fff5f5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #fadbd8;
+        }
+
+        .relationship-type {
+            font-size: 1em;
+            color: #8e44ad;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .explanation {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, #bdc3c7, #ecf0f1);
+            margin: 15px 0;
+            border-radius: 1px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            .card-answers {
+                padding: 20px;
+            }
+            
+            .analogy-text {
+                font-size: 1.1em;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .container {
+                box-shadow: none;
+                background: white;
+            }
+            
+            .navigation {
+                display: none;
+            }
+            
+            .difficulty-section {
+                break-inside: avoid;
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analogies Fill-in-the-Blank</h1>
+        <div class="subtitle">Answer Key with Relationship Explanations</div>
+        
+        <div class="navigation">
+            <a href="index.html" class="nav-link">← Back to Gallery</a>
+            <a href="analogies-fill-in-blank-task-cards.html" class="nav-link">Back to Task Cards</a>
+        </div>
+
+        <!-- Easy Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header easy">Easy Level Answers</div>
+            <div class="answers-content">
+                
+                <div class="card-answers">
+                    <div class="card-title">Card 1 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">cat : kitten :: dog : <span class="answer">puppy</span></div>
+                        <div class="relationship-type">Relationship: Adult to Baby/Young</div>
+                        <div class="explanation">A cat's baby is called a kitten, just as a dog's baby is called a puppy. This shows the relationship between an adult animal and its offspring.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">big : small :: hot : <span class="answer">cold</span></div>
+                        <div class="relationship-type">Relationship: Antonyms/Opposites</div>
+                        <div class="explanation">Big and small are opposites, just as hot and cold are opposites. This shows contrasting or opposite meanings.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 2 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">hand : glove :: foot : <span class="answer">shoe</span></div>
+                        <div class="relationship-type">Relationship: Object to Covering</div>
+                        <div class="explanation">A glove covers and protects a hand, just as a shoe covers and protects a foot. This shows what item covers or protects each body part.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">book : read :: song : <span class="answer">listen</span></div>
+                        <div class="relationship-type">Relationship: Object to Action</div>
+                        <div class="explanation">You read a book to experience it, just as you listen to a song to experience it. This shows the action you perform with each object.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 3 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">sun : day :: moon : <span class="answer">night</span></div>
+                        <div class="relationship-type">Relationship: Object to Time/Context</div>
+                        <div class="explanation">The sun is associated with and provides light during the day, just as the moon is associated with and provides light during the night.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">bird : fly :: fish : <span class="answer">swim</span></div>
+                        <div class="relationship-type">Relationship: Animal to Movement</div>
+                        <div class="explanation">Flying is the natural way birds move through their environment, just as swimming is the natural way fish move through their environment.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 4 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">happy : sad :: up : <span class="answer">down</span></div>
+                        <div class="relationship-type">Relationship: Antonyms/Opposites</div>
+                        <div class="explanation">Happy and sad are opposite emotions, just as up and down are opposite directions. This shows contrasting concepts.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">teacher : school :: doctor : <span class="answer">hospital</span></div>
+                        <div class="relationship-type">Relationship: Worker to Workplace</div>
+                        <div class="explanation">A teacher works at a school, just as a doctor works at a hospital. This shows the relationship between a profession and its typical workplace.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header medium">Medium Level Answers</div>
+            <div class="answers-content">
+                
+                <div class="card-answers">
+                    <div class="card-title">Card 5 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">painter : brush :: writer : <span class="answer">pen</span></div>
+                        <div class="relationship-type">Relationship: Professional to Tool</div>
+                        <div class="explanation">A painter uses a brush as their primary tool for creating art, just as a writer uses a pen as their primary tool for creating written works.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">library : books :: museum : <span class="answer">artifacts</span></div>
+                        <div class="relationship-type">Relationship: Place to Contents</div>
+                        <div class="explanation">A library is a place that houses and displays books, just as a museum is a place that houses and displays artifacts or artworks.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 6 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">captain : ship :: pilot : <span class="answer">airplane</span></div>
+                        <div class="relationship-type">Relationship: Leader to Vehicle</div>
+                        <div class="explanation">A captain is the person in charge of operating and commanding a ship, just as a pilot is the person in charge of operating and commanding an airplane.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">foundation : building :: roots : <span class="answer">tree</span></div>
+                        <div class="relationship-type">Relationship: Support to Structure</div>
+                        <div class="explanation">A foundation provides structural support and stability for a building, just as roots provide support and nourishment for a tree.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 7 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">orchestra : conductor :: team : <span class="answer">coach</span></div>
+                        <div class="relationship-type">Relationship: Group to Leader</div>
+                        <div class="explanation">A conductor leads and directs an orchestra to coordinate their performance, just as a coach leads and directs a team to coordinate their efforts.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">telescope : distant :: microscope : <span class="answer">tiny</span></div>
+                        <div class="relationship-type">Relationship: Tool to Purpose</div>
+                        <div class="explanation">A telescope is used to see distant objects clearly, just as a microscope is used to see tiny objects clearly. Both tools help us see what we normally cannot.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 8 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">architect : blueprint :: chef : <span class="answer">recipe</span></div>
+                        <div class="relationship-type">Relationship: Professional to Plan</div>
+                        <div class="explanation">An architect creates and follows blueprints to design buildings, just as a chef creates and follows recipes to prepare dishes.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">chapter : book :: scene : <span class="answer">play</span></div>
+                        <div class="relationship-type">Relationship: Part to Whole</div>
+                        <div class="explanation">A chapter is a section or part of a book, just as a scene is a section or part of a play. Both represent subdivisions of a larger work.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Answers -->
+        <div class="difficulty-section">
+            <div class="difficulty-header hard">Hard Level Answers</div>
+            <div class="answers-content">
+                
+                <div class="card-answers">
+                    <div class="card-title">Card 9 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">catalyst : reaction :: inspiration : <span class="answer">creativity</span></div>
+                        <div class="relationship-type">Relationship: Trigger to Result</div>
+                        <div class="explanation">A catalyst triggers or accelerates a chemical reaction, just as inspiration triggers or accelerates creativity. Both serve as initiating forces for a process.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">eloquent : speech :: graceful : <span class="answer">movement</span></div>
+                        <div class="relationship-type">Relationship: Quality to Expression</div>
+                        <div class="explanation">Eloquent describes the quality of refined, articulate speech, just as graceful describes the quality of refined, fluid movement.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 10 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">meticulous : precision :: spontaneous : <span class="answer">improvisation</span></div>
+                        <div class="relationship-type">Relationship: Characteristic to Behavior</div>
+                        <div class="explanation">Being meticulous leads to precision and careful attention to detail, just as being spontaneous leads to improvisation and unplanned action.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">symbiosis : mutual :: parasitism : <span class="answer">one-sided</span></div>
+                        <div class="relationship-type">Relationship: Biological Relationship to Benefit Pattern</div>
+                        <div class="explanation">Symbiosis is a relationship where both organisms benefit mutually, while parasitism is a relationship where the benefit is one-sided (only the parasite benefits).</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 11 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">ephemeral : duration :: ubiquitous : <span class="answer">presence</span></div>
+                        <div class="relationship-type">Relationship: Quality to Dimension</div>
+                        <div class="explanation">Ephemeral describes something brief in duration (time), just as ubiquitous describes something widespread in presence (space).</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">cacophony : harmonious :: chaos : <span class="answer">organized</span></div>
+                        <div class="relationship-type">Relationship: Negative State to Positive Opposite</div>
+                        <div class="explanation">Cacophony (harsh, discordant sounds) is the opposite of harmonious, just as chaos (disorder) is the opposite of organized.</div>
+                    </div>
+                </div>
+
+                <div class="card-answers">
+                    <div class="card-title">Card 12 Answers</div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">intrepid : courage :: astute : <span class="answer">wisdom</span></div>
+                        <div class="relationship-type">Relationship: Trait to Underlying Quality</div>
+                        <div class="explanation">Being intrepid (fearlessly bold) demonstrates courage, just as being astute (perceptive and insightful) demonstrates wisdom.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="analogy-answer">
+                        <div class="analogy-text">verbose : concise :: opaque : <span class="answer">transparent</span></div>
+                        <div class="relationship-type">Relationship: Negative Quality to Positive Opposite</div>
+                        <div class="explanation">Verbose (using too many words) is the opposite of concise (brief and clear), just as opaque (unclear or hard to understand) is the opposite of transparent (clear and easy to understand).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
