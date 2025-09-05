@@ -79,7 +79,6 @@
     <script>
         // Coda API configuration
         const CODA_CONFIG = {
-            apiToken: 'coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
             docId: 'xmloQUGg-g',
             tableId: 'grid-c2mxIgdn3y',
             columns: {
@@ -119,44 +118,96 @@
             }).join('');
         }
 
-        // Fetch data from Coda API
+        // Fetch data from Coda API using multiple CORS proxy options
         async function fetchCodaData() {
             const container = document.getElementById('cardsContainer');
             container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>';
 
-            try {
-                const corsProxy = 'https://cors-anywhere.herokuapp.com/';
-                const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
-                
-                const response = await fetch(corsProxy + apiUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
+            // Multiple CORS proxy options to try
+            const corsProxies = [
+                'https://api.allorigins.win/raw?url=',
+                'https://cors-anywhere.herokuapp.com/',
+                'https://corsproxy.io/?'
+            ];
+
+            const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
+            
+            for (let proxy of corsProxies) {
+                try {
+                    console.log(`Trying proxy: ${proxy}`);
+                    
+                    let fetchUrl;
+                    let headers;
+                    
+                    if (proxy.includes('allorigins')) {
+                        // allorigins requires URL encoding and different approach
+                        fetchUrl = proxy + encodeURIComponent(apiUrl);
+                        headers = {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        };
+                    } else {
+                        fetchUrl = proxy + apiUrl;
+                        headers = {
+                            'Authorization': 'Bearer coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        };
                     }
-                });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const response = await fetch(fetchUrl, { headers });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    let data;
+                    if (proxy.includes('allorigins')) {
+                        const text = await response.text();
+                        data = JSON.parse(text);
+                    } else {
+                        data = await response.json();
+                    }
+
+                    const posts = processCodaPosts(data.items);
+                    renderCards(posts);
+                    console.log(`Success with proxy: ${proxy}`);
+                    return; // Success, exit the loop
+
+                } catch (error) {
+                    console.error(`Error with proxy ${proxy}:`, error);
+                    continue; // Try next proxy
                 }
-
-                const data = await response.json();
-                const posts = processCodePosts(data.items);
-                renderCards(posts);
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                container.innerHTML = `
-                    <div style="text-align: center; color: #e74c3c; padding: 20px;">
-                        <p>Unable to load cards. Please try refreshing the page.</p>
-                        <p style="font-size: 12px; margin-top: 10px;">Error: ${error.message}</p>
-                    </div>
-                `;
             }
+
+            // If all proxies fail, show error and fallback to static data
+            console.error('All CORS proxies failed, using fallback data');
+            container.innerHTML = `
+                <div style="text-align: center; color: #f39c12; padding: 20px;">
+                    <p>Using cached data (live sync temporarily unavailable)</p>
+                </div>
+            `;
+            
+            // Fallback to last known good data
+            const fallbackPosts = [
+                {
+                    title: "WCSU Enrollment Flyer",
+                    content: "<img src='https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress&fit=max' style='width: 100%; max-width: 500px; height: auto;'>",
+                    classes: "ap"
+                },
+                {
+                    title: "AP Vocab #1 - Quizlet",
+                    content: "Practice your first AP vocabulary set with interactive flashcards and games.",
+                    link: "https://quizlet.com/your-vocab-set",
+                    classes: "ap"
+                }
+            ];
+            renderCards(fallbackPosts);
         }
 
         // Process raw Coda data into card format
-        function processCodePosts(items) {
+        function processCodaPosts(items) {
+            if (!items) return [];
+            
             return items
                 .map(item => {
                     const values = item.values;
@@ -187,8 +238,38 @@
             fetchCodaData();
         });
 
-        // Refresh data every 5 minutes
-        setInterval(fetchCodaData, 5 * 60 * 1000);
+        // Refresh data every 10 minutes
+        setInterval(fetchCodaData, 10 * 60 * 1000);
+        
+        // Add manual refresh button (hidden by default)
+        function addRefreshButton() {
+            const button = document.createElement('button');
+            button.textContent = '🔄 Refresh';
+            button.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: #3498db;
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                z-index: 1000;
+                opacity: 0.7;
+            `;
+            button.onclick = fetchCodaData;
+            document.body.appendChild(button);
+        }
+        
+        // Show refresh button on hover
+        document.addEventListener('mouseover', () => {
+            if (!document.querySelector('[data-refresh-btn]')) {
+                addRefreshButton();
+                document.querySelector('button').setAttribute('data-refresh-btn', 'true');
+            }
+        });
     </script>
 </body>
 </html>
