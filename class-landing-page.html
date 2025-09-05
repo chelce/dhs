@@ -234,19 +234,7 @@
         // Direct API call using fetch with proper error handling
         async function fetchCodaData() {
             const container = document.getElementById('cardsContainer');
-            container.innerHTML = '    <div id="cardsContainer">
-        <div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>
-    </div>
-
-    <!-- Modal for expanded content -->
-    <div id="cardModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <div class="modal-title" id="modalTitle"></div>
-            <div class="modal-body" id="modalBody"></div>
-            <div class="modal-footer" id="modalFooter"></div>
-        </div>
-    </div>';
+            container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>';
 
             try {
                 const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
