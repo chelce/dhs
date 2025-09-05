@@ -77,6 +77,20 @@
     </div>
 
     <script>
+        // Coda API configuration
+        const CODA_CONFIG = {
+            apiToken: 'coda_api_KPJKBkY2F_fqGxLKF-bJ8nCBCWY8yNJm',
+            docId: 'xmloQUGg-g',
+            tableId: 'grid-c2mxIgdn3y',
+            columns: {
+                title: 'c-vVaiuGSXY0',
+                subhead: 'c-_hxFWzFw6Q', 
+                content: 'c-dA-y5r4f_H',
+                link: 'c-BgwwlV4K1D',
+                classes: 'c-Qcz-VEgR-F'
+            }
+        };
+
         // Simple card rendering function
         function renderCards(posts) {
             const container = document.getElementById('cardsContainer');
@@ -105,11 +119,76 @@
             }).join('');
         }
 
+        // Fetch data from Coda API
+        async function fetchCodaData() {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">Loading cards...</div>';
+
+            try {
+                const corsProxy = 'https://cors-anywhere.herokuapp.com/';
+                const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
+                
+                const response = await fetch(corsProxy + apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const posts = processCodePosts(data.items);
+                renderCards(posts);
+
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; color: #e74c3c; padding: 20px;">
+                        <p>Unable to load cards. Please try refreshing the page.</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Process raw Coda data into card format
+        function processCodePosts(items) {
+            return items
+                .map(item => {
+                    const values = item.values;
+                    const title = values[CODA_CONFIG.columns.title] || '';
+                    const subhead = values[CODA_CONFIG.columns.subhead] || '';
+                    const content = values[CODA_CONFIG.columns.content] || '';
+                    const link = values[CODA_CONFIG.columns.link] || '';
+                    const classes = values[CODA_CONFIG.columns.classes] || 'all';
+
+                    // Skip empty rows
+                    if (!title) return null;
+
+                    return {
+                        id: item.id,
+                        title: title,
+                        subhead: subhead,
+                        content: content,
+                        link: link,
+                        classes: classes.split(',').map(c => c.trim()),
+                        date: new Date().toISOString().split('T')[0]
+                    };
+                })
+                .filter(post => post !== null);
+        }
+
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', () => {
-            // This will be replaced by the sync script with actual data
-            renderCards([{"id":"i-odvWyFmIhd","classes":["ap"],"subhead":"","title":"AP Vocab #1 - Quizlet","type":"resource","link":"https://quizlet.com/your-vocab-set","content":"Practice your first AP vocabulary set with interactive flashcards and games.","date":"2025-09-05"},{"id":"i-ZQam_oYg4H","classes":["ap"],"subhead":"","title":"WCSU Enrollment Flyer","type":"resource","link":"","content":"\u003cimg src=\u0027https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress\u0026fit=max\u0027 style=\u0027width: 100%; max-width: 500px; height: auto;\u0027\u003e","date":"2025-09-05"},{"id":"i-ula0m7KAFY","classes":["ap"],"subhead":"","title":"Test WCSU Post","type":"resource","link":"","content":"This is a test post for WCSU enrollment","date":"2025-09-05"}]);
+            fetchCodaData();
         });
+
+        // Refresh data every 5 minutes
+        setInterval(fetchCodaData, 5 * 60 * 1000);
     </script>
 </body>
 </html>
