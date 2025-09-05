@@ -1,1 +1,116 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Cards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: transparent;
+            padding: 10px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .card-content {
+            color: #2c3e50;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .card-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .card-link {
+            display: inline-block;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .card-link:hover {
+            text-decoration: underline;
+        }
+
+        .card-classes {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div id="cardsContainer">
+        <!-- Cards will be populated by JavaScript -->
+    </div>
+
+    <script>
+        // Simple card rendering function
+        function renderCards(posts) {
+            const container = document.getElementById('cardsContainer');
+            if (!posts || posts.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #7f8c8d; padding: 20px;">No cards available</div>';
+                return;
+            }
+
+            container.innerHTML = posts.map(post => {
+                let cardHTML = `
+                    <div class="card">
+                        <div class="card-title">${post.title || 'No Title'}</div>
+                        <div class="card-content">${post.content || ''}</div>
+                `;
+
+                if (post.link) {
+                    cardHTML += `<a href="${post.link}" target="_blank" class="card-link">Open Link</a>`;
+                }
+
+                cardHTML += `
+                        <div class="card-classes">Classes: ${post.classes || 'none'}</div>
+                    </div>
+                `;
+
+                return cardHTML;
+            }).join('');
+        }
+
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // This will be replaced by the sync script with actual data
+            renderCards([{"id":"i-odvWyFmIhd","classes":["ap"],"subhead":"","title":"AP Vocab #1 - Quizlet","type":"resource","link":"https://quizlet.com/your-vocab-set","content":"Practice your first AP vocabulary set with interactive flashcards and games.","date":"2025-09-05"},{"id":"i-ZQam_oYg4H","classes":["ap"],"subhead":"","title":"WCSU Enrollment Flyer","type":"resource","link":"","content":"\u003cimg src=\u0027https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress\u0026fit=max\u0027 style=\u0027width: 100%; max-width: 500px; height: auto;\u0027\u003e","date":"2025-09-05"},{"id":"i-ula0m7KAFY","classes":["ap"],"subhead":"","title":"Test WCSU Post","type":"resource","link":"","content":"This is a test post for WCSU enrollment","date":"2025-09-05"}]);
+        });
+    </script>
+</body>
+</html>
+
