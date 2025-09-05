@@ -1,16 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Landing Page</title>
-</head>
-<body>
-    <h2>WCSU Enrollment Flyer</h2>
-    <img src="https://codaio.imgix.net/docs/xmloQUGg-g/blobs/bl-V3WAFnW--9/03f263fea4c45c7b5f4544f5ee3915a831c28f47d0e74bc4c261cfe3f61717eb86fcf50b5ed0ad32b2fdaf360e6517a71857e974706abdd7e65335695c547161f40f9f936032997573ffbf5b4da152a257d2be87670414dc5efa0b423e5fdae81fbd8ed9?auto=format%2Ccompress&fit=max" style="width: 100%; max-width: 600px;">
-    
-    <h2>AP Vocab #1</h2>
-    <p>Study flashcards for AP vocabulary set #1. Click to open Quizlet in a new tab.</p>
-</body>
-</html>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-gray: #ecf0f1;
+            --dark-gray: #7f8c8d;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background-color: var(--light-gray);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
         }
 
         .class-filter {
@@ -159,11 +196,6 @@
             color: var(--white);
         }
 
-        .card-type.opportunity {
-            background: #9b59b6;
-            color: var(--white);
-        }
-
         .card-content {
             color: var(--primary-color);
             margin-bottom: 15px;
@@ -295,14 +327,6 @@
                         type: "resource",
                         date: "2025-08-28",
                         classes: ["ap"]
-                    },
-                    {
-                        id: 7,
-                        title: "Virtual Lab Simulation",
-                        content: "Explore chemical reactions in a safe virtual environment.",
-                        type: "activity",
-                        date: "2025-08-24",
-                        classes: ["3a", "cp", "honors"]
                     }
                 ];
             }
