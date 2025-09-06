@@ -245,6 +245,16 @@
             border-bottom: 1px solid #3498db;
         }
 
+        .card-datestamp {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 11px;
+            color: #bdc3c7;
+            font-weight: 400;
+            z-index: 1;
+        }
+
         .card-link {
             display: inline-block;
             color: white;
@@ -315,7 +325,8 @@
                 html: 'c-1usMGE-tni', // HTML column
                 link: 'c-BgwwlV4K1D',
                 classes: 'c-Qcz-VEgR-F',
-                icon: 'c-ebGeiOye9b' // cms-icon column
+                icon: 'c-ebGeiOye9b', // cms-icon column
+                modified: 'c-TB-BnQYP8S' // last modified datetime column
             }
         };
 
@@ -398,6 +409,20 @@
 
                 if (post.link) {
                     cardHTML += `<a href="${post.link}" target="_blank" class="card-link" onclick="event.stopPropagation()">Open Link</a>`;
+                }
+
+                // Add datestamp
+                const formatDate = (dateString) => {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    if (isNaN(date.getTime())) return '';
+                    const options = { weekday: 'short', month: 'short', day: 'numeric' };
+                    return date.toLocaleDateString('en-US', options);
+                };
+
+                const formattedDate = formatDate(post.modified);
+                if (formattedDate) {
+                    cardHTML += `<div class="card-datestamp">${formattedDate}</div>`;
                 }
 
                 cardHTML += `
@@ -688,6 +713,7 @@
                     const link = values[CODA_CONFIG.columns.link] || '';
                     const classes = values[CODA_CONFIG.columns.classes] || 'all';
                     const icon = values[CODA_CONFIG.columns.icon] || '';
+                    const modified = values[CODA_CONFIG.columns.modified] || '';
 
                     // Skip empty rows
                     if (!title) return null;
@@ -719,7 +745,7 @@
                         link: link,
                         classes: classes.split(',').map(c => c.trim()),
                         icon: icon,
-                        date: new Date().toISOString().split('T')[0],
+                        modified: modified,
                         source: htmlContent ? 'html-column' : 'auto-converted'
                     };
                 })
