@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Cards</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * {
             margin: 0;
@@ -132,6 +133,40 @@
             font-weight: 700;
             color: #ff6f00;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Class-specific icon colors */
+        .card.class-2a .card-title-icon {
+            color: #8e44ad;
+        }
+
+        .card.class-3a .card-title-icon {
+            color: #00c851;
+        }
+
+        .card.class-2b .card-title-icon {
+            color: #17a2b8;
+        }
+
+        .card.class-4b .card-title-icon {
+            color: #e91e63;
+        }
+
+        .card.class-ap .card-title-icon {
+            color: #ff6f00;
+        }
+
+        .card.class-all .card-title-icon {
+            color: #3498db;
         }
 
         .card-content {
