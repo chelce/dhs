@@ -241,7 +241,6 @@
     </style>
 </head>
 <body>
-    <div id="classFilter" style="text-align: center; margin: 10px 0; color: #7f8c8d; font-style: italic; font-family: 'HarmonyOS Sans', system-ui, sans-serif; font-weight: 500;"></div>
     <div id="cardsContainer">
         <!-- Cards will be populated by JavaScript -->
     </div>
@@ -286,25 +285,6 @@
         // Simple card rendering function
         function renderCards(posts) {
             const container = document.getElementById('cardsContainer');
-            const filterIndicator = document.getElementById('classFilter');
-            
-            // Show class filter indicator
-            const classFilter = getUrlParameter('class');
-            if (classFilter) {
-                const classColors = {
-                    '2a': '#8e44ad',
-                    '3a': '#00c851', 
-                    '2b': '#17a2b8',
-                    '4b': '#e91e63',
-                    'ap': '#ff6f00'
-                };
-                const color = classColors[classFilter] || '#7f8c8d';
-                filterIndicator.innerHTML = `<span style="color: ${color}; font-weight: 600;">● </span>Showing cards for: ${classFilter.toUpperCase()}`;
-                filterIndicator.style.display = 'block';
-            } else {
-                filterIndicator.textContent = 'Showing all cards';
-                filterIndicator.style.display = 'block';
-            }
             
             // Apply class filtering
             const filteredPosts = filterPostsByClass(posts);
