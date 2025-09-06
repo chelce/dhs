@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coda-Powered Class Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', system-ui, sans-serif;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .calendar-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .calendar-header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .calendar-navigation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .current-month {
+            font-size: 20px;
+            font-weight: 600;
+            min-width: 200px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: #e9ecef;
+            margin: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .calendar-day-header {
+            background: #495057;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 120px;
+            padding: 8px;
+            position: relative;
+            border: 1px solid #e9ecef;
+        }
+
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .calendar-day.today {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .event-item {
+            background: #3498db;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .event-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Class-specific event colors */
+        .event-item.class-ap { background: #ff6f00; }
+        .event-item.class-2a { background: #8e44ad; }
+        .event-item.class-3a { background: #00c851; }
+        .event-item.class-2b { background: #17a2b8; }
+        .event-item.class-4b { background: #e91e63; }
+        .event-item.class-all { background: #3498db; }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+            background: #f8d7da;
+            margin: 20px;
+            border-radius: 8px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            padding-right: 40px;
+        }
+
+        .modal-date {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .modal-classes {
+            margin-bottom: 20px;
+        }
+
+        .class-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 8px;
+            color: white;
+        }
+
+        .class-badge.class-ap { background: #ff6f00; }
+        .class-badge.class-2a { background: #8e44ad; }
+        .class-badge.class-3a { background: #00c851; }
+        .class-badge.class-2b { background: #17a2b8; }
+        .class-badge.class-4b { background: #e91e63; }
+        .class-badge.class-all { background: #3498db; }
+
+        .modal-content-text {
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .add-event-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .add-event-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h1>Class Calendar</h1>
+            <div class="calendar-navigation">
+                <button class="nav-button" onclick="changeMonth(-1)">
+                    <i data-lucide="chevron-left"></i> Previous
+                </button>
+                <div class="current-month" id="currentMonth"></div>
+                <button class="nav-button" onclick="changeMonth(1)">
+                    Next <i data-lucide="chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div id="calendarContent">
+            <div class="loading">Loading calendar events...</div>
+        </div>
+    </div>
+
+    <!-- Event Modal -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-title" id="modalTitle"></div>
+            <div class="modal-date" id="modalDate"></div>
+            <div class="modal-classes" id="modalClasses"></div>
+            <div class="modal-content-text" id="modalContent"></div>
+        </div>
+    </div>
+
+    <button class="add-event-button" onclick="showAddEventForm()" title="Add New Event">
+        <i data-lucide="plus"></i>
+    </button>
+
+    <script>
+        // Coda configuration
+        const CODA_CONFIG = {
+            docId: 'xmloQUGg-g',
+            tableId: 'grid-MRF7PFTuaC', // Calendar table
+            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
+            columns: {
+                title: 'c-xvkLSSfsSn',    // cms-calendar-title
+                date: 'c-iwbhQPYnV5',     // cms-calendar-date
+                classes: 'c-C45a_itzd3',  // cms-calendar-classes
+                content: 'c-_Vm-tHwUii'   // cms-calendar-content
+            }
+        };
+
+        let currentDate = new Date();
+        let events = [];
+
+        // Initialize calendar
+        async function initCalendar() {
+            try {
+                await loadEventsFromCoda();
+                renderCalendar();
+                
+                // Initialize Lucide icons
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            } catch (error) {
+                console.error('Failed to initialize calendar:', error);
+                showError('Failed to load calendar events. Please try again later.');
+            }
+        }
+
+        // Load events from Coda
+        async function loadEventsFromCoda() {
+            try {
+                const apiUrl = `https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`;
+                
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Process events
+                events = data.items
+                    .map(item => {
+                        const values = item.values;
+                        const title = values[CODA_CONFIG.columns.title] || '';
+                        const date = values[CODA_CONFIG.columns.date] || '';
+                        const classes = values[CODA_CONFIG.columns.classes] || 'all';
+                        const content = values[CODA_CONFIG.columns.content] || '';
+
+                        // Skip empty rows
+                        if (!title || !date) return null;
+
+                        // Parse date
+                        let eventDate = '';
+                        if (date) {
+                            const parsedDate = new Date(date);
+                            if (!isNaN(parsedDate.getTime())) {
+                                eventDate = parsedDate.toISOString().split('T')[0];
+                            }
+                        }
+
+                        // Parse classes
+                        const classArray = classes.split(',').map(c => c.trim()).filter(c => c);
+
+                        return {
+                            id: item.id,
+                            title: title,
+                            date: eventDate,
+                            classes: classArray,
+                            content: content,
+                            createdAt: item.createdAt,
+                            updatedAt: item.updatedAt
+                        };
+                    })
+                    .filter(event => event !== null);
+
+                console.log(`Loaded ${events.length} events from Coda`);
+                
+            } catch (error) {
+                console.error('Error loading events from Coda:', error);
+                throw error;
+            }
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Update month display
+            document.getElementById('currentMonth').textContent = 
+                currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            // Create calendar grid
+            const calendarHTML = createCalendarGrid(year, month);
+            document.getElementById('calendarContent').innerHTML = calendarHTML;
+
+            // Add events to calendar
+            addEventsToCalendar();
+        }
+
+        // Create calendar grid
+        function createCalendarGrid(year, month) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            
+            let html = '<div class="calendar-grid">';
+            
+            // Day headers
+            dayHeaders.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+
+            // Calendar days
+            const currentDate = new Date(startDate);
+            for (let week = 0; week < 6; week++) {
+                for (let day = 0; day < 7; day++) {
+                    const isCurrentMonth = currentDate.getMonth() === month;
+                    const isToday = currentDate.toDateString() === new Date().toDateString();
+                    const dateString = currentDate.toISOString().split('T')[0];
+                    
+                    let dayClass = 'calendar-day';
+                    if (!isCurrentMonth) dayClass += ' other-month';
+                    if (isToday) dayClass += ' today';
+
+                    html += `
+                        <div class="${dayClass}" data-date="${dateString}">
+                            <div class="day-number">${currentDate.getDate()}</div>
+                            <div class="events-container" id="events-${dateString}"></div>
+                        </div>
+                    `;
+
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+            }
+
+            html += '</div>';
+            return html;
+        }
+
+        // Add events to calendar
+        function addEventsToCalendar() {
+            events.forEach(event => {
+                const container = document.getElementById(`events-${event.date}`);
+                if (container) {
+                    const eventElement = createEventElement(event);
+                    container.appendChild(eventElement);
+                }
+            });
+        }
+
+        // Create event element
+        function createEventElement(event) {
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event-item class-${event.classes[0] || 'all'}`;
+            eventDiv.textContent = event.title;
+            eventDiv.onclick = () => openEventModal(event);
+            return eventDiv;
+        }
+
+        // Open event modal
+        function openEventModal(event) {
+            document.getElementById('modalTitle').textContent = event.title;
+            document.getElementById('modalDate').textContent = 
+                new Date(event.date + 'T00:00:00').toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+
+            // Create class badges
+            const classesContainer = document.getElementById('modalClasses');
+            classesContainer.innerHTML = '';
+            event.classes.forEach(cls => {
+                const badge = document.createElement('span');
+                badge.className = `class-badge class-${cls}`;
+                badge.textContent = cls.toUpperCase();
+                classesContainer.appendChild(badge);
+            });
+
+            document.getElementById('modalContent').innerHTML = event.content || 'No additional details available.';
+            document.getElementById('eventModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('eventModal').style.display = 'none';
+        }
+
+        // Change month
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('calendarContent').innerHTML = 
+                `<div class="error">${message}</div>`;
+        }
+
+        // Add event form (placeholder)
+        function showAddEventForm() {
+            alert('Add event functionality will be implemented next. For now, add events directly in your Coda table.');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initCalendar);
+    </script>
+</body>
+</html>
