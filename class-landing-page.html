@@ -258,7 +258,8 @@
                 content: 'c-dA-y5r4f_H',
                 html: 'c-1usMGE-tni', // HTML column
                 link: 'c-BgwwlV4K1D',
-                classes: 'c-Qcz-VEgR-F'
+                classes: 'c-Qcz-VEgR-F',
+                icon: 'c-ICON-PLACEHOLDER' // Icon column - update this with actual column ID
             }
         };
 
@@ -340,9 +341,13 @@
                     cardClass += ' class-all'; // Default fallback
                 }
                 
+                // Create title with icon if available
+                const iconHTML = post.icon ? `<i data-lucide="${post.icon}" class="card-title-icon"></i>` : '';
+                const titleHTML = `<div class="card-title">${iconHTML}${post.title || 'No Title'}</div>`;
+                
                 let cardHTML = `
                     <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}')">
-                        <div class="card-title">${post.title || 'No Title'}</div>
+                        ${titleHTML}
                         <div class="card-content">${processedContent}</div>
                 `;
 
@@ -357,6 +362,11 @@
 
                 return cardHTML;
             }).join('');
+            
+            // Initialize Lucide icons after cards are rendered
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
         }
 
         // Direct API call using fetch with proper error handling
@@ -633,6 +643,7 @@
                     const htmlContent = values[CODA_CONFIG.columns.html] || '';
                     const link = values[CODA_CONFIG.columns.link] || '';
                     const classes = values[CODA_CONFIG.columns.classes] || 'all';
+                    const icon = values[CODA_CONFIG.columns.icon] || '';
 
                     // Skip empty rows
                     if (!title) return null;
@@ -663,6 +674,7 @@
                         content: content,
                         link: link,
                         classes: classes.split(',').map(c => c.trim()),
+                        icon: icon,
                         date: new Date().toISOString().split('T')[0],
                         source: htmlContent ? 'html-column' : 'auto-converted'
                     };
