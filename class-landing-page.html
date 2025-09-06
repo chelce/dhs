@@ -247,14 +247,46 @@
 
         .card-link {
             display: inline-block;
-            color: #3498db;
+            color: white;
+            background: #3498db;
             text-decoration: none;
             font-weight: 500;
             margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
         }
 
         .card-link:hover {
-            text-decoration: underline;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            text-decoration: none;
+        }
+
+        /* Class-specific button colors */
+        .card.class-2a .card-link {
+            background: #8e44ad;
+        }
+
+        .card.class-3a .card-link {
+            background: #00c851;
+        }
+
+        .card.class-2b .card-link {
+            background: #17a2b8;
+        }
+
+        .card.class-4b .card-link {
+            background: #e91e63;
+        }
+
+        .card.class-ap .card-link {
+            background: #ff6f00;
+        }
+
+        .card.class-all .card-link {
+            background: #3498db;
         }
 
         .card-classes {
@@ -712,7 +744,18 @@
             
             // Add link if available
             if (link) {
-                modalFooter.innerHTML = `<a href="${link}" target="_blank" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #3498db; color: white; text-decoration: none; border-radius: 5px;">Open Link</a>`;
+                // Get class-specific color
+                const classColors = {
+                    'class-2a': '#8e44ad',
+                    'class-3a': '#00c851',
+                    'class-2b': '#17a2b8', 
+                    'class-4b': '#e91e63',
+                    'class-ap': '#ff6f00',
+                    'class-all': '#3498db'
+                };
+                const buttonColor = classColors[classes] || '#3498db';
+                
+                modalFooter.innerHTML = `<a href="${link}" target="_blank" style="display: inline-block; margin-top: 15px; padding: 8px 16px; background: ${buttonColor}; color: white; text-decoration: none; border-radius: 20px; font-size: 14px; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0px)'; this.style.boxShadow='none';">Open Link</a>`;
             } else {
                 modalFooter.innerHTML = '';
             }
