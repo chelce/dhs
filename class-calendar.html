@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- calendar-build: 2025-09-01T00:00Z TipTap-3.0-upgrade +lucide-icons +enhancements -->
+<!-- calendar-build: 2025-09-06T00:00Z Coda-Integration +lucide-icons +enhancements -->
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Class Calendar & Reflections (TipTap 3.0)</title>
+<title>Class Calendar & Reflections (Coda-Powered)</title>
 <link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Lucide icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script type="module">
@@ -335,11 +334,20 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 
 <script>
 /* ========= CONFIG ========= */
-const SUPABASE_URL = 'https://dfqjhgftmhdsjlcdaaxk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmcWpoZ2Z0bWhkc2psY2RhYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4MDY0NTEsImV4cCI6MjA2NjM4MjQ1MX0.iu1OH2wV6hjV9EhxkFBwqSApcy6uRn0b40AOc9yJ0Yk';
+const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
+const CODA_DOC_ID = 'xmloQUGg-g';
+const CODA_TABLE_ID = 'grid-MRF7PFTuaC';
+
+// Coda API column IDs
+const CODA_COLUMNS = {
+  title: 'c-xvkLSSfsSn',
+  date: 'c-iwbhQPYnV5', 
+  classes: 'c-C45a_itzd3',
+  content: 'c-_Vm-tHwUii'
+};
 
 /* ========= STATE ========= */
-let supabase = null;
+let codaApiReady = true; // Coda API doesn't need initialization like Supabase
 let weekOffset = 0; // 0 is current week block center
 let events = []; // {id,date(YYYY-MM-DD),text,classes[],isTentative,notes,createdAt}
 let currentEditId = null; // for details modal
@@ -363,14 +371,13 @@ if (document.readyState === 'loading') {
 } else { init(); }
 
 async function init(){
-  initSupabase();
   wireUI();
   await ensureEditors();
   
-  // CLOUD-FIRST APPROACH: Try cloud, then localStorage, then hardcoded events
+  // CLOUD-FIRST APPROACH: Try Coda, then localStorage, then hardcoded events
   const remoteLoaded = await loadRemoteEvents();
-  if (!remoteLoaded || !supabase) {
-    console.warn('🔄 Cloud unavailable - falling back to local storage');
+  if (!remoteLoaded) {
+    console.warn('🔄 Coda API unavailable - falling back to local storage');
     loadLocalEvents();
     // If we still have no events, try loading hardcoded events
     if (events.length === 0) {
@@ -378,16 +385,12 @@ async function init(){
       await loadHardcodedEvents();
     }
   } else {
-    console.log('☁️ Cloud data loaded successfully - skipping localStorage');
+    console.log('☁️ Coda data loaded successfully - skipping localStorage');
     // Clear any stale local data since we have cloud data
     localStorage.removeItem('calendar_events_user');
   }
   
   render();
-}
-
-function initSupabase(){
-  try { supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); } catch(e){ console.warn('Supabase init failed', e); supabase = null; }
 }
 
 function wireUI(){
@@ -1009,56 +1012,75 @@ function fmtDate(d){return d.toISOString().slice(0,10);}
 /* ========= HARD CODED EVENTS ========= */
 /* ========= REMOTE LOAD ========= */
 async function loadRemoteEvents(){
-  if(!supabase) {
-    console.warn('Supabase not available - cannot load from cloud');
-    return false;
-  }
-  
   try {
-    const startRange = new Date(); startRange.setDate(startRange.getDate()-21);
-    const endRange = new Date(); endRange.setDate(endRange.getDate()+21);
-    console.log('☁️ Loading events from cloud database...');
+    console.log('☁️ Loading events from Coda...');
     
-    const { data, error } = await supabase.from('calendar_events').select('*').gte('event_date',fmtDate(startRange)).lte('event_date',fmtDate(endRange));
+    const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows`, {
+      headers: {
+        'Authorization': `Bearer ${CODA_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
     
-    if(error){
-      console.error('❌ Remote fetch error:', error);
+    if (!response.ok) {
+      console.error('❌ Coda API error:', response.status, response.statusText);
       return false;
     }
     
-    console.log(`✅ Loaded ${data.length} events from cloud`);
-    if (data.length > 0) {
-      console.log('📋 ACTUAL DATABASE SCHEMA - Sample event structure:', data[0]);
-      console.log('📋 Database event keys:', Object.keys(data[0]));
+    const data = await response.json();
+    console.log(`✅ Loaded ${data.items.length} events from Coda`);
+    
+    if (data.items.length > 0) {
+      console.log('📋 ACTUAL CODA SCHEMA - Sample event structure:', data.items[0]);
+      console.log('📋 Coda event keys:', Object.keys(data.items[0].values));
     } else {
-      console.log('📋 No events in database to examine schema');
+      console.log('📋 No events in Coda table to examine schema');
     }
     
-    data.forEach(r=>{
+    data.items.forEach(row => {
       // avoid duplicates
-      if(!events.some(e=>e.id===r.id)){
-        // Handle both old single-class events and new multi-class events
+      if(!events.some(e => e.id === row.id)){
+        const values = row.values;
+        
+        // Extract data from Coda columns
+        const title = values[CODA_COLUMNS.title] || 'Untitled Event';
+        const dateStr = values[CODA_COLUMNS.date] || '';
+        const classesStr = values[CODA_COLUMNS.classes] || 'other';
+        const content = values[CODA_COLUMNS.content] || '';
+        
+        // Parse classes - could be comma-separated or JSON
         let eventClasses = [];
-        if (r.event_classes) {
-          try {
-            eventClasses = JSON.parse(r.event_classes);
-          } catch(e) {
-            console.warn('Failed to parse event_classes, falling back to single class');
-            eventClasses = [r.event_class];
+        try {
+          if (classesStr.startsWith('[')) {
+            eventClasses = JSON.parse(classesStr);
+          } else {
+            eventClasses = classesStr.split(',').map(c => c.trim());
           }
-        } else {
-          eventClasses = [r.event_class];
+        } catch(e) {
+          eventClasses = [classesStr.trim()];
+        }
+        
+        // Convert Coda date format to YYYY-MM-DD
+        let formattedDate = '';
+        if (dateStr) {
+          try {
+            const date = new Date(dateStr);
+            formattedDate = date.toISOString().split('T')[0];
+          } catch(e) {
+            console.warn('Failed to parse date:', dateStr);
+            formattedDate = dateStr;
+          }
         }
         
         events.push({
-          id: r.id || 'db-'+r.event_date+'-'+r.event_text.replace(/\s+/g,'_'),
-          date: r.event_date,
-          text: r.event_text,
+          id: row.id,
+          date: formattedDate,
+          text: title,
           classes: eventClasses,
           class: eventClasses[0], // Keep for backwards compatibility
-          isTentative: !!r.is_tentative,
-          notes: r.notes || '',
-          createdAt: r.created_at || r.event_date
+          isTentative: false, // Could add this as a column later
+          notes: content,
+          createdAt: row.createdAt || formattedDate
         });
       }
     });
@@ -1066,7 +1088,7 @@ async function loadRemoteEvents(){
     return true; // Success
     
   } catch(e){ 
-    console.error('❌ Remote load failed:', e); 
+    console.error('❌ Coda load failed:', e); 
     return false;
   }
 }
@@ -1095,15 +1117,15 @@ function loadLocalEvents(){
 
 function saveLocalEvents(){
   // CLOUD-FIRST: Only save locally as emergency backup
-  if (!supabase) {
-    console.log('💾 Saving to localStorage (cloud unavailable)');
+  if (!codaApiReady) {
+    console.log('💾 Saving to localStorage (Coda unavailable)');
     try { 
       localStorage.setItem('calendar_events_user', JSON.stringify(events)); 
     } catch(e){ 
       console.warn('Local save error:', e); 
     }
   } else {
-    console.log('☁️ Cloud available - skipping localStorage save');
+    console.log('☁️ Coda available - skipping localStorage save');
   }
 }
 
@@ -1229,13 +1251,8 @@ function generateUUID() {
 }
 
 async function persistNewEvent(ev){
-  if(!supabase) {
-    console.warn('☁️ Cloud unavailable - event saved locally only');
-    return;
-  }
-  
   try { 
-    console.log('☁️ Saving new event to cloud database...');
+    console.log('☁️ Saving new event to Coda...');
     
     // Generate a proper UUID if the event doesn't have a UUID format ID
     let eventId = ev.id;
@@ -1245,36 +1262,61 @@ async function persistNewEvent(ev){
       ev.id = eventId;
     }
     
-    // Prepare the event data - provide the UUID since database expects it
-    const eventData = {
-      id: eventId,
-      event_date: ev.date, 
-      year: parseInt(ev.date.slice(0,4),10), 
-      month: parseInt(ev.date.slice(5,7),10)-1, 
-      day: parseInt(ev.date.slice(8,10),10), 
-      event_text: ev.text, 
-      event_class: ev.classes ? ev.classes[0] : (ev.class || 'other'), // Primary class for backwards compatibility
-      event_classes: JSON.stringify(ev.classes || [ev.class || 'other']), // All classes as JSON
-      notes: ev.notes || '<p>No notes yet...</p>', 
-      is_tentative: ev.isTentative || false,
-      created_at: ev.createdAt || new Date().toISOString()
+    // Prepare the event data for Coda
+    const codaData = {
+      rows: [{
+        cells: [
+          {
+            column: CODA_COLUMNS.title,
+            value: ev.text
+          },
+          {
+            column: CODA_COLUMNS.date,
+            value: ev.date
+          },
+          {
+            column: CODA_COLUMNS.classes,
+            value: JSON.stringify(ev.classes || ['other'])
+          },
+          {
+            column: CODA_COLUMNS.content,
+            value: ev.notes || 'No notes yet...'
+          }
+        ]
+      }]
     };
     
-    console.log('📤 Event data being sent:', eventData);
-    console.log('📤 Event object structure:', Object.keys(eventData));
+    console.log('📤 Event data being sent to Coda:', codaData);
     
-    const { data, error } = await supabase
-      .from('calendar_events')
-      .insert(eventData)
-      .select(); // Return the inserted data to see what was created
+    const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CODA_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(codaData)
+    });
     
-    if(error) {
-      console.error('❌ Cloud save error:', error);
+    if(!response.ok) {
+      console.error('❌ Coda save error:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('❌ Error details:', errorText);
     } else {
-      console.log('✅ Event saved to cloud successfully:', data);
+      const result = await response.json();
+      console.log('✅ Event saved to Coda successfully:', result);
+      
+      // Update the event ID with the Coda row ID for future operations
+      if (result.addedRowIds && result.addedRowIds.length > 0) {
+        ev.id = result.addedRowIds[0];
+        // Update the event in our local array too
+        const eventIndex = events.findIndex(e => e.id === eventId);
+        if (eventIndex !== -1) {
+          events[eventIndex].id = result.addedRowIds[0];
+        }
+      }
     }
   } catch(e){ 
-    console.error('❌ Cloud persist failed:', e);
+    console.error('❌ Coda persist failed:', e);
   }
 }
 
@@ -1380,23 +1422,25 @@ function deleteEvent(id){
   // Remove from memory
   events.splice(idx,1); 
   
-  // CLOUD-FIRST: Delete from cloud, backup locally only if cloud unavailable
-  if(supabase){ 
-    console.log('☁️ Deleting event from cloud database...');
-    supabase.from('calendar_events')
-      .delete()
-      .eq('event_date',ev.date)
-      .eq('event_text',ev.text)
-      .eq('event_class',ev.class)
-      .then(result => {
-        console.log('✅ Event deleted from cloud:', result);
-      })
-      .catch(error => {
-        console.error('❌ Cloud delete failed:', error);
-      });
-  } else {
-    console.warn('☁️ Cloud unavailable - updating local backup only');
-  }
+  // CLOUD-FIRST: Delete from Coda
+  console.log('☁️ Deleting event from Coda...');
+  fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows/${ev.id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${CODA_API_TOKEN}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('✅ Event deleted from Coda');
+    } else {
+      console.error('❌ Coda delete failed:', response.status, response.statusText);
+    }
+  })
+  .catch(error => {
+    console.error('❌ Coda delete failed:', error);
+  });
   
   saveLocalEvents(); // Only saves locally if cloud unavailable
   render();
@@ -1423,25 +1467,50 @@ function saveDetailsNotes(){
   ev.classes = selectedClasses;
   ev.class = selectedClasses[0]; // Keep for backwards compatibility
   
-  // CLOUD-FIRST: Save to cloud, backup locally only if cloud unavailable
-  if(supabase){ 
-    console.log('☁️ Saving event changes to cloud database...');
-    supabase.from('calendar_events')
-      .update({ 
-        notes: ev.notes,
-        event_class: ev.classes[0], // Primary class for backwards compatibility
-        event_classes: JSON.stringify(ev.classes) // All classes as JSON
-      })
-      .eq('id', ev.id) // Use ID for more precise matching
-      .then(result => {
-        console.log('✅ Event changes saved to cloud:', result);
-      })
-      .catch(error => {
-        console.error('❌ Cloud save failed:', error);
-      });
-  } else {
-    console.warn('☁️ Cloud unavailable - saving notes locally only');
-  }
+  // CLOUD-FIRST: Save to Coda
+  console.log('☁️ Saving event changes to Coda...');
+  
+  const updateData = {
+    rows: [{
+      cells: [
+        {
+          column: CODA_COLUMNS.title,
+          value: ev.text
+        },
+        {
+          column: CODA_COLUMNS.date,
+          value: ev.date
+        },
+        {
+          column: CODA_COLUMNS.classes,
+          value: JSON.stringify(ev.classes)
+        },
+        {
+          column: CODA_COLUMNS.content,
+          value: ev.notes
+        }
+      ]
+    }]
+  };
+  
+  fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows/${ev.id}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${CODA_API_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updateData)
+  })
+  .then(response => {
+    if (response.ok) {
+      console.log('✅ Event changes saved to Coda');
+    } else {
+      console.error('❌ Coda save failed:', response.status, response.statusText);
+    }
+  })
+  .catch(error => {
+    console.error('❌ Coda save failed:', error);
+  });
   
   saveLocalEvents(); // Only saves locally if cloud unavailable
   closeModal('detailsModal');
@@ -1616,26 +1685,49 @@ function safeMoveEvent(id, newDate, originalDate) {
     console.log('UI updated');
     
     // Update database if available (async - don't wait for it)
-    if (supabase) {
-      console.log('☁️ Updating cloud database...');
-      supabase.from('calendar_events').update({ 
-        event_date: newDate, 
-        year: parseInt(newDate.slice(0,4),10), 
-        month: parseInt(newDate.slice(5,7),10)-1, 
-        day: parseInt(newDate.slice(8,10),10) 
-      })
-      .eq('event_date', oldDate)
-      .eq('event_text', ev.text)
-      .eq('event_class', ev.class)
-      .then(result => {
-        console.log('✅ Cloud database updated successfully:', result);
-      })
-      .catch(dbError => {
-        console.error('❌ Cloud update failed:', dbError);
-      });
-    } else {
-      console.warn('☁️ Cloud unavailable - move saved locally only');
-    }
+    console.log('☁️ Updating Coda...');
+    
+    const updateData = {
+      rows: [{
+        cells: [
+          {
+            column: CODA_COLUMNS.title,
+            value: ev.text
+          },
+          {
+            column: CODA_COLUMNS.date,
+            value: newDate
+          },
+          {
+            column: CODA_COLUMNS.classes,
+            value: JSON.stringify(ev.classes || ['other'])
+          },
+          {
+            column: CODA_COLUMNS.content,
+            value: ev.notes || ''
+          }
+        ]
+      }]
+    };
+    
+    fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows/${ev.id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${CODA_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log('✅ Coda updated successfully');
+      } else {
+        console.error('❌ Coda update failed:', response.status, response.statusText);
+      }
+    })
+    .catch(error => {
+      console.error('❌ Coda update failed:', error);
+    });
     
     return true;
     
