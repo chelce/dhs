@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'HarmonyOS Sans', system-ui, sans-serif;
             background: transparent;
             padding: 10px;
         }
@@ -34,6 +34,27 @@
             transition: all 0.2s ease;
             height: fit-content;
             cursor: pointer;
+        }
+
+        /* Class-specific card colors */
+        .card.class-2a {
+            border-left-color: #8e44ad;
+        }
+
+        .card.class-3a {
+            border-left-color: #00c851;
+        }
+
+        .card.class-2b {
+            border-left-color: #17a2b8;
+        }
+
+        .card.class-4b {
+            border-left-color: #e91e63;
+        }
+
+        .card.class-all {
+            border-left-color: #3498db;
         }
 
         .card:hover {
@@ -181,7 +202,7 @@
     </style>
 </head>
 <body>
-    <div id="classFilter" style="text-align: center; margin: 10px 0; color: #7f8c8d; font-style: italic;"></div>
+    <div id="classFilter" style="text-align: center; margin: 10px 0; color: #7f8c8d; font-style: italic; font-family: 'HarmonyOS Sans', system-ui, sans-serif; font-weight: 500;"></div>
     <div id="cardsContainer">
         <!-- Cards will be populated by JavaScript -->
     </div>
@@ -230,7 +251,14 @@
             // Show class filter indicator
             const classFilter = getUrlParameter('class');
             if (classFilter) {
-                filterIndicator.textContent = `Showing cards for: ${classFilter.toUpperCase()}`;
+                const classColors = {
+                    '2a': '#8e44ad',
+                    '3a': '#00c851', 
+                    '2b': '#17a2b8',
+                    '4b': '#e91e63'
+                };
+                const color = classColors[classFilter] || '#7f8c8d';
+                filterIndicator.innerHTML = `<span style="color: ${color}; font-weight: 600;">● </span>Showing cards for: ${classFilter.toUpperCase()}`;
                 filterIndicator.style.display = 'block';
             } else {
                 filterIndicator.textContent = 'Showing all cards';
@@ -251,8 +279,27 @@
             container.innerHTML = filteredPosts.map((post, index) => {
                 const processedContent = autoGenerateHTML(post.content);
                 
+                // Determine card class for styling based on post's classes
+                const postClasses = post.classes || 'all';
+                let cardClass = 'card';
+                
+                // Apply class-specific styling
+                if (postClasses === 'all') {
+                    cardClass += ' class-all';
+                } else if (postClasses.includes('2a')) {
+                    cardClass += ' class-2a';
+                } else if (postClasses.includes('3a')) {
+                    cardClass += ' class-3a';
+                } else if (postClasses.includes('2b')) {
+                    cardClass += ' class-2b';
+                } else if (postClasses.includes('4b')) {
+                    cardClass += ' class-4b';
+                } else {
+                    cardClass += ' class-all'; // Default fallback
+                }
+                
                 let cardHTML = `
-                    <div class="card" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}')">
+                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}')">
                         <div class="card-title">${post.title || 'No Title'}</div>
                         <div class="card-content">${processedContent}</div>
                 `;
