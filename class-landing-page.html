@@ -328,22 +328,30 @@
                 // Determine card class for styling based on post's classes
                 const postClasses = post.classes || 'all';
                 let cardClass = 'card';
+                let modalClass = '';
                 
                 // Apply class-specific styling
                 if (postClasses === 'all') {
                     cardClass += ' class-all';
+                    modalClass = 'class-all';
                 } else if (postClasses.includes('2a')) {
                     cardClass += ' class-2a';
+                    modalClass = 'class-2a';
                 } else if (postClasses.includes('3a')) {
                     cardClass += ' class-3a';
+                    modalClass = 'class-3a';
                 } else if (postClasses.includes('2b')) {
                     cardClass += ' class-2b';
+                    modalClass = 'class-2b';
                 } else if (postClasses.includes('4b')) {
                     cardClass += ' class-4b';
+                    modalClass = 'class-4b';
                 } else if (postClasses.includes('ap')) {
                     cardClass += ' class-ap';
+                    modalClass = 'class-ap';
                 } else {
                     cardClass += ' class-all'; // Default fallback
+                    modalClass = 'class-all';
                 }
                 
                 // Create title with icon if available
@@ -351,7 +359,7 @@
                 const titleHTML = `<div class="card-title">${iconHTML}${post.title || 'No Title'}</div>`;
                 
                 let cardHTML = `
-                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}', '${cardClass}')">
+                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}', '${modalClass}')">
                         ${titleHTML}
                         <div class="card-content">${processedContent}</div>
                 `;
