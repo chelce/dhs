@@ -1471,7 +1471,7 @@ function saveDetailsNotes(){
   console.log('☁️ Saving event changes to Coda...');
   
   const updateData = {
-    rows: [{
+    row: {
       cells: [
         {
           column: CODA_COLUMNS.title,
@@ -1490,7 +1490,7 @@ function saveDetailsNotes(){
           value: ev.notes
         }
       ]
-    }]
+    }
   };
   
   fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows/${ev.id}`, {
@@ -1688,7 +1688,7 @@ function safeMoveEvent(id, newDate, originalDate) {
     console.log('☁️ Updating Coda...');
     
     const updateData = {
-      rows: [{
+      row: {
         cells: [
           {
             column: CODA_COLUMNS.title,
@@ -1707,7 +1707,7 @@ function safeMoveEvent(id, newDate, originalDate) {
             value: ev.notes || ''
           }
         ]
-      }]
+      }
     };
     
     fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${CODA_TABLE_ID}/rows/${ev.id}`, {
