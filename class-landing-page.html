@@ -53,6 +53,10 @@
             border-left-color: #e91e63;
         }
 
+        .card.class-ap {
+            border-left-color: #ff6f00;
+        }
+
         .card.class-all {
             border-left-color: #3498db;
         }
@@ -255,7 +259,8 @@
                     '2a': '#8e44ad',
                     '3a': '#00c851', 
                     '2b': '#17a2b8',
-                    '4b': '#e91e63'
+                    '4b': '#e91e63',
+                    'ap': '#ff6f00'
                 };
                 const color = classColors[classFilter] || '#7f8c8d';
                 filterIndicator.innerHTML = `<span style="color: ${color}; font-weight: 600;">● </span>Showing cards for: ${classFilter.toUpperCase()}`;
@@ -294,6 +299,8 @@
                     cardClass += ' class-2b';
                 } else if (postClasses.includes('4b')) {
                     cardClass += ' class-4b';
+                } else if (postClasses.includes('ap')) {
+                    cardClass += ' class-ap';
                 } else {
                     cardClass += ' class-all'; // Default fallback
                 }
