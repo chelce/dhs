@@ -116,6 +116,31 @@
             padding-right: 40px;
         }
 
+        /* Class-specific modal title colors */
+        .modal-title.class-2a {
+            color: #8e44ad;
+        }
+
+        .modal-title.class-3a {
+            color: #00c851;
+        }
+
+        .modal-title.class-2b {
+            color: #17a2b8;
+        }
+
+        .modal-title.class-4b {
+            color: #e91e63;
+        }
+
+        .modal-title.class-ap {
+            color: #ff6f00;
+        }
+
+        .modal-title.class-all {
+            color: #3498db;
+        }
+
         .modal-content img {
             max-width: 100%;
             height: auto;
@@ -326,7 +351,7 @@
                 const titleHTML = `<div class="card-title">${iconHTML}${post.title || 'No Title'}</div>`;
                 
                 let cardHTML = `
-                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}')">
+                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}', '${cardClass}')">
                         ${titleHTML}
                         <div class="card-content">${processedContent}</div>
                 `;
@@ -662,11 +687,17 @@
         }
 
         // Modal functionality
-        function openModal(title, content, link) {
+        function openModal(title, content, link, classes) {
             const modal = document.getElementById('cardModal');
             const modalTitle = document.getElementById('modalTitle');
             const modalBody = document.getElementById('modalBody');
             const modalFooter = document.getElementById('modalFooter');
+            
+            // Reset modal classes and add new ones
+            modalTitle.className = 'modal-title';
+            if (classes) {
+                modalTitle.className += ' ' + classes;
+            }
             
             modalTitle.textContent = title;
             modalBody.innerHTML = content;
