@@ -2111,6 +2111,11 @@ function openAddModal(prefillDate){
     notesEditor = createTipTapEditor('eventNotesEditor', ({ editor }) => {
       document.getElementById('eventNotes').value = editor.getHTML();
     });
+    // Prefill initial content only once to prevent later selection resets
+    try {
+      const prefill = document.getElementById('eventNotesEditor')?.innerHTML || '<p></p>';
+      notesEditor.commands.setContent(prefill);
+    } catch(_) {}
     
     if (notesEditor && eventNotesMenu) {
       console.log('✅ Building fresh toolbar for add modal');
@@ -2337,7 +2342,12 @@ function openDetails(id){
     cb.checked = eventClasses.includes(cb.value);
   });
   
-  if(detailsEditor){ detailsEditor.commands.setContent(ev.notes||'<p></p>'); } else { document.getElementById('detailsNotesEditor').innerHTML=ev.notes||''; }
+  // Defer setting content until after (re)creating the fresh editor instance to avoid resetting selection during toolbar actions
+  const prefillHtml = ev.notes || '<p></p>';
+  const detailsNotesEl = document.getElementById('detailsNotesEditor');
+  if (detailsNotesEl) {
+    detailsNotesEl.innerHTML = prefillHtml; // placeholder until TipTap is (re)initialized
+  }
   
   // Ensure notes section is visible and functional
   const detailsNotesSection = document.querySelector('.notes-section');
@@ -2386,16 +2396,13 @@ function openDetails(id){
     
     if (detailsEditor && detailsNotesMenu) {
       console.log('✅ Building TipTap toolbar for details modal');
+      // Set initial content once on the fresh editor to avoid later resets that move the caret
+      try { detailsEditor.commands.setContent(prefillHtml); } catch(_) {}
       // Always rebuild to bind to the fresh editor instance
       setTimeout(() => {
         buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
       }, 150);
-      // After mount, set content if present
-      if (ev.notes) {
-        setTimeout(() => {
-          try { detailsEditor.commands.setContent(ev.notes); } catch(_){}
-        }, 220);
-      }
+  // Do not setContent again later; repeated calls can reset selection and move the caret to the end
       
     } else {
       console.log('⚠️ Using fallback toolbar for details modal');
