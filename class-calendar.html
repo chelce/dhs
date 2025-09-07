@@ -1065,10 +1065,22 @@ function buildTipTap3Toolbar(editor, el) {
     }
     
     // Execute action when editor is actually ready
-  runWhenEditorReady(editor, () => {
+    runWhenEditorReady(editor, () => {
       try {
-    // Re-focus so commands apply to current selection/caret
-    const chain = editor.chain().focus();
+        // Capture current selection prior to any focus changes
+        const sel = editor.state?.selection;
+        const from = sel?.from;
+        const to = sel?.to;
+
+        // Build chain; only focus if editor is not already focused
+        let chain = editor.chain();
+        if (!editor.isFocused) {
+          chain = chain.focus();
+        }
+        // Restore selection if available to avoid caret jumping to end
+        if (typeof editor.commands?.setTextSelection === 'function' && typeof from === 'number' && typeof to === 'number') {
+          chain = chain.setTextSelection({ from, to });
+        }
         switch (action) {
           case 'undo': chain.undo().run(); break;
           case 'redo': chain.redo().run(); break;
