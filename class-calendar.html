@@ -823,7 +823,16 @@ function updateWorkingToolbar(editor, el) {
 
 // TipTap 3.0 Toolbar with Lucide Icons
 function buildTipTap3Toolbar(editor, el) {
-  if (!el || !editor) return;
+  if (!el || !editor) {
+    console.error('❌ buildTipTap3Toolbar: Missing editor or element', { editor: !!editor, el: !!el });
+    return;
+  }
+  
+  console.log('🔧 Building TipTap3 toolbar:', { 
+    editorType: editor.constructor.name,
+    hasChain: !!editor.chain,
+    elementId: el.id 
+  });
   
   // Remove any conflicting inline styles
   el.style.cssText = '';
@@ -880,9 +889,19 @@ function buildTipTap3Toolbar(editor, el) {
   
   el.addEventListener('click', (e) => {
     const btn = e.target.closest('.toolbar-btn');
-    if (!btn || !editor) return;
+    if (!btn || !editor) {
+      console.log('⚠️ Toolbar click but no button or editor', { btn: !!btn, editor: !!editor });
+      return;
+    }
     
     const action = btn.dataset.action;
+    console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
+    
+    if (!editor.chain || typeof editor.chain !== 'function') {
+      console.error('❌ Editor missing chain method', editor);
+      return;
+    }
+    
     const chain = editor.chain().focus();
     
     switch (action) {
@@ -898,6 +917,8 @@ function buildTipTap3Toolbar(editor, el) {
       case 'orderedList': chain.toggleOrderedList().run(); break;
       case 'taskList': chain.toggleTaskList().run(); break;
       case 'blockquote': chain.toggleBlockquote().run(); break;
+      default:
+        console.warn('🤷 Unknown toolbar action:', action);
     }
     
     updateTipTap3Toolbar(editor, el);
@@ -951,18 +972,42 @@ function updateTipTap3Toolbar(editor, el) {
   }
 }
 
-// Fallback toolbar for when TipTap fails completely
-function buildFallbackToolbar(el) {
+// Simple working toolbar that targets contentEditable divs directly
+function buildWorkingToolbar(el, targetEditorId) {
   if (!el) return;
   
   el.innerHTML = `
     <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="bold" title="Bold"><strong>B</strong></button>
-      <button type="button" class="toolbar-btn" data-action="italic" title="Italic"><em>I</em></button>
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold">
+        <i data-lucide="bold"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic">
+        <i data-lucide="italic"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="underline" title="Underline">
+        <i data-lucide="underline"></i>
+      </button>
     </div>
     <div class="toolbar-divider"></div>
     <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="insertText" title="Add Text">Text</button>
+      <button type="button" class="toolbar-btn" data-action="insertOrderedList" title="Numbered List">
+        <i data-lucide="list-ordered"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="insertUnorderedList" title="Bullet List">
+        <i data-lucide="list"></i>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="formatBlock-h1" title="Heading 1">
+        <i data-lucide="heading-1"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="formatBlock-h2" title="Heading 2">
+        <i data-lucide="heading-2"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="formatBlock-p" title="Paragraph">
+        <i data-lucide="pilcrow"></i>
+      </button>
     </div>
   `;
   
@@ -971,19 +1016,51 @@ function buildFallbackToolbar(el) {
     if (!btn) return;
     
     const action = btn.dataset.action;
+    const targetEditor = document.getElementById(targetEditorId);
     
-    switch (action) {
-      case 'bold':
-        document.execCommand('bold', false, null);
-        break;
-      case 'italic':
-        document.execCommand('italic', false, null);
-        break;
-      case 'insertText':
-        const text = prompt('Enter text:');
-        if (text) document.execCommand('insertText', false, text);
-        break;
+    if (targetEditor) {
+      targetEditor.focus();
+      
+      if (action.startsWith('formatBlock-')) {
+        const tag = action.split('-')[1];
+        document.execCommand('formatBlock', false, `<${tag}>`);
+      } else {
+        document.execCommand(action, false, null);
+      }
+      
+      // Update button states
+      updateWorkingToolbarStates(el);
     }
+  });
+  
+  // Initialize Lucide icons
+  if (window.lucide) {
+    window.lucide.createIcons();
+  }
+  
+  updateWorkingToolbarStates(el);
+}
+
+function updateWorkingToolbarStates(el) {
+  if (!el) return;
+  
+  el.querySelectorAll('.toolbar-btn').forEach(btn => {
+    const action = btn.dataset.action;
+    let isActive = false;
+    
+    try {
+      if (action.startsWith('formatBlock-')) {
+        // Check heading states differently
+        const tag = action.split('-')[1];
+        isActive = document.queryCommandValue('formatBlock').toLowerCase() === tag;
+      } else {
+        isActive = document.queryCommandState(action);
+      }
+    } catch (e) {
+      // Ignore errors from queryCommandState
+    }
+    
+    btn.classList.toggle('is-active', isActive);
   });
 }
 
@@ -1639,16 +1716,16 @@ function openAddModal(prefillDate){
   
   // Ensure notes section is visible and functional
   const notesSection = document.querySelector('#eventNotesWrapper');
-  const notesEditor = document.getElementById('eventNotesEditor');
+  const notesEditorElement = document.getElementById('eventNotesEditor'); // renamed to avoid conflict
   if (notesSection) {
     notesSection.style.display = 'flex';
     notesSection.style.visibility = 'visible';
   }
-  if (notesEditor) {
-    notesEditor.style.minHeight = '100px';
-    notesEditor.contentEditable = 'true';
-    if (!notesEditor.innerHTML || notesEditor.innerHTML === '') {
-      notesEditor.innerHTML = '<p></p>';
+  if (notesEditorElement) {
+    notesEditorElement.style.minHeight = '100px';
+    notesEditorElement.contentEditable = 'true';
+    if (!notesEditorElement.innerHTML || notesEditorElement.innerHTML === '') {
+      notesEditorElement.innerHTML = '<p></p>';
     }
   }
   
@@ -1657,14 +1734,16 @@ function openAddModal(prefillDate){
   // Initialize or reinitialize TipTap for this modal
   setTimeout(() => {
     const eventNotesMenu = document.getElementById('eventNotesMenu');
-    const eventNotesEditor = document.getElementById('eventNotesEditor');
+    const eventNotesEditorEl = document.getElementById('eventNotesEditor');
     
     if (notesEditor && eventNotesMenu) {
-      // TipTap editor is available
+      // TipTap editor is available - use global notesEditor instance
+      console.log('🎯 Using TipTap editor for add modal');
       buildTipTap3Toolbar(notesEditor, eventNotesMenu);
-    } else if (eventNotesEditor && eventNotesMenu) {
+    } else if (eventNotesEditorEl && eventNotesMenu) {
       // Fallback: ensure basic editing works
-      eventNotesEditor.contentEditable = 'true';
+      console.log('⚠️ Falling back to basic editor for add modal');
+      eventNotesEditorEl.contentEditable = 'true';
       buildFallbackToolbar(eventNotesMenu);
     }
     
