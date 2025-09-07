@@ -1025,13 +1025,11 @@ function buildTipTap3Toolbar(editor, el) {
       return;
     }
     
-    // Check if editor is ready and mounted
-    if (!editor.view || !editor.view.dom) {
-      console.warn('⚠️ Editor view not ready yet, retrying in 100ms...');
-      setTimeout(() => {
-        // Retry the action
-        e.target.closest('.toolbar-btn').click();
-      }, 100);
+    // Check initialization state without touching editor.view (which can throw pre-mount)
+    if (editor && editor.isInitialized === false) {
+      console.warn('⚠️ Editor not initialized yet, retrying in 120ms...');
+      const btnEl = e.target.closest('.toolbar-btn');
+      setTimeout(() => { btnEl?.click(); }, 120);
       return;
     }
     
@@ -1307,8 +1305,13 @@ function updateReplicaToolbar(editor, el){
 function setupEditorEnhancements(editor){
   if(!editor) return;
   
-  // Auto-embed on paste (YouTube / image)
-  const el = editor.view.dom;
+  // Avoid touching editor.view before mount
+  const el = (editor && editor.view && editor.view.dom) ? editor.view.dom : null;
+  if(!el){
+    // Try again shortly after mount
+    setTimeout(()=>setupEditorEnhancements(editor), 150);
+    return;
+  }
   el.addEventListener('paste', (e)=>{
     setTimeout(()=>{ // allow paste insertion
       try {
@@ -1353,7 +1356,8 @@ function setupEditorEnhancements(editor){
 function reorderTaskItems(editor, fromIdx, toIdx){
   try {
     // naive: rebuild task list order based on DOM and setContent for that list only
-    const root = editor.view.dom.querySelector('ul[data-type="taskList"]');
+  if(!editor || !editor.view || !editor.view.dom) return;
+  const root = editor.view.dom.querySelector('ul[data-type="taskList"]');
     if(!root) return;
     const items = Array.from(root.children);
     const moving = items[fromIdx]; if(!moving) return;
