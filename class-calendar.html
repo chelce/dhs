@@ -3104,6 +3104,106 @@ function loadSavedTasks() {
   }
 }
 
+// New Modal Functions
+let newLeftOffEditor = null;
+let newNextEditor = null;
+
+function initializeNewModalEditors(classCode, latestEntry) {
+  console.log('🎨 Initializing new modal editors for:', classCode);
+  
+  try {
+    // Create left off editor
+    if (window.TiptapEditor && document.getElementById('newLeftOffEditor')) {
+      newLeftOffEditor = new window.TiptapEditor({
+        element: document.getElementById('newLeftOffEditor'),
+        extensions: [window.TiptapStarterKit, window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })]
+      });
+      
+      // Build toolbar
+      buildTipTap3Toolbar(newLeftOffEditor, document.getElementById('newLeftOffMenu'));
+      
+      // Set content
+      if (latestEntry?.leftOffHtml) {
+        newLeftOffEditor.commands.setContent(latestEntry.leftOffHtml);
+      } else if (latestEntry?.leftOffRtf) {
+        newLeftOffEditor.commands.setContent(latestEntry.leftOffRtf);
+      }
+      
+      console.log('✅ Left off editor created');
+    }
+    
+    // Create next editor
+    if (window.TiptapEditor && document.getElementById('newNextEditor')) {
+      newNextEditor = new window.TiptapEditor({
+        element: document.getElementById('newNextEditor'),
+        extensions: [window.TiptapStarterKit, window.TiptapPlaceholder.configure({ placeholder: 'What\'s coming up next...' })]
+      });
+      
+      // Build toolbar
+      buildTipTap3Toolbar(newNextEditor, document.getElementById('newNextMenu'));
+      
+      // Set content
+      if (latestEntry?.whatsNextHtml) {
+        newNextEditor.commands.setContent(latestEntry.whatsNextHtml);
+      } else if (latestEntry?.whatsNextRtf) {
+        newNextEditor.commands.setContent(latestEntry.whatsNextRtf);
+      }
+      
+      console.log('✅ Next editor created');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error initializing modal editors:', error);
+  }
+}
+
+function closeProgressModal() {
+  const modal = document.getElementById('progressModal');
+  if (modal) {
+    modal.remove();
+  }
+  
+  // Clean up editors
+  if (newLeftOffEditor) {
+    newLeftOffEditor.destroy();
+    newLeftOffEditor = null;
+  }
+  if (newNextEditor) {
+    newNextEditor.destroy();
+    newNextEditor = null;
+  }
+}
+
+async function saveNewProgressModal(classCode) {
+  console.log('💾 Saving progress for:', classCode);
+  
+  try {
+    // Get content from editors
+    const leftOffContent = newLeftOffEditor ? newLeftOffEditor.getHTML() : '';
+    const nextContent = newNextEditor ? newNextEditor.getHTML() : '';
+    
+    // Save to Coda
+    const success = await saveProgressToCoda(classCode, leftOffContent, nextContent);
+    
+    if (success) {
+      // Close modal
+      closeProgressModal();
+      
+      // Refresh the display
+      await loadProgressData();
+      updateProgressDisplay();
+      
+      console.log('✅ Progress saved successfully');
+    } else {
+      alert('Failed to save progress. Please try again.');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error saving progress:', error);
+    alert('Error saving progress: ' + error.message);
+  }
+}
+
 // Initialize task panel on page load
 document.addEventListener('DOMContentLoaded', function() {
   // Restore panel state
@@ -3200,41 +3300,58 @@ function openProgressModal(classCode) {
   }
   
   // Open modal
-  console.log('🪟 Opening modal...');
+  console.log('🪟 Opening progress modal for:', classCode);
   
-  // Instead of using the hidden modal, let's create a completely new one
+  // Remove any existing modal
   const existingModal = document.getElementById('progressModal');
   if (existingModal) {
-    existingModal.remove(); // Remove the problematic modal
+    existingModal.remove();
   }
+  
+  // Get class display name
+  const classDisplayName = CLASS_META[classCode]?.name || classCode.toUpperCase();
   
   // Create a brand new modal from scratch
   const newModal = document.createElement('div');
   newModal.id = 'progressModal';
   newModal.innerHTML = `
     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display: flex; align-items: center; justify-content: center;">
-      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto;">
-        <h2 style="margin: 0 0 20px 0; color: #333;">Edit Progress for 2A</h2>
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Where We Left Off:</label>
-          <textarea id="tempLeftOff" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">${latestEntry?.leftOffRtf || ''}</textarea>
+      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 900px; width: 95%; max-height: 90%; overflow-y: auto;">
+        <h2 style="margin: 0 0 20px 0; color: #333;">✏️ Edit Progress for ${classDisplayName}</h2>
+        
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">📍 Where We Left Off:</label>
+          <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
+            <div id="newLeftOffMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
+            <div id="newLeftOffEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What did we accomplish today..."></div>
+          </div>
         </div>
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; margin-bottom: 5px; font-weight: bold;">What's Next:</label>
-          <textarea id="tempNext" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">${latestEntry?.whatsNextRtf || ''}</textarea>
+        
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">🎯 What's Next:</label>
+          <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
+            <div id="newNextMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
+            <div id="newNextEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What's coming up next..."></div>
+          </div>
         </div>
-        <div style="text-align: right;">
-          <button onclick="document.getElementById('progressModal').remove()" style="background: #ccc; color: black; border: none; padding: 10px 20px; border-radius: 5px; margin-right: 10px; cursor: pointer;">Cancel</button>
-          <button onclick="alert('Save functionality would go here')" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Save</button>
+        
+        <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px;">
+          <button onclick="closeProgressModal()" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 5px; margin-right: 15px; cursor: pointer; font-size: 14px;">Cancel</button>
+          <button onclick="saveNewProgressModal('${classCode}')" style="background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 14px;">💾 Save Progress</button>
         </div>
       </div>
     </div>
   `;
   
-  // Add it to the very end of the body
+  // Add it to the body
   document.body.appendChild(newModal);
   
-  console.log('✅ Created brand new modal and added to body');
+  // Initialize TipTap editors for the new modal
+  setTimeout(() => {
+    initializeNewModalEditors(classCode, latestEntry);
+  }, 100);
+  
+  console.log('✅ Created new modal with TipTap editors');
   
   } catch (error) {
     console.error('❌ Error in openProgressModal:', error);
