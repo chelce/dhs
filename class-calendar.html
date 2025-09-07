@@ -2752,10 +2752,20 @@ function toggleStatusSection() {
 
 // Restore status section visibility on page load
 document.addEventListener('DOMContentLoaded', function() {
+  // Temporarily clear the hidden setting to ensure section shows after modal update
+  localStorage.removeItem('statusSectionHidden');
+  
   const isHidden = localStorage.getItem('statusSectionHidden') === 'true';
+  const section = document.getElementById('classStatusSection');
+  const btn = document.querySelector('.btn-toggle-status');
+  
   if (isHidden) {
-    document.getElementById('classStatusSection').classList.add('hidden');
-    document.querySelector('.btn-toggle-status').textContent = '👁️ Show Status';
+    section.classList.add('hidden');
+    btn.textContent = '👁️ Show Status';
+  } else {
+    // Ensure section is visible by default
+    section.classList.remove('hidden');
+    btn.textContent = '👁️ Hide Status';
   }
 });
 
