@@ -1260,14 +1260,23 @@ async function saveProgressEntry(classCode, leftOff, whatsNext) {
         body: JSON.stringify({ row: entryData })
       });
     } else {
-      // Create new entry
+      // Create new entry with correct format
+      const cellsData = {
+        cells: [
+          { column: PROGRESS_COLUMNS.date, value: today },
+          { column: PROGRESS_COLUMNS.classes, value: classCode },
+          { column: PROGRESS_COLUMNS.leftOffRtf, value: leftOff },
+          { column: PROGRESS_COLUMNS.whatsNextRtf, value: whatsNext }
+        ]
+      };
+      
       response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${CODA_API_TOKEN}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ rows: [{ cells: entryData }] })
+        body: JSON.stringify({ rows: [cellsData] })
       });
     }
 
