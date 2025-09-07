@@ -3134,16 +3134,20 @@ document.addEventListener('DOMContentLoaded', function() {
 let currentProgressClass = null;
 
 function openProgressModal(classCode) {
+  console.log('🚀 Opening progress modal for:', classCode);
   currentProgressClass = classCode;
   
   // Set class name in modal
   const className = CLASS_META[classCode]?.name || classCode.toUpperCase();
   document.getElementById('progressClass').value = className;
+  console.log('📝 Set class name:', className);
   
   // Get current progress data for this class
   const latestEntry = progressData
     .filter(entry => entry.classes === classCode)
     .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  
+  console.log('📊 Latest entry for', classCode, ':', latestEntry);
   
   // Populate editors with current content
   if (latestEntry) {
@@ -3174,7 +3178,14 @@ function openProgressModal(classCode) {
   }
   
   // Open modal
-  document.getElementById('progressModal').style.display = 'flex';
+  console.log('🪟 Opening modal...');
+  const modal = document.getElementById('progressModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    console.log('✅ Modal opened successfully');
+  } else {
+    console.error('❌ Modal element not found!');
+  }
 }
 
 async function saveProgressModal(e) {
