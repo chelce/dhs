@@ -33,14 +33,10 @@ async function ensureEditors(){
   });
   
   // TipTap 3.0 ES module approach
-  if (window.tiptapLoaded && window.TiptapEditor) {
-    console.log('TipTap 3.0 ES modules detected, initializing editors');
-    initEditors();
-    if (notesEditor && detailsEditor) {
-      console.log('TipTap 3.0 editors created successfully');
-      return;
+    if (window.tiptapLoaded && window.TiptapEditor) {
+      console.log('TipTap 3.0 ES modules detected, initializing editors');
+      initEditors();
     }
-  }
   
   // Wait a bit for modules to load
   console.log('Waiting 2s for ES modules to load...');
@@ -716,9 +712,8 @@ function initEditors(){
     if (notesEditor) {
       setTimeout(() => {
         const m = document.getElementById('eventNotesMenu');
-        if (m && !m.dataset.toolbarBuilt) {
+        if (m) {
           buildTipTap3Toolbar(notesEditor, m);
-          m.dataset.toolbarBuilt = 'true';
         }
         setupEditorEnhancements(notesEditor);
       }, 150);
@@ -726,9 +721,8 @@ function initEditors(){
     if (detailsEditor) {
       setTimeout(() => {
         const m = document.getElementById('detailsNotesMenu');
-        if (m && !m.dataset.toolbarBuilt) {
+        if (m) {
           buildTipTap3Toolbar(detailsEditor, m);
-          m.dataset.toolbarBuilt = 'true';
         }
         setupEditorEnhancements(detailsEditor);
       }, 150);
@@ -736,9 +730,8 @@ function initEditors(){
     if (progressLeftOffEditor) {
       setTimeout(() => {
         const m = document.getElementById('progressLeftOffMenu');
-        if (m && !m.dataset.toolbarBuilt) {
+        if (m) {
           buildTipTap3Toolbar(progressLeftOffEditor, m);
-          m.dataset.toolbarBuilt = 'true';
         }
         setupEditorEnhancements(progressLeftOffEditor);
       }, 150);
@@ -746,9 +739,8 @@ function initEditors(){
     if (progressNextEditor) {
       setTimeout(() => {
         const m = document.getElementById('progressNextMenu');
-        if (m && !m.dataset.toolbarBuilt) {
+        if (m) {
           buildTipTap3Toolbar(progressNextEditor, m);
-          m.dataset.toolbarBuilt = 'true';
         }
         setupEditorEnhancements(progressNextEditor);
       }, 150);
@@ -986,6 +978,8 @@ function buildTipTap3Toolbar(editor, el) {
     hasChain: !!editor.chain,
     elementId: el.id 
   });
+  // Always bind the current editor to the toolbar element so handlers don't capture stale editors
+  el.__tiptapEditor = editor;
   
   // Remove any conflicting inline styles
   el.style.cssText = '';
@@ -1122,6 +1116,8 @@ function buildTipTap3Toolbar(editor, el) {
   }
 
   el.__tiptapClickHandler = (e) => {
+    // Always resolve the active editor from the toolbar element to avoid stale closures
+    const editor = el.__tiptapEditor;
     const btn = e.target.closest('.toolbar-btn');
     if (!btn || !editor) {
       console.log('⚠️ Toolbar click but no button or editor', { btn: !!btn, editor: !!editor });
@@ -1142,7 +1138,7 @@ function buildTipTap3Toolbar(editor, el) {
     el.__tiptapHandling = true;
     el.__tiptapHandlingTs = Date.now();
 
-    const action = btn.dataset.action;
+  const action = btn.dataset.action;
     console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
     
     if (!editor.chain || typeof editor.chain !== 'function') {
@@ -1155,7 +1151,7 @@ function buildTipTap3Toolbar(editor, el) {
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
   // Execute action when editor is actually ready
-    runWhenEditorReady(editor, () => {
+  runWhenEditorReady(editor, () => {
       try {
         // Capture current selection prior to any focus changes
         const sel = editor.state?.selection;
@@ -2118,15 +2114,10 @@ function openAddModal(prefillDate){
     
     if (notesEditor && eventNotesMenu) {
       console.log('✅ Building fresh toolbar for add modal');
-      
-      // Wait for editor to be fully mounted before building toolbar
-      if (!eventNotesMenu.dataset.toolbarBuilt) {
-        setTimeout(() => {
-          buildTipTap3Toolbar(notesEditor, eventNotesMenu);
-          eventNotesMenu.dataset.toolbarBuilt = 'true';
-        }, 150);
-      }
-      
+      // Always rebuild to bind to the fresh editor instance
+      setTimeout(() => {
+        buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+      }, 150);
     } else {
       console.log('⚠️ Fallback to basic editor for add modal');
       if (eventNotesEditorEl) {
@@ -2138,7 +2129,7 @@ function openAddModal(prefillDate){
     }
     
     // Initialize Lucide icons for the toolbar
-    if (window.lucide) {
+  if (window.lucide) {
       window.lucide.createIcons();
     }
   }, 100);
@@ -2395,15 +2386,10 @@ function openDetails(id){
     
     if (detailsEditor && detailsNotesMenu) {
       console.log('✅ Building TipTap toolbar for details modal');
-      
-      // Only build once per open to avoid duplicate listeners
-      if (!detailsNotesMenu.dataset.toolbarBuilt) {
-        // Wait for editor to be fully mounted before building toolbar
-        setTimeout(() => {
-          buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
-          detailsNotesMenu.dataset.toolbarBuilt = 'true';
-        }, 150);
-      }
+      // Always rebuild to bind to the fresh editor instance
+      setTimeout(() => {
+        buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+      }, 150);
       // After mount, set content if present
       if (ev.notes) {
         setTimeout(() => {
