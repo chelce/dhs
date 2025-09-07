@@ -1110,8 +1110,41 @@ function buildTipTap3Toolbar(editor, el) {
       try {
         // Capture current selection prior to any focus changes
         const sel = editor.state?.selection;
-        const from = sel?.from;
-        const to = sel?.to;
+        let from = sel?.from;
+        let to = sel?.to;
+        
+        // If no text is selected, try to select the current word
+        if (from === to && ['bold', 'italic', 'code'].includes(action)) {
+          const state = editor.state;
+          const doc = state.doc;
+          const pos = from;
+          
+          // Find word boundaries
+          let wordStart = pos;
+          let wordEnd = pos;
+          
+          // Scan backwards for word start
+          while (wordStart > 0) {
+            const char = doc.textBetween(wordStart - 1, wordStart);
+            if (/\s/.test(char)) break;
+            wordStart--;
+          }
+          
+          // Scan forwards for word end  
+          while (wordEnd < doc.content.size) {
+            const char = doc.textBetween(wordEnd, wordEnd + 1);
+            if (/\s/.test(char)) break;
+            wordEnd++;
+          }
+          
+          // If we found a word, use it
+          if (wordEnd > wordStart && wordEnd > pos) {
+            from = wordStart;
+            to = wordEnd;
+            console.log('📝 Auto-selected current word:', { wordStart, wordEnd, word: doc.textBetween(wordStart, wordEnd) });
+          }
+        }
+        
         console.log('🧭 Pre-action state:', {
           action,
           isFocused: editor.isFocused,
