@@ -714,20 +714,28 @@ function initEditors(){
     
     // Build toolbars only for created editors
     if (notesEditor) {
-      buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
-      setupEditorEnhancements(notesEditor);
+      setTimeout(() => {
+        buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
+        setupEditorEnhancements(notesEditor);
+      }, 150);
     }
     if (detailsEditor) {
-      buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
-      setupEditorEnhancements(detailsEditor);
+      setTimeout(() => {
+        buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+        setupEditorEnhancements(detailsEditor);
+      }, 150);
     }
     if (progressLeftOffEditor) {
-      buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
-      setupEditorEnhancements(progressLeftOffEditor);
+      setTimeout(() => {
+        buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
+        setupEditorEnhancements(progressLeftOffEditor);
+      }, 150);
     }
     if (progressNextEditor) {
-      buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
-      setupEditorEnhancements(progressNextEditor);
+      setTimeout(() => {
+        buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
+        setupEditorEnhancements(progressNextEditor);
+      }, 150);
     }
     
     console.log('✅ TipTap initialization complete');
