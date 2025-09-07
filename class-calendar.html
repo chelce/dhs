@@ -213,6 +213,41 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
   font-size: 0.9em !important;
 }
+
+/* Ultra-aggressive styling for debugging - make formatting VERY visible */
+div[contenteditable] strong,
+div[contenteditable] b,
+.ProseMirror strong,
+.ProseMirror b,
+.tiptap strong,
+.tiptap b,
+*[data-tiptap-editor] strong,
+*[data-tiptap-editor] b {
+  font-weight: 900 !important;
+  background-color: yellow !important;
+  color: #000 !important;
+  border: 1px solid red !important;
+}
+
+div[contenteditable] em,
+div[contenteditable] i,
+.ProseMirror em,
+.ProseMirror i,
+.tiptap em,
+.tiptap i,
+*[data-tiptap-editor] em,
+*[data-tiptap-editor] i {
+  font-style: italic !important;
+  background-color: lightblue !important;
+  color: #0066cc !important;
+}
+
+/* Global strong/bold debug styling */
+strong, b {
+  font-weight: 900 !important;
+  background-color: pink !important;
+  border: 2px solid red !important;
+}
 .editor-content-area img{max-width:100%;height:auto;display:block;margin:.4em 0}
 /* Task list styling */
 .editor-content-area ul[data-type="taskList"]{list-style:none;padding-left:0;margin:.6em 0 .9em}
@@ -1233,6 +1268,26 @@ function buildTipTap3Toolbar(editor, el) {
             let ok = chain.toggleBold().run();
             console.log('🔎 Bold active after:', editor.isActive?.('bold'));
             console.log('🔎 Content after bold:', editor.getHTML?.()?.substring(0, 200));
+            
+            // Debug: Check actual DOM structure
+            setTimeout(() => {
+              const editorEl = editor.view?.dom;
+              if (editorEl) {
+                const selectedEl = editorEl.querySelector('strong, b');
+                console.log('🔧 DOM inspection:', {
+                  editorHTML: editorEl.innerHTML.substring(0, 200),
+                  hasStrongTag: !!selectedEl,
+                  strongContent: selectedEl ? selectedEl.textContent : 'none',
+                  strongStyles: selectedEl ? window.getComputedStyle(selectedEl).fontWeight : 'none',
+                  editorClass: editorEl.className
+                });
+                
+                // Force re-render by updating the view
+                if (editor.view?.updateState) {
+                  editor.view.updateState(editor.state);
+                }
+              }
+            }, 100);
             // Defensive: if run() returned false, toggle via ProseMirror transaction
             if (!ok) {
               console.log('🛠️ Chain failed, trying fallback...');
@@ -2517,6 +2572,16 @@ function openDetails(id){
         const decodedHtml = prefillHtml.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
         console.log('🔧 Setting content:', { original: prefillHtml.substring(0, 100), decoded: decodedHtml.substring(0, 100) });
         detailsEditor.commands.setContent(decodedHtml, false, { preserveWhitespace: 'full' }); 
+        
+        // Additional debug: Check if content is being set as HTML or text
+        setTimeout(() => {
+          console.log('🔧 Post-setContent debug:', {
+            editorHTML: detailsEditor.getHTML?.()?.substring(0, 200),
+            editorText: detailsEditor.getText?.()?.substring(0, 100),
+            viewDOM: detailsEditor.view?.dom?.innerHTML?.substring(0, 200),
+            hasStrongInContent: detailsEditor.getHTML?.()?.includes('<strong>') || detailsEditor.getHTML?.()?.includes('<b>')
+          });
+        }, 100);
       } catch(e) { 
         console.warn('⚠️ Failed to set content:', e);
       }
