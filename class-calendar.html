@@ -343,7 +343,8 @@ const CODA_COLUMNS = {
   title: 'c-xvkLSSfsSn',
   date: 'c-iwbhQPYnV5', 
   classes: 'c-C45a_itzd3',
-  content: 'c-_Vm-tHwUii'
+  content: 'c-_Vm-tHwUii',      // Raw content column (for writing)
+  contentHtml: 'c-Hu17x_1CGX'   // Auto-rendered HTML column (for reading)
 };
 
 /* ========= STATE ========= */
@@ -1046,7 +1047,18 @@ async function loadRemoteEvents(){
         const title = values[CODA_COLUMNS.title] || 'Untitled Event';
         const dateStr = values[CODA_COLUMNS.date] || '';
         const classesStr = values[CODA_COLUMNS.classes] || 'other';
-        const content = values[CODA_COLUMNS.content] || '';
+        
+        // Use HTML-rendered content if available, fall back to raw content
+        const contentHtml = values[CODA_COLUMNS.contentHtml] || '';
+        const contentRaw = values[CODA_COLUMNS.content] || '';
+        const content = contentHtml || contentRaw || 'No notes available';
+        
+        console.log('📋 Content loading:', {
+          title,
+          hasHtml: !!contentHtml,
+          hasRaw: !!contentRaw,
+          usingHtml: !!contentHtml
+        });
         
         // Parse classes - could be comma-separated or JSON
         let eventClasses = [];
