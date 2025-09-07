@@ -53,22 +53,28 @@ async function ensureEditors(){
     console.log('TipTap 3.0 available after delay, trying again');
     initEditors();
   }
-  
-  // Fallback to contentEditable
-  console.warn('TipTap 3.0 unavailable, using fallback contentEditable editors');
-  const enEd = document.getElementById('eventNotesEditor');
-  const dnEd = document.getElementById('detailsNotesEditor');
-  
-  if (enEd) {
-    enEd.contentEditable = 'true';
-    enEd.innerHTML = '<p>Start typing your notes...</p>';
+  // If TipTap initialized successfully, do NOT run fallback. Exit early.
+  if (window.__tiptapInitialized) {
+    console.log('✅ TipTap initialized; skipping fallback contentEditable setup');
+    return;
   }
-  if (dnEd) {
-    dnEd.contentEditable = 'true'; 
-    dnEd.innerHTML = '<p>Add reflection notes...</p>';
+
+  // Fallback to contentEditable only if TipTap truly unavailable
+  if (!window.TiptapEditor || !window.tiptapLoaded) {
+    console.warn('TipTap 3.0 unavailable, using fallback contentEditable editors');
+    const enEd = document.getElementById('eventNotesEditor');
+    const dnEd = document.getElementById('detailsNotesEditor');
+    
+    if (enEd) {
+      enEd.contentEditable = 'true';
+      if (!enEd.innerHTML) enEd.innerHTML = '<p>Start typing your notes...</p>';
+    }
+    if (dnEd) {
+      dnEd.contentEditable = 'true'; 
+      if (!dnEd.innerHTML) dnEd.innerHTML = '<p>Add reflection notes...</p>';
+    }
+    // Fallback toolbars will be built on-demand inside modal open functions if TipTap is unavailable.
   }
-  
-  // Fallback toolbars will be built on-demand inside modal open functions if TipTap is unavailable.
 }
 </script>
 <style>
@@ -3619,22 +3625,20 @@ function initializeNewModalEditors(classCode, latestEntry) {
   console.log('🎨 Initializing new modal editors for:', classCode);
   
   try {
-    // Use the same extensions as the main editors
-    const extensions = [
-      window.TiptapStarterKit,
-      window.TiptapUnderline,
-      window.TiptapHighlight.configure({ multicolor: true }),
-      window.TiptapTextAlign.configure({ types: ['heading', 'paragraph'] }),
-      window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })
-    ];
+    // Use the same safe extensions as the main editors (StarterKit + Placeholder)
+    if (!window.TiptapEditor || !window.TiptapStarterKit) {
+      console.warn('⚠️ TipTap not available; skipping editor init in progress modal');
+      return;
+    }
+    const extensions = [ window.TiptapStarterKit ];
     
     // Create left off editor
     if (window.TiptapEditor && document.getElementById('newLeftOffEditor')) {
       newLeftOffEditor = new window.TiptapEditor({
         element: document.getElementById('newLeftOffEditor'),
-        extensions: extensions.map(ext => ext === window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
-          ? window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
-          : ext)
+        extensions: window.TiptapPlaceholder
+          ? [...extensions, window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })]
+          : extensions
       });
       
       // Build toolbar
@@ -3660,9 +3664,9 @@ function initializeNewModalEditors(classCode, latestEntry) {
     if (window.TiptapEditor && document.getElementById('newNextEditor')) {
       newNextEditor = new window.TiptapEditor({
         element: document.getElementById('newNextEditor'),
-        extensions: extensions.map(ext => ext === window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
-          ? window.TiptapPlaceholder.configure({ placeholder: 'What\'s coming up next...' }) 
-          : ext)
+        extensions: window.TiptapPlaceholder
+          ? [...extensions, window.TiptapPlaceholder.configure({ placeholder: "What's coming up next..." })]
+          : extensions
       });
       
       // Build toolbar
