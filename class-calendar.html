@@ -315,16 +315,6 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
-<!-- ========= TEST PROGRESS SECTION ========= -->
-<div style="background: #ffeb3b; padding: 20px; margin: 20px; border: 3px solid #f57c00; border-radius: 10px;">
-  <h2 style="color: #e65100; text-align: center;">🧪 TEST: Can you see this progress section?</h2>
-  <div style="background: white; padding: 15px; margin: 10px; border-radius: 5px;">
-    <h3>📖 Test Class Card</h3>
-    <p>If you can see this, then we know the HTML structure works and the issue is elsewhere.</p>
-    <button style="background: #4caf50; color: white; padding: 10px; border: none; border-radius: 5px;">Test Edit Button</button>
-  </div>
-</div>
-
 <!-- Upcoming Events Section -->
 <div class="calendar-container" style="margin-top: 20px; display: none;">
   <div class="calendar-header">
@@ -2459,9 +2449,10 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
   }
 }
 
-/* Hidden state */
+/* Hidden state - temporarily disabled to force visibility */
 .class-status-container.hidden {
-  display: none;
+  /* display: none; */
+  opacity: 0.5; /* Show but dimmed instead of hidden */
 }
 
 /* ========= TASK PANEL STYLES ========= */
@@ -2762,20 +2753,20 @@ function toggleStatusSection() {
 
 // Restore status section visibility on page load
 document.addEventListener('DOMContentLoaded', function() {
-  // Temporarily clear the hidden setting to ensure section shows after modal update
+  // FORCE the section to be visible - remove any hiding
   localStorage.removeItem('statusSectionHidden');
   
-  const isHidden = localStorage.getItem('statusSectionHidden') === 'true';
   const section = document.getElementById('classStatusSection');
   const btn = document.querySelector('.btn-toggle-status');
   
-  if (isHidden) {
-    section.classList.add('hidden');
-    btn.textContent = '👁️ Show Status';
-  } else {
-    // Ensure section is visible by default
+  if (section && btn) {
+    // Remove all classes that might hide it
     section.classList.remove('hidden');
+    section.style.display = 'block';
+    section.style.visibility = 'visible';
     btn.textContent = '👁️ Hide Status';
+    
+    console.log('📋 Progress section force-shown');
   }
   
   // Force visibility as a backup
@@ -2785,9 +2776,9 @@ document.addEventListener('DOMContentLoaded', function() {
       statusSection.classList.remove('hidden');
       statusSection.style.display = 'block';
       statusSection.style.visibility = 'visible';
-      console.log('🔧 Force-showing progress section');
+      console.log('🔧 Secondary force-showing progress section');
     }
-  }, 100);
+  }, 500);
 });
 
 // Function to update individual class status (called by AI during debriefs)
