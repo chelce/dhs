@@ -2140,7 +2140,7 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
 </div>
 
 <!-- ========= CLASS STATUS SECTION ========= -->
-<div id="classStatusSection" class="class-status-container">
+<div id="classStatusSection" class="class-status-container" style="display: block !important; visibility: visible !important;">
   <h2>📚 Class Progress & Next Steps</h2>
   <div class="class-status-grid">
     
@@ -2452,12 +2452,6 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
 /* Hidden state */
 .class-status-container.hidden {
   display: none;
-}
-
-/* Force visibility override - temporary fix */
-#classStatusSection {
-  display: block !important;
-  visibility: visible !important;
 }
 
 /* ========= TASK PANEL STYLES ========= */
