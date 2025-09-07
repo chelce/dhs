@@ -752,6 +752,42 @@ function initEditors(){
   }
 }
 
+// Test function for TipTap
+function testTipTap() {
+  console.log('🧪 Testing TipTap functionality...');
+  
+  // Show test editor
+  const testDiv = document.getElementById('test-editor');
+  if (testDiv) {
+    testDiv.style.display = 'block';
+  }
+  
+  // Create a test editor
+  const testEditor = createTipTapEditor('test-editor');
+  
+  if (testEditor) {
+    console.log('✅ Test editor created successfully');
+    
+    // Try to set content and format it
+    setTimeout(() => {
+      try {
+        testEditor.commands.setContent('<p>Hello <strong>world</strong>!</p>');
+        console.log('✅ Content set successfully');
+        
+        // Try to focus and add bold text
+        testEditor.chain().focus().run();
+        console.log('✅ Focus successful');
+        
+      } catch (e) {
+        console.error('❌ Test commands failed:', e);
+      }
+    }, 200);
+    
+  } else {
+    console.error('❌ Test editor creation failed');
+  }
+}
+
 // Dynamic TipTap editor creation
 function createTipTapEditor(elementId, onUpdate = null) {
   console.log('🎯 Creating TipTap editor for:', elementId);
@@ -762,23 +798,49 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return null;
   }
   
-  const extensions = [
-    window.TiptapStarterKit,
-    window.TiptapUnderline,
-    window.TiptapHighlight?.configure?.({ multicolor: true }),
-    window.TiptapTextAlign?.configure?.({ types: ['heading', 'paragraph'] }),
-    window.TiptapPlaceholder?.configure?.({ placeholder: 'Start typing...' })
-  ].filter(Boolean); // Remove any undefined extensions
+  // Test if TipTap is available
+  if (!window.TiptapEditor) {
+    console.error('❌ TiptapEditor not available on window object');
+    console.log('Available TipTap objects:', Object.keys(window).filter(key => key.includes('Tiptap')));
+    return null;
+  }
+  
+  if (!window.TiptapStarterKit) {
+    console.error('❌ TiptapStarterKit not available');
+    return null;
+  }
+  
+  const extensions = [window.TiptapStarterKit];
+  
+  console.log('🔧 Creating editor with extensions:', extensions);
   
   try {
     const editor = new window.TiptapEditor({
       element: element,
       extensions: extensions,
-      content: '<p></p>',
-      onUpdate: onUpdate || (() => {})
+      content: '<p>Test content</p>',
+      onUpdate: onUpdate || (() => {}),
+      editorProps: {
+        attributes: {
+          class: 'tiptap-editor-content',
+        },
+      }
     });
     
-    console.log('✅ TipTap editor created for:', elementId);
+    console.log('✅ TipTap editor created successfully for:', elementId);
+    console.log('Editor object:', editor);
+    console.log('Editor has chain method:', typeof editor.chain);
+    
+    // Test the chain method
+    setTimeout(() => {
+      try {
+        editor.chain().focus().run();
+        console.log('✅ Chain method works');
+      } catch (e) {
+        console.error('❌ Chain method failed:', e);
+      }
+    }, 100);
+    
     return editor;
   } catch (error) {
     console.error('❌ Failed to create TipTap editor:', error);
