@@ -720,6 +720,16 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return null;
   }
   
+  // Enhanced debugging for editor creation
+  console.log('🔧 Element state before creation:', {
+    elementId,
+    elementExists: !!element,
+    elementHTML: element.innerHTML?.substring(0, 100),
+    elementVisible: element.offsetWidth > 0 && element.offsetHeight > 0,
+    elementStyle: element.style.cssText,
+    elementParent: element.parentNode?.tagName
+  });
+  
   // Test if TipTap is available
   if (!window.TiptapEditor) {
     console.error('❌ TiptapEditor not available on window object');
@@ -749,6 +759,13 @@ function createTipTapEditor(elementId, onUpdate = null) {
       },
       onCreate: ({ editor }) => {
         console.log('✅ TipTap editor onCreate triggered for:', elementId);
+        console.log('🔧 Editor state in onCreate:', {
+          hasView: !!(editor.view || editor.editorView),
+          hasState: !!editor.state,
+          hasCommands: !!editor.commands,
+          hasChain: !!editor.chain,
+          canToggleBold: !!(editor.commands?.toggleBold || editor.chain()?.toggleBold)
+        });
         // Wait a bit more to ensure DOM is ready
         setTimeout(() => {
           try {
@@ -771,8 +788,13 @@ function createTipTapEditor(elementId, onUpdate = null) {
     });
     
     console.log('✅ TipTap editor created successfully for:', elementId);
-    console.log('Editor object:', editor);
-    console.log('Editor has chain method:', typeof editor.chain);
+    console.log('Editor object details:', {
+      constructor: editor.constructor.name,
+      hasChain: typeof editor.chain,
+      hasCommands: !!editor.commands,
+      hasState: !!editor.state,
+      hasView: !!(editor.view || editor.editorView)
+    });
     
     return editor;
   } catch (error) {
@@ -1038,6 +1060,21 @@ function buildTipTap3Toolbar(editor, el) {
     // Always resolve the active editor from the toolbar element to avoid stale closures
     const editor = el.__tiptapEditor;
     const btn = e.target.closest('.toolbar-btn');
+    
+    // Enhanced debugging for toolbar clicks
+    console.log('🔍 TOOLBAR CLICK DEBUG:', {
+      toolbarId: el.id,
+      buttonExists: !!btn,
+      buttonAction: btn?.dataset?.action,
+      editorExists: !!editor,
+      editorType: editor?.constructor?.name,
+      editorReady: editor?.__ready,
+      editorHasChain: !!(editor?.chain),
+      editorIsFocused: editor?.isFocused,
+      editorHasView: !!(editor?.view || editor?.editorView),
+      viewDomExists: !!(editor?.view?.dom || editor?.editorView?.dom)
+    });
+    
     if (!btn || !editor) {
       console.log('⚠️ Toolbar click but no button or editor', { btn: !!btn, editor: !!editor });
       return;
@@ -1078,13 +1115,28 @@ function buildTipTap3Toolbar(editor, el) {
         console.log('🧭 Pre-action state:', {
           action,
           isFocused: editor.isFocused,
-          selection: { from, to, empty: sel?.empty }
+          selection: { from, to, empty: sel?.empty },
+          selectionType: sel?.constructor?.name,
+          content: editor.getHTML?.()?.substring(0, 100) + '...'
+        });
+
+        // Test editor capabilities before action
+        console.log('🔧 Editor capabilities check:', {
+          hasChain: !!(editor.chain),
+          chainType: typeof editor.chain,
+          hasCommands: !!(editor.commands),
+          hasState: !!(editor.state),
+          hasView: !!(editor.view || editor.editorView),
+          canToggleBold: !!(editor.chain()?.toggleBold),
+          canToggleItalic: !!(editor.chain()?.toggleItalic),
+          canFocus: !!(editor.chain()?.focus)
         });
 
         // Build chain; focus first, then restore selection if we have it
         let chain = editor.chain().focus();
         if (typeof editor.commands?.setTextSelection === 'function' && typeof from === 'number' && typeof to === 'number') {
           chain = chain.setTextSelection({ from, to });
+          console.log('📍 Selection restored to chain:', { from, to });
         }
         switch (action) {
           case 'undo': {
@@ -1098,19 +1150,29 @@ function buildTipTap3Toolbar(editor, el) {
           case 'bold': {
             const can = typeof editor.can === 'function' && editor.can().toggleBold ? editor.can().toggleBold() : true;
             console.log('🔎 can toggleBold:', can);
+            console.log('🔎 Bold active before:', editor.isActive?.('bold'));
             let ok = chain.toggleBold().run();
+            console.log('🔎 Bold active after:', editor.isActive?.('bold'));
+            console.log('🔎 Content after bold:', editor.getHTML?.()?.substring(0, 200));
             // Defensive: if run() returned false, toggle via ProseMirror transaction
             if (!ok) {
+              console.log('🛠️ Chain failed, trying fallback...');
               ok = fallbackToggleMark(editor, 'bold', from, to);
               console.log('🛠️ fallbackToggleMark("bold"):', ok);
+              console.log('🔎 Content after fallback:', editor.getHTML?.()?.substring(0, 200));
             }
             console.log('✅ toggleBold run:', ok); break;
           }
           case 'italic': {
+            console.log('🔎 Italic active before:', editor.isActive?.('italic'));
             let ok = chain.toggleItalic().run();
+            console.log('🔎 Italic active after:', editor.isActive?.('italic'));
+            console.log('🔎 Content after italic:', editor.getHTML?.()?.substring(0, 200));
             if (!ok) {
+              console.log('🛠️ Chain failed, trying fallback...');
               ok = fallbackToggleMark(editor, 'italic', from, to);
               console.log('🛠️ fallbackToggleMark("italic"):', ok);
+              console.log('🔎 Content after fallback:', editor.getHTML?.()?.substring(0, 200));
             }
             console.log('✅ toggleItalic run:', ok); break;
           }
@@ -1163,14 +1225,19 @@ function buildTipTap3Toolbar(editor, el) {
         if (typeof from === 'number' && typeof to === 'number') {
           requestAnimationFrame(() => {
             try {
+              console.log('🔄 Restoring selection:', { from, to });
               editor.chain().setTextSelection({ from, to }).focus().run();
-            } catch(_) { /* noop */ }
+              console.log('✅ Selection restored');
+            } catch(restoreErr) { 
+              console.warn('⚠️ Selection restore failed:', restoreErr);
+            }
           });
         }
         const selAfter = editor.state?.selection;
         console.log('✅ Action completed:', action, {
           isFocusedAfter: editor.isFocused,
-          selectionAfter: { from: selAfter?.from, to: selAfter?.to, empty: selAfter?.empty }
+          selectionAfter: { from: selAfter?.from, to: selAfter?.to, empty: selAfter?.empty },
+          finalContent: editor.getHTML?.()?.substring(0, 200) + '...'
         });
         updateTipTap3Toolbar(editor, el);
       } catch (actionError) {
@@ -2063,17 +2130,39 @@ function openAddModal(prefillDate){
     notesEditor = createTipTapEditor('eventNotesEditor', ({ editor }) => {
       document.getElementById('eventNotes').value = editor.getHTML();
     });
+    
+    // Enhanced debugging for Add modal editor setup
+    console.log('🔍 Add modal editor creation result:', {
+      editorCreated: !!notesEditor,
+      editorType: notesEditor?.constructor?.name,
+      editorReady: notesEditor?.__ready,
+      elementExists: !!document.getElementById('eventNotesEditor'),
+      menuExists: !!document.getElementById('eventNotesMenu')
+    });
+    
     // Prefill initial content only once to prevent later selection resets
     try {
       const prefill = document.getElementById('eventNotesEditor')?.innerHTML || '<p></p>';
-      notesEditor.commands.setContent(prefill);
-    } catch(_) {}
+      if (notesEditor && notesEditor.commands) {
+        notesEditor.commands.setContent(prefill);
+        console.log('📝 Set initial content for add modal:', prefill.substring(0, 100));
+      }
+    } catch(contentErr) {
+      console.warn('⚠️ Failed to set initial content:', contentErr);
+    }
     
   if (notesEditor && eventNotesMenu) {
       console.log('✅ Building fresh toolbar for add modal');
+      console.log('🔍 Toolbar build context:', {
+        editorExists: !!notesEditor,
+        editorReady: notesEditor.__ready,
+        menuExists: !!eventNotesMenu,
+        menuId: eventNotesMenu.id
+      });
       // Always rebuild to bind to the fresh editor instance
       setTimeout(() => {
         buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+        console.log('🔧 Toolbar built for add modal');
       }, 150);
     } else {
       console.log('⚠️ Fallback to basic editor for add modal');
