@@ -1086,14 +1086,17 @@ function buildTipTap3Toolbar(editor, el) {
       console.log('⚠️ Toolbar click but no button or editor', { btn: !!btn, editor: !!editor });
       return;
     }
-    
-    const action = btn.dataset.action;
-    console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
+
+    // Guard BEFORE any work/logging to avoid double execution (icon/svg bubbling)
     if (el.__tiptapHandling) {
-      console.warn('⏳ Ignoring re-entrant toolbar click');
+      // Prevent any other handlers from firing in this tick
+      if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
       return;
     }
     el.__tiptapHandling = true;
+
+    const action = btn.dataset.action;
+    console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
     
     if (!editor.chain || typeof editor.chain !== 'function') {
       console.error('❌ Editor missing chain method', editor);
@@ -1114,14 +1117,15 @@ function buildTipTap3Toolbar(editor, el) {
           selection: { from, to, empty: sel?.empty }
         });
 
-        // Build chain; only focus if editor is not already focused
+        // Build chain; restore selection FIRST, then (optionally) focus
         let chain = editor.chain();
-  if (!editor.isFocused) {
-          chain = chain.focus();
-        }
         // Restore selection if available to avoid caret jumping to end
         if (typeof editor.commands?.setTextSelection === 'function' && typeof from === 'number' && typeof to === 'number') {
           chain = chain.setTextSelection({ from, to });
+        }
+        // Only call focus if not already focused (prevents moving caret to end)
+        if (!editor.isFocused) {
+          chain = chain.focus();
         }
         switch (action) {
           case 'undo': chain.undo().run(); break;
@@ -1148,9 +1152,12 @@ function buildTipTap3Toolbar(editor, el) {
         updateTipTap3Toolbar(editor, el);
       } catch (actionError) {
         console.error('❌ Action failed:', action, actionError);
+      } finally {
+        // Release the handling flag after the tiptap transaction completes
+        Promise.resolve().then(() => {
+          el.__tiptapHandling = false;
+        });
       }
-      // Release the handling flag shortly after to allow next clicks
-      setTimeout(()=>{ el.__tiptapHandling = false; }, 0);
     });
   };
   el.addEventListener('click', el.__tiptapClickHandler);
