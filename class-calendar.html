@@ -934,9 +934,13 @@ function buildTipTap3Toolbar(editor, el) {
     updateTipTap3Toolbar(editor, el);
   });
   
-  // Update button states initially
-  editor.on('selectionUpdate', () => updateTipTap3Toolbar(editor, el));
-  editor.on('transaction', () => updateTipTap3Toolbar(editor, el));
+  // Update button states initially (with error checking)
+  if (editor && typeof editor.on === 'function') {
+    editor.on('selectionUpdate', () => updateTipTap3Toolbar(editor, el));
+    editor.on('transaction', () => updateTipTap3Toolbar(editor, el));
+  } else {
+    console.warn('⚠️ Editor does not support .on() method, skipping event listeners');
+  }
   
   // Initialize Lucide icons
   if (window.lucide) {
@@ -953,17 +957,20 @@ function updateTipTap3Toolbar(editor, el) {
     const action = btn.dataset.action;
     let isActive = false;
     
-    switch (action) {
-      case 'bold': isActive = editor.isActive('bold'); break;
-      case 'italic': isActive = editor.isActive('italic'); break;
-      case 'code': isActive = editor.isActive('code'); break;
-      case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
-      case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
-      case 'paragraph': isActive = editor.isActive('paragraph'); break;
-      case 'bulletList': isActive = editor.isActive('bulletList'); break;
-      case 'orderedList': isActive = editor.isActive('orderedList'); break;
-      case 'taskList': isActive = editor.isActive('taskList'); break;
-      case 'blockquote': isActive = editor.isActive('blockquote'); break;
+    // Check if editor has isActive method before using it
+    if (editor && typeof editor.isActive === 'function') {
+      switch (action) {
+        case 'bold': isActive = editor.isActive('bold'); break;
+        case 'italic': isActive = editor.isActive('italic'); break;
+        case 'code': isActive = editor.isActive('code'); break;
+        case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
+        case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
+        case 'paragraph': isActive = editor.isActive('paragraph'); break;
+        case 'bulletList': isActive = editor.isActive('bulletList'); break;
+        case 'orderedList': isActive = editor.isActive('orderedList'); break;
+        case 'taskList': isActive = editor.isActive('taskList'); break;
+        case 'blockquote': isActive = editor.isActive('blockquote'); break;
+      }
     }
     
     btn.classList.toggle('is-active', isActive);
