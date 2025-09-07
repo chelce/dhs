@@ -825,16 +825,8 @@ function updateWorkingToolbar(editor, el) {
 function buildTipTap3Toolbar(editor, el) {
   if (!el || !editor) return;
   
-  // Set container styling for single row
-  el.style.display = 'flex';
-  el.style.flexWrap = 'nowrap';
-  el.style.gap = '4px';
-  el.style.overflowX = 'auto';
-  el.style.alignItems = 'center';
-  el.style.padding = '6px';
-  el.style.background = '#f9fafb';
-  el.style.border = '1px solid #e5e7eb';
-  el.style.borderRadius = '6px';
+  // Remove any conflicting inline styles
+  el.style.cssText = '';
   
   el.innerHTML = `
     <div class="toolbar-group">
@@ -995,8 +987,8 @@ function buildFallbackToolbar(el) {
   });
 }
 
-// Safety: after load, verify toolbars; if empty, attempt rebuild
-setTimeout(()=>{
+// Safety: removed - using buildTipTap3Toolbar instead
+/* setTimeout(()=>{
   try {
     const enm=document.getElementById('eventNotesMenu');
     if(enm && !enm.children.length){
@@ -1009,7 +1001,7 @@ setTimeout(()=>{
       else { buildSimpleMenu && buildSimpleMenu(null, dnm); }
     }
   } catch(err){ console.warn('toolbar safety check failed', err); }
-}, 2000);
+}, 2000); */
 
 function buildReplicaToolbar(editor, el){
   if(!el) return; if(!editor || !editor.chain){
