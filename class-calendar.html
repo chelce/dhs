@@ -1143,7 +1143,12 @@ function buildTipTap3Toolbar(editor, el) {
             console.log('✅ toggleOrderedList run:', ok); break;
           }
           case 'taskList': {
-            const ok = chain.toggleTaskList().run();
+            let ok = false;
+            if (typeof chain.toggleTaskList === 'function') {
+              ok = chain.toggleTaskList().run();
+            } else {
+              console.warn('⚠️ TaskList extension not available');
+            }
             console.log('✅ toggleTaskList run:', ok); break;
           }
           case 'blockquote': {
@@ -1307,6 +1312,27 @@ function buildWorkingToolbar(el, targetEditorId) {
   }
   
   updateWorkingToolbarStates(el);
+}
+
+// Minimal fallback wrapper used when TipTap fails to initialize
+function buildFallbackToolbar(el) {
+  try {
+    if (!el || !el.id) return;
+    // Map '*Menu' -> '*Editor'
+    let targetId = null;
+    if (el.id.endsWith('Menu')) {
+      targetId = el.id.replace(/Menu$/, 'Editor');
+    }
+    // Special-case known ids if needed
+    if (!document.getElementById(targetId)) {
+      // Try common ids
+      const candidates = ['eventNotesEditor', 'detailsNotesEditor', 'progressLeftOffEditor', 'progressNextEditor'];
+      targetId = candidates.find(id => document.getElementById(id)) || null;
+    }
+    if (targetId) {
+      buildWorkingToolbar(el, targetId);
+    }
+  } catch (_) { /* noop */ }
 }
 
 function updateWorkingToolbarStates(el) {
