@@ -178,6 +178,41 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area hr{border:none;border-top:1px solid #e5e7eb;margin:1.4em 0}
 .editor-content-area a{color:#2563eb;text-decoration:underline}
 .editor-content-area p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;color:#9ca3af;pointer-events:none;height:0}
+
+/* Critical TipTap formatting styles - ensure bold/italic/code are visible */
+.tiptap-editor-content strong,
+.tiptap-editor-content b,
+.ProseMirror strong,
+.ProseMirror b,
+#detailsNotesEditor strong,
+#detailsNotesEditor b,
+#addNotesEditor strong,
+#addNotesEditor b {
+  font-weight: bold !important;
+  font-weight: 700 !important;
+}
+
+.tiptap-editor-content em,
+.tiptap-editor-content i,
+.ProseMirror em,
+.ProseMirror i,
+#detailsNotesEditor em,
+#detailsNotesEditor i,
+#addNotesEditor em,
+#addNotesEditor i {
+  font-style: italic !important;
+}
+
+.tiptap-editor-content code,
+.ProseMirror code,
+#detailsNotesEditor code,
+#addNotesEditor code {
+  background-color: #f3f4f6 !important;
+  border-radius: 4px !important;
+  padding: 2px 4px !important;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+  font-size: 0.9em !important;
+}
 .editor-content-area img{max-width:100%;height:auto;display:block;margin:.4em 0}
 /* Task list styling */
 .editor-content-area ul[data-type="taskList"]{list-style:none;padding-left:0;margin:.6em 0 .9em}
@@ -751,10 +786,19 @@ function createTipTapEditor(elementId, onUpdate = null) {
       element: element,
       extensions: extensions,
       content: '<p></p>',
+      parseOptions: {
+        preserveWhitespace: 'full',
+      },
       onUpdate: onUpdate || (() => {}),
       editorProps: {
         attributes: {
           class: 'tiptap-editor-content',
+        },
+        transformPastedHTML(html) {
+          return html;
+        },
+        transformPastedText(text) {
+          return text;
         },
       },
       onCreate: ({ editor }) => {
@@ -2468,7 +2512,14 @@ function openDetails(id){
     if (detailsEditor && detailsNotesMenu) {
       console.log('✅ Building TipTap toolbar for details modal');
       // Set initial content once on the fresh editor to avoid later resets that move the caret
-      try { detailsEditor.commands.setContent(prefillHtml); } catch(_) {}
+      try { 
+        // Decode HTML entities if present
+        const decodedHtml = prefillHtml.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+        console.log('🔧 Setting content:', { original: prefillHtml.substring(0, 100), decoded: decodedHtml.substring(0, 100) });
+        detailsEditor.commands.setContent(decodedHtml, false, { preserveWhitespace: 'full' }); 
+      } catch(e) { 
+        console.warn('⚠️ Failed to set content:', e);
+      }
       // Always rebuild to bind to the fresh editor instance
       setTimeout(() => {
         buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
