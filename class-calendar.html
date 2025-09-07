@@ -715,25 +715,41 @@ function initEditors(){
     // Build toolbars only for created editors
     if (notesEditor) {
       setTimeout(() => {
-        buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
+        const m = document.getElementById('eventNotesMenu');
+        if (m && !m.dataset.toolbarBuilt) {
+          buildTipTap3Toolbar(notesEditor, m);
+          m.dataset.toolbarBuilt = 'true';
+        }
         setupEditorEnhancements(notesEditor);
       }, 150);
     }
     if (detailsEditor) {
       setTimeout(() => {
-        buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+        const m = document.getElementById('detailsNotesMenu');
+        if (m && !m.dataset.toolbarBuilt) {
+          buildTipTap3Toolbar(detailsEditor, m);
+          m.dataset.toolbarBuilt = 'true';
+        }
         setupEditorEnhancements(detailsEditor);
       }, 150);
     }
     if (progressLeftOffEditor) {
       setTimeout(() => {
-        buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
+        const m = document.getElementById('progressLeftOffMenu');
+        if (m && !m.dataset.toolbarBuilt) {
+          buildTipTap3Toolbar(progressLeftOffEditor, m);
+          m.dataset.toolbarBuilt = 'true';
+        }
         setupEditorEnhancements(progressLeftOffEditor);
       }, 150);
     }
     if (progressNextEditor) {
       setTimeout(() => {
-        buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
+        const m = document.getElementById('progressNextMenu');
+        if (m && !m.dataset.toolbarBuilt) {
+          buildTipTap3Toolbar(progressNextEditor, m);
+          m.dataset.toolbarBuilt = 'true';
+        }
         setupEditorEnhancements(progressNextEditor);
       }, 150);
     }
@@ -1024,6 +1040,21 @@ function buildTipTap3Toolbar(editor, el) {
     </div>
   `;
   
+  // Ensure we don't stack multiple listeners on the same toolbar element
+  if (el.__tiptapClickHandler) {
+    el.removeEventListener('click', el.__tiptapClickHandler);
+  }
+  if (el.__tiptapMouseDownHandler) {
+    el.removeEventListener('mousedown', el.__tiptapMouseDownHandler);
+  }
+  
+  // Prevent toolbar buttons from stealing focus so selection is preserved
+  el.__tiptapMouseDownHandler = (e) => {
+    const btn = e.target.closest('.toolbar-btn');
+    if (btn) e.preventDefault();
+  };
+  el.addEventListener('mousedown', el.__tiptapMouseDownHandler);
+  
   // Helper: queue actions until editor is truly ready (no access to getter view)
   function runWhenEditorReady(ed, cb){
     if(!ed) return;
@@ -1049,7 +1080,7 @@ function buildTipTap3Toolbar(editor, el) {
     }
   }
 
-  el.addEventListener('click', (e) => {
+  el.__tiptapClickHandler = (e) => {
     const btn = e.target.closest('.toolbar-btn');
     if (!btn || !editor) {
       console.log('⚠️ Toolbar click but no button or editor', { btn: !!btn, editor: !!editor });
@@ -1058,9 +1089,15 @@ function buildTipTap3Toolbar(editor, el) {
     
     const action = btn.dataset.action;
     console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
+    if (el.__tiptapHandling) {
+      console.warn('⏳ Ignoring re-entrant toolbar click');
+      return;
+    }
+    el.__tiptapHandling = true;
     
     if (!editor.chain || typeof editor.chain !== 'function') {
       console.error('❌ Editor missing chain method', editor);
+      el.__tiptapHandling = false;
       return;
     }
     
@@ -1112,8 +1149,11 @@ function buildTipTap3Toolbar(editor, el) {
       } catch (actionError) {
         console.error('❌ Action failed:', action, actionError);
       }
+      // Release the handling flag shortly after to allow next clicks
+      setTimeout(()=>{ el.__tiptapHandling = false; }, 0);
     });
-  });
+  };
+  el.addEventListener('click', el.__tiptapClickHandler);
   
   // Update button states initially (with error checking)
   if (editor && typeof editor.on === 'function') {
@@ -1277,6 +1317,19 @@ function buildReplicaToolbar(editor, el){
     buildSimpleMenu(null, el); return;
   }
   el.innerHTML='';
+  // Deduplicate any previous listeners on this element
+  if (el.__replicaClickHandler) {
+    el.removeEventListener('click', el.__replicaClickHandler);
+  }
+  if (el.__replicaMouseDownHandler) {
+    el.removeEventListener('mousedown', el.__replicaMouseDownHandler);
+  }
+  // Prevent toolbar focus stealing
+  el.__replicaMouseDownHandler = (e) => {
+    const btn = e.target.closest('.toolbar-btn');
+    if (btn) e.preventDefault();
+  };
+  el.addEventListener('mousedown', el.__replicaMouseDownHandler);
   const groups = [
     [ {act:'undo', icon:'undo', title:'Undo'}, {act:'redo', icon:'redo', title:'Redo'} ],
     [ {act:'bold', icon:'bold', title:'Bold'}, {act:'italic', icon:'italic', title:'Italic'}, {act:'underline', icon:'underline', title:'Underline'}, {act:'strike', icon:'strikethrough', title:'Strikethrough'}, {act:'code', icon:'code', title:'Inline Code'}, {act:'highlight', icon:'highlighter', title:'Highlight'} ],
@@ -1314,7 +1367,7 @@ function buildReplicaToolbar(editor, el){
   fileInput.addEventListener('change',()=>{
     const f=fileInput.files?.[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>{ const src=reader.result; if(src) { editor.chain().setImage({src}).run(); updateReplicaToolbar(editor, el);} }; reader.readAsDataURL(f); fileInput.value=''; });
   el.appendChild(fileInput);
-  el.addEventListener('click', ev=>{
+  el.__replicaClickHandler = (ev)=>{
     const btn=ev.target.closest('button.toolbar-btn'); if(!btn||!btn.dataset.act) return; const act=btn.dataset.act; const ch=editor.chain();
     switch(act){
       case 'undo': ch.undo().run(); break; case 'redo': ch.redo().run(); break;
@@ -1328,7 +1381,8 @@ function buildReplicaToolbar(editor, el){
       case 'unlink': ch.unsetLink().run(); break; case 'clear': ch.clearNodes().unsetAllMarks().run(); break;
     }
     updateReplicaToolbar(editor, el);
-  });
+  };
+  el.addEventListener('click', el.__replicaClickHandler);
   document.addEventListener('click',e=>{ if(!el.contains(e.target)) el.querySelectorAll('.heading-dropdown.open').forEach(dd=>dd.classList.remove('open')); });
   editor.on('transaction', ()=>updateReplicaToolbar(editor, el));
   try { lucide?.createIcons?.(); } catch(_){ /* ignore */ }
@@ -1951,9 +2005,12 @@ function openAddModal(prefillDate){
       console.log('✅ Building fresh toolbar for add modal');
       
       // Wait for editor to be fully mounted before building toolbar
-      setTimeout(() => {
-        buildTipTap3Toolbar(notesEditor, eventNotesMenu);
-      }, 150);
+      if (!eventNotesMenu.dataset.toolbarBuilt) {
+        setTimeout(() => {
+          buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+          eventNotesMenu.dataset.toolbarBuilt = 'true';
+        }, 150);
+      }
       
     } else {
       console.log('⚠️ Fallback to basic editor for add modal');
@@ -2218,23 +2275,26 @@ function openDetails(id){
       detailsEditor = null;
     }
     
-    // Create fresh TipTap editor
-    detailsEditor = createTipTapEditor('detailsNotesEditor');
+  // Create fresh TipTap editor
+  detailsEditor = createTipTapEditor('detailsNotesEditor');
     
     if (detailsEditor && detailsNotesMenu) {
       console.log('✅ Building TipTap toolbar for details modal');
       
-      // Set existing content first
+      // Only build once per open to avoid duplicate listeners
+      if (!detailsNotesMenu.dataset.toolbarBuilt) {
+        // Wait for editor to be fully mounted before building toolbar
+        setTimeout(() => {
+          buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+          detailsNotesMenu.dataset.toolbarBuilt = 'true';
+        }, 150);
+      }
+      // After mount, set content if present
       if (ev.notes) {
         setTimeout(() => {
-          detailsEditor.commands.setContent(ev.notes);
-        }, 100);
+          try { detailsEditor.commands.setContent(ev.notes); } catch(_){}
+        }, 220);
       }
-      
-      // Wait for editor to be fully mounted before building toolbar
-      setTimeout(() => {
-        buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
-      }, 150);
       
     } else {
       console.log('⚠️ Using fallback toolbar for details modal');
