@@ -145,7 +145,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Simple Editor Replica (Lucide) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:10px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f8f9fa;border-bottom:1px solid #e9ecef;align-items:center}
+.editor-toolbar{display:flex;flex-wrap:nowrap;gap:4px;padding:6px 8px;background:#f8f9fa;border-bottom:1px solid #e9ecef;align-items:center;overflow-x:auto}
 .toolbar-group{display:inline-flex;gap:2px;align-items:center}
 .toolbar-divider{width:1px;height:12px;background:#dee2e6;margin:0 4px}
 .toolbar-btn{background:transparent;border:1px solid transparent;border-radius:8px;padding:2px;min-width:18px;min-height:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6c757d;font-size:9px;line-height:1;font-weight:400;transition:.15s all ease}
@@ -3286,21 +3286,38 @@ function initializeNewModalEditors(classCode, latestEntry) {
   console.log('🎨 Initializing new modal editors for:', classCode);
   
   try {
+    // Use the same extensions as the main editors
+    const extensions = [
+      window.TiptapStarterKit,
+      window.TiptapUnderline,
+      window.TiptapHighlight.configure({ multicolor: true }),
+      window.TiptapTextAlign.configure({ types: ['heading', 'paragraph'] }),
+      window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })
+    ];
+    
     // Create left off editor
     if (window.TiptapEditor && document.getElementById('newLeftOffEditor')) {
       newLeftOffEditor = new window.TiptapEditor({
         element: document.getElementById('newLeftOffEditor'),
-        extensions: [window.TiptapStarterKit, window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })]
+        extensions: extensions.map(ext => ext === window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
+          ? window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
+          : ext)
       });
       
       // Build toolbar
+      console.log('🔧 Building left off toolbar');
       buildTipTap3Toolbar(newLeftOffEditor, document.getElementById('newLeftOffMenu'));
       
       // Set content
       if (latestEntry?.leftOffHtml) {
+        console.log('📝 Setting left off HTML content');
         newLeftOffEditor.commands.setContent(latestEntry.leftOffHtml);
       } else if (latestEntry?.leftOffRtf) {
+        console.log('📝 Setting left off RTF content');
         newLeftOffEditor.commands.setContent(latestEntry.leftOffRtf);
+      } else {
+        console.log('📝 No existing left off content');
+        newLeftOffEditor.commands.setContent('<p></p>');
       }
       
       console.log('✅ Left off editor created');
@@ -3310,20 +3327,33 @@ function initializeNewModalEditors(classCode, latestEntry) {
     if (window.TiptapEditor && document.getElementById('newNextEditor')) {
       newNextEditor = new window.TiptapEditor({
         element: document.getElementById('newNextEditor'),
-        extensions: [window.TiptapStarterKit, window.TiptapPlaceholder.configure({ placeholder: 'What\'s coming up next...' })]
+        extensions: extensions.map(ext => ext === window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' }) 
+          ? window.TiptapPlaceholder.configure({ placeholder: 'What\'s coming up next...' }) 
+          : ext)
       });
       
       // Build toolbar
+      console.log('🔧 Building next toolbar');
       buildTipTap3Toolbar(newNextEditor, document.getElementById('newNextMenu'));
       
       // Set content
       if (latestEntry?.whatsNextHtml) {
+        console.log('📝 Setting next HTML content');
         newNextEditor.commands.setContent(latestEntry.whatsNextHtml);
       } else if (latestEntry?.whatsNextRtf) {
+        console.log('📝 Setting next RTF content');
         newNextEditor.commands.setContent(latestEntry.whatsNextRtf);
+      } else {
+        console.log('📝 No existing next content');
+        newNextEditor.commands.setContent('<p></p>');
       }
       
       console.log('✅ Next editor created');
+    }
+    
+    // Initialize Lucide icons
+    if (window.lucide) {
+      window.lucide.createIcons();
     }
     
   } catch (error) {
