@@ -838,8 +838,14 @@ function createTipTapEditor(elementId, onUpdate = null) {
         // Wait a bit more to ensure DOM is ready
         setTimeout(() => {
           try {
-            if (editor.view && editor.view.dom) {
+            const ok = !!(editor.editorView && editor.editorView.dom);
+            if (ok) {
               console.log('✅ Editor view is ready and mounted');
+              editor.__ready = true;
+              // Flush any queued actions registered before ready
+              const q = editor.__pendingActions || [];
+              editor.__pendingActions = [];
+              q.forEach(fn => { try { fn(); } catch(e){ console.error('❌ Queued action error (onCreate):', e); } });
             } else {
               console.warn('⚠️ Editor view not ready in onCreate');
             }
@@ -1010,6 +1016,31 @@ function buildTipTap3Toolbar(editor, el) {
     </div>
   `;
   
+  // Helper: queue actions until editor is truly ready (no access to getter view)
+  function runWhenEditorReady(ed, cb){
+    if(!ed) return;
+    const hasView = !!(ed.editorView && ed.editorView.dom);
+    if (hasView || ed.__ready === true) {
+      try { cb(); } catch(err){ console.error('❌ Action exec error:', err); }
+      return;
+    }
+    // Queue
+    ed.__pendingActions = ed.__pendingActions || [];
+    ed.__pendingActions.push(cb);
+    if (!ed.__readyCheckTimer) {
+      ed.__readyCheckTimer = setInterval(() => {
+        const ok = !!(ed.editorView && ed.editorView.dom);
+        if (ok || ed.__ready === true) {
+          clearInterval(ed.__readyCheckTimer);
+          ed.__readyCheckTimer = null;
+          const q = ed.__pendingActions || [];
+          ed.__pendingActions = [];
+          q.forEach(fn => { try { fn(); } catch(e){ console.error('❌ Queued action error:', e); } });
+        }
+      }, 80);
+    }
+  }
+
   el.addEventListener('click', (e) => {
     const btn = e.target.closest('.toolbar-btn');
     if (!btn || !editor) {
@@ -1025,40 +1056,33 @@ function buildTipTap3Toolbar(editor, el) {
       return;
     }
     
-    // Check initialization state without touching editor.view (which can throw pre-mount)
-    if (editor && editor.isInitialized === false) {
-      console.warn('⚠️ Editor not initialized yet, retrying in 120ms...');
-      const btnEl = e.target.closest('.toolbar-btn');
-      setTimeout(() => { btnEl?.click(); }, 120);
-      return;
-    }
-    
-    try {
-      // Start chain and run actions without forcing focus
-      const chain = editor.chain();
-      switch (action) {
-        case 'undo': chain.undo().run(); break;
-        case 'redo': chain.redo().run(); break;
-        case 'bold': chain.toggleBold().run(); break;
-        case 'italic': chain.toggleItalic().run(); break;
-        case 'code': chain.toggleCode().run(); break;
-        case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
-        case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
-        case 'paragraph': chain.setParagraph().run(); break;
-        case 'bulletList': chain.toggleBulletList().run(); break;
-        case 'orderedList': chain.toggleOrderedList().run(); break;
-        case 'taskList': chain.toggleTaskList().run(); break;
-        case 'blockquote': chain.toggleBlockquote().run(); break;
-        default:
-          console.warn('🤷 Unknown toolbar action:', action);
-          return;
+    // Execute action when editor is actually ready
+    runWhenEditorReady(editor, () => {
+      try {
+        const chain = editor.chain();
+        switch (action) {
+          case 'undo': chain.undo().run(); break;
+          case 'redo': chain.redo().run(); break;
+          case 'bold': chain.toggleBold().run(); break;
+          case 'italic': chain.toggleItalic().run(); break;
+          case 'code': chain.toggleCode().run(); break;
+          case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
+          case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
+          case 'paragraph': chain.setParagraph().run(); break;
+          case 'bulletList': chain.toggleBulletList().run(); break;
+          case 'orderedList': chain.toggleOrderedList().run(); break;
+          case 'taskList': chain.toggleTaskList().run(); break;
+          case 'blockquote': chain.toggleBlockquote().run(); break;
+          default:
+            console.warn('🤷 Unknown toolbar action:', action);
+            return;
+        }
+        console.log('✅ Action completed:', action);
+        updateTipTap3Toolbar(editor, el);
+      } catch (actionError) {
+        console.error('❌ Action failed:', action, actionError);
       }
-      console.log('✅ Action completed:', action);
-    } catch (actionError) {
-      console.error('❌ Action failed:', action, actionError);
-    }
-    
-    updateTipTap3Toolbar(editor, el);
+    });
   });
   
   // Update button states initially (with error checking)
