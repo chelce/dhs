@@ -1071,10 +1071,15 @@ function buildTipTap3Toolbar(editor, el) {
         const sel = editor.state?.selection;
         const from = sel?.from;
         const to = sel?.to;
+        console.log('🧭 Pre-action state:', {
+          action,
+          isFocused: editor.isFocused,
+          selection: { from, to, empty: sel?.empty }
+        });
 
         // Build chain; only focus if editor is not already focused
         let chain = editor.chain();
-        if (!editor.isFocused) {
+  if (!editor.isFocused) {
           chain = chain.focus();
         }
         // Restore selection if available to avoid caret jumping to end
@@ -1098,7 +1103,11 @@ function buildTipTap3Toolbar(editor, el) {
             console.warn('🤷 Unknown toolbar action:', action);
             return;
         }
-        console.log('✅ Action completed:', action);
+        const selAfter = editor.state?.selection;
+        console.log('✅ Action completed:', action, {
+          isFocusedAfter: editor.isFocused,
+          selectionAfter: { from: selAfter?.from, to: selAfter?.to, empty: selAfter?.empty }
+        });
         updateTipTap3Toolbar(editor, el);
       } catch (actionError) {
         console.error('❌ Action failed:', action, actionError);
