@@ -1051,7 +1051,8 @@ function buildTipTap3Toolbar(editor, el) {
   // Prevent toolbar buttons from stealing focus so selection is preserved
   el.__tiptapMouseDownHandler = (e) => {
     const btn = e.target.closest('.toolbar-btn');
-    if (btn) e.preventDefault();
+  // Prevent focus change on left-click only; allow other interactions untouched
+  if (btn && (e.button === 0 || e.button === undefined)) e.preventDefault();
   };
   el.addEventListener('mousedown', el.__tiptapMouseDownHandler);
   
@@ -1129,11 +1130,17 @@ function buildTipTap3Toolbar(editor, el) {
 
     // Guard BEFORE any work/logging to avoid double execution (icon/svg bubbling)
     if (el.__tiptapHandling) {
+      // If the flag is stale (>500ms), clear it and continue
+      if (el.__tiptapHandlingTs && (Date.now() - el.__tiptapHandlingTs > 500)) {
+        el.__tiptapHandling = false;
+      } else {
       // Prevent any other handlers from firing in this tick
       if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
       return;
+      }
     }
     el.__tiptapHandling = true;
+    el.__tiptapHandlingTs = Date.now();
 
     const action = btn.dataset.action;
     console.log('🎯 Toolbar action:', action, 'on editor:', editor.constructor.name);
@@ -1147,7 +1154,7 @@ function buildTipTap3Toolbar(editor, el) {
     // Avoid button focusing and any default behavior that might alter selection
     if (typeof e.preventDefault === 'function') e.preventDefault();
 
-    // Execute action when editor is actually ready
+  // Execute action when editor is actually ready
     runWhenEditorReady(editor, () => {
       try {
         // Capture current selection prior to any focus changes
@@ -1245,8 +1252,20 @@ function buildTipTap3Toolbar(editor, el) {
         // Release the handling flag after the tiptap transaction completes
         Promise.resolve().then(() => {
           el.__tiptapHandling = false;
+          el.__tiptapHandlingTs = 0;
         });
       }
+    });
+
+    // Failsafe: if the editor isn't ready and we queued the action, release the flag soon
+    Promise.resolve().then(() => {
+      setTimeout(() => {
+        if (el.__tiptapHandling) {
+          // If inner finally didn't run yet, allow future clicks while queued actions will still execute later
+          el.__tiptapHandling = false;
+          el.__tiptapHandlingTs = 0;
+        }
+      }, 200);
     });
   };
   el.addEventListener('click', el.__tiptapClickHandler);
