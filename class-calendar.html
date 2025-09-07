@@ -436,11 +436,12 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
       <div class="form-group"><label for="eventType">Type</label>
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
       </div>
-      <div class="form-group" style="display: block !important; visibility: visible !important;"><label>Notes</label>
-        <div class="editor-shell" id="eventNotesWrapper" style="display: flex !important; visibility: visible !important;">
-          <div id="eventNotesMenu" class="editor-toolbar"></div>
-          <div class="editor-content-area"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..."></div></div>
+      <div class="form-group" style="display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; position: relative !important; z-index: 999 !important;"><label style="display: block !important; color: #000 !important; font-weight: bold !important;">Notes</label>
+        <div class="editor-shell" id="eventNotesWrapper" style="display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 150px !important; background: #fff !important; border: 2px solid #007cba !important; border-radius: 8px !important;">
+          <div id="eventNotesMenu" class="editor-toolbar" style="display: block !important; visibility: visible !important; background: #f0f0f0 !important; padding: 8px !important;"></div>
+          <div class="editor-content-area" style="display: block !important; visibility: visible !important; min-height: 100px !important; padding: 10px !important;"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..." style="display: block !important; visibility: visible !important; min-height: 80px !important; border: 1px dashed #ccc !important; padding: 8px !important;"></div></div>
         </div>
+        <textarea id="notesBackup" placeholder="Notes backup editor" style="width: 100%; height: 100px; margin-top: 10px; display: block !important; visibility: visible !important; background: yellow !important; border: 2px solid red !important;"></textarea>
         <input type="hidden" id="eventNotes" />
       </div>
       <div class="form-actions"><button type="button" class="btn" data-close="eventModal">Cancel</button><button class="btn btn-primary" type="submit">Save</button></div>
@@ -530,11 +531,11 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
       </div>
     </div>
     
-    <div class="notes-section" style="display: block !important; visibility: visible !important;">
-      <label style="font-size:12px;font-weight:600">Reflection Notes</label>
-      <div class="editor-shell" id="detailsNotesWrapper" style="display: flex !important; visibility: visible !important;">
-        <div id="detailsNotesMenu" class="editor-toolbar"></div>
-        <div class="editor-content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
+    <div class="notes-section" style="display: block !important; visibility: visible !important; opacity: 1 !important; height: auto !important; overflow: visible !important; position: relative !important; z-index: 999 !important;">
+      <label style="font-size:12px;font-weight:600; display: block !important; color: #000 !important; font-weight: bold !important;">Reflection Notes</label>
+      <div class="editor-shell" id="detailsNotesWrapper" style="display: flex !important; visibility: visible !important; opacity: 1 !important; height: auto !important; min-height: 150px !important; background: #fff !important; border: 2px solid #007cba !important; border-radius: 8px !important;">
+        <div id="detailsNotesMenu" class="editor-toolbar" style="display: block !important; visibility: visible !important; background: #f0f0f0 !important; padding: 8px !important;"></div>
+        <div class="editor-content-area" style="display: block !important; visibility: visible !important; min-height: 100px !important; padding: 10px !important;"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..." style="display: block !important; visibility: visible !important; min-height: 80px !important; border: 1px dashed #ccc !important; padding: 8px !important;"></div></div>
       </div>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save</button></div>
