@@ -530,9 +530,9 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
       </div>
     </div>
     
-    <div class="notes-section">
+    <div class="notes-section" style="display: block !important; visibility: visible !important;">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
-      <div class="editor-shell" id="detailsNotesWrapper">
+      <div class="editor-shell" id="detailsNotesWrapper" style="display: flex !important; visibility: visible !important;">
         <div id="detailsNotesMenu" class="editor-toolbar"></div>
         <div class="editor-content-area"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..."></div></div>
       </div>
@@ -1689,6 +1689,11 @@ function openAddModal(prefillDate){
       eventNotesEditor.contentEditable = 'true';
       buildFallbackToolbar(eventNotesMenu);
     }
+    
+    // Initialize Lucide icons for the toolbar
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
   }, 100);
 }
 function closeModal(id){ if(!id){document.querySelectorAll('.modal').forEach(m=>m.style.display='none');return;} document.getElementById(id).style.display='none'; }
@@ -1887,7 +1892,49 @@ function openDetails(id){
   });
   
   if(detailsEditor){ detailsEditor.commands.setContent(ev.notes||'<p></p>'); } else { document.getElementById('detailsNotesEditor').innerHTML=ev.notes||''; }
+  
+  // Ensure notes section is visible and functional
+  const detailsNotesSection = document.querySelector('.notes-section');
+  const detailsNotesWrapper = document.getElementById('detailsNotesWrapper');
+  const detailsNotesEditor = document.getElementById('detailsNotesEditor');
+  
+  if (detailsNotesSection) {
+    detailsNotesSection.style.display = 'block';
+    detailsNotesSection.style.visibility = 'visible';
+  }
+  if (detailsNotesWrapper) {
+    detailsNotesWrapper.style.display = 'flex';
+    detailsNotesWrapper.style.visibility = 'visible';
+  }
+  if (detailsNotesEditor) {
+    detailsNotesEditor.style.minHeight = '100px';
+    detailsNotesEditor.contentEditable = 'true';
+    if (!detailsNotesEditor.innerHTML || detailsNotesEditor.innerHTML === '') {
+      detailsNotesEditor.innerHTML = '<p></p>';
+    }
+  }
+  
   document.getElementById('detailsModal').style.display='flex';
+  
+  // Initialize editor and toolbar for details modal
+  setTimeout(() => {
+    const detailsNotesMenu = document.getElementById('detailsNotesMenu');
+    const detailsNotesEditor = document.getElementById('detailsNotesEditor');
+    
+    if (detailsEditor && detailsNotesMenu) {
+      // TipTap editor is available
+      buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+    } else if (detailsNotesEditor && detailsNotesMenu) {
+      // Fallback: ensure basic editing works
+      detailsNotesEditor.contentEditable = 'true';
+      buildFallbackToolbar(detailsNotesMenu);
+    }
+    
+    // Initialize Lucide icons for the toolbar
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+  }, 100);
 }
 
 function deleteEvent(id){
