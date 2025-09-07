@@ -436,8 +436,8 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
       <div class="form-group"><label for="eventType">Type</label>
         <select id="eventType"><option value="">Normal</option><option value="tentative">Tentative</option></select>
       </div>
-      <div class="form-group"><label>Notes</label>
-        <div class="editor-shell" id="eventNotesWrapper">
+      <div class="form-group" style="display: block !important; visibility: visible !important;"><label>Notes</label>
+        <div class="editor-shell" id="eventNotesWrapper" style="display: flex !important; visibility: visible !important;">
           <div id="eventNotesMenu" class="editor-toolbar"></div>
           <div class="editor-content-area"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..."></div></div>
         </div>
@@ -1653,9 +1653,43 @@ function updateWeekRange(weeks){
 
 /* ========= EVENTS CRUD ========= */
 function openAddModal(prefillDate){
-  currentEditId=null; document.getElementById('eventForm').reset(); document.getElementById('eventModalTitle').textContent='Add Event';
-  if(prefillDate) document.getElementById('eventForm').dataset.date=prefillDate; else delete document.getElementById('eventForm').dataset.date;
+  currentEditId=null; 
+  document.getElementById('eventForm').reset(); 
+  document.getElementById('eventModalTitle').textContent='Add Event';
+  if(prefillDate) document.getElementById('eventForm').dataset.date=prefillDate; 
+  else delete document.getElementById('eventForm').dataset.date;
+  
+  // Ensure notes section is visible and functional
+  const notesSection = document.querySelector('#eventNotesWrapper');
+  const notesEditor = document.getElementById('eventNotesEditor');
+  if (notesSection) {
+    notesSection.style.display = 'flex';
+    notesSection.style.visibility = 'visible';
+  }
+  if (notesEditor) {
+    notesEditor.style.minHeight = '100px';
+    notesEditor.contentEditable = 'true';
+    if (!notesEditor.innerHTML || notesEditor.innerHTML === '') {
+      notesEditor.innerHTML = '<p></p>';
+    }
+  }
+  
   document.getElementById('eventModal').style.display='flex';
+  
+  // Initialize or reinitialize TipTap for this modal
+  setTimeout(() => {
+    const eventNotesMenu = document.getElementById('eventNotesMenu');
+    const eventNotesEditor = document.getElementById('eventNotesEditor');
+    
+    if (notesEditor && eventNotesMenu) {
+      // TipTap editor is available
+      buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+    } else if (eventNotesEditor && eventNotesMenu) {
+      // Fallback: ensure basic editing works
+      eventNotesEditor.contentEditable = 'true';
+      buildFallbackToolbar(eventNotesMenu);
+    }
+  }, 100);
 }
 function closeModal(id){ if(!id){document.querySelectorAll('.modal').forEach(m=>m.style.display='none');return;} document.getElementById(id).style.display='none'; }
 
