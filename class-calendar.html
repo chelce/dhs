@@ -896,6 +896,14 @@ function buildWorkingToolbar(editor, el) {
     </div>
   `;
   
+  // Keep selection: prevent toolbar from stealing focus on mousedown
+  el.addEventListener('mousedown', (e) => {
+    const isToolbarBtn = !!e.target.closest('.toolbar-btn');
+    if (isToolbarBtn) {
+      e.preventDefault(); // preserves editor selection/caret
+    }
+  });
+
   el.addEventListener('click', (e) => {
     const btn = e.target.closest('.toolbar-btn');
     if (!btn || !editor) return;
@@ -1057,9 +1065,10 @@ function buildTipTap3Toolbar(editor, el) {
     }
     
     // Execute action when editor is actually ready
-    runWhenEditorReady(editor, () => {
+  runWhenEditorReady(editor, () => {
       try {
-        const chain = editor.chain();
+    // Re-focus so commands apply to current selection/caret
+    const chain = editor.chain().focus();
         switch (action) {
           case 'undo': chain.undo().run(); break;
           case 'redo': chain.redo().run(); break;
