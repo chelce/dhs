@@ -2454,6 +2454,12 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
   display: none;
 }
 
+/* Force visibility override - temporary fix */
+#classStatusSection {
+  display: block !important;
+  visibility: visible !important;
+}
+
 /* ========= TASK PANEL STYLES ========= */
 .task-panel {
   margin: 20px auto;
@@ -2767,6 +2773,17 @@ document.addEventListener('DOMContentLoaded', function() {
     section.classList.remove('hidden');
     btn.textContent = '👁️ Hide Status';
   }
+  
+  // Force visibility as a backup
+  setTimeout(() => {
+    const statusSection = document.getElementById('classStatusSection');
+    if (statusSection) {
+      statusSection.classList.remove('hidden');
+      statusSection.style.display = 'block';
+      statusSection.style.visibility = 'visible';
+      console.log('🔧 Force-showing progress section');
+    }
+  }, 100);
 });
 
 // Function to update individual class status (called by AI during debriefs)
