@@ -1104,6 +1104,9 @@ function buildTipTap3Toolbar(editor, el) {
       return;
     }
     
+    // Avoid button focusing and any default behavior that might alter selection
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+
     // Execute action when editor is actually ready
     runWhenEditorReady(editor, () => {
       try {
@@ -1117,29 +1120,73 @@ function buildTipTap3Toolbar(editor, el) {
           selection: { from, to, empty: sel?.empty }
         });
 
-        // Build chain; restore selection FIRST, then (optionally) focus
-        let chain = editor.chain();
-        // Restore selection if available to avoid caret jumping to end
+        // Build chain; focus first, then restore selection if we have it
+        let chain = editor.chain().focus();
         if (typeof editor.commands?.setTextSelection === 'function' && typeof from === 'number' && typeof to === 'number') {
           chain = chain.setTextSelection({ from, to });
         }
-        // Only call focus if not already focused (prevents moving caret to end)
-        if (!editor.isFocused) {
-          chain = chain.focus();
-        }
         switch (action) {
-          case 'undo': chain.undo().run(); break;
-          case 'redo': chain.redo().run(); break;
-          case 'bold': chain.toggleBold().run(); break;
-          case 'italic': chain.toggleItalic().run(); break;
-          case 'code': chain.toggleCode().run(); break;
-          case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
-          case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
-          case 'paragraph': chain.setParagraph().run(); break;
-          case 'bulletList': chain.toggleBulletList().run(); break;
-          case 'orderedList': chain.toggleOrderedList().run(); break;
-          case 'taskList': chain.toggleTaskList().run(); break;
-          case 'blockquote': chain.toggleBlockquote().run(); break;
+          case 'undo': {
+            const ok = chain.undo().run();
+            console.log('↩️ undo run:', ok); break;
+          }
+          case 'redo': {
+            const ok = chain.redo().run();
+            console.log('↪️ redo run:', ok); break;
+          }
+          case 'bold': {
+            const can = typeof editor.can === 'function' && editor.can().toggleBold ? editor.can().toggleBold() : true;
+            console.log('🔎 can toggleBold:', can);
+            let ok = chain.toggleBold().run();
+            // Defensive: if it returned false and we have a selection, try a direct mark command
+            if (!ok && typeof from === 'number' && typeof to === 'number') {
+              try {
+                if (typeof editor.commands?.setMark === 'function') {
+                  ok = editor.chain().focus().setTextSelection({ from, to }).setMark('bold').run();
+                  console.log('🛠️ fallback setMark("bold") run:', ok);
+                }
+              } catch(e) {
+                console.warn('⚠️ fallback setMark failed:', e);
+              }
+            }
+            console.log('✅ toggleBold run:', ok); break;
+          }
+          case 'italic': {
+            const ok = chain.toggleItalic().run();
+            console.log('✅ toggleItalic run:', ok); break;
+          }
+          case 'code': {
+            const ok = chain.toggleCode().run();
+            console.log('✅ toggleCode run:', ok); break;
+          }
+          case 'heading1': {
+            const ok = chain.toggleHeading({ level: 1 }).run();
+            console.log('✅ toggleHeading(1) run:', ok); break;
+          }
+          case 'heading2': {
+            const ok = chain.toggleHeading({ level: 2 }).run();
+            console.log('✅ toggleHeading(2) run:', ok); break;
+          }
+          case 'paragraph': {
+            const ok = chain.setParagraph().run();
+            console.log('✅ setParagraph run:', ok); break;
+          }
+          case 'bulletList': {
+            const ok = chain.toggleBulletList().run();
+            console.log('✅ toggleBulletList run:', ok); break;
+          }
+          case 'orderedList': {
+            const ok = chain.toggleOrderedList().run();
+            console.log('✅ toggleOrderedList run:', ok); break;
+          }
+          case 'taskList': {
+            const ok = chain.toggleTaskList().run();
+            console.log('✅ toggleTaskList run:', ok); break;
+          }
+          case 'blockquote': {
+            const ok = chain.toggleBlockquote().run();
+            console.log('✅ toggleBlockquote run:', ok); break;
+          }
           default:
             console.warn('🤷 Unknown toolbar action:', action);
             return;
