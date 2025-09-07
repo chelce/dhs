@@ -537,6 +537,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <div id="detailsNotesMenu" class="editor-toolbar" style="display: block !important; visibility: visible !important; background: #f0f0f0 !important; padding: 8px !important;"></div>
         <div class="editor-content-area" style="display: block !important; visibility: visible !important; min-height: 100px !important; padding: 10px !important;"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..." style="display: block !important; visibility: visible !important; min-height: 80px !important; border: 1px dashed #ccc !important; padding: 8px !important;"></div></div>
       </div>
+      <textarea id="detailsNotesBackup" placeholder="Details notes backup editor" style="width: 100%; height: 100px; margin-top: 10px; display: block !important; visibility: visible !important; background: orange !important; border: 2px solid purple !important;"></textarea>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save</button></div>
   </div>
@@ -1870,7 +1871,15 @@ function applyFilters(){
 }
 
 function openDetails(id){
-  const ev=events.find(e=>e.id===id); if(!ev) return; currentEditId=id;
+  console.log('🔍 openDetails called with id:', id);
+  const ev=events.find(e=>e.id===id); 
+  if(!ev) {
+    console.log('❌ Event not found with id:', id);
+    return; 
+  }
+  console.log('📝 Event found:', ev);
+  
+  currentEditId=id;
   document.getElementById('detailsTitle').textContent=ev.text;
   
   // Handle multi-class events in details modal
@@ -1916,23 +1925,34 @@ function openDetails(id){
   }
   
   document.getElementById('detailsModal').style.display='flex';
+  console.log('🎯 Details modal should now be visible');
   
   // Initialize editor and toolbar for details modal
   setTimeout(() => {
+    console.log('⏰ Initializing details modal editor...');
     const detailsNotesMenu = document.getElementById('detailsNotesMenu');
     const detailsNotesEditor = document.getElementById('detailsNotesEditor');
     
+    console.log('📋 Elements found:', {
+      menu: !!detailsNotesMenu,
+      editor: !!detailsNotesEditor,
+      detailsEditor: !!detailsEditor
+    });
+    
     if (detailsEditor && detailsNotesMenu) {
       // TipTap editor is available
+      console.log('✅ Building TipTap toolbar');
       buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
     } else if (detailsNotesEditor && detailsNotesMenu) {
       // Fallback: ensure basic editing works
+      console.log('⚠️ Using fallback toolbar');
       detailsNotesEditor.contentEditable = 'true';
       buildFallbackToolbar(detailsNotesMenu);
     }
     
     // Initialize Lucide icons for the toolbar
     if (window.lucide) {
+      console.log('🎨 Initializing Lucide icons');
       window.lucide.createIcons();
     }
   }, 100);
