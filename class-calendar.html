@@ -979,6 +979,12 @@ function buildTipTap3Toolbar(editor, el) {
     elementId: el.id 
   });
   // Always bind the current editor to the toolbar element so handlers don't capture stale editors
+  // Also: replace toolbar node with a fresh clone to drop ANY prior listeners from any builder
+  if (el.parentNode) {
+    const fresh = el.cloneNode(false);
+    el.parentNode.replaceChild(fresh, el);
+    el = fresh;
+  }
   el.__tiptapEditor = editor;
   
   // Remove any conflicting inline styles
@@ -1045,8 +1051,11 @@ function buildTipTap3Toolbar(editor, el) {
   // Prevent toolbar buttons from stealing focus so selection is preserved
   el.__tiptapMouseDownHandler = (e) => {
     const btn = e.target.closest('.toolbar-btn');
-  // Prevent focus change on left-click only; allow other interactions untouched
-  if (btn && (e.button === 0 || e.button === undefined)) e.preventDefault();
+    // Prevent focus change on left-click only; allow other interactions untouched
+    if (btn && (e.button === 0 || e.button === undefined)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   };
   el.addEventListener('mousedown', el.__tiptapMouseDownHandler);
   
@@ -1116,6 +1125,10 @@ function buildTipTap3Toolbar(editor, el) {
   }
 
   el.__tiptapClickHandler = (e) => {
+    // Be aggressive about preventing duplicate bubbling across nested elements
+    if (typeof e.preventDefault === 'function') e.preventDefault();
+    if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
     // Always resolve the active editor from the toolbar element to avoid stale closures
     const editor = el.__tiptapEditor;
     const btn = e.target.closest('.toolbar-btn');
@@ -1147,8 +1160,7 @@ function buildTipTap3Toolbar(editor, el) {
       return;
     }
     
-    // Avoid button focusing and any default behavior that might alter selection
-    if (typeof e.preventDefault === 'function') e.preventDefault();
+  // Avoid button focusing and any default behavior that might alter selection (already done above)
 
   // Execute action when editor is actually ready
   runWhenEditorReady(editor, () => {
@@ -1235,6 +1247,14 @@ function buildTipTap3Toolbar(editor, el) {
           default:
             console.warn('🤷 Unknown toolbar action:', action);
             return;
+        }
+        // Restore selection and focus to avoid any caret jump side effects
+        if (typeof from === 'number' && typeof to === 'number') {
+          requestAnimationFrame(() => {
+            try {
+              editor.chain().setTextSelection({ from, to }).focus().run();
+            } catch(_) { /* noop */ }
+          });
         }
         const selAfter = editor.state?.selection;
         console.log('✅ Action completed:', action, {
