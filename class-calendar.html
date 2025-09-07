@@ -1108,16 +1108,18 @@ function buildTipTap3Toolbar(editor, el) {
   // Execute action when editor is actually ready
   runWhenEditorReady(editor, () => {
       try {
-        // Capture current selection prior to any focus changes
-        const sel = editor.state?.selection;
-        let from = sel?.from;
-        let to = sel?.to;
+        // Capture current selection FIRST, before any editor interactions
+        const originalState = editor.state;
+        const originalSel = originalState?.selection;
+        let targetFrom = originalSel?.from;
+        let targetTo = originalSel?.to;
+        
+        console.log('🎯 Original cursor position:', { from: targetFrom, to: targetTo });
         
         // If no text is selected, try to select the current word
-        if (from === to && ['bold', 'italic', 'code'].includes(action)) {
-          const state = editor.state;
-          const doc = state.doc;
-          const pos = from;
+        if (targetFrom === targetTo && ['bold', 'italic', 'code'].includes(action)) {
+          const doc = originalState.doc;
+          const pos = targetFrom;
           
           // Find word boundaries
           let wordStart = pos;
@@ -1139,8 +1141,8 @@ function buildTipTap3Toolbar(editor, el) {
           
           // If we found a word, use it
           if (wordEnd > wordStart && wordEnd > pos) {
-            from = wordStart;
-            to = wordEnd;
+            targetFrom = wordStart;
+            targetTo = wordEnd;
             console.log('📝 Auto-selected current word:', { wordStart, wordEnd, word: doc.textBetween(wordStart, wordEnd) });
           }
         }
@@ -1148,8 +1150,8 @@ function buildTipTap3Toolbar(editor, el) {
         console.log('🧭 Pre-action state:', {
           action,
           isFocused: editor.isFocused,
-          selection: { from, to, empty: sel?.empty },
-          selectionType: sel?.constructor?.name,
+          selection: { from: targetFrom, to: targetTo, empty: originalSel?.empty },
+          selectionType: originalSel?.constructor?.name,
           content: editor.getHTML?.()?.substring(0, 100) + '...'
         });
 
@@ -1165,11 +1167,11 @@ function buildTipTap3Toolbar(editor, el) {
           canFocus: !!(editor.chain()?.focus)
         });
 
-        // Build chain; focus first, then restore selection if we have it
-        let chain = editor.chain().focus();
-        if (typeof editor.commands?.setTextSelection === 'function' && typeof from === 'number' && typeof to === 'number') {
-          chain = chain.setTextSelection({ from, to });
-          console.log('📍 Selection restored to chain:', { from, to });
+        // Set selection FIRST, then apply formatting without additional focus changes
+        let chain = editor.chain();
+        if (typeof editor.commands?.setTextSelection === 'function' && typeof targetFrom === 'number' && typeof targetTo === 'number') {
+          chain = chain.setTextSelection({ from: targetFrom, to: targetTo });
+          console.log('📍 Selection set on chain:', { from: targetFrom, to: targetTo });
         }
         switch (action) {
           case 'undo': {
@@ -1190,7 +1192,7 @@ function buildTipTap3Toolbar(editor, el) {
             // Defensive: if run() returned false, toggle via ProseMirror transaction
             if (!ok) {
               console.log('🛠️ Chain failed, trying fallback...');
-              ok = fallbackToggleMark(editor, 'bold', from, to);
+              ok = fallbackToggleMark(editor, 'bold', targetFrom, targetTo);
               console.log('🛠️ fallbackToggleMark("bold"):', ok);
               console.log('🔎 Content after fallback:', editor.getHTML?.()?.substring(0, 200));
             }
@@ -1203,17 +1205,22 @@ function buildTipTap3Toolbar(editor, el) {
             console.log('🔎 Content after italic:', editor.getHTML?.()?.substring(0, 200));
             if (!ok) {
               console.log('🛠️ Chain failed, trying fallback...');
-              ok = fallbackToggleMark(editor, 'italic', from, to);
+              ok = fallbackToggleMark(editor, 'italic', targetFrom, targetTo);
               console.log('🛠️ fallbackToggleMark("italic"):', ok);
               console.log('🔎 Content after fallback:', editor.getHTML?.()?.substring(0, 200));
             }
             console.log('✅ toggleItalic run:', ok); break;
           }
           case 'code': {
+            console.log('🔎 Code active before:', editor.isActive?.('code'));
             let ok = chain.toggleCode().run();
+            console.log('🔎 Code active after:', editor.isActive?.('code'));
+            console.log('🔎 Content after code:', editor.getHTML?.()?.substring(0, 200));
             if (!ok) {
-              ok = fallbackToggleMark(editor, 'code', from, to);
+              console.log('🛠️ Chain failed, trying fallback...');
+              ok = fallbackToggleMark(editor, 'code', targetFrom, targetTo);
               console.log('🛠️ fallbackToggleMark("code"):', ok);
+              console.log('🔎 Content after fallback:', editor.getHTML?.()?.substring(0, 200));
             }
             console.log('✅ toggleCode run:', ok); break;
           }
@@ -1254,18 +1261,7 @@ function buildTipTap3Toolbar(editor, el) {
             console.warn('🤷 Unknown toolbar action:', action);
             return;
         }
-        // Restore selection and focus to avoid any caret jump side effects
-        if (typeof from === 'number' && typeof to === 'number') {
-          requestAnimationFrame(() => {
-            try {
-              console.log('🔄 Restoring selection:', { from, to });
-              editor.chain().setTextSelection({ from, to }).focus().run();
-              console.log('✅ Selection restored');
-            } catch(restoreErr) { 
-              console.warn('⚠️ Selection restore failed:', restoreErr);
-            }
-          });
-        }
+        // Don't restore selection after action - let TipTap maintain the current state
         const selAfter = editor.state?.selection;
         console.log('✅ Action completed:', action, {
           isFocusedAfter: editor.isFocused,
