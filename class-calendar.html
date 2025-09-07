@@ -845,48 +845,55 @@ function updateWorkingToolbar(editor, el) {
 function buildTipTap3Toolbar(editor, el) {
   if (!el || !editor) return;
   
+  // Set container styling for single row
+  el.style.display = 'flex';
+  el.style.flexWrap = 'nowrap';
+  el.style.gap = '4px';
+  el.style.overflowX = 'auto';
+  el.style.alignItems = 'center';
+  
   el.innerHTML = `
-    <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="undo" title="Undo">
+    <div class="toolbar-group" style="display: flex; gap: 2px;">
+      <button type="button" class="toolbar-btn" data-action="undo" title="Undo" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="undo-2"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="redo" title="Redo">
+      <button type="button" class="toolbar-btn" data-action="redo" title="Redo" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="redo-2"></i>
       </button>
     </div>
-    <div class="toolbar-divider"></div>
-    <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="bold" title="Bold">
+    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
+    <div class="toolbar-group" style="display: flex; gap: 2px;">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="bold"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="italic" title="Italic">
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="italic"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="code" title="Inline Code">
+      <button type="button" class="toolbar-btn" data-action="code" title="Inline Code" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="code"></i>
       </button>
     </div>
-    <div class="toolbar-divider"></div>
-    <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1">
+    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
+    <div class="toolbar-group" style="display: flex; gap: 2px;">
+      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="heading-1"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2">
+      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="heading-2"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph">
+      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="pilcrow"></i>
       </button>
     </div>
-    <div class="toolbar-divider"></div>
-    <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List">
+    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
+    <div class="toolbar-group" style="display: flex; gap: 2px;">
+      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="list"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">
+      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="list-ordered"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">
+      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
         <i data-lucide="quote"></i>
       </button>
     </div>
@@ -3319,21 +3326,21 @@ function openProgressModal(classCode) {
       <div style="background: white; padding: 30px; border-radius: 10px; max-width: 900px; width: 95%; max-height: 90%; overflow-y: auto;">
         <h2 style="margin: 0 0 20px 0; color: #333;">✏️ Edit Progress for ${classDisplayName}</h2>
         
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">📍 Where We Left Off:</label>
-          <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
-            <div id="newLeftOffMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
-            <div id="newLeftOffEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What did we accomplish today..."></div>
+          <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">📍 Where We Left Off:</label>
+            <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
+              <div id="newLeftOffMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0; display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto;"></div>
+              <div id="newLeftOffEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What did we accomplish today..."></div>
+            </div>
           </div>
-        </div>
-        
-        <div style="margin-bottom: 25px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">🎯 What's Next:</label>
-          <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
-            <div id="newNextMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
-            <div id="newNextEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What's coming up next..."></div>
+          
+          <div style="margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">🎯 What's Next:</label>
+            <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
+              <div id="newNextMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0; display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto;"></div>
+              <div id="newNextEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What's coming up next..."></div>
+            </div>
           </div>
-        </div>
         
         <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px;">
           <button onclick="closeProgressModal()" style="background: #6c757d; color: white; border: none; padding: 12px 24px; border-radius: 5px; margin-right: 15px; cursor: pointer; font-size: 14px;">Cancel</button>
