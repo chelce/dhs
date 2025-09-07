@@ -818,28 +818,33 @@ function createTipTapEditor(elementId, onUpdate = null) {
     const editor = new window.TiptapEditor({
       element: element,
       extensions: extensions,
-      content: '<p>Test content</p>',
+      content: '<p></p>',
       onUpdate: onUpdate || (() => {}),
       editorProps: {
         attributes: {
           class: 'tiptap-editor-content',
         },
+      },
+      onCreate: ({ editor }) => {
+        console.log('✅ TipTap editor onCreate triggered for:', elementId);
+        // Wait a bit more to ensure DOM is ready
+        setTimeout(() => {
+          try {
+            if (editor.view && editor.view.dom) {
+              console.log('✅ Editor view is ready and mounted');
+            } else {
+              console.warn('⚠️ Editor view not ready in onCreate');
+            }
+          } catch (e) {
+            console.warn('⚠️ Error checking editor view in onCreate:', e);
+          }
+        }, 50);
       }
     });
     
     console.log('✅ TipTap editor created successfully for:', elementId);
     console.log('Editor object:', editor);
     console.log('Editor has chain method:', typeof editor.chain);
-    
-    // Test the chain method
-    setTimeout(() => {
-      try {
-        editor.chain().focus().run();
-        console.log('✅ Chain method works');
-      } catch (e) {
-        console.error('❌ Chain method failed:', e);
-      }
-    }, 100);
     
     return editor;
   } catch (error) {
@@ -1012,23 +1017,49 @@ function buildTipTap3Toolbar(editor, el) {
       return;
     }
     
-    const chain = editor.chain().focus();
+    // Check if editor is ready and mounted
+    if (!editor.view || !editor.view.dom) {
+      console.warn('⚠️ Editor view not ready yet, retrying in 100ms...');
+      setTimeout(() => {
+        // Retry the action
+        e.target.closest('.toolbar-btn').click();
+      }, 100);
+      return;
+    }
     
-    switch (action) {
-      case 'undo': chain.undo().run(); break;
-      case 'redo': chain.redo().run(); break;
-      case 'bold': chain.toggleBold().run(); break;
-      case 'italic': chain.toggleItalic().run(); break;
-      case 'code': chain.toggleCode().run(); break;
-      case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
-      case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
-      case 'paragraph': chain.setParagraph().run(); break;
-      case 'bulletList': chain.toggleBulletList().run(); break;
-      case 'orderedList': chain.toggleOrderedList().run(); break;
-      case 'taskList': chain.toggleTaskList().run(); break;
-      case 'blockquote': chain.toggleBlockquote().run(); break;
-      default:
-        console.warn('🤷 Unknown toolbar action:', action);
+    try {
+      // Start chain without focus first to avoid the error
+      const chain = editor.chain();
+      
+      switch (action) {
+        case 'undo': chain.undo().run(); break;
+        case 'redo': chain.redo().run(); break;
+        case 'bold': chain.toggleBold().run(); break;
+        case 'italic': chain.toggleItalic().run(); break;
+        case 'code': chain.toggleCode().run(); break;
+        case 'heading1': chain.toggleHeading({ level: 1 }).run(); break;
+        case 'heading2': chain.toggleHeading({ level: 2 }).run(); break;
+        case 'paragraph': chain.setParagraph().run(); break;
+        case 'bulletList': chain.toggleBulletList().run(); break;
+        case 'orderedList': chain.toggleOrderedList().run(); break;
+        case 'taskList': chain.toggleTaskList().run(); break;
+        case 'blockquote': chain.toggleBlockquote().run(); break;
+        default:
+          console.warn('🤷 Unknown toolbar action:', action);
+          return;
+      }
+      
+      // Try to focus after the action, but don't fail if it doesn't work
+      try {
+        editor.chain().focus().run();
+      } catch (focusError) {
+        console.warn('⚠️ Could not focus editor after action, but action completed:', focusError.message);
+      }
+      
+      console.log('✅ Action completed:', action);
+      
+    } catch (actionError) {
+      console.error('❌ Action failed:', action, actionError);
     }
     
     updateTipTap3Toolbar(editor, el);
@@ -1862,7 +1893,12 @@ function openAddModal(prefillDate){
     
     if (notesEditor && eventNotesMenu) {
       console.log('✅ Building fresh toolbar for add modal');
-      buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+      
+      // Wait for editor to be fully mounted before building toolbar
+      setTimeout(() => {
+        buildTipTap3Toolbar(notesEditor, eventNotesMenu);
+      }, 150);
+      
     } else {
       console.log('⚠️ Fallback to basic editor for add modal');
       if (eventNotesEditorEl) {
@@ -2131,11 +2167,19 @@ function openDetails(id){
     
     if (detailsEditor && detailsNotesMenu) {
       console.log('✅ Building TipTap toolbar for details modal');
-      // Set existing content
+      
+      // Set existing content first
       if (ev.notes) {
-        detailsEditor.commands.setContent(ev.notes);
+        setTimeout(() => {
+          detailsEditor.commands.setContent(ev.notes);
+        }, 100);
       }
-      buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+      
+      // Wait for editor to be fully mounted before building toolbar
+      setTimeout(() => {
+        buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+      }, 150);
+      
     } else {
       console.log('⚠️ Using fallback toolbar for details modal');
       if (detailsNotesEditorEl) {
