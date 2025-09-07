@@ -237,6 +237,54 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 }
 .event .class-badges{position:absolute;top:2px;right:2px;display:flex;flex-direction:column;gap:1px}
 .event .class-badge{width:5px;height:5px;border-radius:50%;display:inline-block}
+
+/* Progress Card Edit Functionality */
+.class-status-card{position:relative}
+.class-status-card .edit-progress-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#666;
+  color:#fff;
+  border:none;
+  border-radius:4px;
+  padding:4px 8px;
+  font-size:11px;
+  cursor:pointer;
+  opacity:0;
+  transition:opacity 0.2s
+}
+.class-status-card:hover .edit-progress-btn{opacity:1}
+.class-status-card .edit-progress-btn:hover{background:#555}
+
+.progress-edit-form{display:none;margin-top:10px}
+.progress-edit-form.active{display:block}
+.progress-edit-form textarea{
+  width:100%;
+  min-height:80px;
+  margin-bottom:10px;
+  padding:8px;
+  border:1px solid #ddd;
+  border-radius:4px;
+  font-family:inherit;
+  font-size:13px;
+  resize:vertical
+}
+.progress-edit-form .form-actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end
+}
+.progress-edit-form .btn{
+  padding:6px 12px;
+  border:none;
+  border-radius:4px;
+  font-size:12px;
+  cursor:pointer
+}
+.progress-edit-form .btn-primary{background:#007bff;color:#fff}
+.progress-edit-form .btn-secondary{background:#6c757d;color:#fff}
+.progress-edit-form .btn:hover{opacity:0.8}
 </style>
 </head>
 <body>
@@ -347,6 +395,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
 const CODA_DOC_ID = 'xmloQUGg-g';
 const CODA_TABLE_ID = 'grid-MRF7PFTuaC';
+const PROGRESS_TABLE_ID = 'grid-whji5vPQLx';
 
 // Coda API column IDs
 const CODA_COLUMNS = {
@@ -357,10 +406,22 @@ const CODA_COLUMNS = {
   contentHtml: 'c-Hu17x_1CGX'   // Auto-rendered HTML column (for reading)
 };
 
+// Progress table columns (to be determined after fetching table structure)
+const PROGRESS_COLUMNS = {
+  dateClass: 'c-bvKqakd7K9',     // cms-progress-date-class (display column)
+  date: 'c-zDAYo0ZFbj',          // cms-progress-date
+  classes: 'c-AxQWA21p2p',       // cms-progress-classes
+  leftOffRtf: 'c-3D-Y-yVMdd',    // cms-progress-left-off-rtf (for writing)
+  whatsNextRtf: 'c-FkzPjUmhri',  // cms-progress-whats-next-rtf (for writing)
+  leftOffHtml: 'c-cmWrRuH7zC',   // x-cms-progress-left-off-html (auto-rendered)
+  whatsNextHtml: 'c-dbKqAeKD_U'  // x-cms-progress-whats-next-html (auto-rendered)
+};
+
 /* ========= STATE ========= */
 let codaApiReady = true; // Coda API doesn't need initialization like Supabase
 let weekOffset = 0; // 0 is current week block center
 let events = []; // {id,date(YYYY-MM-DD),text,classes[],isTentative,notes,createdAt}
+let progressData = []; // Progress entries from Coda
 let currentEditId = null; // for details modal
 let notesEditor = null; let detailsEditor = null;
 
@@ -390,6 +451,8 @@ async function init(){
   
   // CLOUD-FIRST APPROACH: Try Coda, then localStorage, then hardcoded events
   const remoteLoaded = await loadRemoteEvents();
+  const progressLoaded = await loadProgressData();
+  
   if (!remoteLoaded) {
     console.warn('🔄 Coda API unavailable - falling back to local storage');
     loadLocalEvents();
@@ -400,6 +463,13 @@ async function init(){
     }
   } else {
     console.log('☁️ Coda data loaded successfully - skipping localStorage');
+  }
+  
+  if (!progressLoaded) {
+    console.warn('📋 Progress data unavailable - using static content');
+  }
+  
+  if (remoteLoaded) {
     // Clear any stale local data since we have cloud data
     localStorage.removeItem('calendar_events_user');
   }
@@ -1118,6 +1188,133 @@ async function loadRemoteEvents(){
   }
 }
 
+/* ========= PROGRESS DATA FUNCTIONS ========= */
+async function loadProgressData(){
+  try {
+    console.log('🔄 Loading progress data from Coda...');
+    
+    const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows`, {
+      headers: {
+        'Authorization': `Bearer ${CODA_API_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    progressData = [];
+
+    data.items.forEach(row => {
+      const values = row.values;
+      
+      progressData.push({
+        id: row.id,
+        dateClass: values[PROGRESS_COLUMNS.dateClass],
+        date: values[PROGRESS_COLUMNS.date],
+        classes: values[PROGRESS_COLUMNS.classes],
+        leftOffRtf: values[PROGRESS_COLUMNS.leftOffRtf],
+        whatsNextRtf: values[PROGRESS_COLUMNS.whatsNextRtf],
+        leftOffHtml: values[PROGRESS_COLUMNS.leftOffHtml],
+        whatsNextHtml: values[PROGRESS_COLUMNS.whatsNextHtml]
+      });
+    });
+
+    console.log(`✅ Loaded ${progressData.length} progress entries from Coda`);
+    updateProgressDisplay();
+    return true;
+    
+  } catch(e) {
+    console.error('❌ Progress data load failed:', e);
+    return false;
+  }
+}
+
+async function saveProgressEntry(classCode, leftOff, whatsNext) {
+  try {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    
+    // Check if entry already exists for this class and date
+    const existingEntry = progressData.find(entry => 
+      entry.classes === classCode && entry.date === today
+    );
+
+    const entryData = {
+      [PROGRESS_COLUMNS.date]: today,
+      [PROGRESS_COLUMNS.classes]: classCode,
+      [PROGRESS_COLUMNS.leftOffRtf]: leftOff,
+      [PROGRESS_COLUMNS.whatsNextRtf]: whatsNext
+    };
+
+    let response;
+    if (existingEntry) {
+      // Update existing entry
+      response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows/${existingEntry.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${CODA_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ row: entryData })
+      });
+    } else {
+      // Create new entry
+      response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${CODA_API_TOKEN}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rows: [{ cells: entryData }] })
+      });
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log('✅ Progress entry saved successfully');
+    await loadProgressData(); // Reload to get updated data
+    return true;
+    
+  } catch(e) {
+    console.error('❌ Progress save failed:', e);
+    return false;
+  }
+}
+
+function updateProgressDisplay() {
+  // Update each class status card with latest data
+  Object.keys(CLASS_META).forEach(classCode => {
+    const latestEntry = progressData
+      .filter(entry => entry.classes === classCode)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+
+    if (latestEntry) {
+      const currentElement = document.getElementById(`status-${classCode}-current`);
+      const nextElement = document.getElementById(`status-${classCode}-next`);
+      const dateElement = document.getElementById(`status-${classCode}-date`);
+
+      if (currentElement) {
+        currentElement.innerHTML = latestEntry.leftOffHtml || latestEntry.leftOffRtf || 'No updates yet';
+      }
+      if (nextElement) {
+        nextElement.innerHTML = latestEntry.whatsNextHtml || latestEntry.whatsNextRtf || 'No plans set';
+      }
+      if (dateElement) {
+        const date = new Date(latestEntry.date);
+        dateElement.textContent = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+    }
+  });
+}
+
 /* ========= LOCAL STORAGE (FALLBACK ONLY) ========= */
 function loadLocalEvents(){
   try { 
@@ -1833,6 +2030,7 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
   <div class="class-status-grid">
     
     <div class="class-status-card class-2a">
+      <button class="edit-progress-btn" onclick="toggleProgressEdit('2a')">Edit</button>
       <div class="class-header">
         <h3>📖 English 2A</h3>
         <div class="class-indicator">2A</div>
@@ -1849,10 +2047,19 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-2a-date">September 4, 2025</span></small>
         </div>
+        <div class="progress-edit-form" id="edit-form-2a">
+          <textarea id="edit-leftoff-2a" placeholder="Where we left off..."></textarea>
+          <textarea id="edit-next-2a" placeholder="Where we're heading..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancelProgressEdit('2a')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProgressEdit('2a')">Save</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="class-status-card class-2b">
+      <button class="edit-progress-btn" onclick="toggleProgressEdit('2b')">Edit</button>
       <div class="class-header">
         <h3>📖 English 2B</h3>
         <div class="class-indicator">2B</div>
@@ -1868,6 +2075,14 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         </div>
         <div class="last-updated">
           <small>Last updated: <span id="status-2b-date">September 5, 2025</span></small>
+        </div>
+        <div class="progress-edit-form" id="edit-form-2b">
+          <textarea id="edit-leftoff-2b" placeholder="Where we left off..."></textarea>
+          <textarea id="edit-next-2b" placeholder="Where we're heading..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancelProgressEdit('2b')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProgressEdit('2b')">Save</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2819,6 +3034,49 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize Lucide icons
   lucide.createIcons();
 });
+
+/* ========= PROGRESS EDIT FUNCTIONS ========= */
+function toggleProgressEdit(classCode) {
+  const form = document.getElementById(`edit-form-${classCode}`);
+  const currentText = document.getElementById(`status-${classCode}-current`).textContent;
+  const nextText = document.getElementById(`status-${classCode}-next`).textContent;
+  
+  if (form.classList.contains('active')) {
+    cancelProgressEdit(classCode);
+  } else {
+    // Show edit form and populate with current content
+    form.classList.add('active');
+    document.getElementById(`edit-leftoff-${classCode}`).value = currentText;
+    document.getElementById(`edit-next-${classCode}`).value = nextText;
+  }
+}
+
+function cancelProgressEdit(classCode) {
+  const form = document.getElementById(`edit-form-${classCode}`);
+  form.classList.remove('active');
+  
+  // Clear form
+  document.getElementById(`edit-leftoff-${classCode}`).value = '';
+  document.getElementById(`edit-next-${classCode}`).value = '';
+}
+
+async function saveProgressEdit(classCode) {
+  const leftOff = document.getElementById(`edit-leftoff-${classCode}`).value.trim();
+  const whatsNext = document.getElementById(`edit-next-${classCode}`).value.trim();
+  
+  if (!leftOff && !whatsNext) {
+    alert('Please enter some content before saving.');
+    return;
+  }
+  
+  const success = await saveProgressEntry(classCode, leftOff, whatsNext);
+  
+  if (success) {
+    cancelProgressEdit(classCode);
+  } else {
+    alert('Failed to save progress. Please try again.');
+  }
+}
 </script>
 
 </body>
