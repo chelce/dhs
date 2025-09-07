@@ -3135,22 +3135,44 @@ let currentProgressClass = null;
 
 function openProgressModal(classCode) {
   console.log('🚀 Opening progress modal for:', classCode);
-  currentProgressClass = classCode;
   
-  // Set class name in modal
-  const className = CLASS_META[classCode]?.name || classCode.toUpperCase();
-  document.getElementById('progressClass').value = className;
-  console.log('📝 Set class name:', className);
-  
-  // Get current progress data for this class
-  const latestEntry = progressData
-    .filter(entry => entry.classes === classCode)
-    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-  
-  console.log('📊 Latest entry for', classCode, ':', latestEntry);
-  
-  // Populate editors with current content
-  if (latestEntry) {
+  try {
+    currentProgressClass = classCode;
+    console.log('✅ Set currentProgressClass');
+    
+    // Check if CLASS_META exists
+    if (!CLASS_META) {
+      console.error('❌ CLASS_META is not defined');
+      return;
+    }
+    console.log('✅ CLASS_META exists:', CLASS_META);
+    
+    // Set class name in modal
+    const className = CLASS_META[classCode]?.name || classCode.toUpperCase();
+    const classInput = document.getElementById('progressClass');
+    if (!classInput) {
+      console.error('❌ progressClass input not found');
+      return;
+    }
+    classInput.value = className;
+    console.log('✅ Set class name:', className);
+    
+    // Check if progressData exists
+    if (!progressData) {
+      console.error('❌ progressData is not defined');
+      return;
+    }
+    console.log('✅ progressData exists, length:', progressData.length);
+    
+    // Get current progress data for this class
+    const latestEntry = progressData
+      .filter(entry => entry.classes === classCode)
+      .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    
+    console.log('📊 Latest entry for', classCode, ':', latestEntry);
+    
+    // Populate editors with current content
+    if (latestEntry) {
     if (progressLeftOffEditor) {
       progressLeftOffEditor.commands.setContent(latestEntry.leftOffHtml || latestEntry.leftOffRtf || '<p></p>');
     } else {
@@ -3185,6 +3207,10 @@ function openProgressModal(classCode) {
     console.log('✅ Modal opened successfully');
   } else {
     console.error('❌ Modal element not found!');
+  }
+  
+  } catch (error) {
+    console.error('❌ Error in openProgressModal:', error);
   }
 }
 
