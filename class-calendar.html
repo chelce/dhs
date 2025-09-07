@@ -104,9 +104,9 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .day-cell.today{outline:2px solid #3b82f6}
 .day-cell.current-week{background:#1f2530}
 .day-number{font-weight:700;font-size:12px;margin-bottom:4px}
-.event{background:#333;border-left:4px solid #555;margin:0 0 4px;padding:4px 20px 4px 6px;border-radius:6px;line-height:1.2;position:relative;font-size:11px;color:#fff;user-select:none;cursor:move}
+.event{background:#f8f9fa;border:1px solid #e9ecef;border-left:4px solid #555;margin:0 0 4px;padding:4px 20px 4px 6px;border-radius:6px;line-height:1.2;position:relative;font-size:11px;color:#333;user-select:none;cursor:move}
 .event.tentative{opacity:.6;border-style:dashed}
-.event[data-class="2a"]{background:#8e44ad}.event[data-class="3a"]{background:#00c851}.event[data-class="2b"]{background:#17a2b8}.event[data-class="ap"]{background:#ff6f00}.event[data-class="4b"]{background:#e91e63}.event[data-class="other"]{background:#455a64}.event[data-class="dhs"]{background:#1565c0}.event[data-class="reflection"]{background:#6c3483}
+.event[data-class="2a"]{background:#f3e8ff;color:#8e44ad;border-color:#8e44ad}.event[data-class="3a"]{background:#e8f5e8;color:#00c851;border-color:#00c851}.event[data-class="2b"]{background:#e8f8fa;color:#17a2b8;border-color:#17a2b8}.event[data-class="ap"]{background:#fff3e0;color:#ff6f00;border-color:#ff6f00}.event[data-class="4b"]{background:#fce4ec;color:#e91e63;border-color:#e91e63}.event[data-class="other"]{background:#f5f5f5;color:#455a64;border-color:#455a64}.event[data-class="dhs"]{background:#e3f2fd;color:#1565c0;border-color:#1565c0}.event[data-class="reflection"]{background:#f1e6f7;color:#6c3483;border-color:#6c3483}
 /* Shared lesson indicators - left border shows shared class color */
 .event.shared-with-2a{border-left-color:#8e44ad !important}
 .event.shared-with-3a{border-left-color:#00c851 !important}
@@ -115,7 +115,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .event.shared-with-4b{border-left-color:#e91e63 !important}
 .event.shared-with-other{border-left-color:#455a64 !important}
 .event.shared-with-dhs{border-left-color:#1565c0 !important}
-.event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.5);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
+.event .delete-btn{position:absolute;right:2px;top:2px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:16px;height:16px;display:none;font-size:12px;cursor:pointer}
 .event:hover .delete-btn{display:block}
 /* CSS for drag safety indicators */
 .drag-safety-indicator {
@@ -355,14 +355,17 @@ let currentEditId = null; // for details modal
 let notesEditor = null; let detailsEditor = null;
 
 const CLASS_META = {
-  '2a': { label:'2A', color:'#8e44ad'},        // purple
-  '3a': { label:'3A', color:'#00c851'},        // bright/gem green
-  '2b': { label:'2B', color:'#17a2b8'},        // teal/turquoise  
-  'ap': { label:'AP', color:'#ff6f00'},        // orange
-  '4b': { label:'4B', color:'#e91e63'},        // hot pink
-  'other': { label:'Other', color:'#455a64'},  // dark slate grey
-  'dhs': { label:'DHS', color:'#1565c0'},      // royal blue
-  'reflection': { label:'Reflection', color:'#6c3483'}
+  '2a': { label:'2A', color:'#8e44ad', lightBg:'#f3e8ff'},        // purple - light purple bg
+  '3a': { label:'3A', color:'#00c851', lightBg:'#e8f5e8'},        // bright/gem green - light green bg
+  '2b': { label:'2B', color:'#17a2b8', lightBg:'#e8f8fa'},        // teal/turquoise - light cyan bg
+  'ap': { label:'AP', color:'#ff6f00', lightBg:'#fff3e0'},        // orange - light orange bg
+  '4b': { label:'4B', color:'#e91e63', lightBg:'#fce4ec'},        // hot pink - light pink bg
+  'other': { label:'Other', color:'#455a64', lightBg:'#f5f5f5'},  // dark slate grey - light grey bg
+  'dhs': { label:'DHS', color:'#1565c0', lightBg:'#e3f2fd'},      // royal blue - light blue bg
+  'reflection': { label:'Reflection', color:'#6c3483', lightBg:'#f1e8ff'}, // purple variant - light purple bg
+  // Support for new class codes
+  'cp': { label:'CP', color:'#8e44ad', lightBg:'#f3e8ff'},        // College Prep (maps to purple)
+  'honors': { label:'Honors', color:'#00c851', lightBg:'#e8f5e8'} // Honors (maps to green)
 };
 
 /* ========= INIT ========= */
