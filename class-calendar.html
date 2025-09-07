@@ -146,13 +146,13 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 /* === Simple Editor Replica (Lucide) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:10px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
 .editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #e5e7eb;align-items:center}
-.toolbar-group{display:inline-flex;gap:4px;align-items:center}
-.toolbar-divider{width:1px;height:24px;background:#d1d5db;margin:0 6px}
-.toolbar-btn{background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:4px 6px;min-width:30px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#374151;font-size:12px;line-height:1;font-weight:500;transition:.15s background,.15s color}
-.toolbar-btn:hover{background:#eef2f7}
-.toolbar-btn.is-active{background:#e0e7ff;border-color:#a5b4fc;color:#1d4ed8}
-.toolbar-btn i{width:16px;height:16px;display:block}
-.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2}
+.toolbar-group{display:inline-flex;gap:2px;align-items:center}
+.toolbar-divider{width:1px;height:20px;background:#e5e7eb;margin:0 4px}
+.toolbar-btn{background:#fafafa;border:1px solid #e5e7eb;border-radius:4px;padding:6px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6b7280;font-size:11px;line-height:1;font-weight:400;transition:.12s all ease}
+.toolbar-btn:hover{background:#f3f4f6;border-color:#d1d5db;color:#374151}
+.toolbar-btn.is-active{background:#dbeafe;border-color:#93c5fd;color:#2563eb}
+.toolbar-btn i{width:14px;height:14px;display:block}
+.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:1.5}
 .heading-dropdown{position:relative}
 .heading-trigger{display:inline-flex;align-items:center;gap:4px}
 .heading-menu{position:absolute;top:105%;left:0;z-index:200;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:4px;display:none;flex-direction:column;min-width:140px}
@@ -192,9 +192,10 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area ul[data-type="taskList"] li.drag-over-task{ outline:2px dashed #2563eb; border-radius:4px; }
 .dark-theme .editor-shell{background:#111827;border-color:#374151}
 .dark-theme .editor-toolbar{background:#1f2937;border-bottom-color:#374151}
-.dark-theme .toolbar-btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
-.dark-theme .toolbar-btn:hover{background:#374151}
-.dark-theme .toolbar-btn.is-active{background:#1d4ed8;color:#fff}
+.dark-theme .toolbar-divider{background:#475569}
+.dark-theme .toolbar-btn{background:#2d3748;border-color:#4a5568;color:#a0aec0}
+.dark-theme .toolbar-btn:hover{background:#4a5568;border-color:#718096;color:#e2e8f0}
+.dark-theme .toolbar-btn.is-active{background:#2b6cb0;border-color:#4299e1;color:#bee3f8}
 .dark-theme .editor-content-area{color:#f1f5f9}
 .dark-theme .editor-content-area blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
 .dark-theme .editor-content-area code{background:#334155;color:#f1f5f9}
@@ -851,49 +852,56 @@ function buildTipTap3Toolbar(editor, el) {
   el.style.gap = '4px';
   el.style.overflowX = 'auto';
   el.style.alignItems = 'center';
+  el.style.padding = '6px';
+  el.style.background = '#f9fafb';
+  el.style.border = '1px solid #e5e7eb';
+  el.style.borderRadius = '6px';
   
   el.innerHTML = `
-    <div class="toolbar-group" style="display: flex; gap: 2px;">
-      <button type="button" class="toolbar-btn" data-action="undo" title="Undo" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="undo" title="Undo">
         <i data-lucide="undo-2"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="redo" title="Redo" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="redo" title="Redo">
         <i data-lucide="redo-2"></i>
       </button>
     </div>
-    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
-    <div class="toolbar-group" style="display: flex; gap: 2px;">
-      <button type="button" class="toolbar-btn" data-action="bold" title="Bold" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold">
         <i data-lucide="bold"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="italic" title="Italic" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic">
         <i data-lucide="italic"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="code" title="Inline Code" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="code" title="Inline Code">
         <i data-lucide="code"></i>
       </button>
     </div>
-    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
-    <div class="toolbar-group" style="display: flex; gap: 2px;">
-      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1">
         <i data-lucide="heading-1"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2">
         <i data-lucide="heading-2"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph">
         <i data-lucide="pilcrow"></i>
       </button>
     </div>
-    <div class="toolbar-divider" style="width: 1px; height: 24px; background: #ddd; margin: 0 4px;"></div>
-    <div class="toolbar-group" style="display: flex; gap: 2px;">
-      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="bulletList" title="Bullet List">
         <i data-lucide="list"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">
         <i data-lucide="list-ordered"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote" style="min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+      <button type="button" class="toolbar-btn" data-action="taskList" title="Task List">
+        <i data-lucide="check-square"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">
         <i data-lucide="quote"></i>
       </button>
     </div>
@@ -917,6 +925,7 @@ function buildTipTap3Toolbar(editor, el) {
       case 'paragraph': chain.setParagraph().run(); break;
       case 'bulletList': chain.toggleBulletList().run(); break;
       case 'orderedList': chain.toggleOrderedList().run(); break;
+      case 'taskList': chain.toggleTaskList().run(); break;
       case 'blockquote': chain.toggleBlockquote().run(); break;
     }
     
@@ -951,6 +960,7 @@ function updateTipTap3Toolbar(editor, el) {
       case 'paragraph': isActive = editor.isActive('paragraph'); break;
       case 'bulletList': isActive = editor.isActive('bulletList'); break;
       case 'orderedList': isActive = editor.isActive('orderedList'); break;
+      case 'taskList': isActive = editor.isActive('taskList'); break;
       case 'blockquote': isActive = editor.isActive('blockquote'); break;
     }
     
@@ -2202,7 +2212,7 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
 </script>
 
 <!-- ========= TASK MANAGEMENT PANEL ========= -->
-<div id="taskPanel" class="task-panel collapsed">
+<div id="taskPanel" class="task-panel collapsed" style="display: none;">
   <div class="task-panel-header" onclick="toggleTaskPanel()">
     <div class="task-panel-title">
       <i data-lucide="clipboard-list"></i>
