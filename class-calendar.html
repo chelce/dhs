@@ -145,14 +145,14 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Simple Editor Replica (Lucide) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:10px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f9fafb;border-bottom:1px solid #e5e7eb;align-items:center}
-.toolbar-group{display:inline-flex;gap:2px;align-items:center}
-.toolbar-divider{width:1px;height:20px;background:#e5e7eb;margin:0 4px}
-.toolbar-btn{background:#fafafa;border:1px solid #e5e7eb;border-radius:4px;padding:6px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6b7280;font-size:11px;line-height:1;font-weight:400;transition:.12s all ease}
-.toolbar-btn:hover{background:#f3f4f6;border-color:#d1d5db;color:#374151}
-.toolbar-btn.is-active{background:#dbeafe;border-color:#93c5fd;color:#2563eb}
-.toolbar-btn i{width:14px;height:14px;display:block}
-.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:1.5}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:3px;padding:4px 6px;background:#f8f9fa;border-bottom:1px solid #e9ecef;align-items:center}
+.toolbar-group{display:inline-flex;gap:1px;align-items:center}
+.toolbar-divider{width:1px;height:16px;background:#dee2e6;margin:0 3px}
+.toolbar-btn{background:#ffffff;border:1px solid #dee2e6;border-radius:3px;padding:4px;min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6c757d;font-size:10px;line-height:1;font-weight:400;transition:.1s all ease}
+.toolbar-btn:hover{background:#f8f9fa;border-color:#ced4da;color:#495057}
+.toolbar-btn.is-active{background:#e7f3ff;border-color:#b6d7ff;color:#0d6efd}
+.toolbar-btn i{width:12px;height:12px;display:block}
+.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:1.8}
 .heading-dropdown{position:relative}
 .heading-trigger{display:inline-flex;align-items:center;gap:4px}
 .heading-menu{position:absolute;top:105%;left:0;z-index:200;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:4px;display:none;flex-direction:column;min-width:140px}
@@ -191,11 +191,11 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area ul[data-type="taskList"] li[data-checked="true"] p{ text-decoration:line-through; opacity:.6; }
 .editor-content-area ul[data-type="taskList"] li.drag-over-task{ outline:2px dashed #2563eb; border-radius:4px; }
 .dark-theme .editor-shell{background:#111827;border-color:#374151}
-.dark-theme .editor-toolbar{background:#1f2937;border-bottom-color:#374151}
-.dark-theme .toolbar-divider{background:#475569}
-.dark-theme .toolbar-btn{background:#2d3748;border-color:#4a5568;color:#a0aec0}
-.dark-theme .toolbar-btn:hover{background:#4a5568;border-color:#718096;color:#e2e8f0}
-.dark-theme .toolbar-btn.is-active{background:#2b6cb0;border-color:#4299e1;color:#bee3f8}
+.dark-theme .editor-toolbar{background:#2d3748;border-bottom-color:#4a5568}
+.dark-theme .toolbar-divider{background:#4a5568}
+.dark-theme .toolbar-btn{background:#374151;border-color:#4a5568;color:#9ca3af}
+.dark-theme .toolbar-btn:hover{background:#4a5568;border-color:#6b7280;color:#e5e7eb}
+.dark-theme .toolbar-btn.is-active{background:#1e40af;border-color:#3b82f6;color:#dbeafe}
 .dark-theme .editor-content-area{color:#f1f5f9}
 .dark-theme .editor-content-area blockquote{background:#1e293b;border-left-color:#6366f1;color:#e2e8f0}
 .dark-theme .editor-content-area code{background:#334155;color:#f1f5f9}
@@ -441,7 +441,6 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
           <div id="eventNotesMenu" class="editor-toolbar" style="display: block !important; visibility: visible !important; background: #f0f0f0 !important; padding: 8px !important;"></div>
           <div class="editor-content-area" style="display: block !important; visibility: visible !important; min-height: 100px !important; padding: 10px !important;"><div id="eventNotesEditor" class="tiptap" data-placeholder="Add notes..." style="display: block !important; visibility: visible !important; min-height: 80px !important; border: 1px dashed #ccc !important; padding: 8px !important;"></div></div>
         </div>
-        <textarea id="notesBackup" placeholder="Notes backup editor" style="width: 100%; height: 100px; margin-top: 10px; display: block !important; visibility: visible !important; background: yellow !important; border: 2px solid red !important;"></textarea>
         <input type="hidden" id="eventNotes" />
       </div>
       <div class="form-actions"><button type="button" class="btn" data-close="eventModal">Cancel</button><button class="btn btn-primary" type="submit">Save</button></div>
@@ -516,7 +515,6 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <div id="detailsNotesMenu" class="editor-toolbar" style="display: block !important; visibility: visible !important; background: #f0f0f0 !important; padding: 8px !important;"></div>
         <div class="editor-content-area" style="display: block !important; visibility: visible !important; min-height: 100px !important; padding: 10px !important;"><div id="detailsNotesEditor" class="tiptap" data-placeholder="Add reflection notes..." style="display: block !important; visibility: visible !important; min-height: 80px !important; border: 1px dashed #ccc !important; padding: 8px !important;"></div></div>
       </div>
-      <textarea id="detailsNotesBackup" placeholder="Details notes backup editor" style="width: 100%; height: 100px; margin-top: 10px; display: block !important; visibility: visible !important; background: orange !important; border: 2px solid purple !important;"></textarea>
     </div>
     <div class="form-actions"><button type="button" class="btn" id="deleteEventBtn">Delete</button><button type="button" class="btn btn-primary" id="saveDetailsBtn">Save</button></div>
   </div>
