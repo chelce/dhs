@@ -248,6 +248,22 @@ strong, b {
   background-color: pink !important;
   border: 2px solid red !important;
 }
+
+/* Force refresh all TipTap editors */
+.ProseMirror * {
+  transition: none !important;
+}
+
+.ProseMirror strong[data-pm-slice],
+.ProseMirror b[data-pm-slice],
+.ProseMirror strong,
+.ProseMirror b {
+  font-weight: 900 !important;
+  background-color: yellow !important;
+  border: 1px solid red !important;
+  color: #000 !important;
+  display: inline !important;
+}
 .editor-content-area img{max-width:100%;height:auto;display:block;margin:.4em 0}
 /* Task list styling */
 .editor-content-area ul[data-type="taskList"]{list-style:none;padding-left:0;margin:.6em 0 .9em}
@@ -852,6 +868,35 @@ function createTipTapEditor(elementId, onUpdate = null) {
             if (ok) {
               console.log('✅ Editor view is ready and mounted');
               editor.__ready = true;
+              
+              // Set up MutationObserver to force styling on new elements
+              const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                  if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                      if (node.nodeType === 1) { // Element node
+                        const strongEls = node.tagName === 'STRONG' || node.tagName === 'B' ? [node] : 
+                                        node.querySelectorAll ? Array.from(node.querySelectorAll('strong, b')) : [];
+                        strongEls.forEach(el => {
+                          el.style.fontWeight = '900';
+                          el.style.backgroundColor = 'yellow';
+                          el.style.border = '1px solid red';
+                          el.style.color = '#000';
+                        });
+                      }
+                    });
+                  }
+                });
+              });
+              
+              if (editor.editorView && editor.editorView.dom) {
+                observer.observe(editor.editorView.dom, {
+                  childList: true,
+                  subtree: true
+                });
+                editor.__styleObserver = observer;
+              }
+              
               // Flush any queued actions registered before ready
               const q = editor.__pendingActions || [];
               editor.__pendingActions = [];
@@ -1280,6 +1325,18 @@ function buildTipTap3Toolbar(editor, el) {
                   strongContent: selectedEl ? selectedEl.textContent : 'none',
                   strongStyles: selectedEl ? window.getComputedStyle(selectedEl).fontWeight : 'none',
                   editorClass: editorEl.className
+                });
+                
+                // Force style refresh on all strong/bold elements
+                const allStrong = editorEl.querySelectorAll('strong, b');
+                allStrong.forEach(el => {
+                  // Force recalculation of styles
+                  el.style.fontWeight = '900';
+                  el.style.backgroundColor = 'yellow';
+                  el.style.border = '1px solid red';
+                  el.style.color = '#000';
+                  // Trigger reflow
+                  el.offsetHeight;
                 });
                 
                 // Force re-render by updating the view
