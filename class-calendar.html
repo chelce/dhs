@@ -378,6 +378,67 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
         <div class="class-checkbox"><input type="checkbox" id="details-class-reflection" value="reflection"><label for="details-class-reflection">Reflection</label></div>
       </div>
     </div>
+
+<!-- Progress Edit Modal -->
+<div class="modal" id="progressModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <span class="modal-title" id="progressModalTitle">Edit Progress</span>
+      <span class="close" data-close="progressModal">×</span>
+    </div>
+    <form id="progressForm" autocomplete="off">
+      <div class="form-group">
+        <label for="progressClass">Class</label>
+        <input id="progressClass" readonly style="background: #f5f5f5;" />
+      </div>
+      <div class="form-group">
+        <label>Where We Left Off</label>
+        <div class="editor-shell" id="progressLeftOffWrapper">
+          <div id="progressLeftOffMenu" class="editor-toolbar"></div>
+          <div class="editor-content-area">
+            <div id="progressLeftOffEditor" class="tiptap" data-placeholder="What did we accomplish today..."></div>
+          </div>
+        </div>
+        <input type="hidden" id="progressLeftOff" />
+      </div>
+      <div class="form-group">
+        <label>What's Next</label>
+        <div class="editor-shell" id="progressNextWrapper">
+          <div id="progressNextMenu" class="editor-toolbar"></div>
+          <div class="editor-content-area">
+            <div id="progressNextEditor" class="tiptap" data-placeholder="What's coming up next..."></div>
+          </div>
+        </div>
+        <input type="hidden" id="progressNext" />
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" data-close="progressModal">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save Progress</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal event-details-modal" id="detailsModal">
+  <div class="modal-content">
+    <div class="modal-header"><span class="modal-title" id="detailsTitle"></span><span class="close" data-close="detailsModal">×</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="event-class-badge" id="detailsBadge"></span><span id="detailsDate" style="font-size:12px;color:#555"></span></div>
+    
+    <!-- Classes Section -->
+    <div class="form-group" style="margin-bottom:15px;">
+      <label style="font-size:12px;font-weight:600">Classes</label>
+      <div class="class-checkboxes" id="detailsClassCheckboxes">
+        <div class="class-checkbox"><input type="checkbox" id="details-class-2a" value="2a"><label for="details-class-2a">2A</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-3a" value="3a"><label for="details-class-3a">3A</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-2b" value="2b"><label for="details-class-2b">2B</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-ap" value="ap"><label for="details-class-ap">AP</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-4b" value="4b"><label for="details-class-4b">4B</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-other" value="other"><label for="details-class-other">Other</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-dhs" value="dhs"><label for="details-class-dhs">DHS</label></div>
+        <div class="class-checkbox"><input type="checkbox" id="details-class-reflection" value="reflection"><label for="details-class-reflection">Reflection</label></div>
+      </div>
+    </div>
     
     <div class="notes-section">
       <label style="font-size:12px;font-weight:600">Reflection Notes</label>
@@ -423,7 +484,7 @@ let weekOffset = 0; // 0 is current week block center
 let events = []; // {id,date(YYYY-MM-DD),text,classes[],isTentative,notes,createdAt}
 let progressData = []; // Progress entries from Coda
 let currentEditId = null; // for details modal
-let notesEditor = null; let detailsEditor = null;
+let notesEditor = null; let detailsEditor = null; let progressLeftOffEditor = null; let progressNextEditor = null;
 
 const CLASS_META = {
   '2a': { label:'2A', color:'#8e44ad', lightBg:'#f3e8ff'},        // purple - light purple bg
@@ -485,6 +546,7 @@ function wireUI(){
   document.querySelectorAll('.filter-checkbox input').forEach(cb=>cb.addEventListener('change',applyFilters));
   document.querySelectorAll('.close,[data-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.getAttribute('data-close'))));
   document.getElementById('eventForm').addEventListener('submit',saveNewEvent);
+  document.getElementById('progressForm').addEventListener('submit',saveProgressModal);
   document.getElementById('saveDetailsBtn').addEventListener('click',saveDetailsNotes);
   document.getElementById('deleteEventBtn').addEventListener('click',deleteCurrentEvent);
 }
@@ -526,7 +588,7 @@ function initEditors(){
   }
   
   try {
-    if(notesEditor||detailsEditor){ 
+    if(notesEditor||detailsEditor||progressLeftOffEditor||progressNextEditor){ 
       console.log('Editors already exist, skipping initialization');
       return; 
     }
@@ -550,14 +612,40 @@ function initEditors(){
       onUpdate: () => {}
     });
     console.log('detailsEditor created successfully');
+
+    console.log('Creating progressLeftOffEditor...');
+    progressLeftOffEditor = new window.TiptapEditor({
+      element: document.getElementById('progressLeftOffEditor'),
+      extensions: extensions,
+      content: '<p></p>',
+      onUpdate: ({ editor }) => { 
+        document.getElementById('progressLeftOff').value = editor.getHTML(); 
+      }
+    });
+    console.log('progressLeftOffEditor created successfully');
+
+    console.log('Creating progressNextEditor...');
+    progressNextEditor = new window.TiptapEditor({
+      element: document.getElementById('progressNextEditor'),
+      extensions: extensions,
+      content: '<p></p>',
+      onUpdate: ({ editor }) => { 
+        document.getElementById('progressNext').value = editor.getHTML(); 
+      }
+    });
+    console.log('progressNextEditor created successfully');
     
     // Build TipTap 3.0 toolbars with Lucide icons
     console.log('Building toolbars...');
     buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
     buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+    buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
+    buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
     
     setupEditorEnhancements(notesEditor);
     setupEditorEnhancements(detailsEditor);
+    setupEditorEnhancements(progressLeftOffEditor);
+    setupEditorEnhancements(progressNextEditor);
     
     console.log('TipTap 3.0 editors initialized successfully');
   } catch (e) {
@@ -567,11 +655,17 @@ function initEditors(){
     // Clear any partial initialization
     notesEditor = null;
     detailsEditor = null;
+    progressLeftOffEditor = null;
+    progressNextEditor = null;
     
     document.getElementById('eventNotesEditor').contentEditable = 'true';
     document.getElementById('detailsNotesEditor').contentEditable = 'true';
+    document.getElementById('progressLeftOffEditor').contentEditable = 'true';
+    document.getElementById('progressNextEditor').contentEditable = 'true';
     buildFallbackToolbar(document.getElementById('eventNotesMenu'));
     buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
+    buildFallbackToolbar(document.getElementById('progressLeftOffMenu'));
+    buildFallbackToolbar(document.getElementById('progressNextMenu'));
   }
 }
 
@@ -1232,7 +1326,7 @@ async function loadProgressData(){
   }
 }
 
-async function saveProgressEntry(classCode, leftOff, whatsNext) {
+async function saveProgressEntry(classCode, leftOffRtf, whatsNextRtf, leftOffHtml = '', whatsNextHtml = '') {
   try {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
     
@@ -1241,16 +1335,20 @@ async function saveProgressEntry(classCode, leftOff, whatsNext) {
       entry.classes === classCode && entry.date === today
     );
 
-    const entryData = {
-      [PROGRESS_COLUMNS.date]: today,
-      [PROGRESS_COLUMNS.classes]: classCode,
-      [PROGRESS_COLUMNS.leftOffRtf]: leftOff,
-      [PROGRESS_COLUMNS.whatsNextRtf]: whatsNext
-    };
-
     let response;
     if (existingEntry) {
-      // Update existing entry
+      // Update existing entry - use object format for PUT
+      const entryData = {
+        [PROGRESS_COLUMNS.date]: today,
+        [PROGRESS_COLUMNS.classes]: classCode,
+        [PROGRESS_COLUMNS.leftOffRtf]: leftOffRtf,
+        [PROGRESS_COLUMNS.whatsNextRtf]: whatsNextRtf
+      };
+      
+      // Add HTML content if provided
+      if (leftOffHtml) entryData[PROGRESS_COLUMNS.leftOffHtml] = leftOffHtml;
+      if (whatsNextHtml) entryData[PROGRESS_COLUMNS.whatsNextHtml] = whatsNextHtml;
+      
       response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows/${existingEntry.id}`, {
         method: 'PUT',
         headers: {
@@ -1260,15 +1358,23 @@ async function saveProgressEntry(classCode, leftOff, whatsNext) {
         body: JSON.stringify({ row: entryData })
       });
     } else {
-      // Create new entry with correct format
+      // Create new entry - use array format for POST
       const cellsData = {
         cells: [
           { column: PROGRESS_COLUMNS.date, value: today },
           { column: PROGRESS_COLUMNS.classes, value: classCode },
-          { column: PROGRESS_COLUMNS.leftOffRtf, value: leftOff },
-          { column: PROGRESS_COLUMNS.whatsNextRtf, value: whatsNext }
+          { column: PROGRESS_COLUMNS.leftOffRtf, value: leftOffRtf },
+          { column: PROGRESS_COLUMNS.whatsNextRtf, value: whatsNextRtf }
         ]
       };
+      
+      // Add HTML content if provided
+      if (leftOffHtml) {
+        cellsData.cells.push({ column: PROGRESS_COLUMNS.leftOffHtml, value: leftOffHtml });
+      }
+      if (whatsNextHtml) {
+        cellsData.cells.push({ column: PROGRESS_COLUMNS.whatsNextHtml, value: whatsNextHtml });
+      }
       
       response = await fetch(`https://coda.io/apis/v1/docs/${CODA_DOC_ID}/tables/${PROGRESS_TABLE_ID}/rows`, {
         method: 'POST',
@@ -2039,7 +2145,7 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
   <div class="class-status-grid">
     
     <div class="class-status-card class-2a">
-      <button class="edit-progress-btn" onclick="toggleProgressEdit('2a')">Edit</button>
+      <button class="edit-progress-btn" onclick="openProgressModal('2a')">Edit</button>
       <div class="class-header">
         <h3>📖 English 2A</h3>
         <div class="class-indicator">2A</div>
@@ -2056,19 +2162,11 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-2a-date">September 4, 2025</span></small>
         </div>
-        <div class="progress-edit-form" id="edit-form-2a">
-          <textarea id="edit-leftoff-2a" placeholder="Where we left off..."></textarea>
-          <textarea id="edit-next-2a" placeholder="Where we're heading..."></textarea>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="cancelProgressEdit('2a')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProgressEdit('2a')">Save</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="class-status-card class-2b">
-      <button class="edit-progress-btn" onclick="toggleProgressEdit('2b')">Edit</button>
+      <button class="edit-progress-btn" onclick="openProgressModal('2b')">Edit</button>
       <div class="class-header">
         <h3>📖 English 2B</h3>
         <div class="class-indicator">2B</div>
@@ -2085,19 +2183,11 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-2b-date">September 5, 2025</span></small>
         </div>
-        <div class="progress-edit-form" id="edit-form-2b">
-          <textarea id="edit-leftoff-2b" placeholder="Where we left off..."></textarea>
-          <textarea id="edit-next-2b" placeholder="Where we're heading..."></textarea>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="cancelProgressEdit('2b')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProgressEdit('2b')">Save</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="class-status-card class-4b">
-      <button class="edit-progress-btn" onclick="toggleProgressEdit('4b')">Edit</button>
+      <button class="edit-progress-btn" onclick="openProgressModal('4b')">Edit</button>
       <div class="class-header">
         <h3>📖 English 4B</h3>
         <div class="class-indicator">4B</div>
@@ -2114,19 +2204,11 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-4b-date">September 5, 2025</span></small>
         </div>
-        <div class="progress-edit-form" id="edit-form-4b">
-          <textarea id="edit-leftoff-4b" placeholder="Where we left off..."></textarea>
-          <textarea id="edit-next-4b" placeholder="Where we're heading..."></textarea>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="cancelProgressEdit('4b')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProgressEdit('4b')">Save</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="class-status-card class-3a">
-      <button class="edit-progress-btn" onclick="toggleProgressEdit('3a')">Edit</button>
+      <button class="edit-progress-btn" onclick="openProgressModal('3a')">Edit</button>
       <div class="class-header">
         <h3>📗 English 3A</h3>
         <div class="class-indicator">3A</div>
@@ -2143,19 +2225,11 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-3a-date">September 4, 2025</span></small>
         </div>
-        <div class="progress-edit-form" id="edit-form-3a">
-          <textarea id="edit-leftoff-3a" placeholder="Where we left off..."></textarea>
-          <textarea id="edit-next-3a" placeholder="Where we're heading..."></textarea>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="cancelProgressEdit('3a')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProgressEdit('3a')">Save</button>
-          </div>
-        </div>
       </div>
     </div>
 
     <div class="class-status-card class-ap">
-      <button class="edit-progress-btn" onclick="toggleProgressEdit('ap')">Edit</button>
+      <button class="edit-progress-btn" onclick="openProgressModal('ap')">Edit</button>
       <div class="class-header">
         <h3>📚 AP Language (3B)</h3>
         <div class="class-indicator">AP</div>
@@ -2171,14 +2245,6 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         </div>
         <div class="last-updated">
           <small>Last updated: <span id="status-ap-date">September 5, 2025</span></small>
-        </div>
-        <div class="progress-edit-form" id="edit-form-ap">
-          <textarea id="edit-leftoff-ap" placeholder="Where we left off..."></textarea>
-          <textarea id="edit-next-ap" placeholder="Where we're heading..."></textarea>
-          <div class="form-actions">
-            <button class="btn btn-secondary" onclick="cancelProgressEdit('ap')">Cancel</button>
-            <button class="btn btn-primary" onclick="saveProgressEdit('ap')">Save</button>
-          </div>
         </div>
       </div>
     </div>
@@ -3072,45 +3138,121 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ========= PROGRESS EDIT FUNCTIONS ========= */
-function toggleProgressEdit(classCode) {
-  const form = document.getElementById(`edit-form-${classCode}`);
-  const currentText = document.getElementById(`status-${classCode}-current`).textContent;
-  const nextText = document.getElementById(`status-${classCode}-next`).textContent;
+let currentProgressClass = null;
+
+function openProgressModal(classCode) {
+  currentProgressClass = classCode;
   
-  if (form.classList.contains('active')) {
-    cancelProgressEdit(classCode);
+  // Set class name in modal
+  const className = CLASS_META[classCode]?.name || classCode.toUpperCase();
+  document.getElementById('progressClass').value = className;
+  
+  // Get current progress data for this class
+  const latestEntry = progressData
+    .filter(entry => entry.classes === classCode)
+    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  
+  // Populate editors with current content
+  if (latestEntry) {
+    if (progressLeftOffEditor) {
+      progressLeftOffEditor.commands.setContent(latestEntry.leftOffHtml || latestEntry.leftOffRtf || '<p></p>');
+    } else {
+      document.getElementById('progressLeftOffEditor').innerHTML = latestEntry.leftOffHtml || latestEntry.leftOffRtf || '';
+    }
+    
+    if (progressNextEditor) {
+      progressNextEditor.commands.setContent(latestEntry.whatsNextHtml || latestEntry.whatsNextRtf || '<p></p>');
+    } else {
+      document.getElementById('progressNextEditor').innerHTML = latestEntry.whatsNextHtml || latestEntry.whatsNextRtf || '';
+    }
   } else {
-    // Show edit form and populate with current content
-    form.classList.add('active');
-    document.getElementById(`edit-leftoff-${classCode}`).value = currentText;
-    document.getElementById(`edit-next-${classCode}`).value = nextText;
+    // Clear editors for new entry
+    if (progressLeftOffEditor) {
+      progressLeftOffEditor.commands.setContent('<p></p>');
+    } else {
+      document.getElementById('progressLeftOffEditor').innerHTML = '';
+    }
+    
+    if (progressNextEditor) {
+      progressNextEditor.commands.setContent('<p></p>');
+    } else {
+      document.getElementById('progressNextEditor').innerHTML = '';
+    }
   }
+  
+  // Open modal
+  document.getElementById('progressModal').style.display = 'flex';
 }
 
-function cancelProgressEdit(classCode) {
-  const form = document.getElementById(`edit-form-${classCode}`);
-  form.classList.remove('active');
+async function saveProgressModal(e) {
+  e.preventDefault();
   
-  // Clear form
-  document.getElementById(`edit-leftoff-${classCode}`).value = '';
-  document.getElementById(`edit-next-${classCode}`).value = '';
-}
-
-async function saveProgressEdit(classCode) {
-  const leftOff = document.getElementById(`edit-leftoff-${classCode}`).value.trim();
-  const whatsNext = document.getElementById(`edit-next-${classCode}`).value.trim();
+  if (!currentProgressClass) {
+    alert('No class selected.');
+    return;
+  }
   
-  if (!leftOff && !whatsNext) {
+  // Get content from editors
+  let leftOffContent, nextContent;
+  
+  if (progressLeftOffEditor) {
+    leftOffContent = progressLeftOffEditor.getHTML();
+    document.getElementById('progressLeftOff').value = leftOffContent;
+  } else {
+    leftOffContent = document.getElementById('progressLeftOffEditor').innerHTML;
+  }
+  
+  if (progressNextEditor) {
+    nextContent = progressNextEditor.getHTML();
+    document.getElementById('progressNext').value = nextContent;
+  } else {
+    nextContent = document.getElementById('progressNextEditor').innerHTML;
+  }
+  
+  // Convert HTML to plain text for RTF field (Coda requirement)
+  const leftOffText = leftOffContent.replace(/<[^>]*>/g, '').trim();
+  const nextText = nextContent.replace(/<[^>]*>/g, '').trim();
+  
+  if (!leftOffText && !nextText) {
     alert('Please enter some content before saving.');
     return;
   }
   
-  const success = await saveProgressEntry(classCode, leftOff, whatsNext);
-  
-  if (success) {
-    cancelProgressEdit(classCode);
-  } else {
+  try {
+    const success = await saveProgressEntry(
+      currentProgressClass, 
+      leftOffText, 
+      nextText, 
+      leftOffContent, 
+      nextContent
+    );
+    
+    if (success) {
+      closeModal('progressModal');
+      console.log('✅ Progress saved successfully');
+    } else {
+      alert('Failed to save progress. Please try again.');
+    }
+  } catch (error) {
+    console.error('❌ Progress save error:', error);
     alert('Failed to save progress. Please try again.');
+  }
+}
+
+// Modal close functionality (if not already present)
+function closeModal(modalId) {
+  if (modalId) {
+    document.getElementById(modalId).style.display = 'none';
+  } else {
+    // Close all modals
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.style.display = 'none';
+    });
+  }
+  
+  // Clear progress modal state
+  if (modalId === 'progressModal' || !modalId) {
+    currentProgressClass = null;
   }
 }
 </script>
