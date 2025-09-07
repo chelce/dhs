@@ -3201,35 +3201,40 @@ function openProgressModal(classCode) {
   
   // Open modal
   console.log('🪟 Opening modal...');
-  const modal = document.getElementById('progressModal');
-  console.log('🔍 Modal element found:', modal);
   
-  if (modal) {
-    console.log('📏 Modal before styling - display:', modal.style.display, 'visibility:', getComputedStyle(modal).visibility);
-    
-    modal.style.display = 'flex';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-    modal.style.zIndex = '10000';
-    modal.innerHTML = '<div style="background: red; color: white; padding: 50px; margin: auto; font-size: 30px;">🚨 TEST MODAL - CAN YOU SEE THIS? 🚨</div>';
-    
-    console.log('📏 Modal after styling - display:', modal.style.display, 'visibility:', getComputedStyle(modal).visibility);
-    console.log('✅ Modal opened successfully with forced styling');
-    
-    // Also try to force it into view
-    modal.scrollIntoView();
-    
-  } else {
-    console.error('❌ Modal element not found!');
-    
-    // Let's search for ANY element with "progress" in the ID
-    const allElements = document.querySelectorAll('[id*="progress"]');
-    console.log('🔍 Found elements with "progress" in ID:', allElements);
+  // Instead of using the hidden modal, let's create a completely new one
+  const existingModal = document.getElementById('progressModal');
+  if (existingModal) {
+    existingModal.remove(); // Remove the problematic modal
   }
+  
+  // Create a brand new modal from scratch
+  const newModal = document.createElement('div');
+  newModal.id = 'progressModal';
+  newModal.innerHTML = `
+    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999999; display: flex; align-items: center; justify-content: center;">
+      <div style="background: white; padding: 30px; border-radius: 10px; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto;">
+        <h2 style="margin: 0 0 20px 0; color: #333;">Edit Progress for 2A</h2>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Where We Left Off:</label>
+          <textarea id="tempLeftOff" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">${latestEntry?.leftOffRtf || ''}</textarea>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">What's Next:</label>
+          <textarea id="tempNext" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">${latestEntry?.whatsNextRtf || ''}</textarea>
+        </div>
+        <div style="text-align: right;">
+          <button onclick="document.getElementById('progressModal').remove()" style="background: #ccc; color: black; border: none; padding: 10px 20px; border-radius: 5px; margin-right: 10px; cursor: pointer;">Cancel</button>
+          <button onclick="alert('Save functionality would go here')" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add it to the very end of the body
+  document.body.appendChild(newModal);
+  
+  console.log('✅ Created brand new modal and added to body');
   
   } catch (error) {
     console.error('❌ Error in openProgressModal:', error);
