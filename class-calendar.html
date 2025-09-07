@@ -1036,9 +1036,8 @@ function buildTipTap3Toolbar(editor, el) {
     }
     
     try {
-      // Start chain without focus first to avoid the error
+      // Start chain and run actions without forcing focus
       const chain = editor.chain();
-      
       switch (action) {
         case 'undo': chain.undo().run(); break;
         case 'redo': chain.redo().run(); break;
@@ -1056,16 +1055,7 @@ function buildTipTap3Toolbar(editor, el) {
           console.warn('🤷 Unknown toolbar action:', action);
           return;
       }
-      
-      // Try to focus after the action, but don't fail if it doesn't work
-      try {
-        editor.chain().focus().run();
-      } catch (focusError) {
-        console.warn('⚠️ Could not focus editor after action, but action completed:', focusError.message);
-      }
-      
       console.log('✅ Action completed:', action);
-      
     } catch (actionError) {
       console.error('❌ Action failed:', action, actionError);
     }
@@ -1252,11 +1242,11 @@ function buildReplicaToolbar(editor, el){
         const btn=document.createElement('button'); btn.type='button'; btn.className='toolbar-btn heading-trigger'; btn.innerHTML='<i data-lucide="type"></i><span class="current-heading">Text</span>';
         btn.addEventListener('click',()=>{ dd.classList.toggle('open'); });
         const menu=document.createElement('div'); menu.className='heading-menu';
-        [['Paragraph','paragraph'],['Heading 1','h1'],['Heading 2','h2'],['Heading 3','h3']].forEach(([label,mode])=>{
+    [['Paragraph','paragraph'],['Heading 1','h1'],['Heading 2','h2'],['Heading 3','h3']].forEach(([label,mode])=>{
           const mb=document.createElement('button'); mb.textContent=label; mb.dataset.mode=mode; mb.addEventListener('click',()=>{
             dd.classList.remove('open');
-            const ch=editor.chain().focus();
-            if(mode==='paragraph') ch.setParagraph().run(); else ch.toggleHeading({level:parseInt(mode.slice(1),10)}).run();
+      const ch=editor.chain();
+      if(mode==='paragraph') ch.setParagraph().run(); else ch.toggleHeading({level:parseInt(mode.slice(1),10)}).run();
             updateReplicaToolbar(editor, el);
           }); menu.appendChild(mb); });
         dd.appendChild(btn); dd.appendChild(menu); wrap.appendChild(dd);
@@ -1270,10 +1260,10 @@ function buildReplicaToolbar(editor, el){
   // hidden file input for image uploads
   const fileInput=document.createElement('input'); fileInput.type='file'; fileInput.accept='image/*'; fileInput.style.display='none';
   fileInput.addEventListener('change',()=>{
-    const f=fileInput.files?.[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>{ const src=reader.result; if(src) { editor.chain().focus().setImage({src}).run(); updateReplicaToolbar(editor, el);} }; reader.readAsDataURL(f); fileInput.value=''; });
+    const f=fileInput.files?.[0]; if(!f) return; const reader=new FileReader(); reader.onload=()=>{ const src=reader.result; if(src) { editor.chain().setImage({src}).run(); updateReplicaToolbar(editor, el);} }; reader.readAsDataURL(f); fileInput.value=''; });
   el.appendChild(fileInput);
   el.addEventListener('click', ev=>{
-    const btn=ev.target.closest('button.toolbar-btn'); if(!btn||!btn.dataset.act) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+    const btn=ev.target.closest('button.toolbar-btn'); if(!btn||!btn.dataset.act) return; const act=btn.dataset.act; const ch=editor.chain();
     switch(act){
       case 'undo': ch.undo().run(); break; case 'redo': ch.redo().run(); break;
       case 'bold': ch.toggleBold().run(); break; case 'italic': ch.toggleItalic().run(); break; case 'underline': ch.toggleUnderline?.().run(); break; case 'strike': ch.toggleStrike().run(); break; case 'code': ch.toggleCode().run(); break; case 'highlight': editor.isActive('highlight')?ch.unsetHighlight().run():ch.setHighlight().run(); break;
@@ -1331,7 +1321,7 @@ function setupEditorEnhancements(editor){
         if(yt){ 
           // Only if YouTube extension is available
           if(editor.commands.setYoutubeVideo) {
-            editor.chain().focus().setYoutubeVideo({ src: url }).run(); 
+            editor.chain().setYoutubeVideo({ src: url }).run(); 
             return; 
           }
         }
@@ -1339,7 +1329,7 @@ function setupEditorEnhancements(editor){
         if(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(url)){
           // Only if Image extension is available
           if(editor.commands.setImage) {
-            editor.chain().focus().setImage({ src:url }).run();
+            editor.chain().setImage({ src:url }).run();
           }
         }
       } catch(err){ console.warn('auto-embed paste err', err); }
@@ -1419,7 +1409,7 @@ function buildSimpleMenu(editor, el){
     el.appendChild(btn);
   });
   el.addEventListener('click', ev=>{
-    const btn=ev.target.closest('button'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain().focus();
+    const btn=ev.target.closest('button'); if(!btn) return; const act=btn.dataset.act; const ch=editor.chain();
     switch(act){
       case 'undo': ch.undo().run(); break;
       case 'redo': ch.redo().run(); break;
