@@ -32,11 +32,11 @@ async function ensureEditors(){
     lucide: !!window.lucide
   });
   
-  // TipTap 3.0 ES module approach
-    if (window.tiptapLoaded && window.TiptapEditor) {
-      console.log('TipTap 3.0 ES modules detected, initializing editors');
-      initEditors();
-    }
+  // TipTap 3.0 ES module approach (run once)
+  if (window.tiptapLoaded && window.TiptapEditor && !window.__tiptapInitialized) {
+    console.log('TipTap 3.0 ES modules detected, initializing editors');
+    initEditors();
+  }
   
   // Wait a bit for modules to load
   console.log('Waiting 2s for ES modules to load...');
@@ -49,13 +49,9 @@ async function ensureEditors(){
     tiptapLoaded: !!window.tiptapLoaded
   });
   
-  if (window.tiptapLoaded && window.TiptapEditor) {
+  if (window.tiptapLoaded && window.TiptapEditor && !window.__tiptapInitialized) {
     console.log('TipTap 3.0 available after delay, trying again');
     initEditors();
-    if (notesEditor && detailsEditor) {
-      console.log('TipTap 3.0 editors created on retry');
-      return;
-    }
   }
   
   // Fallback to contentEditable
@@ -72,8 +68,7 @@ async function ensureEditors(){
     dnEd.innerHTML = '<p>Add reflection notes...</p>';
   }
   
-  buildFallbackToolbar(document.getElementById('eventNotesMenu'));
-  buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
+  // Fallback toolbars will be built on-demand inside modal open functions if TipTap is unavailable.
 }
 </script>
 <style>
@@ -653,100 +648,12 @@ function initEditors(){
   }
   
   try {
-    // Don't create global editors on page load - create them when modals open
-    console.log('TipTap extensions ready for dynamic editor creation');
-    console.log('Available extensions:', extensions.map(ext => ext.name || 'unknown'));
-    
-    // Initialize any existing editors if their elements exist
-    if (document.getElementById('eventNotesEditor')) {
-      console.log('Event notes editor element found, creating...');
-      notesEditor = new window.TiptapEditor({
-        element: document.getElementById('eventNotesEditor'),
-        extensions: extensions,
-        content: '<p></p>',
-        onUpdate: ({ editor }) => { 
-          document.getElementById('eventNotes').value = editor.getHTML(); 
-        }
-      });
-      console.log('✅ notesEditor created successfully');
-    }
-    
-    if (document.getElementById('detailsNotesEditor')) {
-      console.log('Details notes editor element found, creating...');
-      detailsEditor = new window.TiptapEditor({
-        element: document.getElementById('detailsNotesEditor'),
-        extensions: extensions,
-        content: '<p></p>',
-        onUpdate: () => {}
-      });
-      console.log('✅ detailsEditor created successfully');
-    }
-
-    if (document.getElementById('progressLeftOffEditor')) {
-      console.log('Progress left off editor element found, creating...');
-      progressLeftOffEditor = new window.TiptapEditor({
-        element: document.getElementById('progressLeftOffEditor'),
-        extensions: extensions,
-        content: '<p></p>',
-        onUpdate: ({ editor }) => { 
-          document.getElementById('progressLeftOff').value = editor.getHTML(); 
-        }
-      });
-      console.log('✅ progressLeftOffEditor created successfully');
-    }
-
-    if (document.getElementById('progressNextEditor')) {
-      console.log('Progress next editor element found, creating...');
-      progressNextEditor = new window.TiptapEditor({
-        element: document.getElementById('progressNextEditor'),
-        extensions: extensions,
-        content: '<p></p>',
-        onUpdate: ({ editor }) => { 
-          document.getElementById('progressNext').value = editor.getHTML(); 
-        }
-      });
-      console.log('✅ progressNextEditor created successfully');
-    }
-    
-    // Build toolbars only for created editors
-    if (notesEditor) {
-      setTimeout(() => {
-        const m = document.getElementById('eventNotesMenu');
-        if (m) {
-          buildTipTap3Toolbar(notesEditor, m);
-        }
-        setupEditorEnhancements(notesEditor);
-      }, 150);
-    }
-    if (detailsEditor) {
-      setTimeout(() => {
-        const m = document.getElementById('detailsNotesMenu');
-        if (m) {
-          buildTipTap3Toolbar(detailsEditor, m);
-        }
-        setupEditorEnhancements(detailsEditor);
-      }, 150);
-    }
-    if (progressLeftOffEditor) {
-      setTimeout(() => {
-        const m = document.getElementById('progressLeftOffMenu');
-        if (m) {
-          buildTipTap3Toolbar(progressLeftOffEditor, m);
-        }
-        setupEditorEnhancements(progressLeftOffEditor);
-      }, 150);
-    }
-    if (progressNextEditor) {
-      setTimeout(() => {
-        const m = document.getElementById('progressNextMenu');
-        if (m) {
-          buildTipTap3Toolbar(progressNextEditor, m);
-        }
-        setupEditorEnhancements(progressNextEditor);
-      }, 150);
-    }
-    
-    console.log('✅ TipTap initialization complete');
+    // We no longer create editors up-front for hidden modals.
+    // Editors are created on-demand in openAddModal/openDetails.
+    console.log('TipTap extensions ready for on-demand creation only');
+    // Mark initialized once to prevent re-entry from ensureEditors retry.
+    window.__tiptapInitialized = true;
+    console.log('✅ TipTap base initialization complete');
   } catch (e) {
     console.error('TipTap 3.0 init failed:', e);
     console.warn('Using fallback contentEditable editors');
@@ -757,14 +664,7 @@ function initEditors(){
     progressLeftOffEditor = null;
     progressNextEditor = null;
     
-    document.getElementById('eventNotesEditor').contentEditable = 'true';
-    document.getElementById('detailsNotesEditor').contentEditable = 'true';
-    document.getElementById('progressLeftOffEditor').contentEditable = 'true';
-    document.getElementById('progressNextEditor').contentEditable = 'true';
-    buildFallbackToolbar(document.getElementById('eventNotesMenu'));
-    buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
-    buildFallbackToolbar(document.getElementById('progressLeftOffMenu'));
-    buildFallbackToolbar(document.getElementById('progressNextMenu'));
+  // Do not wire fallback toolbars here; modals will build fallback only if TipTap fails at open time.
   }
 }
 
@@ -2137,7 +2037,7 @@ function openAddModal(prefillDate){
       notesEditor.commands.setContent(prefill);
     } catch(_) {}
     
-    if (notesEditor && eventNotesMenu) {
+  if (notesEditor && eventNotesMenu) {
       console.log('✅ Building fresh toolbar for add modal');
       // Always rebuild to bind to the fresh editor instance
       setTimeout(() => {
@@ -2145,10 +2045,11 @@ function openAddModal(prefillDate){
       }, 150);
     } else {
       console.log('⚠️ Fallback to basic editor for add modal');
-      if (eventNotesEditorEl) {
+      if (!notesEditor && eventNotesEditorEl) {
         eventNotesEditorEl.contentEditable = 'true';
       }
-      if (eventNotesMenu) {
+      // Do not build a fallback toolbar unless we truly have no TipTap editor
+      if (!notesEditor && eventNotesMenu) {
         buildFallbackToolbar(eventNotesMenu);
       }
     }
@@ -2425,14 +2326,14 @@ function openDetails(id){
   // Do not setContent again later; repeated calls can reset selection and move the caret to the end
       
     } else {
-      console.log('⚠️ Using fallback toolbar for details modal');
-      if (detailsNotesEditorEl) {
+      console.log('⚠️ Using fallback contentEditable for details modal');
+      if (!detailsEditor && detailsNotesEditorEl) {
         detailsNotesEditorEl.contentEditable = 'true';
         if (ev.notes) {
           detailsNotesEditorEl.innerHTML = ev.notes;
         }
       }
-      if (detailsNotesMenu) {
+      if (!detailsEditor && detailsNotesMenu) {
         buildFallbackToolbar(detailsNotesMenu);
       }
     }
