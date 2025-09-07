@@ -145,7 +145,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Simple Editor Replica (Lucide) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:10px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.editor-toolbar{display:flex;flex-wrap:nowrap;gap:4px;padding:6px 8px;background:#f8f9fa;border-bottom:1px solid #e9ecef;align-items:center;overflow-x:auto}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;background:#f8f9fa;border-bottom:1px solid #e9ecef;align-items:center}
 .toolbar-group{display:inline-flex;gap:2px;align-items:center}
 .toolbar-divider{width:1px;height:12px;background:#dee2e6;margin:0 4px}
 .toolbar-btn{background:transparent;border:1px solid transparent;border-radius:8px;padding:2px;min-width:18px;min-height:18px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#6c757d;font-size:9px;line-height:1;font-weight:400;transition:.15s all ease}
@@ -657,66 +657,80 @@ function initEditors(){
   }
   
   try {
-    if(notesEditor||detailsEditor||progressLeftOffEditor||progressNextEditor){ 
-      console.log('Editors already exist, skipping initialization');
-      return; 
+    // Don't create global editors on page load - create them when modals open
+    console.log('TipTap extensions ready for dynamic editor creation');
+    console.log('Available extensions:', extensions.map(ext => ext.name || 'unknown'));
+    
+    // Initialize any existing editors if their elements exist
+    if (document.getElementById('eventNotesEditor')) {
+      console.log('Event notes editor element found, creating...');
+      notesEditor = new window.TiptapEditor({
+        element: document.getElementById('eventNotesEditor'),
+        extensions: extensions,
+        content: '<p></p>',
+        onUpdate: ({ editor }) => { 
+          document.getElementById('eventNotes').value = editor.getHTML(); 
+        }
+      });
+      console.log('✅ notesEditor created successfully');
     }
     
-    console.log('Creating notesEditor...');
-    notesEditor = new window.TiptapEditor({
-      element: document.getElementById('eventNotesEditor'),
-      extensions: extensions,
-      content: '<p></p>',
-      onUpdate: ({ editor }) => { 
-        document.getElementById('eventNotes').value = editor.getHTML(); 
-      }
-    });
-    console.log('notesEditor created successfully');
-    
-    console.log('Creating detailsEditor...');
-    detailsEditor = new window.TiptapEditor({
-      element: document.getElementById('detailsNotesEditor'),
-      extensions: extensions,
-      content: '<p></p>',
-      onUpdate: () => {}
-    });
-    console.log('detailsEditor created successfully');
+    if (document.getElementById('detailsNotesEditor')) {
+      console.log('Details notes editor element found, creating...');
+      detailsEditor = new window.TiptapEditor({
+        element: document.getElementById('detailsNotesEditor'),
+        extensions: extensions,
+        content: '<p></p>',
+        onUpdate: () => {}
+      });
+      console.log('✅ detailsEditor created successfully');
+    }
 
-    console.log('Creating progressLeftOffEditor...');
-    progressLeftOffEditor = new window.TiptapEditor({
-      element: document.getElementById('progressLeftOffEditor'),
-      extensions: extensions,
-      content: '<p></p>',
-      onUpdate: ({ editor }) => { 
-        document.getElementById('progressLeftOff').value = editor.getHTML(); 
-      }
-    });
-    console.log('progressLeftOffEditor created successfully');
+    if (document.getElementById('progressLeftOffEditor')) {
+      console.log('Progress left off editor element found, creating...');
+      progressLeftOffEditor = new window.TiptapEditor({
+        element: document.getElementById('progressLeftOffEditor'),
+        extensions: extensions,
+        content: '<p></p>',
+        onUpdate: ({ editor }) => { 
+          document.getElementById('progressLeftOff').value = editor.getHTML(); 
+        }
+      });
+      console.log('✅ progressLeftOffEditor created successfully');
+    }
 
-    console.log('Creating progressNextEditor...');
-    progressNextEditor = new window.TiptapEditor({
-      element: document.getElementById('progressNextEditor'),
-      extensions: extensions,
-      content: '<p></p>',
-      onUpdate: ({ editor }) => { 
-        document.getElementById('progressNext').value = editor.getHTML(); 
-      }
-    });
-    console.log('progressNextEditor created successfully');
+    if (document.getElementById('progressNextEditor')) {
+      console.log('Progress next editor element found, creating...');
+      progressNextEditor = new window.TiptapEditor({
+        element: document.getElementById('progressNextEditor'),
+        extensions: extensions,
+        content: '<p></p>',
+        onUpdate: ({ editor }) => { 
+          document.getElementById('progressNext').value = editor.getHTML(); 
+        }
+      });
+      console.log('✅ progressNextEditor created successfully');
+    }
     
-    // Build TipTap 3.0 toolbars with Lucide icons
-    console.log('Building toolbars...');
-    buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
-    buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
-    buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
-    buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
+    // Build toolbars only for created editors
+    if (notesEditor) {
+      buildTipTap3Toolbar(notesEditor, document.getElementById('eventNotesMenu'));
+      setupEditorEnhancements(notesEditor);
+    }
+    if (detailsEditor) {
+      buildTipTap3Toolbar(detailsEditor, document.getElementById('detailsNotesMenu'));
+      setupEditorEnhancements(detailsEditor);
+    }
+    if (progressLeftOffEditor) {
+      buildTipTap3Toolbar(progressLeftOffEditor, document.getElementById('progressLeftOffMenu'));
+      setupEditorEnhancements(progressLeftOffEditor);
+    }
+    if (progressNextEditor) {
+      buildTipTap3Toolbar(progressNextEditor, document.getElementById('progressNextMenu'));
+      setupEditorEnhancements(progressNextEditor);
+    }
     
-    setupEditorEnhancements(notesEditor);
-    setupEditorEnhancements(detailsEditor);
-    setupEditorEnhancements(progressLeftOffEditor);
-    setupEditorEnhancements(progressNextEditor);
-    
-    console.log('TipTap 3.0 editors initialized successfully');
+    console.log('✅ TipTap initialization complete');
   } catch (e) {
     console.error('TipTap 3.0 init failed:', e);
     console.warn('Using fallback contentEditable editors');
@@ -735,6 +749,40 @@ function initEditors(){
     buildFallbackToolbar(document.getElementById('detailsNotesMenu'));
     buildFallbackToolbar(document.getElementById('progressLeftOffMenu'));
     buildFallbackToolbar(document.getElementById('progressNextMenu'));
+  }
+}
+
+// Dynamic TipTap editor creation
+function createTipTapEditor(elementId, onUpdate = null) {
+  console.log('🎯 Creating TipTap editor for:', elementId);
+  
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error('❌ Element not found:', elementId);
+    return null;
+  }
+  
+  const extensions = [
+    window.TiptapStarterKit,
+    window.TiptapUnderline,
+    window.TiptapHighlight?.configure?.({ multicolor: true }),
+    window.TiptapTextAlign?.configure?.({ types: ['heading', 'paragraph'] }),
+    window.TiptapPlaceholder?.configure?.({ placeholder: 'Start typing...' })
+  ].filter(Boolean); // Remove any undefined extensions
+  
+  try {
+    const editor = new window.TiptapEditor({
+      element: element,
+      extensions: extensions,
+      content: '<p></p>',
+      onUpdate: onUpdate || (() => {})
+    });
+    
+    console.log('✅ TipTap editor created for:', elementId);
+    return editor;
+  } catch (error) {
+    console.error('❌ Failed to create TipTap editor:', error);
+    return null;
   }
 }
 
@@ -1736,15 +1784,31 @@ function openAddModal(prefillDate){
     const eventNotesMenu = document.getElementById('eventNotesMenu');
     const eventNotesEditorEl = document.getElementById('eventNotesEditor');
     
+    console.log('🔧 Initializing add modal editor...');
+    
+    // Destroy existing editor if it exists
+    if (notesEditor) {
+      console.log('🗑️ Destroying existing notesEditor');
+      notesEditor.destroy();
+      notesEditor = null;
+    }
+    
+    // Create fresh TipTap editor
+    notesEditor = createTipTapEditor('eventNotesEditor', ({ editor }) => {
+      document.getElementById('eventNotes').value = editor.getHTML();
+    });
+    
     if (notesEditor && eventNotesMenu) {
-      // TipTap editor is available - use global notesEditor instance
-      console.log('🎯 Using TipTap editor for add modal');
+      console.log('✅ Building fresh toolbar for add modal');
       buildTipTap3Toolbar(notesEditor, eventNotesMenu);
-    } else if (eventNotesEditorEl && eventNotesMenu) {
-      // Fallback: ensure basic editing works
-      console.log('⚠️ Falling back to basic editor for add modal');
-      eventNotesEditorEl.contentEditable = 'true';
-      buildFallbackToolbar(eventNotesMenu);
+    } else {
+      console.log('⚠️ Fallback to basic editor for add modal');
+      if (eventNotesEditorEl) {
+        eventNotesEditorEl.contentEditable = 'true';
+      }
+      if (eventNotesMenu) {
+        buildFallbackToolbar(eventNotesMenu);
+      }
     }
     
     // Initialize Lucide icons for the toolbar
@@ -1986,23 +2050,41 @@ function openDetails(id){
   setTimeout(() => {
     console.log('⏰ Initializing details modal editor...');
     const detailsNotesMenu = document.getElementById('detailsNotesMenu');
-    const detailsNotesEditor = document.getElementById('detailsNotesEditor');
+    const detailsNotesEditorEl = document.getElementById('detailsNotesEditor');
     
     console.log('📋 Elements found:', {
       menu: !!detailsNotesMenu,
-      editor: !!detailsNotesEditor,
-      detailsEditor: !!detailsEditor
+      editorEl: !!detailsNotesEditorEl
     });
     
+    // Destroy existing editor if it exists
+    if (detailsEditor) {
+      console.log('🗑️ Destroying existing detailsEditor');
+      detailsEditor.destroy();
+      detailsEditor = null;
+    }
+    
+    // Create fresh TipTap editor
+    detailsEditor = createTipTapEditor('detailsNotesEditor');
+    
     if (detailsEditor && detailsNotesMenu) {
-      // TipTap editor is available
-      console.log('✅ Building TipTap toolbar');
+      console.log('✅ Building TipTap toolbar for details modal');
+      // Set existing content
+      if (ev.notes) {
+        detailsEditor.commands.setContent(ev.notes);
+      }
       buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
-    } else if (detailsNotesEditor && detailsNotesMenu) {
-      // Fallback: ensure basic editing works
-      console.log('⚠️ Using fallback toolbar');
-      detailsNotesEditor.contentEditable = 'true';
-      buildFallbackToolbar(detailsNotesMenu);
+    } else {
+      console.log('⚠️ Using fallback toolbar for details modal');
+      if (detailsNotesEditorEl) {
+        detailsNotesEditorEl.contentEditable = 'true';
+        if (ev.notes) {
+          detailsNotesEditorEl.innerHTML = ev.notes;
+        }
+      }
+      if (detailsNotesMenu) {
+        buildFallbackToolbar(detailsNotesMenu);
+      }
     }
     
     // Initialize Lucide icons for the toolbar
