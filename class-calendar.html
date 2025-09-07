@@ -315,6 +315,95 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   <div class="calendar-grid" id="calendarGrid"></div>
 </div>
 
+<!-- ========= CLASS STATUS SECTION (MOVED HERE FOR VISIBILITY) ========= -->
+<div id="classStatusSection" style="background: #f8f9fa; padding: 20px; margin: 20px; border-radius: 15px; border: 2px solid #dee2e6;">
+  <h2 style="text-align: center; color: #495057; margin-bottom: 25px;">📚 Class Progress & Next Steps</h2>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+    
+    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
+      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('2a')">Edit</button>
+      <div style="margin-bottom: 15px;">
+        <h3 style="color: #2a5aa0; margin: 0;">📖 English 2A</h3>
+        <div style="background: #2a5aa0; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">2A</div>
+      </div>
+      <div>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
+        <p id="status-2a-current" style="margin: 0 0 15px; color: #6c757d;">Worked well on analogies - several groups understand analogy patterns. Ready for skill check next class (keeping it reasonably easy). Will need to explain what skill checks are.</p>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
+        <p id="status-2a-next" style="margin: 0 0 15px; color: #6c757d;">Easy skill check on analogies next class. Need to explain skill check process and format to students.</p>
+        <small style="color: #999;">Last updated: <span id="status-2a-date">September 4, 2025</span></small>
+      </div>
+    </div>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
+      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('2b')">Edit</button>
+      <div style="margin-bottom: 15px;">
+        <h3 style="color: #28a745; margin: 0;">📖 English 2B</h3>
+        <div style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">2B</div>
+      </div>
+      <div>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
+        <p id="status-2b-current" style="margin: 0 0 15px; color: #6c757d;">Students worked on analogies and took the skill check. Majority passed and are ready to move on from analogies. Did not get assigned the first vocab list yet.</p>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
+        <p id="status-2b-next" style="margin: 0 0 15px; color: #6c757d;">Moving on from analogies - students have demonstrated mastery. Need to assign first vocab list and plan next skill focus.</p>
+        <small style="color: #999;">Last updated: <span id="status-2b-date">September 5, 2025</span></small>
+      </div>
+    </div>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
+      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('4b')">Edit</button>
+      <div style="margin-bottom: 15px;">
+        <h3 style="color: #dc3545; margin: 0;">📖 English 4B</h3>
+        <div style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">4B</div>
+      </div>
+      <div>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
+        <p id="status-4b-current" style="margin: 0 0 15px; color: #6c757d;">Students took the analogies skill check and majority passed. Definitely ready to move on from analogies. Gave them their first vocab list and showed them how to access it. Told them quiz in a few weeks. Talked with Lily about Hamilton unit - she got very excited!</p>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
+        <p id="status-4b-next" style="margin: 0 0 15px; color: #6c757d;">Moving forward from analogies to Hamilton unit. Students have vocab list #1 to work with. Lily's excitement about Hamilton is a good sign for unit engagement.</p>
+        <small style="color: #999;">Last updated: <span id="status-4b-date">September 5, 2025</span></small>
+      </div>
+    </div>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
+      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('3a')">Edit</button>
+      <div style="margin-bottom: 15px;">
+        <h3 style="color: #fd7e14; margin: 0;">📗 English 3A</h3>
+        <div style="background: #fd7e14; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">3A</div>
+      </div>
+      <div>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
+        <p id="status-3a-current" style="margin: 0 0 15px; color: #6c757d;">Went smoother today. Everyone got something done, though some groups slow-rolling. Strong partnerships emerged: Renan/Sael excellent collaboration. Karly works well solo. Good pairs: Jonh/Jeffrey. Solo workers: Meredith, Tam, Cora. Abigail/Andrea collaborated well when focused. Everyone did analogy work.</p>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
+        <p id="status-3a-next" style="margin: 0 0 15px; color: #6c757d;">Easy skill check on analogies next class. Consider solo work options for students like Karly. Build on successful partnerships identified today. Continue working on engagement for slower groups.</p>
+        <small style="color: #999;">Last updated: <span id="status-3a-date">September 4, 2025</span></small>
+      </div>
+    </div>
+
+    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
+      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('ap')">Edit</button>
+      <div style="margin-bottom: 15px;">
+        <h3 style="color: #6f42c1; margin: 0;">📚 AP Language (3B)</h3>
+        <div style="background: #6f42c1; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">AP</div>
+      </div>
+      <div>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
+        <p id="status-ap-current" style="margin: 0 0 15px; color: #6c757d;">AP worked on app project the whole block. Towards the end a couple of groups started fizzling, but for the most part, groups used time well. Told them they're allowed to use AI in ways that are most helpful for them. Told them NEXT CLASS we will have Intellectual Devotional Week 9 and Vocab List #1 quiz, and rest of class time to finish pitches. Pitches due at end of next class.</p>
+        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
+        <p id="status-ap-next" style="margin: 0 0 15px; color: #6c757d;">Next class: Intellectual Devotional Week 9 + Vocab List #1 quiz, then remainder of class for pitch completion. Pitches due at end of class.</p>
+        <small style="color: #999;">Last updated: <span id="status-ap-date">September 5, 2025</span></small>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div style="text-align: center; margin-top: 20px;">
+    <button onclick="updateClassStatus()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 10px; cursor: pointer;">✏️ Update Class Status</button>
+    <button onclick="toggleStatusSection()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 10px; cursor: pointer;" class="btn-toggle-status">👁️ Hide Status</button>
+  </div>
+</div>
+
 <!-- Upcoming Events Section -->
 <div class="calendar-container" style="margin-top: 20px; display: none;">
   <div class="calendar-header">
@@ -2137,100 +2226,6 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
       <!-- Tasks will be dynamically added here -->
     </div>
   </div>
-</div>
-
-<!-- ========= CLASS STATUS SECTION ========= -->
-<div id="classStatusSection" style="background: #f8f9fa; padding: 20px; margin: 20px; border-radius: 15px; border: 2px solid #dee2e6;">
-  <h2 style="text-align: center; color: #495057; margin-bottom: 25px;">📚 Class Progress & Next Steps</h2>
-  
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-    
-    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
-      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('2a')">Edit</button>
-      <div style="margin-bottom: 15px;">
-        <h3 style="color: #2a5aa0; margin: 0;">📖 English 2A</h3>
-        <div style="background: #2a5aa0; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">2A</div>
-      </div>
-      <div>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
-        <p id="status-2a-current" style="margin: 0 0 15px; color: #6c757d;">Worked well on analogies - several groups understand analogy patterns. Ready for skill check next class (keeping it reasonably easy). Will need to explain what skill checks are.</p>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
-        <p id="status-2a-next" style="margin: 0 0 15px; color: #6c757d;">Easy skill check on analogies next class. Need to explain skill check process and format to students.</p>
-        <small style="color: #999;">Last updated: <span id="status-2a-date">September 4, 2025</span></small>
-      </div>
-    </div>
-
-    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
-      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('2b')">Edit</button>
-      <div style="margin-bottom: 15px;">
-        <h3 style="color: #28a745; margin: 0;">📖 English 2B</h3>
-        <div style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">2B</div>
-      </div>
-      <div>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
-        <p id="status-2b-current" style="margin: 0 0 15px; color: #6c757d;">Students worked on analogies and took the skill check. Majority passed and are ready to move on from analogies. Did not get assigned the first vocab list yet.</p>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
-        <p id="status-2b-next" style="margin: 0 0 15px; color: #6c757d;">Moving on from analogies - students have demonstrated mastery. Need to assign first vocab list and plan next skill focus.</p>
-        <small style="color: #999;">Last updated: <span id="status-2b-date">September 5, 2025</span></small>
-      </div>
-    </div>
-
-    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
-      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('4b')">Edit</button>
-      <div style="margin-bottom: 15px;">
-        <h3 style="color: #dc3545; margin: 0;">📖 English 4B</h3>
-        <div style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">4B</div>
-      </div>
-      <div>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
-        <p id="status-4b-current" style="margin: 0 0 15px; color: #6c757d;">Students took the analogies skill check and majority passed. Definitely ready to move on from analogies. Gave them their first vocab list and showed them how to access it. Told them quiz in a few weeks. Talked with Lily about Hamilton unit - she got very excited!</p>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
-        <p id="status-4b-next" style="margin: 0 0 15px; color: #6c757d;">Moving forward from analogies to Hamilton unit. Students have vocab list #1 to work with. Lily's excitement about Hamilton is a good sign for unit engagement.</p>
-        <small style="color: #999;">Last updated: <span id="status-4b-date">September 5, 2025</span></small>
-      </div>
-    </div>
-
-    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
-      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('3a')">Edit</button>
-      <div style="margin-bottom: 15px;">
-        <h3 style="color: #fd7e14; margin: 0;">📗 English 3A</h3>
-        <div style="background: #fd7e14; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">3A</div>
-      </div>
-      <div>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
-        <p id="status-3a-current" style="margin: 0 0 15px; color: #6c757d;">Went smoother today. Everyone got something done, though some groups slow-rolling. Strong partnerships emerged: Renan/Sael excellent collaboration. Karly works well solo. Good pairs: Jonh/Jeffrey. Solo workers: Meredith, Tam, Cora. Abigail/Andrea collaborated well when focused. Everyone did analogy work.</p>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
-        <p id="status-3a-next" style="margin: 0 0 15px; color: #6c757d;">Easy skill check on analogies next class. Consider solo work options for students like Karly. Build on successful partnerships identified today. Continue working on engagement for slower groups.</p>
-        <small style="color: #999;">Last updated: <span id="status-3a-date">September 4, 2025</span></small>
-      </div>
-    </div>
-
-    <div style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #ddd; position: relative;">
-      <button style="position: absolute; top: 10px; right: 10px; background: #666; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;" onclick="openProgressModal('ap')">Edit</button>
-      <div style="margin-bottom: 15px;">
-        <h3 style="color: #6f42c1; margin: 0;">📚 AP Language (3B)</h3>
-        <div style="background: #6f42c1; color: white; padding: 2px 8px; border-radius: 12px; display: inline-block; font-size: 12px; margin-top: 5px;">AP</div>
-      </div>
-      <div>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">📍 Where We Left Off:</h4>
-        <p id="status-ap-current" style="margin: 0 0 15px; color: #6c757d;">AP worked on app project the whole block. Towards the end a couple of groups started fizzling, but for the most part, groups used time well. Told them they're allowed to use AI in ways that are most helpful for them. Told them NEXT CLASS we will have Intellectual Devotional Week 9 and Vocab List #1 quiz, and rest of class time to finish pitches. Pitches due at end of next class.</p>
-        <h4 style="color: #495057; font-size: 14px; margin: 10px 0 5px;">🎯 Where We're Heading:</h4>
-        <p id="status-ap-next" style="margin: 0 0 15px; color: #6c757d;">Next class: Intellectual Devotional Week 9 + Vocab List #1 quiz, then remainder of class for pitch completion. Pitches due at end of class.</p>
-        <small style="color: #999;">Last updated: <span id="status-ap-date">September 5, 2025</span></small>
-      </div>
-    </div>
-    
-  </div>
-  
-  <div style="text-align: center; margin-top: 20px;">
-    <button onclick="updateClassStatus()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 10px; cursor: pointer;">✏️ Update Class Status</button>
-    <button onclick="toggleStatusSection()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin: 0 10px; cursor: pointer;" class="btn-toggle-status">👁️ Hide Status</button>
-  </div>
-</div>
-
-<!-- DEBUGGING: Super obvious test element -->
-<div style="background: red !important; color: white !important; padding: 50px !important; margin: 20px !important; font-size: 30px !important; text-align: center !important; border: 10px solid yellow !important; z-index: 9999 !important; position: relative !important;">
-  🚨 CAN YOU SEE THIS RED BOX? IF YES, THE PROBLEM IS CSS HIDING THE PROGRESS SECTION 🚨
 </div>
 
 <style>
