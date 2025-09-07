@@ -2088,6 +2088,7 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
     </div>
 
     <div class="class-status-card class-4b">
+      <button class="edit-progress-btn" onclick="toggleProgressEdit('4b')">Edit</button>
       <div class="class-header">
         <h3>📖 English 4B</h3>
         <div class="class-indicator">4B</div>
@@ -2104,12 +2105,21 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-4b-date">September 5, 2025</span></small>
         </div>
+        <div class="progress-edit-form" id="edit-form-4b">
+          <textarea id="edit-leftoff-4b" placeholder="Where we left off..."></textarea>
+          <textarea id="edit-next-4b" placeholder="Where we're heading..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancelProgressEdit('4b')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProgressEdit('4b')">Save</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="class-status-card class-3a">
+      <button class="edit-progress-btn" onclick="toggleProgressEdit('3a')">Edit</button>
       <div class="class-header">
-        <h3>� English 3A</h3>
+        <h3>📗 English 3A</h3>
         <div class="class-indicator">3A</div>
       </div>
       <div class="status-content">
@@ -2124,10 +2134,19 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         <div class="last-updated">
           <small>Last updated: <span id="status-3a-date">September 4, 2025</span></small>
         </div>
+        <div class="progress-edit-form" id="edit-form-3a">
+          <textarea id="edit-leftoff-3a" placeholder="Where we left off..."></textarea>
+          <textarea id="edit-next-3a" placeholder="Where we're heading..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancelProgressEdit('3a')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProgressEdit('3a')">Save</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="class-status-card class-ap">
+      <button class="edit-progress-btn" onclick="toggleProgressEdit('ap')">Edit</button>
       <div class="class-header">
         <h3>📚 AP Language (3B)</h3>
         <div class="class-indicator">AP</div>
@@ -2143,6 +2162,14 @@ window.addEventListener('click',e=>{ if(e.target.classList.contains('modal')) e.
         </div>
         <div class="last-updated">
           <small>Last updated: <span id="status-ap-date">September 5, 2025</span></small>
+        </div>
+        <div class="progress-edit-form" id="edit-form-ap">
+          <textarea id="edit-leftoff-ap" placeholder="Where we left off..."></textarea>
+          <textarea id="edit-next-ap" placeholder="Where we're heading..."></textarea>
+          <div class="form-actions">
+            <button class="btn btn-secondary" onclick="cancelProgressEdit('ap')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveProgressEdit('ap')">Save</button>
+          </div>
         </div>
       </div>
     </div>
