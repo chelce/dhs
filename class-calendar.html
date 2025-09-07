@@ -1080,6 +1080,46 @@ function buildTipTap3Toolbar(editor, el) {
     }
   }
 
+  // Fallback: directly toggle a mark using ProseMirror transactions when chain().toggleX().run() fails
+  function fallbackToggleMark(ed, markName, from, to) {
+    try {
+      if (!ed || !ed.state || !ed.view) return false;
+      const { state, view } = ed;
+      const { tr, schema, selection } = state;
+      if (!schema || !schema.marks || !schema.marks[markName]) return false;
+      const markType = schema.marks[markName];
+
+      // If no range or empty selection, toggle stored mark at caret
+      if (typeof from !== 'number' || typeof to !== 'number' || from === to) {
+        const stored = state.storedMarks || selection.$from.marks();
+        const has = !!markType.isInSet(stored);
+        if (has) tr.removeStoredMark(markType);
+        else tr.addStoredMark(markType.create());
+        view.dispatch(tr);
+        return true;
+      }
+
+      // Determine if any text in range already has the mark
+      let hasMark = false;
+      state.doc.nodesBetween(from, to, (node) => {
+        if (node.isText && markType.isInSet(node.marks)) {
+          hasMark = true;
+          return false; // early exit
+        }
+        return undefined;
+      });
+
+      if (hasMark) tr.removeMark(from, to, markType);
+      else tr.addMark(from, to, markType.create());
+
+      view.dispatch(tr.scrollIntoView());
+      return true;
+    } catch (e) {
+      console.warn('⚠️ fallbackToggleMark error:', markName, e);
+      return false;
+    }
+  }
+
   el.__tiptapClickHandler = (e) => {
     const btn = e.target.closest('.toolbar-btn');
     if (!btn || !editor) {
@@ -1138,25 +1178,27 @@ function buildTipTap3Toolbar(editor, el) {
             const can = typeof editor.can === 'function' && editor.can().toggleBold ? editor.can().toggleBold() : true;
             console.log('🔎 can toggleBold:', can);
             let ok = chain.toggleBold().run();
-            // Defensive: if it returned false and we have a selection, try a direct mark command
-            if (!ok && typeof from === 'number' && typeof to === 'number') {
-              try {
-                if (typeof editor.commands?.setMark === 'function') {
-                  ok = editor.chain().focus().setTextSelection({ from, to }).setMark('bold').run();
-                  console.log('🛠️ fallback setMark("bold") run:', ok);
-                }
-              } catch(e) {
-                console.warn('⚠️ fallback setMark failed:', e);
-              }
+            // Defensive: if run() returned false, toggle via ProseMirror transaction
+            if (!ok) {
+              ok = fallbackToggleMark(editor, 'bold', from, to);
+              console.log('🛠️ fallbackToggleMark("bold"):', ok);
             }
             console.log('✅ toggleBold run:', ok); break;
           }
           case 'italic': {
-            const ok = chain.toggleItalic().run();
+            let ok = chain.toggleItalic().run();
+            if (!ok) {
+              ok = fallbackToggleMark(editor, 'italic', from, to);
+              console.log('🛠️ fallbackToggleMark("italic"):', ok);
+            }
             console.log('✅ toggleItalic run:', ok); break;
           }
           case 'code': {
-            const ok = chain.toggleCode().run();
+            let ok = chain.toggleCode().run();
+            if (!ok) {
+              ok = fallbackToggleMark(editor, 'code', from, to);
+              console.log('🛠️ fallbackToggleMark("code"):', ok);
+            }
             console.log('✅ toggleCode run:', ok); break;
           }
           case 'heading1': {
