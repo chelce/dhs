@@ -150,6 +150,28 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .toolbar-btn.is-active{background:#e8f4fd;border-color:#cce7ff;color:#0066cc}
 .toolbar-btn i{width:10px;height:10px;display:block}
 .toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2.2}
+
+/* Force single-row toolbar for Progress modal editors */
+#newLeftOffMenu,
+#newNextMenu,
+#progressLeftOffMenu,
+#progressNextMenu {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+}
+#newLeftOffMenu .toolbar-group,
+#newLeftOffMenu .toolbar-divider,
+#newNextMenu .toolbar-group,
+#newNextMenu .toolbar-divider,
+#progressLeftOffMenu .toolbar-group,
+#progressLeftOffMenu .toolbar-divider,
+#progressNextMenu .toolbar-group,
+#progressNextMenu .toolbar-divider {
+  flex: 0 0 auto; /* prevent flex items from wrapping to next line */
+}
 .heading-dropdown{position:relative}
 .heading-trigger{display:inline-flex;align-items:center;gap:4px}
 .heading-menu{position:absolute;top:105%;left:0;z-index:200;background:#fff;border:1px solid #d1d5db;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:4px;display:none;flex-direction:column;min-width:140px}
@@ -3997,7 +4019,7 @@ function openProgressModal(classCode) {
           <div style="margin-bottom: 25px;">
             <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">📍 Where We Left Off:</label>
             <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
-              <div id="newLeftOffMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0; display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto;"></div>
+              <div id="newLeftOffMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
               <div id="newLeftOffEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What did we accomplish today..."></div>
             </div>
           </div>
@@ -4005,7 +4027,7 @@ function openProgressModal(classCode) {
           <div style="margin-bottom: 25px;">
             <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">🎯 What's Next:</label>
             <div style="border: 1px solid #ddd; border-radius: 5px; min-height: 120px;">
-              <div id="newNextMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0; display: flex; flex-wrap: nowrap; gap: 4px; overflow-x: auto;"></div>
+              <div id="newNextMenu" style="border-bottom: 1px solid #eee; padding: 8px; background: #f8f9fa; border-radius: 5px 5px 0 0;"></div>
               <div id="newNextEditor" style="padding: 15px; min-height: 100px; outline: none;" contenteditable="true" data-placeholder="What's coming up next..."></div>
             </div>
           </div>
