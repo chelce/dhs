@@ -840,7 +840,28 @@ function createTipTapEditor(elementId, onUpdate = null) {
       parseOptions: {
         preserveWhitespace: 'full',
       },
-      onUpdate: onUpdate || (() => {}),
+      onUpdate: ({ editor }) => {
+        // Apply forced styling on every update to ensure it persists
+        setTimeout(() => {
+          const editorEl = editor.view?.dom;
+          if (editorEl) {
+            const allStrong = editorEl.querySelectorAll('strong, b');
+            allStrong.forEach((el, index) => {
+              if (!el.hasAttribute('data-styled')) {
+                el.style.fontWeight = '900';
+                el.style.backgroundColor = 'yellow';
+                el.style.border = '1px solid red';
+                el.style.color = '#000';
+                el.setAttribute('data-styled', 'true');
+                console.log(`🎨 Auto-styled strong element ${index}:`, el.textContent);
+              }
+            });
+          }
+        }, 10);
+        
+        // Call original onUpdate if provided
+        if (onUpdate) onUpdate({ editor });
+      },
       editorProps: {
         attributes: {
           class: 'tiptap-editor-content',
@@ -1286,41 +1307,19 @@ function buildTipTap3Toolbar(editor, el) {
             console.log('🔎 Bold active after:', editor.isActive?.('bold'));
             console.log('🔎 Content after bold:', editor.getHTML?.()?.substring(0, 200));
             
-            // Debug: Check actual DOM structure
-            setTimeout(() => {
-              const editorEl = editor.view?.dom;
-              if (editorEl) {
-                const selectedEl = editorEl.querySelector('strong, b');
-                console.log('🔧 DOM inspection:', {
-                  editorHTML: editorEl.innerHTML.substring(0, 200),
-                  hasStrongTag: !!selectedEl,
-                  strongContent: selectedEl ? selectedEl.textContent : 'none',
-                  strongStyles: selectedEl ? window.getComputedStyle(selectedEl).fontWeight : 'none',
-                  editorClass: editorEl.className
-                });
-                
-                // Force style refresh on all strong/bold elements - ONE TIME ONLY
-                const allStrong = editorEl.querySelectorAll('strong, b');
-                allStrong.forEach((el, index) => {
-                  if (!el.hasAttribute('data-styled')) {
-                    // Force recalculation of styles
-                    el.style.fontWeight = '900';
-                    el.style.backgroundColor = 'yellow';
-                    el.style.border = '1px solid red';
-                    el.style.color = '#000';
-                    el.setAttribute('data-styled', 'true'); // Prevent re-styling
-                    console.log(`🎨 Applied styles to strong element ${index}:`, el.textContent);
-                  }
-                });
-                
-                // Force re-render by updating the view (only if needed)
-                if (editor.view?.updateState && allStrong.length > 0) {
-                  requestAnimationFrame(() => {
-                    editor.view.updateState(editor.state);
-                  });
-                }
-              }
-            }, 100);
+            // Simple immediate styling - let onUpdate handle persistence
+            const editorEl = editor.view?.dom;
+            if (editorEl) {
+              const allStrong = editorEl.querySelectorAll('strong, b');
+              console.log(`🔧 Found ${allStrong.length} strong elements to style`);
+              allStrong.forEach((el, index) => {
+                el.style.fontWeight = '900';
+                el.style.backgroundColor = 'yellow'; 
+                el.style.border = '1px solid red';
+                el.style.color = '#000';
+                console.log(`🎨 Immediate styling applied to element ${index}:`, el.textContent);
+              });
+            }
             // Defensive: if run() returned false, toggle via ProseMirror transaction
             if (!ok) {
               console.log('🛠️ Chain failed, trying fallback...');
