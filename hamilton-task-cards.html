@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton Opening Songs - Task Cards with Navigation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f4c75 100%);
+            padding: 20px;
+            line-height: 1.4;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #d4a574 0%, #b8860b 100%);
+            color: #1a1a2e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(212, 165, 116, 0.3);
+        }
+
+        .header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .difficulty-section {
+            position: relative;
+        }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.4s ease-in-out;
+            width: 500%;
+        }
+
+        .task-card {
+            background: #ffffff;
+            overflow: hidden;
+            min-height: 650px;
+            width: 20%;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(212, 165, 116, 0.9);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .nav-button:hover {
+            background: #d4a574;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-button.prev {
+            left: 15px;
+        }
+
+        .nav-button.next {
+            right: 15px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #d4a574;
+            transform: scale(1.2);
+        }
+
+        /* Difficulty Level Headers */
+        .easy-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.2em;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .medium-header {
+            background: linear-gradient(135deg, #fd7e14, #ffc107);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.2em;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hard-header {
+            background: linear-gradient(135deg, #dc3545, #6f42c1);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.2em;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card-content {
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            text-align: center;
+            border-bottom: 3px solid #d4a574;
+            padding-bottom: 10px;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 5px solid #d4a574;
+            padding: 20px;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .directions {
+            margin-bottom: 20px;
+        }
+
+        .directions h3 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .directions ol {
+            margin-left: 20px;
+        }
+
+        .directions li {
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+
+        .hints {
+            background: #e8f4fd;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .hints h3 {
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .hints ul {
+            margin-left: 20px;
+        }
+
+        .hints li {
+            margin-bottom: 5px;
+            color: #0c5460;
+        }
+
+        .sentence-frame {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+            font-size: 1.1em;
+            color: #856404;
+        }
+
+        .time-estimate {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #17a2b8;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .task-card {
+                min-height: 500px;
+            }
+            
+            .card-content {
+                padding: 20px;
+            }
+            
+            .nav-button {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hamilton: Opening Songs Task Cards</h1>
+            <p>Character Analysis, Themes, and Historical Connections</p>
+        </div>
+
+        <div class="card-grid">
+            <!-- Easy Level Carousel -->
+            <div class="difficulty-section">
+                <div class="carousel-container">
+                    <button class="nav-button prev" onclick="moveCarousel('easy', -1)">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <button class="nav-button next" onclick="moveCarousel('easy', 1)">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    
+                    <div class="carousel-track" id="easy-track">
+                        <!-- Easy Card 1 -->
+                        <div class="task-card">
+                            <div class="easy-header">
+                                EASY LEVEL (70%)
+                                <div class="time-estimate">12-15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Hamilton's Big Dreams</div>
+                                
+                                <div class="instructions">
+                                    In "Alexander Hamilton," we learn about Hamilton's goals and dreams. Work with your group to find what Hamilton wants most.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Listen to "Alexander Hamilton" again with your group</li>
+                                        <li>Write down 3 things Hamilton wants to do or become</li>
+                                        <li>Pick the most important dream and explain why it matters to him</li>
+                                        <li>Share your answer with another group</li>
+                                    </ol>
+                                </div>
+
+                                <div class="sentence-frame">
+                                    <strong>Sentence Frame:</strong><br>
+                                    "Hamilton's biggest dream is to _______ because _______."
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Listen for words like "want," "will," and "gonna"</li>
+                                        <li>Think about what Hamilton says about his future</li>
+                                        <li>Pay attention to what makes Hamilton excited or passionate</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Easy Card 2 -->
+                        <div class="task-card">
+                            <div class="easy-header">
+                                EASY LEVEL (70%)
+                                <div class="time-estimate">12-15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Aaron Burr's Advice</div>
+                                
+                                <div class="instructions">
+                                    In "Aaron Burr, Sir," Burr gives Hamilton advice about how to act. Find out what Burr thinks Hamilton should do differently.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Listen to "Aaron Burr, Sir" with your group</li>
+                                        <li>Find 2 pieces of advice Burr gives Hamilton</li>
+                                        <li>Decide if this is good advice or bad advice</li>
+                                        <li>Explain your choice using examples from the song</li>
+                                    </ol>
+                                </div>
+
+                                <div class="sentence-frame">
+                                    <strong>Sentence Frame:</strong><br>
+                                    "Burr tells Hamilton to _______, but I think this is _______ advice because _______."
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Look for times when Burr says "you should" or "don't"</li>
+                                        <li>Think about how Hamilton reacts to the advice</li>
+                                        <li>Consider what might happen if Hamilton follows or ignores the advice</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Easy Card 3 -->
+                        <div class="task-card">
+                            <div class="easy-header">
+                                EASY LEVEL (70%)
+                                <div class="time-estimate">10-12 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Hamilton's Energy</div>
+                                
+                                <div class="instructions">
+                                    In "My Shot," Hamilton shows a lot of energy and excitement. Look for words and actions that show his personality.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Listen to "My Shot" and count how many times Hamilton says "I" or "I'm"</li>
+                                        <li>Write down 3 action words (verbs) Hamilton uses</li>
+                                        <li>Describe Hamilton's personality in 2-3 words</li>
+                                        <li>Give examples from the song to support your description</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Action words tell us what someone does (write, fight, work)</li>
+                                        <li>Notice the speed and energy of Hamilton's singing</li>
+                                        <li>Think about words like: confident, excited, ambitious, impatient</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Easy Card 4 -->
+                        <div class="task-card">
+                            <div class="easy-header">
+                                EASY LEVEL (70%)
+                                <div class="time-estimate">12-15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Friends and Dreams</div>
+                                
+                                <div class="instructions">
+                                    In "The Story of Tonight," Hamilton and his friends talk about their hopes. Compare what the friends want with what Hamilton wants.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Listen to "The Story of Tonight" as a group</li>
+                                        <li>Make two lists: What Hamilton wants vs. What his friends want</li>
+                                        <li>Find one thing they all want together</li>
+                                        <li>Discuss: Are they good friends? Why or why not?</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Listen for "we" words vs. "I" words</li>
+                                        <li>Pay attention to the chorus that they all sing together</li>
+                                        <li>Think about what makes people good friends</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Easy Card 5 -->
+                        <div class="task-card">
+                            <div class="easy-header">
+                                EASY LEVEL (70%)
+                                <div class="time-estimate">10-12 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">The Schuyler Sisters' World</div>
+                                
+                                <div class="instructions">
+                                    In "The Schuyler Sisters," we meet three sisters who have different personalities. Find out what makes each sister special.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Listen to "The Schuyler Sisters" with your group</li>
+                                        <li>Write down one fact about each sister: Angelica, Eliza, and Peggy</li>
+                                        <li>Choose which sister is most like you and explain why</li>
+                                        <li>Discuss: What do all three sisters care about?</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Listen to what each sister says about herself</li>
+                                        <li>Notice how their voices and attitudes are different</li>
+                                        <li>Think about what they all agree on or want together</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-dots" id="easy-dots"></div>
+            </div>
+
+            <!-- Medium Level Carousel -->
+            <div class="difficulty-section">
+                <div class="carousel-container">
+                    <button class="nav-button prev" onclick="moveCarousel('medium', -1)">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <button class="nav-button next" onclick="moveCarousel('medium', 1)">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    
+                    <div class="carousel-track" id="medium-track">
+                        <!-- Medium Card 1 -->
+                        <div class="task-card">
+                            <div class="medium-header">
+                                MEDIUM LEVEL (85%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Hamilton vs. Burr: Leadership Styles</div>
+                                
+                                <div class="instructions">
+                                    Compare how Hamilton and Burr approach leadership and making decisions. Analyze their different strategies and predict the consequences.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Review "Alexander Hamilton," "Aaron Burr, Sir," and "My Shot"</li>
+                                        <li>Create a comparison chart: Hamilton's approach vs. Burr's approach</li>
+                                        <li>Identify specific lyrics that show their leadership differences</li>
+                                        <li>Predict which approach will be more successful and explain your reasoning</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider words like "wait," "speak," "action," and "silence"</li>
+                                        <li>Think about risk-taking vs. being cautious</li>
+                                        <li>Look for evidence of how others respond to each character</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Card 2 -->
+                        <div class="task-card">
+                            <div class="medium-header">
+                                MEDIUM LEVEL (85%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Immigrant Ambition and the American Dream</div>
+                                
+                                <div class="instructions">
+                                    Examine how Hamilton's immigrant background influences his drive and ambition. Connect his experience to modern immigrant stories.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Identify 3 references to Hamilton's immigrant status in "Alexander Hamilton"</li>
+                                        <li>Explain how being an outsider might motivate someone to work harder</li>
+                                        <li>Compare Hamilton's immigrant experience to challenges immigrants face today</li>
+                                        <li>Discuss: Does being an immigrant give Hamilton advantages or disadvantages?</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Look for references to the Caribbean, orphan status, and "outsider"</li>
+                                        <li>Consider how proving yourself might motivate achievement</li>
+                                        <li>Think about language barriers, cultural differences, and opportunity</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Card 3 -->
+                        <div class="task-card">
+                            <div class="medium-header">
+                                MEDIUM LEVEL (85%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Revolutionary Friendship vs. Personal Goals</div>
+                                
+                                <div class="instructions">
+                                    Analyze the tension between individual ambition and group loyalty in "My Shot" and "The Story of Tonight."
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Compare Hamilton's solo moments in "My Shot" with group moments in "The Story of Tonight"</li>
+                                        <li>Identify when Hamilton talks about "I" vs. "we"</li>
+                                        <li>Explain how personal ambition and group goals can conflict</li>
+                                        <li>Predict potential problems in Hamilton's friendships based on these songs</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Notice the difference in musical style between solo and group numbers</li>
+                                        <li>Consider how Hamilton's energy compares to his friends' energy</li>
+                                        <li>Think about real-life examples of individual vs. team goals</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Card 4 -->
+                        <div class="task-card">
+                            <div class="medium-header">
+                                MEDIUM LEVEL (85%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Women's Voices and Social Commentary</div>
+                                
+                                <div class="instructions">
+                                    Examine how "The Schuyler Sisters" presents women's perspectives on revolution and social change, comparing their concerns to the men's focus.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>List the social and political issues the Schuyler sisters discuss</li>
+                                        <li>Compare their concerns with what Hamilton and his friends prioritize</li>
+                                        <li>Analyze how each sister shows different approaches to creating change</li>
+                                        <li>Evaluate whose perspective seems most realistic or practical</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider references to equality, education, and social justice</li>
+                                        <li>Notice how the sisters balance propriety with rebellion</li>
+                                        <li>Think about different types of revolution: social, political, intellectual</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Card 5 -->
+                        <div class="task-card">
+                            <div class="medium-header">
+                                MEDIUM LEVEL (85%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Historical Context and Character Motivation</div>
+                                
+                                <div class="instructions">
+                                    Connect the historical time period to character behavior. Analyze how the Revolutionary War era shapes what characters value and pursue.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Identify 3 historical references across all five songs</li>
+                                        <li>Explain how the time period creates opportunities for characters like Hamilton</li>
+                                        <li>Compare the risks of revolution with the potential rewards</li>
+                                        <li>Analyze why this historical moment attracts ambitious people</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Look for references to King George, colonies, and war</li>
+                                        <li>Consider how uncertain times create both danger and opportunity</li>
+                                        <li>Think about how revolutions can make ordinary people into heroes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-dots" id="medium-dots"></div>
+            </div>
+
+            <!-- Hard Level Carousel -->
+            <div class="difficulty-section">
+                <div class="carousel-container">
+                    <button class="nav-button prev" onclick="moveCarousel('hard', -1)">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <button class="nav-button next" onclick="moveCarousel('hard', 1)">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    
+                    <div class="carousel-track" id="hard-track">
+                        <!-- Hard Card 1 -->
+                        <div class="task-card">
+                            <div class="hard-header">
+                                HARD LEVEL (100%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Narrative Construction and Historical Mythology</div>
+                                
+                                <div class="instructions">
+                                    Critically analyze how the opening songs construct Hamilton's mythological status while examining the tension between historical accuracy and theatrical narrative.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Deconstruct how "Alexander Hamilton" functions as both exposition and heroic myth-making</li>
+                                        <li>Analyze the rhetorical strategies used to position Hamilton as simultaneously outsider and inevitable insider</li>
+                                        <li>Examine how musical choices (tempo, harmony, ensemble vocals) reinforce thematic messages about ambition and destiny</li>
+                                        <li>Synthesize how these narrative techniques might influence audience perception of historical figures and events</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider the role of the ensemble as both narrator and Greek chorus</li>
+                                        <li>Examine how contradictions (orphan/genius, outsider/founder) create compelling paradox</li>
+                                        <li>Analyze how musical theater conventions shape historical interpretation</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hard Card 2 -->
+                        <div class="task-card">
+                            <div class="hard-header">
+                                HARD LEVEL (100%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Dialectical Opposition and Character Foiling</div>
+                                
+                                <div class="instructions">
+                                    Examine Hamilton and Burr as dialectical opposites whose philosophical differences reflect broader tensions about power, prudence, and political engagement in democratic societies.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Analyze how "Aaron Burr, Sir" establishes philosophical binaries (action/inaction, speech/silence, principle/pragmatism)</li>
+                                        <li>Evaluate the historical and contemporary relevance of each character's approach to political engagement</li>
+                                        <li>Synthesize how their opposition reflects fundamental tensions in democratic participation</li>
+                                        <li>Critique which philosophical approach proves more effective for creating lasting change</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider how each character's strategy reflects different theories of power and influence</li>
+                                        <li>Examine the long-term consequences of transparent vs. strategic political behavior</li>
+                                        <li>Analyze how their conflict foreshadows larger democratic tensions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hard Card 3 -->
+                        <div class="task-card">
+                            <div class="hard-header">
+                                HARD LEVEL (100%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Meritocracy, Ideology, and Class Transformation</div>
+                                
+                                <div class="instructions">
+                                    Interrogate how "My Shot" functions as both personal manifesto and ideological statement about meritocracy, examining how individual transformation connects to broader social revolution.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Deconstruct the rhetorical elements that frame Hamilton's ambition as both personal and political revolution</li>
+                                        <li>Analyze how the song's structure mirrors the argument it makes about seizing opportunity</li>
+                                        <li>Critique the meritocratic ideology embedded in Hamilton's worldview and its contemporary implications</li>
+                                        <li>Synthesize connections between individual agency and systemic change as presented in the musical</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Examine how metaphors of writing, shooting, and rising function symbolically</li>
+                                        <li>Consider tensions between self-made success narratives and structural inequalities</li>
+                                        <li>Analyze how the song positions education and intellect as revolutionary tools</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hard Card 4 -->
+                        <div class="task-card">
+                            <div class="hard-header">
+                                HARD LEVEL (100%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Collective Identity and Revolutionary Solidarity</div>
+                                
+                                <div class="instructions">
+                                    Analyze how "The Story of Tonight" constructs revolutionary fellowship while examining tensions between idealistic unity and individual ambition that threaten collective action.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Evaluate how musical elements (harmony, shared lyrics, overlapping voices) create sonic representations of unity</li>
+                                        <li>Analyze the ideological contradictions between egalitarian revolutionary ideals and hierarchical social ambitions</li>
+                                        <li>Examine how the song functions as both celebration and foreshadowing of future conflicts</li>
+                                        <li>Synthesize how personal relationships intersect with political movements to create both strength and vulnerability</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider how the toast structure mirrors ritualistic bonding in political movements</li>
+                                        <li>Analyze subtle musical and lyrical hints of future relationship tensions</li>
+                                        <li>Examine how shared purpose can both unite and eventually divide allies</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hard Card 5 -->
+                        <div class="task-card">
+                            <div class="hard-header">
+                                HARD LEVEL (100%)
+                                <div class="time-estimate">15 min</div>
+                            </div>
+                            <div class="card-content">
+                                <div class="task-title">Intersectionality and Revolutionary Discourse</div>
+                                
+                                <div class="instructions">
+                                    Critically examine how "The Schuyler Sisters" complicates revolutionary narratives by foregrounding gender, class, and intellectual intersections that challenge simplified liberation mythology.
+                                </div>
+                                
+                                <div class="directions">
+                                    <h3>Directions:</h3>
+                                    <ol>
+                                        <li>Analyze how each sister represents different strategies for navigating restrictive social systems while pursuing intellectual and political engagement</li>
+                                        <li>Evaluate the tension between privilege and constraint in their revolutionary participation</li>
+                                        <li>Examine how their discourse introduces complexities absent from male-centered revolutionary narratives</li>
+                                        <li>Synthesize how their perspectives challenge or reinforce the musical's broader ideological framework</li>
+                                    </ol>
+                                </div>
+                                
+                                <div class="hints">
+                                    <h3>Helpful Hints:</h3>
+                                    <ul>
+                                        <li>Consider how references to education, equality, and social justice expand revolutionary scope</li>
+                                        <li>Examine how their class privilege complicates their status as revolutionary voices</li>
+                                        <li>Analyze how their individual agency operates within collective sisterhood dynamics</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-dots" id="hard-dots"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlides = {
+            easy: 0,
+            medium: 0,
+            hard: 0
+        };
+
+        const slideCount = {
+            easy: 5,
+            medium: 5,
+            hard: 5
+        };
+
+        function initializeCarousels() {
+            ['easy', 'medium', 'hard'].forEach(level => {
+                updateCarousel(level);
+                createDots(level);
+            });
+        }
+
+        function moveCarousel(level, direction) {
+            const maxSlide = slideCount[level] - 1;
+            currentSlides[level] += direction;
+            
+            if (currentSlides[level] > maxSlide) {
+                currentSlides[level] = 0;
+            } else if (currentSlides[level] < 0) {
+                currentSlides[level] = maxSlide;
+            }
+            
+            updateCarousel(level);
+            updateDots(level);
+        }
+
+        function updateCarousel(level) {
+            const track = document.getElementById(`${level}-track`);
+            const slideWidth = 100 / slideCount[level];
+            const translateX = -currentSlides[level] * slideWidth;
+            track.style.transform = `translateX(${translateX}%)`;
+        }
+
+        function createDots(level) {
+            const dotsContainer = document.getElementById(`${level}-dots`);
+            dotsContainer.innerHTML = '';
+            
+            for (let i = 0; i < slideCount[level]; i++) {
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(level, i);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        function updateDots(level) {
+            const dots = document.querySelectorAll(`#${level}-dots .dot`);
+            dots.forEach((dot, index) => {
+                dot.className = `dot ${index === currentSlides[level] ? 'active' : ''}`;
+            });
+        }
+
+        function goToSlide(level, slideIndex) {
+            currentSlides[level] = slideIndex;
+            updateCarousel(level);
+            updateDots(level);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            initializeCarousels();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                ['easy', 'medium', 'hard'].forEach(level => moveCarousel(level, -1));
+            } else if (e.key === 'ArrowRight') {
+                ['easy', 'medium', 'hard'].forEach(level => moveCarousel(level, 1));
+            }
+        });
+    </script>
+</body>
+</html>
