@@ -18,9 +18,7 @@
         body {
             font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f0f4f8;
-                                         <strong>Task:</strong> Complete the missing word in each of the 20 analogies, then categorize them using the 12 advanced relationship categories, and create 1 new analogy for each category (12 total).                            <div class="instructions">
-                                    <strong>Task:</strong> Complete the missing word in each of the 20 analogies, then categorize them using the 12 advanced relationship categories, and create 1 new analogy for each category (12 total).
-                                </div>       padding: 20px;
+            padding: 20px;
             line-height: 1.4;
         }
 
@@ -74,6 +72,11 @@
             min-height: 600px;
             width: 33.333%;
             flex-shrink: 0;
+        }
+
+        /* Override for 4-slide hard carousel */
+        #hard-track .task-card {
+            width: 25%;
         }
 
         .nav-button {
@@ -420,7 +423,7 @@
     <div class="container">
         <div class="header">
             <h1><i data-lucide="search"></i> Analogies & Word Relationship Patterns</h1>
-            <p>Self-Contained Task Cards with Navigation • 3 Sets per Level</p>
+            <p>Self-Contained Task Cards with Navigation • Multiple Sets per Level</p>
         </div>
 
         <div class="card-grid">
@@ -805,8 +808,9 @@
                         <div class="indicator-dot active" onclick="goToSlide('hard', 0)"></div>
                         <div class="indicator-dot" onclick="goToSlide('hard', 1)"></div>
                         <div class="indicator-dot" onclick="goToSlide('hard', 2)"></div>
+                        <div class="indicator-dot" onclick="goToSlide('hard', 3)"></div>
                     </div>
-                    <div class="carousel-track" id="hard-track">
+                    <div class="carousel-track" id="hard-track" style="width: 400%">
                         <!-- HARD CARD 1 -->
                         <div class="task-card">
                             <div class="card-header hard-header">🚀 HARD LEVEL - Set 1</div>
@@ -876,51 +880,210 @@
                             </div>
                         </div>
 
-                        <!-- HARD CARD 2 & 3 abbreviated for space -->
+                        <!-- HARD CARD 2 -->
                         <div class="task-card">
                             <div class="card-header hard-header">🚀 HARD LEVEL - Set 2</div>
                             <div class="card-content">
                                 <div class="instructions">
-                                    <strong>Task:</strong> Identify relationships in 20 complex analogies using 12 advanced categories, then Create 1 New Analogy for Each Category (12 total).
+                                    <strong>Task:</strong> Complete the missing word in each of the 20 analogies, then categorize them using the 12 advanced relationship categories, and create 1 new analogy for each category (12 total).
                                 </div>
                                 <div class="categories-section">
                                     <div class="categories-title">📋 The 12 Advanced Relationship Categories</div>
                                     <div class="categories-grid">
-                                        <div class="category-item"><div class="category-name">Part/Whole</div></div>
-                                        <div class="category-item"><div class="category-name">Synonyms</div></div>
-                                        <div class="category-item"><div class="category-name">Antonyms</div></div>
-                                        <div class="category-item"><div class="category-name">Function/Purpose</div></div>
-                                        <div class="category-item"><div class="category-name">Cause/Effect</div></div>
-                                        <div class="category-item"><div class="category-name">Category/Example</div></div>
-                                        <div class="category-item"><div class="category-name">Creator/Creation</div></div>
-                                        <div class="category-item"><div class="category-name">Degree/Intensity</div></div>
-                                        <div class="category-item"><div class="category-name">Sequential/Process</div></div>
-                                        <div class="category-item"><div class="category-name">Symbol/Meaning</div></div>
-                                        <div class="category-item"><div class="category-name">Problem/Solution</div></div>
-                                        <div class="category-item"><div class="category-name">Characteristic/Trait</div></div>
+                                        <div class="category-item"><div class="category-name">Part/Whole</div><div class="category-example">Neuron : Brain</div></div>
+                                        <div class="category-item"><div class="category-name">Synonyms</div><div class="category-example">Eloquent : Articulate</div></div>
+                                        <div class="category-item"><div class="category-name">Antonyms</div><div class="category-example">Meticulous : Careless</div></div>
+                                        <div class="category-item"><div class="category-name">Function/Purpose</div><div class="category-example">Catalyst : Reaction</div></div>
+                                        <div class="category-item"><div class="category-name">Cause/Effect</div><div class="category-example">Drought : Famine</div></div>
+                                        <div class="category-item"><div class="category-name">Category/Example</div><div class="category-example">Philosophy : Stoicism</div></div>
+                                        <div class="category-item"><div class="category-name">Creator/Creation</div><div class="category-example">Architect : Blueprint</div></div>
+                                        <div class="category-item"><div class="category-name">Degree/Intensity</div><div class="category-example">Whisper : Shout</div></div>
+                                        <div class="category-item"><div class="category-name">Sequential/Process</div><div class="category-example">Seed : Harvest</div></div>
+                                        <div class="category-item"><div class="category-name">Symbol/Meaning</div><div class="category-example">Dove : Peace</div></div>
+                                        <div class="category-item"><div class="category-name">Problem/Solution</div><div class="category-example">Disease : Medicine</div></div>
+                                        <div class="category-item"><div class="category-name">Characteristic/Trait</div><div class="category-example">Diamond : Hardness</div></div>
                                     </div>
                                 </div>
                                 <div class="analogies-section">
-                                    <div class="analogies-title">🧠 Different Set of 20 Complex Analogies</div>
+                                    <div class="analogies-title">🧠 Complete & Categorize These 20 Complex Analogies</div>
                                     <div class="analogies-grid">
-                                        <div class="analogy-item">Ambition : Success :: Doubt : Failure</div>
-                                        <div class="analogy-item">Novelist : Story :: Composer : Symphony</div>
-                                        <div class="analogy-item">[... more analogies ...]</div>
+                                        <div class="analogy-item">Patience : Wisdom :: Impulse : _______</div>
+                                        <div class="analogy-item">Cartographer : Map :: Composer : _______</div>
+                                        <div class="analogy-item">Thesis : Essay :: Hypothesis : _______</div>
+                                        <div class="analogy-item">Seed : Orchard :: Spark : _______</div>
+                                        <div class="analogy-item">Binary : Computer :: DNA : _______</div>
+                                        <div class="analogy-item">Hammer : Build :: Evidence : _______</div>
+                                        <div class="analogy-item">Atlas : Geography :: Periodic Table : _______</div>
+                                        <div class="analogy-item">Pixel : Image :: Note : _______</div>
+                                        <div class="analogy-item">Mentor : Growth :: Catalyst : _______</div>
+                                        <div class="analogy-item">Poverty : Hunger :: Pollution : _______</div>
+                                        <div class="analogy-item">Compass : Direction :: Microscope : _______</div>
+                                        <div class="analogy-item">Symptom : Disease :: Clue : _______</div>
+                                        <div class="analogy-item">Keystone : Arch :: Thesis : _______</div>
+                                        <div class="analogy-item">Whisper : Murmur :: Tempest : _______</div>
+                                        <div class="analogy-item">Desert : Drought :: Oasis : _______</div>
+                                        <div class="analogy-item">Sun : Daylight :: Moon : _______</div>
+                                        <div class="analogy-item">Prototype : Product :: Draft : _______</div>
+                                        <div class="analogy-item">Justice : Scales :: Peace : _______</div>
+                                        <div class="analogy-item">Ignition : Engine :: Inspiration : _______</div>
+                                        <div class="analogy-item">Apprentice : Master :: Student : _______</div>
                                     </div>
                                 </div>
                                 <div class="creation-section">
                                     <div class="creation-title">✍️ Create 1 New Analogy for Each Category (12 total)</div>
                                     <div class="creation-grid">
-                                        <!-- Same 12 categories -->
+                                        <div class="creation-prompt">Part/Whole: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Synonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Antonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Function/Purpose: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Cause/Effect: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Category/Example: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Creator/Creation: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Degree/Intensity: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Sequential/Process: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Symbol/Meaning: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Problem/Solution: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Characteristic/Trait: _____ : _____ :: _____ : _____</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- HARD CARD 3 -->
                         <div class="task-card">
                             <div class="card-header hard-header">🚀 HARD LEVEL - Set 3</div>
                             <div class="card-content">
-                                <!-- Similar structure with different analogies -->
+                                <div class="instructions">
+                                    <strong>Task:</strong> Complete the missing word in each of the 20 analogies, then categorize them using the 12 advanced relationship categories, and create 1 new analogy for each category (12 total).
+                                </div>
+                                <div class="categories-section">
+                                    <div class="categories-title">📋 The 12 Advanced Relationship Categories</div>
+                                    <div class="categories-grid">
+                                        <div class="category-item"><div class="category-name">Part/Whole</div><div class="category-example">Neuron : Brain</div></div>
+                                        <div class="category-item"><div class="category-name">Synonyms</div><div class="category-example">Eloquent : Articulate</div></div>
+                                        <div class="category-item"><div class="category-name">Antonyms</div><div class="category-example">Meticulous : Careless</div></div>
+                                        <div class="category-item"><div class="category-name">Function/Purpose</div><div class="category-example">Catalyst : Reaction</div></div>
+                                        <div class="category-item"><div class="category-name">Cause/Effect</div><div class="category-example">Drought : Famine</div></div>
+                                        <div class="category-item"><div class="category-name">Category/Example</div><div class="category-example">Philosophy : Stoicism</div></div>
+                                        <div class="category-item"><div class="category-name">Creator/Creation</div><div class="category-example">Architect : Blueprint</div></div>
+                                        <div class="category-item"><div class="category-name">Degree/Intensity</div><div class="category-example">Whisper : Shout</div></div>
+                                        <div class="category-item"><div class="category-name">Sequential/Process</div><div class="category-example">Seed : Harvest</div></div>
+                                        <div class="category-item"><div class="category-name">Symbol/Meaning</div><div class="category-example">Dove : Peace</div></div>
+                                        <div class="category-item"><div class="category-name">Problem/Solution</div><div class="category-example">Disease : Medicine</div></div>
+                                        <div class="category-item"><div class="category-name">Characteristic/Trait</div><div class="category-example">Diamond : Hardness</div></div>
+                                    </div>
+                                </div>
+                                <div class="analogies-section">
+                                    <div class="analogies-title">🧠 Complete & Categorize These 20 Complex Analogies</div>
+                                    <div class="analogies-grid">
+                                        <div class="analogy-item">Equation : Solution :: Puzzle : _______</div>
+                                        <div class="analogy-item">Palette : Painting :: Vocabulary : _______</div>
+                                        <div class="analogy-item">Gravity : Planet :: Magnetism : _______</div>
+                                        <div class="analogy-item">Rumor : Misinformation :: Evidence : _______</div>
+                                        <div class="analogy-item">Algorithm : Program :: Recipe : _______</div>
+                                        <div class="analogy-item">Skeleton : Body :: Framework : _______</div>
+                                        <div class="analogy-item">Oxygen : Fire :: Feedback : _______</div>
+                                        <div class="analogy-item">Budget : Spending :: Schedule : _______</div>
+                                        <div class="analogy-item">Dialect : Language :: Accent : _______</div>
+                                        <div class="analogy-item">Blueprint : Construction :: Plan : _______</div>
+                                        <div class="analogy-item">Prism : Spectrum :: Lens : _______</div>
+                                        <div class="analogy-item">Bacteria : Infection :: Vaccine : _______</div>
+                                        <div class="analogy-item">Survey : Opinion :: Census : _______</div>
+                                        <div class="analogy-item">Navigator : Route :: Editor : _______</div>
+                                        <div class="analogy-item">Myth : Culture :: Legend : _______</div>
+                                        <div class="analogy-item">Thesis : Support :: Claim : _______</div>
+                                        <div class="analogy-item">Spring : Renewal :: Autumn : _______</div>
+                                        <div class="analogy-item">Conductor : Orchestra :: Coach : _______</div>
+                                        <div class="analogy-item">Equation : Balance :: Justice : _______</div>
+                                        <div class="analogy-item">Archive : History :: Memory : _______</div>
+                                    </div>
+                                </div>
+                                <div class="creation-section">
+                                    <div class="creation-title">✍️ Create 1 New Analogy for Each Category (12 total)</div>
+                                    <div class="creation-grid">
+                                        <div class="creation-prompt">Part/Whole: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Synonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Antonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Function/Purpose: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Cause/Effect: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Category/Example: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Creator/Creation: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Degree/Intensity: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Sequential/Process: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Symbol/Meaning: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Problem/Solution: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Characteristic/Trait: _____ : _____ :: _____ : _____</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HARD CARD 4 -->
+                        <div class="task-card">
+                            <div class="card-header hard-header">🚀 HARD LEVEL - Set 4</div>
+                            <div class="card-content">
+                                <div class="instructions">
+                                    <strong>Task:</strong> Complete the missing word in each of the 20 analogies, then categorize them using the 12 advanced relationship categories, and create 1 new analogy for each category (12 total).
+                                </div>
+                                <div class="categories-section">
+                                    <div class="categories-title">📋 The 12 Advanced Relationship Categories</div>
+                                    <div class="categories-grid">
+                                        <div class="category-item"><div class="category-name">Part/Whole</div><div class="category-example">Neuron : Brain</div></div>
+                                        <div class="category-item"><div class="category-name">Synonyms</div><div class="category-example">Eloquent : Articulate</div></div>
+                                        <div class="category-item"><div class="category-name">Antonyms</div><div class="category-example">Meticulous : Careless</div></div>
+                                        <div class="category-item"><div class="category-name">Function/Purpose</div><div class="category-example">Catalyst : Reaction</div></div>
+                                        <div class="category-item"><div class="category-name">Cause/Effect</div><div class="category-example">Drought : Famine</div></div>
+                                        <div class="category-item"><div class="category-name">Category/Example</div><div class="category-example">Philosophy : Stoicism</div></div>
+                                        <div class="category-item"><div class="category-name">Creator/Creation</div><div class="category-example">Architect : Blueprint</div></div>
+                                        <div class="category-item"><div class="category-name">Degree/Intensity</div><div class="category-example">Whisper : Shout</div></div>
+                                        <div class="category-item"><div class="category-name">Sequential/Process</div><div class="category-example">Seed : Harvest</div></div>
+                                        <div class="category-item"><div class="category-name">Symbol/Meaning</div><div class="category-example">Dove : Peace</div></div>
+                                        <div class="category-item"><div class="category-name">Problem/Solution</div><div class="category-example">Disease : Medicine</div></div>
+                                        <div class="category-item"><div class="category-name">Characteristic/Trait</div><div class="category-example">Diamond : Hardness</div></div>
+                                    </div>
+                                </div>
+                                <div class="analogies-section">
+                                    <div class="analogies-title">🧠 Complete & Categorize These 20 Complex Analogies</div>
+                                    <div class="analogies-grid">
+                                        <div class="analogy-item">Friction : Heat :: Pressure : _______</div>
+                                        <div class="analogy-item">Antidote : Poison :: Remedy : _______</div>
+                                        <div class="analogy-item">Keystone : Ecosystem :: Heart : _______</div>
+                                        <div class="analogy-item">Encryption : Privacy :: Helmet : _______</div>
+                                        <div class="analogy-item">Prism : Light :: Sieve : _______</div>
+                                        <div class="analogy-item">Evidence : Verdict :: Data : _______</div>
+                                        <div class="analogy-item">Volcano : Eruption :: Fault : _______</div>
+                                        <div class="analogy-item">Photosynthesis : Plant :: Respiration : _______</div>
+                                        <div class="analogy-item">Inflation : Prices :: Drought : _______</div>
+                                        <div class="analogy-item">Thesis : Dissertation :: Theme : _______</div>
+                                        <div class="analogy-item">Catalyst : Change :: Teacher : _______</div>
+                                        <div class="analogy-item">Map : Territory :: Model : _______</div>
+                                        <div class="analogy-item">Currency : Economy :: Blood : _______</div>
+                                        <div class="analogy-item">Enzyme : Digestion :: Router : _______</div>
+                                        <div class="analogy-item">Satellite : Orbit :: Boat : _______</div>
+                                        <div class="analogy-item">Metaphor : Poetry :: Symbol : _______</div>
+                                        <div class="analogy-item">Lighthouse : Navigation :: Signpost : _______</div>
+                                        <div class="analogy-item">DNA : Inheritance :: Code : _______</div>
+                                        <div class="analogy-item">Microscope : Microbe :: Telescope : _______</div>
+                                        <div class="analogy-item">Seed : Germination :: Question : _______</div>
+                                    </div>
+                                </div>
+                                <div class="creation-section">
+                                    <div class="creation-title">✍️ Create 1 New Analogy for Each Category (12 total)</div>
+                                    <div class="creation-grid">
+                                        <div class="creation-prompt">Part/Whole: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Synonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Antonyms: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Function/Purpose: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Cause/Effect: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Category/Example: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Creator/Creation: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Degree/Intensity: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Sequential/Process: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Symbol/Meaning: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Problem/Solution: _____ : _____ :: _____ : _____</div>
+                                        <div class="creation-prompt">Characteristic/Trait: _____ : _____ :: _____ : _____</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -934,26 +1097,26 @@
     </div>
 
     <script>
-        const carouselStates = {
-            easy: 0,
-            medium: 0,
-            hard: 0
-        };
+        const carouselStates = { easy: 0, medium: 0, hard: 0 };
+        const slideCounts = { easy: 3, medium: 3, hard: 4 };
 
         function navigateCarousel(level, direction) {
-            const currentIndex = carouselStates[level];
-            const newIndex = (currentIndex + direction + 3) % 3; // Wrap around 0-2
+            const count = slideCounts[level] || 3;
+            const currentIndex = carouselStates[level] || 0;
+            const newIndex = (currentIndex + direction + count) % count;
             goToSlide(level, newIndex);
         }
 
         function goToSlide(level, index) {
+            const count = slideCounts[level] || 3;
             carouselStates[level] = index;
             const track = document.getElementById(level + '-track');
             const indicators = document.querySelectorAll(`#${level}-carousel .indicator-dot`);
-            
-            // Update track position
-            track.style.transform = `translateX(-${index * 33.333}%)`;
-            
+
+            // Update track position based on number of slides
+            const step = 100 / count;
+            track.style.transform = `translateX(-${index * step}%)`;
+
             // Update indicators
             indicators.forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
