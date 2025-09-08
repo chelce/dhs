@@ -166,6 +166,67 @@
             line-height: 1.4;
         }
 
+        /* Color-themed numbered list styling */
+        .task-card.easy .directions ol {
+            counter-reset: easy-counter;
+        }
+
+        .task-card.easy .directions ol li {
+            counter-increment: easy-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.easy .directions ol li::before {
+            content: counter(easy-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .task-card.medium .directions ol {
+            counter-reset: medium-counter;
+        }
+
+        .task-card.medium .directions ol li {
+            counter-increment: medium-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.medium .directions ol li::before {
+            content: counter(medium-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #fd7e14;
+            font-size: 12px;
+        }
+
+        .task-card.hard .directions ol {
+            counter-reset: hard-counter;
+        }
+
+        .task-card.hard .directions ol li {
+            counter-increment: hard-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.hard .directions ol li::before {
+            content: counter(hard-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #dc3545;
+            font-size: 12px;
+        }
+
         .bottom-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -219,6 +280,24 @@
             margin-top: auto;
         }
 
+        .full-width-hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .full-width-hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .full-width-hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
         @media print {
             body {
                 padding: 0.5in;
@@ -257,10 +336,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Listen to "Alexander Hamilton" with your group</li>
-                        <li>Identify the most important events from Hamilton's childhood and youth</li>
-                        <li>Choose the TWO events that shaped him the most</li>
-                        <li>Find two specific quotes that show how these events affected him</li>
+                        <li>Listen to <strong>"Alexander Hamilton"</strong> with your group</li>
+                        <li>Identify the most <strong>important events</strong> from Hamilton's childhood and youth</li>
+                        <li>Choose the <strong>TWO events</strong> that shaped him the most</li>
+                        <li>Find <strong>two specific quotes</strong> that show how these events affected him</li>
                     </ol>
                 </div>
 
@@ -297,10 +376,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Listen to "Aaron Burr, Sir" with your group</li>
-                        <li>Find 2 ways Burr and Hamilton are similar</li>
-                        <li>Find 2 ways they are different</li>
-                        <li>Write down a quote that proves each similarity and difference</li>
+                        <li>Listen to <strong>"Aaron Burr, Sir"</strong> with your group</li>
+                        <li>Find <strong>2 ways</strong> Burr and Hamilton are similar</li>
+                        <li>Find <strong>2 ways</strong> they are different</li>
+                        <li>Write down a <strong>quote</strong> that proves each similarity and difference</li>
                     </ol>
                 </div>
 
@@ -337,10 +416,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Listen to "My Shot" and "The Story of Tonight" with your group</li>
-                        <li>Decide what Hamilton thinks about the revolution</li>
-                        <li>Choose 2-3 words to describe his attitude</li>
-                        <li>Find two quotes that prove your description</li>
+                        <li>Listen to <strong>"My Shot"</strong> and <strong>"The Story of Tonight"</strong> with your group</li>
+                        <li>Decide what <strong>Hamilton thinks</strong> about the revolution</li>
+                        <li>Choose <strong>2-3 words</strong> to describe his attitude</li>
+                        <li>Find <strong>two quotes</strong> that prove your description</li>
                     </ol>
                 </div>
 
@@ -370,10 +449,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Listen to "The Schuyler Sisters" as a group</li>
-                        <li>Pay attention to what Angelica says and does</li>
-                        <li>Choose 2-3 words that best describe her personality</li>
-                        <li>Find two quotes from Angelica that prove your description</li>
+                        <li>Listen to <strong>"The Schuyler Sisters"</strong> as a group</li>
+                        <li>Pay attention to what <strong>Angelica says and does</strong></li>
+                        <li>Choose <strong>2-3 words</strong> that best describe her personality</li>
+                        <li>Find <strong>two quotes from Angelica</strong> that prove your description</li>
                     </ol>
                 </div>
 
@@ -403,10 +482,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Review all five songs with your group</li>
-                        <li>Think about what makes Hamilton want to fight for change</li>
-                        <li>Choose the main reason he cares about the revolution</li>
-                        <li>Find two quotes that show this motivation clearly</li>
+                        <li>Review <strong>all five songs</strong> with your group</li>
+                        <li>Think about what makes Hamilton want to <strong>fight for change</strong></li>
+                        <li>Choose the <strong>main reason</strong> he cares about the revolution</li>
+                        <li>Find <strong>two quotes</strong> that show this motivation clearly</li>
                     </ol>
                 </div>
 
@@ -436,10 +515,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify three pieces of advice Burr gives Hamilton</li>
-                        <li>For each piece of advice, determine what Burr is really saying</li>
-                        <li>Analyze what Burr's real concerns about Hamilton might be</li>
-                        <li>Explain how Burr's tone and word choices reveal his true feelings</li>
+                        <li>Identify <strong>three pieces of advice</strong> Burr gives Hamilton</li>
+                        <li>For each piece of advice, determine what <strong>Burr is really saying</strong></li>
+                        <li>Analyze what Burr's <strong>real concerns</strong> about Hamilton might be</li>
+                        <li>Explain how Burr's <strong>tone and word choices</strong> reveal his true feelings</li>
                     </ol>
                 </div>
                 
@@ -469,10 +548,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify moments where Hamilton's background influences his behavior</li>
-                        <li>Analyze how his outsider status affects his relationships with others</li>
-                        <li>Examine what Hamilton might be trying to prove or overcome</li>
-                        <li>Connect his defensive or aggressive moments to deeper insecurities</li>
+                        <li>Identify moments where Hamilton's <strong>background influences</strong> his behavior</li>
+                        <li>Analyze how his <strong>outsider status</strong> affects his relationships with others</li>
+                        <li>Examine what Hamilton might be trying to <strong>prove or overcome</strong></li>
+                        <li>Connect his <strong>defensive or aggressive moments</strong> to deeper insecurities</li>
                     </ol>
                 </div>
                 
@@ -502,10 +581,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify moments where the sisters challenge social expectations</li>
-                        <li>Analyze how they balance conformity with rebellion</li>
-                        <li>Examine what they're really saying about education and equality</li>
-                        <li>Consider how their privilege allows them to speak more freely</li>
+                        <li>Identify moments where the sisters <strong>challenge social expectations</strong></li>
+                        <li>Analyze how they balance <strong>conformity with rebellion</strong></li>
+                        <li>Examine what they're really saying about <strong>education and equality</strong></li>
+                        <li>Consider how their <strong>privilege allows</strong> them to speak more freely</li>
                     </ol>
                 </div>
                 
@@ -535,10 +614,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify moments that suggest competition beneath the friendship</li>
-                        <li>Analyze how each character positions himself within the group</li>
-                        <li>Examine what each friend might be trying to prove or gain</li>
-                        <li>Consider how the revolutionary cause serves different personal goals</li>
+                        <li>Identify moments that suggest <strong>competition beneath the friendship</strong></li>
+                        <li>Analyze how each character <strong>positions himself</strong> within the group</li>
+                        <li>Examine what each friend might be trying to <strong>prove or gain</strong></li>
+                        <li>Consider how the revolutionary cause serves <strong>different personal goals</strong></li>
                     </ol>
                 </div>
                 
@@ -568,10 +647,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify all references to time, urgency, and waiting in the song</li>
-                        <li>Analyze what Hamilton fears will happen if he waits</li>
-                        <li>Connect his urgency to his background and insecurities</li>
-                        <li>Examine how his impatience affects his relationships with others</li>
+                        <li>Identify <strong>all references to time, urgency, and waiting</strong> in the song</li>
+                        <li>Analyze what Hamilton fears will happen if he <strong>waits</strong></li>
+                        <li>Connect his urgency to his <strong>background and insecurities</strong></li>
+                        <li>Examine how his impatience affects his <strong>relationships with others</strong></li>
                     </ol>
                 </div>
                 
@@ -601,10 +680,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Select two specific performance elements (rhythm, vocal tone, staging, musical style, etc.)</li>
-                        <li>Analyze how each element reflects Hamilton's core personality traits</li>
-                        <li>Explain how these performance choices enhance the audience's understanding of his character</li>
-                        <li>Evaluate why these specific artistic choices are more effective than alternatives</li>
+                        <li>Select <strong>two specific performance elements</strong> (rhythm, vocal tone, staging, musical style, etc.)</li>
+                        <li>Analyze how each element reflects Hamilton's <strong>core personality traits</strong></li>
+                        <li>Explain how these performance choices enhance the audience's <strong>understanding of his character</strong></li>
+                        <li>Evaluate why these specific artistic choices are <strong>more effective than alternatives</strong></li>
                     </ol>
                 </div>
                 
@@ -634,10 +713,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify two contrasting performance elements between Burr and Hamilton (tempo, vocal style, musical genre, etc.)</li>
-                        <li>Analyze how these performance differences reflect their opposing worldviews</li>
-                        <li>Explain how the artistic choices enhance the philosophical conflict</li>
-                        <li>Evaluate how these performance contrasts foreshadow future tensions</li>
+                        <li>Identify <strong>two contrasting performance elements</strong> between Burr and Hamilton (tempo, vocal style, musical genre, etc.)</li>
+                        <li>Analyze how these performance differences reflect their <strong>opposing worldviews</strong></li>
+                        <li>Explain how the artistic choices enhance the <strong>philosophical conflict</strong></li>
+                        <li>Evaluate how these performance contrasts <strong>foreshadow future tensions</strong></li>
                     </ol>
                 </div>
                 
@@ -667,10 +746,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Select two specific ensemble performance elements (vocal harmony, staging, choreography, etc.)</li>
-                        <li>Analyze how these elements create a sense of unity and shared purpose</li>
-                        <li>Examine how the performance choices reflect the fragility of their bond</li>
-                        <li>Evaluate how these artistic decisions enhance the song's emotional impact</li>
+                        <li>Select <strong>two specific ensemble performance elements</strong> (vocal harmony, staging, choreography, etc.)</li>
+                        <li>Analyze how these elements create a sense of <strong>unity and shared purpose</strong></li>
+                        <li>Examine how the performance choices reflect the <strong>fragility of their bond</strong></li>
+                        <li>Evaluate how these artistic decisions enhance the song's <strong>emotional impact</strong></li>
                     </ol>
                 </div>
                 
@@ -700,10 +779,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Identify two contrasting musical or performance styles within the song</li>
-                        <li>Analyze how each style reflects different aspects of the sisters' social position</li>
-                        <li>Examine how the performance elements reveal the tension between conformity and rebellion</li>
-                        <li>Evaluate how these artistic choices enhance the complexity of their characterization</li>
+                        <li>Identify <strong>two contrasting musical or performance styles</strong> within the song</li>
+                        <li>Analyze how each style reflects <strong>different aspects of the sisters' social position</strong></li>
+                        <li>Examine how the performance elements reveal the tension between <strong>conformity and rebellion</strong></li>
+                        <li>Evaluate how these artistic choices enhance the <strong>complexity of their characterization</strong></li>
                     </ol>
                 </div>
                 
@@ -733,10 +812,10 @@
                 <div class="directions">
                     <h3>Directions:</h3>
                     <ol>
-                        <li>Select two specific performance elements that reflect Hamilton's mental state</li>
-                        <li>Analyze how these elements mirror his psychological urgency and ambition</li>
-                        <li>Examine how the performance choices create empathy or distance with the audience</li>
-                        <li>Evaluate how these artistic decisions enhance understanding of his character's motivations</li>
+                        <li>Select <strong>two specific performance elements</strong> that reflect Hamilton's mental state</li>
+                        <li>Analyze how these elements mirror his <strong>psychological urgency and ambition</strong></li>
+                        <li>Examine how the performance choices create <strong>empathy or distance</strong> with the audience</li>
+                        <li>Evaluate how these artistic decisions enhance understanding of his <strong>character's motivations</strong></li>
                     </ol>
                 </div>
                 
