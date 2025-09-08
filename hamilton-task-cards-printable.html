@@ -6,7 +6,7 @@
     <title>Hamilton Task Cards - Printable Format</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
         * {
@@ -25,7 +25,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 0.25in;
             width: 100%;
         }
@@ -54,20 +54,21 @@
 
         .card-title {
             font-family: 'Bebas Neue', cursive;
-            font-size: 20px;
-            letter-spacing: 1px;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
             flex-grow: 1;
         }
 
         .card-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             flex-shrink: 0;
         }
 
         .difficulty-label {
             font-family: 'Bebas Neue', cursive;
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
@@ -79,7 +80,10 @@
         
         .task-card.easy .card-title,
         .task-card.easy .card-icon,
-        .task-card.easy .difficulty-label {
+        .task-card.easy .difficulty-label,
+        .task-card.easy .directions h3,
+        .task-card.easy .sentence-frame h3,
+        .task-card.easy .hints h3 {
             color: #28a745;
         }
 
@@ -90,7 +94,10 @@
         
         .task-card.medium .card-title,
         .task-card.medium .card-icon,
-        .task-card.medium .difficulty-label {
+        .task-card.medium .difficulty-label,
+        .task-card.medium .directions h3,
+        .task-card.medium .sentence-frame h3,
+        .task-card.medium .hints h3 {
             color: #fd7e14;
         }
 
@@ -101,7 +108,10 @@
         
         .task-card.hard .card-title,
         .task-card.hard .card-icon,
-        .task-card.hard .difficulty-label {
+        .task-card.hard .difficulty-label,
+        .task-card.hard .directions h3,
+        .task-card.hard .sentence-frame h3,
+        .task-card.hard .hints h3 {
             color: #dc3545;
         }
 
@@ -123,10 +133,11 @@
         }
 
         .directions h3 {
-            font-size: 13px;
-            font-weight: 600;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
             margin-bottom: 8px;
-            color: #333;
         }
 
         .directions ol {
@@ -140,33 +151,34 @@
         }
 
         .sentence-frame {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 10px;
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
             margin: 10px 0;
             font-style: italic;
             font-size: 12px;
         }
 
-        .sentence-frame strong {
+        .sentence-frame h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
             font-style: normal;
-            font-weight: 600;
+            margin-bottom: 8px;
         }
 
         .hints {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 10px;
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
             margin-top: auto;
         }
 
         .hints h3 {
-            font-size: 12px;
-            font-weight: 600;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
             margin-bottom: 8px;
-            color: #333;
         }
 
         .hints ul {
@@ -204,7 +216,7 @@
     <div class="cards-grid">
         <!-- Easy Card 1 -->
         <div class="task-card easy">
-            <div class="difficulty-label">EASY LEVEL (70%)</div>
+            <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="history" class="card-icon"></i>
                 <div class="card-title">Hamilton's Early Life</div>
@@ -225,7 +237,7 @@
                 </div>
 
                 <div class="sentence-frame">
-                    <strong>Sentence Frame:</strong><br>
+                    <h3>Sentence Frame:</h3>
                     "The most influential events in Hamilton's early life were _______ and _______. This is shown in the quotes '...' and '...' because _______."
                 </div>
                 
@@ -242,7 +254,7 @@
 
         <!-- Easy Card 2 -->
         <div class="task-card easy">
-            <div class="difficulty-label">EASY LEVEL (70%)</div>
+            <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="users" class="card-icon"></i>
                 <div class="card-title">Burr vs. Hamilton</div>
@@ -280,7 +292,7 @@
 
         <!-- Easy Card 3 -->
         <div class="task-card easy">
-            <div class="difficulty-label">EASY LEVEL (70%)</div>
+            <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="flag" class="card-icon"></i>
                 <div class="card-title">Hamilton's Revolution Attitude</div>
@@ -313,7 +325,7 @@
 
         <!-- Easy Card 4 -->
         <div class="task-card easy">
-            <div class="difficulty-label">EASY LEVEL (70%)</div>
+            <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="crown" class="card-icon"></i>
                 <div class="card-title">Characterizing Angelica</div>
@@ -346,7 +358,7 @@
 
         <!-- Easy Card 5 -->
         <div class="task-card easy">
-            <div class="difficulty-label">EASY LEVEL (70%)</div>
+            <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="heart" class="card-icon"></i>
                 <div class="card-title">Revolutionary Passion</div>
@@ -379,7 +391,7 @@
 
         <!-- Medium Card 1 -->
         <div class="task-card medium">
-            <div class="difficulty-label">MEDIUM LEVEL (85%)</div>
+            <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="eye" class="card-icon"></i>
                 <div class="card-title">What Burr Really Means</div>
@@ -412,7 +424,7 @@
 
         <!-- Medium Card 2 -->
         <div class="task-card medium">
-            <div class="difficulty-label">MEDIUM LEVEL (85%)</div>
+            <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="shield" class="card-icon"></i>
                 <div class="card-title">Hamilton's Insecurities and Overcompensation</div>
@@ -445,7 +457,7 @@
 
         <!-- Medium Card 3 -->
         <div class="task-card medium">
-            <div class="difficulty-label">MEDIUM LEVEL (85%)</div>
+            <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="message-circle" class="card-icon"></i>
                 <div class="card-title">The Schuyler Sisters' Social Commentary</div>
@@ -478,7 +490,7 @@
 
         <!-- Medium Card 4 -->
         <div class="task-card medium">
-            <div class="difficulty-label">MEDIUM LEVEL (85%)</div>
+            <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="handshake" class="card-icon"></i>
                 <div class="card-title">Friendship and Competition Subtext</div>
@@ -511,7 +523,7 @@
 
         <!-- Medium Card 5 -->
         <div class="task-card medium">
-            <div class="difficulty-label">MEDIUM LEVEL (85%)</div>
+            <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="clock" class="card-icon"></i>
                 <div class="card-title">Hamilton's Desperate Urgency</div>
@@ -544,7 +556,7 @@
 
         <!-- Hard Card 1 -->
         <div class="task-card hard">
-            <div class="difficulty-label">HARD LEVEL (100%)</div>
+            <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="theater" class="card-icon"></i>
                 <div class="card-title">Performance Elements and Character Essence</div>
@@ -577,7 +589,7 @@
 
         <!-- Hard Card 2 -->
         <div class="task-card hard">
-            <div class="difficulty-label">HARD LEVEL (100%)</div>
+            <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="music" class="card-icon"></i>
                 <div class="card-title">Musical Contrast and Character Opposition</div>
@@ -610,7 +622,7 @@
 
         <!-- Hard Card 3 -->
         <div class="task-card hard">
-            <div class="difficulty-label">HARD LEVEL (100%)</div>
+            <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="users-2" class="card-icon"></i>
                 <div class="card-title">Ensemble Dynamics and Collective Voice</div>
@@ -643,7 +655,7 @@
 
         <!-- Hard Card 4 -->
         <div class="task-card hard">
-            <div class="difficulty-label">HARD LEVEL (100%)</div>
+            <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="layers" class="card-icon"></i>
                 <div class="card-title">Genre Fusion and Character Complexity</div>
@@ -676,7 +688,7 @@
 
         <!-- Hard Card 5 -->
         <div class="task-card hard">
-            <div class="difficulty-label">HARD LEVEL (100%)</div>
+            <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="zap" class="card-icon"></i>
                 <div class="card-title">Rhythmic Intensity and Psychological State</div>
