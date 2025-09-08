@@ -38,25 +38,25 @@
             position: relative;
         }
 
-        /* Class-specific card colors */
-        .card.class-2a {
-            border-left-color: #8e44ad;
+        /* Class-specific card colors (match documentation CLASS-COLOR-SCHEME.md) */
+        .card.class-2a { /* PURPLE */
+            border-left-color: #6f42c1;
         }
 
-        .card.class-3a {
-            border-left-color: #00c851;
+        .card.class-3a { /* LIGHT GREEN */
+            border-left-color: #90ee90;
         }
 
-        .card.class-2b {
+        .card.class-2b { /* TEAL/TURQUOISE */
             border-left-color: #17a2b8;
         }
 
-        .card.class-4b {
-            border-left-color: #e91e63;
+        .card.class-4b { /* HOT PINK */
+            border-left-color: #ff1493;
         }
 
-        .card.class-ap {
-            border-left-color: #ff6f00;
+        .card.class-ap { /* ORANGE (3B/AP) */
+            border-left-color: #ff8c00;
         }
 
         .card.class-all {
@@ -118,29 +118,12 @@
         }
 
         /* Class-specific modal title colors */
-        .modal-title.class-2a {
-            color: #8e44ad;
-        }
-
-        .modal-title.class-3a {
-            color: #00c851;
-        }
-
-        .modal-title.class-2b {
-            color: #17a2b8;
-        }
-
-        .modal-title.class-4b {
-            color: #e91e63;
-        }
-
-        .modal-title.class-ap {
-            color: #ff6f00;
-        }
-
-        .modal-title.class-all {
-            color: #3498db;
-        }
+    .modal-title.class-2a { color: #6f42c1; }
+    .modal-title.class-3a { color: #90ee90; }
+    .modal-title.class-2b { color: #17a2b8; }
+    .modal-title.class-4b { color: #ff1493; }
+    .modal-title.class-ap { color: #ff8c00; }
+    .modal-title.class-all { color: #3498db; }
 
         .modal-content img {
             max-width: 100%;
@@ -157,7 +140,7 @@
         .card-title {
             font-size: 18px;
             font-weight: 700;
-            color: #ff6f00;
+            color: #2c3e50; /* default; overridden per class below */
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -170,30 +153,13 @@
             flex-shrink: 0;
         }
 
-        /* Class-specific icon colors */
-        .card.class-2a .card-title-icon {
-            color: #8e44ad;
-        }
-
-        .card.class-3a .card-title-icon {
-            color: #00c851;
-        }
-
-        .card.class-2b .card-title-icon {
-            color: #17a2b8;
-        }
-
-        .card.class-4b .card-title-icon {
-            color: #e91e63;
-        }
-
-        .card.class-ap .card-title-icon {
-            color: #ff6f00;
-        }
-
-        .card.class-all .card-title-icon {
-            color: #3498db;
-        }
+    /* Class-specific title and icon colors */
+    .card.class-2a .card-title, .card.class-2a .card-title-icon { color: #6f42c1; }
+    .card.class-3a .card-title, .card.class-3a .card-title-icon { color: #90ee90; }
+    .card.class-2b .card-title, .card.class-2b .card-title-icon { color: #17a2b8; }
+    .card.class-4b .card-title, .card.class-4b .card-title-icon { color: #ff1493; }
+    .card.class-ap .card-title, .card.class-ap .card-title-icon { color: #ff8c00; }
+    .card.class-all .card-title, .card.class-all .card-title-icon { color: #3498db; }
 
         .card-content {
             color: #2c3e50;
@@ -275,30 +241,13 @@
             text-decoration: none;
         }
 
-        /* Class-specific button colors */
-        .card.class-2a .card-link {
-            background: #8e44ad;
-        }
-
-        .card.class-3a .card-link {
-            background: #00c851;
-        }
-
-        .card.class-2b .card-link {
-            background: #17a2b8;
-        }
-
-        .card.class-4b .card-link {
-            background: #e91e63;
-        }
-
-        .card.class-ap .card-link {
-            background: #ff6f00;
-        }
-
-        .card.class-all .card-link {
-            background: #3498db;
-        }
+    /* Class-specific button colors */
+    .card.class-2a .card-link { background: #6f42c1; }
+    .card.class-3a .card-link { background: #90ee90; }
+    .card.class-2b .card-link { background: #17a2b8; }
+    .card.class-4b .card-link { background: #ff1493; }
+    .card.class-ap .card-link { background: #ff8c00; }
+    .card.class-all .card-link { background: #3498db; }
 
         .card-classes {
             font-size: 12px;
@@ -773,12 +722,12 @@
             if (link) {
                 // Get class-specific color
                 const classColors = {
-                    'class-2a': '#8e44ad',
-                    'class-3a': '#00c851',
-                    'class-2b': '#17a2b8', 
-                    'class-4b': '#e91e63',
-                    'class-ap': '#ff6f00',
-                    'class-all': '#3498db'
+                    'class-2a': '#6f42c1',    // PURPLE
+                    'class-3a': '#90ee90',    // LIGHT GREEN
+                    'class-2b': '#17a2b8',    // TEAL/TURQUOISE
+                    'class-4b': '#ff1493',    // HOT PINK
+                    'class-ap': '#ff8c00',    // ORANGE (AP)
+                    'class-all': '#3498db'    // DEFAULT
                 };
                 const buttonColor = classColors[classes] || '#3498db';
                 
