@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton Task Cards Set 2 - Printable Format</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 0.5in;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.25in;
+            width: 100%;
+        }
+
+        .task-card {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            width: 100%;
+            min-height: 4.5in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+        }
+
+        .card-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            flex-grow: 1;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .difficulty-label {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        /* Easy Level Colors - Green */
+        .task-card.easy {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-header {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-title,
+        .task-card.easy .card-icon,
+        .task-card.easy .difficulty-label,
+        .task-card.easy .directions h3,
+        .task-card.easy .sentence-frame h3,
+        .task-card.easy .hints h3,
+        .task-card.easy .full-width-hints h3 {
+            color: #28a745;
+        }
+
+        /* Medium Level Colors - Orange */
+        .task-card.medium {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-header {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-title,
+        .task-card.medium .card-icon,
+        .task-card.medium .difficulty-label,
+        .task-card.medium .directions h3,
+        .task-card.medium .sentence-frame h3,
+        .task-card.medium .hints h3,
+        .task-card.medium .full-width-hints h3 {
+            color: #fd7e14;
+        }
+
+        /* Hard Level Colors - Red */
+        .task-card.hard {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-header {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-title,
+        .task-card.hard .card-icon,
+        .task-card.hard .difficulty-label,
+        .task-card.hard .directions h3,
+        .task-card.hard .sentence-frame h3,
+        .task-card.hard .hints h3,
+        .task-card.hard .full-width-hints h3 {
+            color: #dc3545;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instructions {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            font-weight: 700;
+        }
+
+        .directions {
+            margin-bottom: 15px;
+        }
+
+        .directions h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .directions ol {
+            margin-left: 18px;
+            font-size: 12px;
+        }
+
+        .directions li {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        /* Color-themed numbered list styling */
+        .task-card.easy .directions ol {
+            counter-reset: easy-counter;
+        }
+
+        .task-card.easy .directions ol li {
+            counter-increment: easy-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.easy .directions ol li::before {
+            content: counter(easy-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .task-card.medium .directions ol {
+            counter-reset: medium-counter;
+        }
+
+        .task-card.medium .directions ol li {
+            counter-increment: medium-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.medium .directions ol li::before {
+            content: counter(medium-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #fd7e14;
+            font-size: 12px;
+        }
+
+        .task-card.hard .directions ol {
+            counter-reset: hard-counter;
+        }
+
+        .task-card.hard .directions ol li {
+            counter-increment: hard-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.hard .directions ol li::before {
+            content: counter(hard-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #dc3545;
+            font-size: 12px;
+        }
+
+        .bottom-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .sentence-frame {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .sentence-frame h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-style: normal;
+            margin-bottom: 8px;
+        }
+
+        .hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+        }
+
+        .hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .full-width-hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .full-width-hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .full-width-hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .full-width-hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        @media print {
+            body {
+                padding: 0.5in;
+            }
+            
+            .task-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .cards-grid {
+                gap: 0.2in;
+            }
+        }
+
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-grid">
+        <!-- Easy Level Cards -->
+        
+        <!-- Easy Card 1: Political Debate -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="megaphone" class="card-icon"></i>
+                <div class="card-title">Political Debate</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Farmer Refuted,"</strong> how do Hamilton and Seabury show they have <strong>different opinions</strong> about working with Britain?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Farmer Refuted"</strong> and identify the two main speakers</li>
+                        <li>Write down <strong>one thing</strong> each person believes about Britain</li>
+                        <li>Find <strong>specific words</strong> that show they disagree with each other</li>
+                        <li>Explain which person sounds more <strong>angry or upset</strong> and why</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Hamilton thinks _____ about Britain, but Seabury believes _____. You can tell they disagree because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Notice how their voices sound different - one is calm, one is excited</li>
+                            <li>Pay attention to who interrupts who during the song</li>
+                            <li>Listen for words about freedom versus safety</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 2: King's Attitude -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="crown" class="card-icon"></i>
+                <div class="card-title">King's Attitude</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"You'll Be Back,"</strong> how does King George show he feels about the <strong>American colonists</strong> leaving Britain?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"You'll Be Back"</strong> and notice the King's tone of voice</li>
+                        <li>Write down <strong>two emotions</strong> the King shows toward the colonists</li>
+                        <li>Find <strong>specific words</strong> that show whether he's angry or sad</li>
+                        <li>Explain what the King thinks will happen to the <strong>colonists without Britain</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        King George feels _____ about the colonists leaving. He thinks they will _____ without Britain's help.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Notice how the music sounds happy but the words are threatening</li>
+                            <li>Pay attention to whether he sounds like he's joking or serious</li>
+                            <li>Listen for what he says about the colonists coming back</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 3: Military Problems -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="shield" class="card-icon"></i>
+                <div class="card-title">Military Problems</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Right Hand Man,"</strong> what <strong>specific problems</strong> do the colonial soldiers face in their war against Britain?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Right Hand Man"</strong> and list the army's problems</li>
+                        <li>Write down <strong>two things</strong> the soldiers are missing or need</li>
+                        <li>Find <strong>specific words</strong> that describe how the soldiers are doing</li>
+                        <li>Explain why Washington needs <strong>help</strong> leading the army</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        The colonial army has problems like _____ and _____. Washington needs help because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what the soldiers don't have enough of</li>
+                            <li>Pay attention to words about winning versus losing</li>
+                            <li>Notice what Washington says about needing assistance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 4: Royal Authority -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="scepter" class="card-icon"></i>
+                <div class="card-title">Royal Authority</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"You'll Be Back,"</strong> what does King George think gives him the <strong>right to control</strong> the American colonists?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"You'll Be Back"</strong> and focus on what the King says about his power</li>
+                        <li>Write down <strong>two reasons</strong> he gives for why colonists should obey him</li>
+                        <li>Find <strong>specific words</strong> that show he feels he owns the colonists</li>
+                        <li>Explain what the King thinks will prove he's <strong>right</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        King George thinks he can control the colonists because _____. He believes _____ will prove he's right.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for words about ownership and belonging</li>
+                            <li>Pay attention to what he says about being their king</li>
+                            <li>Notice how he talks about the colonists like children</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 5: Leadership Skills -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="star" class="card-icon"></i>
+                <div class="card-title">Leadership Skills</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Right Hand Man,"</strong> what <strong>specific skills</strong> make Hamilton a good choice to be Washington's assistant?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Right Hand Man"</strong> and focus on Hamilton's abilities</li>
+                        <li>Write down <strong>two things</strong> Hamilton can do well</li>
+                        <li>Find <strong>specific words</strong> that describe Hamilton's talents</li>
+                        <li>Explain why these skills would <strong>help Washington</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Hamilton is good at _____ and _____. These skills will help Washington because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what Hamilton can write or organize</li>
+                            <li>Pay attention to words about speed and intelligence</li>
+                            <li>Notice what Washington says he needs help with</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Cards -->
+        
+        <!-- Medium Card 1: Political Philosophy -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="book-open" class="card-icon"></i>
+                <div class="card-title">Political Philosophy</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Compare the <strong>political arguments</strong> presented in <strong>"Farmer Refuted"</strong> and analyze how each speaker uses <strong>different reasoning strategies</strong> to support their position.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Identify the <strong>core argument</strong> each speaker makes about American independence</li>
+                        <li>Analyze how each speaker uses <strong>evidence or examples</strong> to support their position</li>
+                        <li>Compare their <strong>rhetorical techniques</strong> (appeals to emotion, logic, or authority)</li>
+                        <li>Evaluate which argument is more <strong>persuasive</strong> and explain your reasoning</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Notice how Hamilton uses rapid-fire facts while Seabury appeals to tradition</li>
+                        <li>Consider how their different speaking styles reflect their arguments</li>
+                        <li>Pay attention to which speaker interrupts and what that suggests about confidence</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 2: Colonial Relationship -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="users" class="card-icon"></i>
+                <div class="card-title">Colonial Relationship</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"You'll Be Back"</strong> portrays the relationship between Britain and America, and evaluate what this reveals about <strong>colonial power dynamics</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine the <strong>metaphors</strong> King George uses to describe his relationship with the colonists</li>
+                        <li>Analyze the <strong>contrast</strong> between the upbeat music and threatening content</li>
+                        <li>Evaluate what the King's <strong>predictions</strong> reveal about his understanding of colonial capabilities</li>
+                        <li>Compare this portrayal to <strong>actual historical</strong> British attitudes toward American independence</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how the King talks about the colonists like they're in a personal relationship</li>
+                        <li>Notice the disconnect between his cheerful tone and his threatening words</li>
+                        <li>Think about what his confidence reveals about British imperial attitudes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 3: Military Strategy -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="map" class="card-icon"></i>
+                <div class="card-title">Military Strategy</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze the <strong>strategic challenges</strong> presented in <strong>"Right Hand Man"</strong> and evaluate how Hamilton's appointment addresses specific <strong>military needs</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Identify the <strong>specific military problems</strong> facing Washington's army as described in the song</li>
+                        <li>Analyze how Hamilton's <strong>background and skills</strong> make him uniquely qualified to address these challenges</li>
+                        <li>Evaluate the <strong>strategic importance</strong> of having an effective aide-de-camp in 18th-century warfare</li>
+                        <li>Compare Washington's leadership approach with <strong>modern military</strong> organizational structures</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how communication and organization were crucial in pre-digital warfare</li>
+                        <li>Think about why Washington specifically needs someone who can write quickly and think strategically</li>
+                        <li>Notice how Hamilton's immigrant status might actually be an advantage</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 4: Political Persuasion -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="target" class="card-icon"></i>
+                <div class="card-title">Political Persuasion</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Evaluate how <strong>"Farmer Refuted"</strong> demonstrates different approaches to <strong>political persuasion</strong> and analyze their effectiveness for different audiences.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Compare the <strong>pace and intensity</strong> of each speaker's delivery</li>
+                        <li>Analyze how each speaker <strong>appeals to different values</strong> (security vs. freedom)</li>
+                        <li>Evaluate which approach would be more effective for <strong>undecided colonists</strong></li>
+                        <li>Connect these persuasion strategies to <strong>modern political</strong> communication methods</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Think about how Hamilton's rapid delivery might overwhelm or energize listeners</li>
+                        <li>Consider how Seabury's measured tone might appeal to cautious colonists</li>
+                        <li>Notice which speaker seems more confident in their facts versus their authority</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 5: Imperial Psychology -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="brain" class="card-icon"></i>
+                <div class="card-title">Imperial Psychology</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze the <strong>psychological elements</strong> in <strong>"You'll Be Back"</strong> and evaluate what they reveal about <strong>imperial mindset</strong> and colonial control.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine the King's use of <strong>possessive language</strong> and what it reveals about his mindset</li>
+                        <li>Analyze how he alternates between <strong>affection and threats</strong> as control mechanisms</li>
+                        <li>Evaluate his <strong>predictions about colonial failure</strong> and what they show about imperial assumptions</li>
+                        <li>Connect this portrayal to broader patterns in <strong>historical colonial</strong> relationships</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how abusive relationships use similar patterns of control</li>
+                        <li>Think about what the King's confidence reveals about British assumptions</li>
+                        <li>Notice how he infantilizes the colonists while claiming to love them</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Cards -->
+        
+        <!-- Hard Card 1: Enlightenment Ideologies -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="lightbulb" class="card-icon"></i>
+                <div class="card-title">Enlightenment Ideologies</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"Farmer Refuted"</strong> embodies competing Enlightenment philosophies and analyze their implications for <strong>revolutionary legitimacy</strong> and social contract theory.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Identify how each speaker's arguments reflect specific <strong>Enlightenment philosophers</strong> (Locke, Hobbes, etc.)</li>
+                        <li>Analyze the tension between <strong>natural rights theory</strong> and traditional authority</li>
+                        <li>Evaluate how their debate anticipates key questions in <strong>American constitutional</strong> development</li>
+                        <li>Synthesize how this intellectual conflict influenced the <strong>broader revolutionary</strong> movement's ideological foundation</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Hamilton's rapid argumentation mirrors Enlightenment emphasis on reason and evidence</li>
+                        <li>Think about how Seabury's appeal to stability reflects Hobbesian concerns about social order</li>
+                        <li>Examine how their debate prefigures Federalist vs. Anti-Federalist tensions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 2: Imperial Discourse -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="globe" class="card-icon"></i>
+                <div class="card-title">Imperial Discourse</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Deconstruct the <strong>imperial discourse</strong> in <strong>"You'll Be Back"</strong> and analyze how it reflects broader patterns of <strong>colonial paternalism</strong> and economic dependency theory.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how the King's language constructs <strong>colonial subjects</strong> as inherently dependent and inferior</li>
+                        <li>Examine the song's <strong>economic assumptions</strong> about colonial viability and imperial necessity</li>
+                        <li>Evaluate how the musical's satirical approach <strong>critiques historical</strong> imperial rhetoric</li>
+                        <li>Connect this portrayal to contemporary discussions of <strong>neocolonialism</strong> and economic dependency</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how the King's "loving" language masks economic exploitation</li>
+                        <li>Think about how his predictions reveal imperial assumptions about colonial capabilities</li>
+                        <li>Examine how the song's humor exposes the absurdity of imperial claims</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 3: Military Transformation -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="sword" class="card-icon"></i>
+                <div class="card-title">Military Transformation</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"Right Hand Man"</strong> represents the transformation of colonial resistance into <strong>professional military</strong> organization and its implications for American state formation.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how the song depicts the evolution from <strong>militia-based resistance</strong> to professional army structure</li>
+                        <li>Analyze Hamilton's appointment as representing broader trends in <strong>meritocratic advancement</strong> versus aristocratic privilege</li>
+                        <li>Evaluate how military <strong>bureaucratization</strong> contributed to emerging American administrative capacity</li>
+                        <li>Connect this military transformation to <strong>broader patterns</strong> of state-building in revolutionary contexts</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Hamilton's outsider status represents democratic ideals versus traditional hierarchy</li>
+                        <li>Think about how professional military organization contributed to post-war governmental capacity</li>
+                        <li>Examine how wartime administrative needs shaped American institutional development</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 4: Rhetorical Revolution -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="pen-tool" class="card-icon"></i>
+                <div class="card-title">Rhetorical Revolution</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Evaluate how <strong>"Farmer Refuted"</strong> demonstrates the relationship between <strong>rhetorical innovation</strong> and political revolution, analyzing the role of discourse in legitimizing social change.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how Hamilton's <strong>rhetorical strategies</strong> challenge traditional forms of political authority and discourse</li>
+                        <li>Examine the relationship between <strong>speed of delivery</strong> and democratic accessibility of ideas</li>
+                        <li>Evaluate how this public debate format contributes to <strong>emerging democratic</strong> political culture</li>
+                        <li>Synthesize how revolutionary rhetoric shaped <strong>American political identity</strong> and public sphere development</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Hamilton's interruptions represent democratic challenge to traditional authority</li>
+                        <li>Think about how rapid-fire argumentation democratizes access to political reasoning</li>
+                        <li>Examine how public political debate contributes to emerging American civic culture</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 5: Democratic Inclusion -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="scale" class="card-icon"></i>
+                <div class="card-title">Democratic Inclusion</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how the three songs collectively address questions of <strong>democratic inclusion</strong> and examine what they reveal about <strong>American revolutionary limitations</strong> and possibilities.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how Hamilton's immigrant status in <strong>"Right Hand Man"</strong> represents both inclusion and exclusion in American democracy</li>
+                        <li>Analyze how the songs' focus on <strong>elite male voices</strong> reflects limitations of revolutionary democratic ideals</li>
+                        <li>Evaluate how the musical's <strong>casting choices</strong> comment on these historical exclusions</li>
+                        <li>Synthesize how these tensions between <strong>revolutionary ideals and practice</strong> continue to shape American democratic development</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Hamilton's success story both fulfills and critiques American dream mythology</li>
+                        <li>Think about whose voices are absent from these political conversations</li>
+                        <li>Examine how the show models inclusive democratic participation through its approach to storytelling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

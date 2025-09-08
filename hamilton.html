@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton Task Cards Collection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .main-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4rem;
+            letter-spacing: 3px;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .sets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .set-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .set-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .set-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .set-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        .song-list {
+            margin-bottom: 1.5rem;
+        }
+
+        .song-list h4 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+            letter-spacing: 1px;
+        }
+
+        .songs {
+            list-style: none;
+            padding: 0;
+        }
+
+        .songs li {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            font-style: italic;
+        }
+
+        .links-section {
+            margin-top: 1.5rem;
+        }
+
+        .card-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .card-link {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .card-link i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .coming-soon {
+            opacity: 0.6;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        .coming-soon .set-title {
+            opacity: 0.7;
+        }
+
+        .coming-soon-text {
+            text-align: center;
+            font-style: italic;
+            opacity: 0.8;
+            font-size: 1.1rem;
+            margin: 2rem 0;
+        }
+
+        .workflow-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 3rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .workflow-info h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .workflow-steps {
+            list-style: none;
+            padding: 0;
+        }
+
+        .workflow-steps li {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .sets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-links {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="main-title">Hamilton Task Cards Collection</h1>
+        <p class="subtitle">Three-tier differentiated learning activities for Lin-Manuel Miranda's Hamilton</p>
+        
+        <div class="nav-links">
+            <a href="index.html" class="nav-link">
+                <i data-lucide="home"></i>
+                Back to Home
+            </a>
+            <a href="#workflow" class="nav-link">
+                <i data-lucide="workflow"></i>
+                Development Process
+            </a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sets-grid">
+            <!-- Set 1: Opening Songs -->
+            <div class="set-card">
+                <div class="set-title">
+                    <i data-lucide="music" class="set-icon"></i>
+                    Set 1: Opening Songs
+                </div>
+                
+                <div class="song-list">
+                    <h4>Featured Songs:</h4>
+                    <ul class="songs">
+                        <li>"Alexander Hamilton"</li>
+                        <li>"Aaron Burr, Sir"</li>
+                        <li>"My Shot"</li>
+                        <li>"The Story of Tonight"</li>
+                        <li>"The Schuyler Sisters"</li>
+                    </ul>
+                </div>
+
+                <div class="links-section">
+                    <div class="card-links">
+                        <a href="hamilton-task-cards-printable.html" class="card-link">
+                            <i data-lucide="printer"></i>
+                            Open for Printing
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Set 2: Political & Military -->
+            <div class="set-card">
+                <div class="set-title">
+                    <i data-lucide="crown" class="set-icon"></i>
+                    Set 2: Political & Military
+                </div>
+                
+                <div class="song-list">
+                    <h4>Featured Songs:</h4>
+                    <ul class="songs">
+                        <li>"Farmer Refuted"</li>
+                        <li>"You'll Be Back"</li>
+                        <li>"Right Hand Man"</li>
+                    </ul>
+                </div>
+
+                <div class="links-section">
+                    <div class="card-links">
+                        <a href="hamilton-task-cards-set2-printable.html" class="card-link">
+                            <i data-lucide="printer"></i>
+                            Open for Printing
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Set 3: Coming Soon -->
+            <div class="set-card coming-soon">
+                <div class="set-title">
+                    <i data-lucide="clock" class="set-icon"></i>
+                    Set 3: Coming Soon
+                </div>
+                
+                <div class="coming-soon-text">
+                    Next set in development...
+                </div>
+            </div>
+
+            <!-- Set 4: Coming Soon -->
+            <div class="set-card coming-soon">
+                <div class="set-title">
+                    <i data-lucide="clock" class="set-icon"></i>
+                    Set 4: Coming Soon
+                </div>
+                
+                <div class="coming-soon-text">
+                    Next set in development...
+                </div>
+            </div>
+        </div>
+
+        <!-- Development Workflow Info -->
+        <div class="workflow-info" id="workflow">
+            <h3>Development Workflow</h3>
+            <ol class="workflow-steps">
+                <li>
+                    <span class="step-number">1</span>
+                    <span>Identify songs for the next set</span>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <span>Create three-tier differentiated task cards following template standards</span>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <span>Add cards to Hamilton collection page with proper navigation</span>
+                </li>
+                <li>
+                    <span class="step-number">4</span>
+                    <span>Deploy materials to DHS repository for classroom access</span>
+                </li>
+                <li>
+                    <span class="step-number">5</span>
+                    <span>Move on to next set with same systematic process</span>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
