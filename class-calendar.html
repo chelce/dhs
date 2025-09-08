@@ -213,57 +213,6 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
   font-size: 0.9em !important;
 }
-
-/* Ultra-aggressive styling for debugging - make formatting VERY visible */
-div[contenteditable] strong,
-div[contenteditable] b,
-.ProseMirror strong,
-.ProseMirror b,
-.tiptap strong,
-.tiptap b,
-*[data-tiptap-editor] strong,
-*[data-tiptap-editor] b {
-  font-weight: 900 !important;
-  background-color: yellow !important;
-  color: #000 !important;
-  border: 1px solid red !important;
-}
-
-div[contenteditable] em,
-div[contenteditable] i,
-.ProseMirror em,
-.ProseMirror i,
-.tiptap em,
-.tiptap i,
-*[data-tiptap-editor] em,
-*[data-tiptap-editor] i {
-  font-style: italic !important;
-  background-color: lightblue !important;
-  color: #0066cc !important;
-}
-
-/* Global strong/bold debug styling */
-strong, b {
-  font-weight: 900 !important;
-  background-color: pink !important;
-  border: 2px solid red !important;
-}
-
-/* Force refresh all TipTap editors */
-.ProseMirror * {
-  transition: none !important;
-}
-
-.ProseMirror strong[data-pm-slice],
-.ProseMirror b[data-pm-slice],
-.ProseMirror strong,
-.ProseMirror b {
-  font-weight: 900 !important;
-  background-color: yellow !important;
-  border: 1px solid red !important;
-  color: #000 !important;
-  display: inline !important;
-}
 .editor-content-area img{max-width:100%;height:auto;display:block;margin:.4em 0}
 /* Task list styling */
 .editor-content-area ul[data-type="taskList"]{list-style:none;padding-left:0;margin:.6em 0 .9em}
@@ -841,24 +790,6 @@ function createTipTapEditor(elementId, onUpdate = null) {
         preserveWhitespace: 'full',
       },
       onUpdate: ({ editor }) => {
-        // Apply forced styling on every update to ensure it persists
-        setTimeout(() => {
-          const editorEl = editor.view?.dom;
-          if (editorEl) {
-            const allStrong = editorEl.querySelectorAll('strong, b');
-            allStrong.forEach((el, index) => {
-              if (!el.hasAttribute('data-styled')) {
-                el.style.fontWeight = '900';
-                el.style.backgroundColor = 'yellow';
-                el.style.border = '1px solid red';
-                el.style.color = '#000';
-                el.setAttribute('data-styled', 'true');
-                console.log(`🎨 Auto-styled strong element ${index}:`, el.textContent);
-              }
-            });
-          }
-        }, 10);
-        
         // Call original onUpdate if provided
         if (onUpdate) onUpdate({ editor });
       },
@@ -2548,7 +2479,9 @@ function openDetails(id){
   const prefillHtml = ev.notes || '<p></p>';
   const detailsNotesEl = document.getElementById('detailsNotesEditor');
   if (detailsNotesEl) {
-    detailsNotesEl.innerHTML = prefillHtml; // placeholder until TipTap is (re)initialized
+  // Important: do NOT prefill the container before TipTap mounts, or the original HTML will remain
+  // alongside the ProseMirror content, appearing as a duplicate. We clear it and set content after init.
+  detailsNotesEl.innerHTML = '';
   }
   
   // Ensure notes section is visible and functional
