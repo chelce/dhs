@@ -709,45 +709,10 @@ function initEditors(){
   }
 }
 
-// Test function for TipTap
-function testTipTap() {
-  console.log('🧪 Testing TipTap functionality...');
-  
-  // Show test editor
-  const testDiv = document.getElementById('test-editor');
-  if (testDiv) {
-    testDiv.style.display = 'block';
-  }
-  
-  // Create a test editor
-  const testEditor = createTipTapEditor('test-editor');
-  
-  if (testEditor) {
-    console.log('✅ Test editor created successfully');
-    
-    // Try to set content and format it
-    setTimeout(() => {
-      try {
-        testEditor.commands.setContent('<p>Hello <strong>world</strong>!</p>');
-        console.log('✅ Content set successfully');
-        
-        // Try to focus and add bold text
-        testEditor.chain().focus().run();
-        console.log('✅ Focus successful');
-        
-      } catch (e) {
-        console.error('❌ Test commands failed:', e);
-      }
-    }, 200);
-    
-  } else {
-    console.error('❌ Test editor creation failed');
-  }
-}
+// (Removed) Debug-only testTipTap() harness
 
 // Dynamic TipTap editor creation
 function createTipTapEditor(elementId, onUpdate = null) {
-  console.log('🎯 Creating TipTap editor for:', elementId);
   
   const element = document.getElementById(elementId);
   if (!element) {
@@ -755,20 +720,11 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return null;
   }
   
-  // Enhanced debugging for editor creation
-  console.log('🔧 Element state before creation:', {
-    elementId,
-    elementExists: !!element,
-    elementHTML: element.innerHTML?.substring(0, 100),
-    elementVisible: element.offsetWidth > 0 && element.offsetHeight > 0,
-    elementStyle: element.style.cssText,
-    elementParent: element.parentNode?.tagName
-  });
+  // Element is required for editor creation
   
   // Test if TipTap is available
   if (!window.TiptapEditor) {
     console.error('❌ TiptapEditor not available on window object');
-    console.log('Available TipTap objects:', Object.keys(window).filter(key => key.includes('Tiptap')));
     return null;
   }
   
@@ -779,7 +735,7 @@ function createTipTapEditor(elementId, onUpdate = null) {
   
   const extensions = [window.TiptapStarterKit];
   
-  console.log('🔧 Creating editor with extensions:', extensions);
+  // Create editor instance
   
   try {
     const editor = new window.TiptapEditor({
@@ -805,45 +761,19 @@ function createTipTapEditor(elementId, onUpdate = null) {
         },
       },
       onCreate: ({ editor }) => {
-        console.log('✅ TipTap editor onCreate triggered for:', elementId);
-        console.log('🔧 Editor state in onCreate:', {
-          hasView: !!(editor.view || editor.editorView),
-          hasState: !!editor.state,
-          hasCommands: !!editor.commands,
-          hasChain: !!editor.chain,
-          canToggleBold: !!(editor.commands?.toggleBold || editor.chain()?.toggleBold)
-        });
-        // Wait a bit more to ensure DOM is ready
+        // Ensure DOM is mounted before marking ready and flushing queued actions
         setTimeout(() => {
-          try {
-            const ok = !!(editor.editorView && editor.editorView.dom);
-            if (ok) {
-              console.log('✅ Editor view is ready and mounted');
-              editor.__ready = true;
-              
-              // Flush any queued actions registered before ready
-              const q = editor.__pendingActions || [];
-              editor.__pendingActions = [];
-              q.forEach(fn => { try { fn(); } catch(e){ console.error('❌ Queued action error (onCreate):', e); } });
-            } else {
-              console.warn('⚠️ Editor view not ready in onCreate');
-            }
-          } catch (e) {
-            console.warn('⚠️ Error checking editor view in onCreate:', e);
+          const ok = !!(editor.editorView && editor.editorView.dom);
+          if (ok) {
+            editor.__ready = true;
+            const q = editor.__pendingActions || [];
+            editor.__pendingActions = [];
+            q.forEach(fn => { try { fn(); } catch(e){} });
           }
         }, 50);
       }
     });
-    
-    console.log('✅ TipTap editor created successfully for:', elementId);
-    console.log('Editor object details:', {
-      constructor: editor.constructor.name,
-      hasChain: typeof editor.chain,
-      hasCommands: !!editor.commands,
-      hasState: !!editor.state,
-      hasView: !!(editor.view || editor.editorView)
-    });
-    
+
     return editor;
   } catch (error) {
     console.error('❌ Failed to create TipTap editor:', error);
@@ -2445,13 +2375,11 @@ function applyFilters(){
 }
 
 function openDetails(id){
-  console.log('🔍 openDetails called with id:', id);
   const ev=events.find(e=>e.id===id); 
   if(!ev) {
-    console.log('❌ Event not found with id:', id);
+  console.warn('❌ Event not found with id:', id);
     return; 
   }
-  console.log('📝 Event found:', ev);
   
   currentEditId=id;
   document.getElementById('detailsTitle').textContent=ev.text;
@@ -2506,22 +2434,14 @@ function openDetails(id){
   }
   
   document.getElementById('detailsModal').style.display='flex';
-  console.log('🎯 Details modal should now be visible');
   
   // Initialize editor and toolbar for details modal
   setTimeout(() => {
-    console.log('⏰ Initializing details modal editor...');
     const detailsNotesMenu = document.getElementById('detailsNotesMenu');
     const detailsNotesEditorEl = document.getElementById('detailsNotesEditor');
 
-    console.log('📋 Elements found:', {
-      menu: !!detailsNotesMenu,
-      editorEl: !!detailsNotesEditorEl
-    });
-
     // Destroy existing editor if it exists
     if (detailsEditor) {
-      console.log('🗑️ Destroying existing detailsEditor');
       detailsEditor.destroy();
       detailsEditor = null;
     }
@@ -2529,8 +2449,7 @@ function openDetails(id){
     // Create fresh TipTap editor
     detailsEditor = createTipTapEditor('detailsNotesEditor');
 
-    if (detailsEditor) {
-      console.log('✅ Building TipTap toolbar for details modal');
+  if (detailsEditor) {
       // Set initial content once on the fresh editor to avoid later resets that move the caret
       try {
         // Decode HTML entities if present
@@ -2539,18 +2458,7 @@ function openDetails(id){
           .replace(/&lt;/g, '<')
           .replace(/&gt;/g, '>')
           .replace(/&quot;/g, '"');
-        console.log('🔧 Setting content:', { original: prefillHtml.substring(0, 100), decoded: decodedHtml.substring(0, 100) });
         detailsEditor.commands.setContent(decodedHtml, false, { preserveWhitespace: 'full' });
-
-        // Additional debug: Check if content is being set as HTML or text
-        setTimeout(() => {
-          console.log('🔧 Post-setContent debug:', {
-            editorHTML: detailsEditor.getHTML?.()?.substring(0, 200),
-            editorText: detailsEditor.getText?.()?.substring(0, 100),
-            viewDOM: detailsEditor.view?.dom?.innerHTML?.substring(0, 200),
-            hasStrongInContent: detailsEditor.getHTML?.()?.includes('<strong>') || detailsEditor.getHTML?.()?.includes('<b>')
-          });
-        }, 50);
       } catch (e) {
         console.warn('⚠️ Failed to set content:', e);
       }
@@ -2562,7 +2470,6 @@ function openDetails(id){
       }
     } else {
       // Fallback only when editor failed to create
-      console.log('⚠️ TipTap editor unavailable; enabling minimal fallback.');
       if (detailsNotesEditorEl) {
         detailsNotesEditorEl.setAttribute('contenteditable', 'true');
         detailsNotesEditorEl.innerHTML = prefillHtml;
@@ -2574,7 +2481,6 @@ function openDetails(id){
 
     // Initialize Lucide icons for the toolbar
     if (window.lucide) {
-      console.log('🎨 Initializing Lucide icons');
       window.lucide.createIcons();
     }
   }, 100);
