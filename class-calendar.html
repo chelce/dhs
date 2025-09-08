@@ -2564,12 +2564,12 @@ function openDetails(id){
     detailsNotesWrapper.style.display = 'flex';
     detailsNotesWrapper.style.visibility = 'visible';
   }
+  // Do NOT enable fallback contentEditable when TipTap is available; it conflicts with ProseMirror DOM
+  // Fallback will be enabled later only if TipTap editor creation fails
   if (detailsNotesEditor) {
     detailsNotesEditor.style.minHeight = '100px';
-    detailsNotesEditor.contentEditable = 'true';
-    if (!detailsNotesEditor.innerHTML || detailsNotesEditor.innerHTML === '') {
-      detailsNotesEditor.innerHTML = '<p></p>';
-    }
+    // Ensure no stray contentEditable attribute remains from prior state
+    detailsNotesEditor.removeAttribute('contenteditable');
   }
   
   document.getElementById('detailsModal').style.display='flex';
@@ -2580,31 +2580,35 @@ function openDetails(id){
     console.log('⏰ Initializing details modal editor...');
     const detailsNotesMenu = document.getElementById('detailsNotesMenu');
     const detailsNotesEditorEl = document.getElementById('detailsNotesEditor');
-    
+
     console.log('📋 Elements found:', {
       menu: !!detailsNotesMenu,
       editorEl: !!detailsNotesEditorEl
     });
-    
+
     // Destroy existing editor if it exists
     if (detailsEditor) {
       console.log('🗑️ Destroying existing detailsEditor');
       detailsEditor.destroy();
       detailsEditor = null;
     }
-    
-  // Create fresh TipTap editor
-  detailsEditor = createTipTapEditor('detailsNotesEditor');
-    
-    if (detailsEditor && detailsNotesMenu) {
+
+    // Create fresh TipTap editor
+    detailsEditor = createTipTapEditor('detailsNotesEditor');
+
+    if (detailsEditor) {
       console.log('✅ Building TipTap toolbar for details modal');
       // Set initial content once on the fresh editor to avoid later resets that move the caret
-      try { 
+      try {
         // Decode HTML entities if present
-        const decodedHtml = prefillHtml.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
+        const decodedHtml = prefillHtml
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"');
         console.log('🔧 Setting content:', { original: prefillHtml.substring(0, 100), decoded: decodedHtml.substring(0, 100) });
-        detailsEditor.commands.setContent(decodedHtml, false, { preserveWhitespace: 'full' }); 
-        
+        detailsEditor.commands.setContent(decodedHtml, false, { preserveWhitespace: 'full' });
+
         // Additional debug: Check if content is being set as HTML or text
         setTimeout(() => {
           console.log('🔧 Post-setContent debug:', {
@@ -2613,29 +2617,28 @@ function openDetails(id){
             viewDOM: detailsEditor.view?.dom?.innerHTML?.substring(0, 200),
             hasStrongInContent: detailsEditor.getHTML?.()?.includes('<strong>') || detailsEditor.getHTML?.()?.includes('<b>')
           });
-        }, 100);
-      } catch(e) { 
+        }, 50);
+      } catch (e) {
         console.warn('⚠️ Failed to set content:', e);
       }
-      // Always rebuild to bind to the fresh editor instance
-      setTimeout(() => {
-        buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
-      }, 150);
-  // Do not setContent again later; repeated calls can reset selection and move the caret to the end
-      
-    } else {
-      console.log('⚠️ Using fallback contentEditable for details modal');
-      if (!detailsEditor && detailsNotesEditorEl) {
-        detailsNotesEditorEl.contentEditable = 'true';
-        if (ev.notes) {
-          detailsNotesEditorEl.innerHTML = ev.notes;
-        }
+      // Build toolbar after editor is ready
+      if (detailsNotesMenu) {
+        setTimeout(() => {
+          buildTipTap3Toolbar(detailsEditor, detailsNotesMenu);
+        }, 150);
       }
-      if (!detailsEditor && detailsNotesMenu) {
+    } else {
+      // Fallback only when editor failed to create
+      console.log('⚠️ TipTap editor unavailable; enabling minimal fallback.');
+      if (detailsNotesEditorEl) {
+        detailsNotesEditorEl.setAttribute('contenteditable', 'true');
+        detailsNotesEditorEl.innerHTML = prefillHtml;
+      }
+      if (detailsNotesMenu) {
         buildFallbackToolbar(detailsNotesMenu);
       }
     }
-    
+
     // Initialize Lucide icons for the toolbar
     if (window.lucide) {
       console.log('🎨 Initializing Lucide icons');
