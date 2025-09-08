@@ -302,7 +302,7 @@
         }
 
         // Simple card rendering function
-        function renderCards(posts) {
+    function renderCards(posts) {
             const container = document.getElementById('cardsContainer');
             
             // Apply class filtering
@@ -316,6 +316,9 @@
                 container.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">${message}</div>`;
                 return;
             }
+
+            // Save for click handlers to reference without embedding content in HTML
+            window._renderedPosts = filteredPosts;
 
             container.innerHTML = filteredPosts.map((post, index) => {
                 const processedContent = autoGenerateHTML(post.content);
@@ -354,7 +357,7 @@
                 const titleHTML = `<div class="card-title">${iconHTML}${post.title || 'No Title'}</div>`;
                 
                 let cardHTML = `
-                    <div class="${cardClass}" onclick="openModal('${post.title || 'No Title'}', \`${processedContent.replace(/`/g, '\\`')}\`, '${post.link || ''}', '${modalClass}')">
+                    <div class="${cardClass}" data-index="${index}">
                         ${titleHTML}
                         <div class="card-content">${processedContent}</div>
                 `;
@@ -383,11 +386,36 @@
 
                 return cardHTML;
             }).join('');
-            
+            // Attach click handlers to cards (avoid inline JS with large HTML strings)
+            const cards = container.querySelectorAll('.card[data-index]');
+            cards.forEach(cardEl => {
+                cardEl.addEventListener('click', (e) => {
+                    // Ignore clicks on links inside the card
+                    if (e.target.closest('a')) return;
+                    const idx = Number(cardEl.getAttribute('data-index'));
+                    const post = (window._renderedPosts || [])[idx];
+                    if (!post) return;
+                    const modalClass = deriveModalClass(post.classes);
+                    openModal(post.title || 'No Title', post.content || '', post.link || '', modalClass);
+                });
+            });
+
             // Initialize Lucide icons after cards are rendered
             if (typeof lucide !== 'undefined') {
                 lucide.createIcons();
             }
+        }
+
+        // Helper to convert classes array into modal class string
+        function deriveModalClass(postClasses) {
+            const classes = Array.isArray(postClasses) ? postClasses : ['all'];
+            if (classes.includes('all')) return 'class-all';
+            if (classes.includes('2a')) return 'class-2a';
+            if (classes.includes('3a')) return 'class-3a';
+            if (classes.includes('2b')) return 'class-2b';
+            if (classes.includes('4b')) return 'class-4b';
+            if (classes.includes('ap') || classes.includes('3b')) return 'class-ap';
+            return 'class-all';
         }
 
         // Direct API call using fetch with proper error handling
