@@ -869,34 +869,6 @@ function createTipTapEditor(elementId, onUpdate = null) {
               console.log('✅ Editor view is ready and mounted');
               editor.__ready = true;
               
-              // Set up MutationObserver to force styling on new elements
-              const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                  if (mutation.type === 'childList') {
-                    mutation.addedNodes.forEach((node) => {
-                      if (node.nodeType === 1) { // Element node
-                        const strongEls = node.tagName === 'STRONG' || node.tagName === 'B' ? [node] : 
-                                        node.querySelectorAll ? Array.from(node.querySelectorAll('strong, b')) : [];
-                        strongEls.forEach(el => {
-                          el.style.fontWeight = '900';
-                          el.style.backgroundColor = 'yellow';
-                          el.style.border = '1px solid red';
-                          el.style.color = '#000';
-                        });
-                      }
-                    });
-                  }
-                });
-              });
-              
-              if (editor.editorView && editor.editorView.dom) {
-                observer.observe(editor.editorView.dom, {
-                  childList: true,
-                  subtree: true
-                });
-                editor.__styleObserver = observer;
-              }
-              
               // Flush any queued actions registered before ready
               const q = editor.__pendingActions || [];
               editor.__pendingActions = [];
@@ -1327,21 +1299,25 @@ function buildTipTap3Toolbar(editor, el) {
                   editorClass: editorEl.className
                 });
                 
-                // Force style refresh on all strong/bold elements
+                // Force style refresh on all strong/bold elements - ONE TIME ONLY
                 const allStrong = editorEl.querySelectorAll('strong, b');
-                allStrong.forEach(el => {
-                  // Force recalculation of styles
-                  el.style.fontWeight = '900';
-                  el.style.backgroundColor = 'yellow';
-                  el.style.border = '1px solid red';
-                  el.style.color = '#000';
-                  // Trigger reflow
-                  el.offsetHeight;
+                allStrong.forEach((el, index) => {
+                  if (!el.hasAttribute('data-styled')) {
+                    // Force recalculation of styles
+                    el.style.fontWeight = '900';
+                    el.style.backgroundColor = 'yellow';
+                    el.style.border = '1px solid red';
+                    el.style.color = '#000';
+                    el.setAttribute('data-styled', 'true'); // Prevent re-styling
+                    console.log(`🎨 Applied styles to strong element ${index}:`, el.textContent);
+                  }
                 });
                 
-                // Force re-render by updating the view
-                if (editor.view?.updateState) {
-                  editor.view.updateState(editor.state);
+                // Force re-render by updating the view (only if needed)
+                if (editor.view?.updateState && allStrong.length > 0) {
+                  requestAnimationFrame(() => {
+                    editor.view.updateState(editor.state);
+                  });
                 }
               }
             }, 100);
