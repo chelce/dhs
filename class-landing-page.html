@@ -151,6 +151,9 @@
             width: 24px;
             height: 24px;
             flex-shrink: 0;
+            /* Ensure Lucide SVGs inherit text color */
+            stroke: currentColor;
+            fill: none;
         }
 
     /* Class-specific title and icon colors */
@@ -286,17 +289,15 @@
             return urlParams.get(name);
         }
 
-        // Filter posts by class if specified in URL
+        // Filter posts by class if specified in URL (case-insensitive, array-aware)
         function filterPostsByClass(posts) {
-            const classFilter = getUrlParameter('class');
-            if (!classFilter) {
-                return posts; // Show all posts if no class filter
-            }
-            
+            const classFilter = (getUrlParameter('class') || '').toLowerCase();
+            if (!classFilter) return posts; // Show all posts if no class filter
+
             return posts.filter(post => {
-                const postClasses = post.classes || 'all';
-                // Check if post is for 'all' classes or matches the specific class
-                return postClasses === 'all' || postClasses.includes(classFilter);
+                const postClasses = Array.isArray(post.classes) ? post.classes : ['all'];
+                // Match 'all' or the specified class token
+                return postClasses.includes('all') || postClasses.includes(classFilter);
             });
         }
 
@@ -306,10 +307,11 @@
             
             // Apply class filtering
             const filteredPosts = filterPostsByClass(posts);
+            const classFilterParam = getUrlParameter('class');
             
             if (!filteredPosts || filteredPosts.length === 0) {
-                const message = classFilter 
-                    ? `No cards available for class: ${classFilter}` 
+                const message = classFilterParam 
+                    ? `No cards available for class: ${classFilterParam}` 
                     : 'No cards available';
                 container.innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 20px;">${message}</div>`;
                 return;
@@ -319,12 +321,12 @@
                 const processedContent = autoGenerateHTML(post.content);
                 
                 // Determine card class for styling based on post's classes
-                const postClasses = post.classes || 'all';
+                const postClasses = Array.isArray(post.classes) ? post.classes : ['all'];
                 let cardClass = 'card';
                 let modalClass = '';
                 
                 // Apply class-specific styling
-                if (postClasses === 'all') {
+                if (postClasses.includes('all')) {
                     cardClass += ' class-all';
                     modalClass = 'class-all';
                 } else if (postClasses.includes('2a')) {
@@ -339,7 +341,7 @@
                 } else if (postClasses.includes('4b')) {
                     cardClass += ' class-4b';
                     modalClass = 'class-4b';
-                } else if (postClasses.includes('ap')) {
+                } else if (postClasses.includes('ap') || postClasses.includes('3b')) {
                     cardClass += ' class-ap';
                     modalClass = 'class-ap';
                 } else {
@@ -650,7 +652,7 @@
         }
 
         // Process raw Coda data into card format
-        function processCodaPosts(items) {
+    function processCodaPosts(items) {
             if (!items) return [];
             
             return items
@@ -661,7 +663,7 @@
                     const rawContent = values[CODA_CONFIG.columns.content] || '';
                     const htmlContent = values[CODA_CONFIG.columns.html] || '';
                     const link = values[CODA_CONFIG.columns.link] || '';
-                    const classes = values[CODA_CONFIG.columns.classes] || 'all';
+            const classes = values[CODA_CONFIG.columns.classes] || 'all';
                     const icon = values[CODA_CONFIG.columns.icon] || '';
                     const modified = values[CODA_CONFIG.columns.modified] || '';
 
@@ -687,13 +689,20 @@
                         content = `<div style="font-style: italic; color: #7f8c8d; margin-bottom: 10px;">${subhead}</div>${content}`;
                     }
 
+                    // Normalize classes into lowercase tokens array
+                    const normalizedClasses = String(classes)
+                        .split(',')
+                        .map(c => c.trim().toLowerCase())
+                        .filter(Boolean);
+                    const classTokens = normalizedClasses.length ? normalizedClasses : ['all'];
+
                     return {
                         id: item.id,
                         title: title,
                         subhead: subhead,
                         content: content,
                         link: link,
-                        classes: classes.split(',').map(c => c.trim()),
+                        classes: classTokens,
                         icon: icon,
                         modified: modified,
                         source: htmlContent ? 'html-column' : 'auto-converted'
