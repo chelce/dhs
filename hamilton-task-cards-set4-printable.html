@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton Task Cards Set 4 - Printable Format</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 0.5in;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.25in;
+            width: 100%;
+        }
+
+        .task-card {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            width: 100%;
+            min-height: 4.5in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+        }
+
+        .card-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            flex-grow: 1;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .difficulty-label {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        /* Easy Level Colors - Green */
+        .task-card.easy {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-header {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-title,
+        .task-card.easy .card-icon,
+        .task-card.easy .difficulty-label,
+        .task-card.easy .directions h3,
+        .task-card.easy .sentence-frame h3,
+        .task-card.easy .hints h3,
+        .task-card.easy .full-width-hints h3 {
+            color: #28a745;
+        }
+
+        /* Medium Level Colors - Orange */
+        .task-card.medium {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-header {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-title,
+        .task-card.medium .card-icon,
+        .task-card.medium .difficulty-label,
+        .task-card.medium .directions h3,
+        .task-card.medium .sentence-frame h3,
+        .task-card.medium .hints h3,
+        .task-card.medium .full-width-hints h3 {
+            color: #fd7e14;
+        }
+
+        /* Hard Level Colors - Red */
+        .task-card.hard {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-header {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-title,
+        .task-card.hard .card-icon,
+        .task-card.hard .difficulty-label,
+        .task-card.hard .directions h3,
+        .task-card.hard .sentence-frame h3,
+        .task-card.hard .hints h3,
+        .task-card.hard .full-width-hints h3 {
+            color: #dc3545;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instructions {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            font-weight: 700;
+        }
+
+        .directions {
+            margin-bottom: 15px;
+        }
+
+        .directions h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .directions ol {
+            margin-left: 18px;
+            font-size: 12px;
+        }
+
+        .directions li {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        /* Color-themed numbered list styling */
+        .task-card.easy .directions ol {
+            counter-reset: easy-counter;
+        }
+
+        .task-card.easy .directions ol li {
+            counter-increment: easy-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.easy .directions ol li::before {
+            content: counter(easy-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .task-card.medium .directions ol {
+            counter-reset: medium-counter;
+        }
+
+        .task-card.medium .directions ol li {
+            counter-increment: medium-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.medium .directions ol li::before {
+            content: counter(medium-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #fd7e14;
+            font-size: 12px;
+        }
+
+        .task-card.hard .directions ol {
+            counter-reset: hard-counter;
+        }
+
+        .task-card.hard .directions ol li {
+            counter-increment: hard-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.hard .directions ol li::before {
+            content: counter(hard-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #dc3545;
+            font-size: 12px;
+        }
+
+        .bottom-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .sentence-frame {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .sentence-frame h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-style: normal;
+            margin-bottom: 8px;
+        }
+
+        .hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+        }
+
+        .hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .full-width-hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .full-width-hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .full-width-hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .full-width-hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        @media print {
+            body {
+                padding: 0.5in;
+            }
+            
+            .task-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .cards-grid {
+                gap: 0.2in;
+            }
+        }
+
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-grid">
+        <!-- Easy Level Cards -->
+        
+        <!-- Easy Card 1: Battlefield Medicine -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="heart-pulse" class="card-icon"></i>
+                <div class="card-title">Battlefield Medicine</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Stay Alive,"</strong> what <strong>medical challenges</strong> do the soldiers face, and how does this affect their fighting ability?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Stay Alive"</strong> and identify what happens to injured soldiers</li>
+                        <li>Write down <strong>two problems</strong> with treating wounded soldiers during battle</li>
+                        <li>Find <strong>specific words</strong> that describe the soldiers' physical condition</li>
+                        <li>Explain how these medical problems make it harder to <strong>win battles</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        When soldiers get hurt, they face problems like _____ and _____. This makes fighting harder because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what happens when soldiers can't get proper medical care</li>
+                            <li>Pay attention to words about pain, wounds, and recovery</li>
+                            <li>Notice how injuries affect the army's strength and morale</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 2: Honor Code -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="sword" class="card-icon"></i>
+                <div class="card-title">Honor Code</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Ten Duel Commandments,"</strong> what are the <strong>main rules</strong> that people must follow when fighting a duel?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Ten Duel Commandments"</strong> and identify the steps people take</li>
+                        <li>Write down <strong>three specific rules</strong> mentioned in the song</li>
+                        <li>Find <strong>specific words</strong> that explain how duels are supposed to be fair</li>
+                        <li>Explain why people thought dueling was necessary to <strong>protect their honor</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        The duel rules include _____, _____, and _____. People duel to _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for numbered steps and what each person must do</li>
+                            <li>Pay attention to words about fairness and proper procedure</li>
+                            <li>Notice what happens if someone doesn't follow the rules</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 3: Military Discipline -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="shield-alert" class="card-icon"></i>
+                <div class="card-title">Military Discipline</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Meet Me Inside,"</strong> why is Washington <strong>angry</strong> with Hamilton, and what does this teach about military rules?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Meet Me Inside"</strong> and identify what Hamilton did wrong</li>
+                        <li>Write down <strong>two reasons</strong> Washington gives for being upset</li>
+                        <li>Find <strong>specific words</strong> that show Washington's authority as a leader</li>
+                        <li>Explain why following orders is important in the <strong>military</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Washington is angry because Hamilton _____. Military rules are important because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what Hamilton did that broke military protocol</li>
+                            <li>Pay attention to words about authority and chain of command</li>
+                            <li>Notice how disobedience affects the whole army</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 4: War's Impact on Families -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="home" class="card-icon"></i>
+                <div class="card-title">War's Impact on Families</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"That Would Be Enough,"</strong> how does Eliza show that she's worried about <strong>Hamilton's safety</strong> in the war?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"That Would Be Enough"</strong> and focus on Eliza's concerns</li>
+                        <li>Write down <strong>two things</strong> Eliza says about war's dangers</li>
+                        <li>Find <strong>specific words</strong> that show her fear about losing Hamilton</li>
+                        <li>Explain what Eliza thinks would be more important than <strong>winning glory</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Eliza worries that _____ might happen to Hamilton. She thinks _____ is more important than glory.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what Eliza says about Hamilton coming home safely</li>
+                            <li>Pay attention to words about family versus fame</li>
+                            <li>Notice how she talks about their future together</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 5: Leadership Pressure (Modified to have 5 cards as requested - combining themes) -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="crown" class="card-icon"></i>
+                <div class="card-title">Leadership Pressure</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Across these songs, what <strong>different pressures</strong> do leaders like Hamilton and Washington face during wartime?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Think about the challenges mentioned in <strong>all four songs</strong></li>
+                        <li>Write down <strong>two pressures</strong> that military leaders face</li>
+                        <li>Find examples of how <strong>personal life</strong> and military duty conflict</li>
+                        <li>Explain why leadership during war is <strong>especially difficult</strong></li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Military leaders face pressures like _____ and _____. Leadership is hard because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Think about medical problems, honor, discipline, and family concerns</li>
+                            <li>Consider how leaders must balance different responsibilities</li>
+                            <li>Notice how personal and professional conflicts arise</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Cards -->
+        
+        <!-- Medium Card 1: Military Medicine -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="stethoscope" class="card-icon"></i>
+                <div class="card-title">Military Medicine</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"Stay Alive"</strong> depicts the medical challenges of 18th-century warfare and evaluate their impact on <strong>military strategy</strong> and morale.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine the <strong>specific medical limitations</strong> described in the song and their historical accuracy</li>
+                        <li>Analyze how <strong>casualty rates and care</strong> affect military decision-making and troop morale</li>
+                        <li>Evaluate the relationship between <strong>medical preparedness</strong> and strategic advantage in warfare</li>
+                        <li>Compare 18th-century battlefield medicine to <strong>modern military</strong> medical capabilities</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how limited medical knowledge affected survival rates and recovery</li>
+                        <li>Think about how medical challenges influenced battle tactics and duration</li>
+                        <li>Notice how medical concerns affect both individual and collective resolve</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 2: Honor Culture -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="scales" class="card-icon"></i>
+                <div class="card-title">Honor Culture</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Evaluate how <strong>"Ten Duel Commandments"</strong> reveals the honor culture of the 18th century and analyze its <strong>social functions</strong> and consequences.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how the <strong>ritual structure</strong> of dueling reflects broader social values about reputation</li>
+                        <li>Examine the <strong>class and gender dynamics</strong> embedded in honor culture practices</li>
+                        <li>Evaluate the tension between <strong>civilized procedure</strong> and violent resolution of conflicts</li>
+                        <li>Compare honor-based conflict resolution to <strong>modern legal</strong> and social systems</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how dueling rules attempt to make violence "civilized" and fair</li>
+                        <li>Think about what social groups had access to honor culture and why</li>
+                        <li>Notice how honor culture both preserves and threatens social order</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 3: Military Hierarchy -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="triangle" class="card-icon"></i>
+                <div class="card-title">Military Hierarchy</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze the <strong>power dynamics</strong> in <strong>"Meet Me Inside"</strong> and evaluate how military hierarchy functions during <strong>revolutionary</strong> versus traditional warfare.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how Washington's <strong>authority</strong> is established and maintained in a volunteer army</li>
+                        <li>Analyze the tension between <strong>democratic ideals</strong> and military discipline requirements</li>
+                        <li>Evaluate Hamilton's challenge to authority and what it reveals about <strong>revolutionary leadership</strong></li>
+                        <li>Compare revolutionary military hierarchy to <strong>traditional European</strong> military structures</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Washington must balance democratic principles with military necessity</li>
+                        <li>Think about Hamilton's position as both subordinate and intellectual equal</li>
+                        <li>Notice how revolutionary armies face unique leadership challenges</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 4: War and Domesticity -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="heart-crack" class="card-icon"></i>
+                <div class="card-title">War and Domesticity</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"That Would Be Enough"</strong> explores the tension between <strong>public ambition</strong> and private happiness during wartime.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how Eliza's perspective <strong>challenges</strong> traditional narratives of military heroism</li>
+                        <li>Analyze the <strong>gendered dimensions</strong> of war's impact on families and domestic life</li>
+                        <li>Evaluate the tension between <strong>individual glory</strong> and collective/family welfare</li>
+                        <li>Compare 18th-century expectations about <strong>war and family</strong> to contemporary military families</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how Eliza's voice provides an alternative view of success and achievement</li>
+                        <li>Think about how war affects different family members in different ways</li>
+                        <li>Notice the conflict between duty to country and duty to family</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 5: Revolutionary Sacrifice -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="flame" class="card-icon"></i>
+                <div class="card-title">Revolutionary Sacrifice</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Evaluate how these four songs collectively explore the <strong>personal costs</strong> of revolutionary participation and their impact on <strong>individual identity</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how each song reveals different <strong>types of sacrifice</strong> required by revolutionary involvement</li>
+                        <li>Examine the tension between <strong>ideological commitment</strong> and personal well-being</li>
+                        <li>Evaluate how revolutionary participation affects <strong>relationships and identity</strong></li>
+                        <li>Compare these revolutionary costs to <strong>modern activism</strong> and social change movements</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider physical, emotional, social, and moral costs of revolutionary involvement</li>
+                        <li>Think about how the revolution demands sacrifice from different people in different ways</li>
+                        <li>Notice how personal relationships become entangled with political commitments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Cards -->
+        
+        <!-- Hard Card 1: Biopolitics of War -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="dna" class="card-icon"></i>
+                <div class="card-title">Biopolitics of War</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"Stay Alive"</strong> reveals the biopolitical dimensions of warfare, analyzing how <strong>state power</strong> manages and sacrifices individual bodies for political ends.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how the song depicts the <strong>state's calculation</strong> of acceptable casualty rates and medical resource allocation</li>
+                        <li>Examine the relationship between <strong>individual bodily</strong> suffering and collective political goals</li>
+                        <li>Evaluate how medical limitations shape <strong>military strategy</strong> and the acceptable costs of revolutionary change</li>
+                        <li>Synthesize how this portrayal connects to <strong>broader theories</strong> about state power and the management of life and death</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how revolutionary states must balance ideological goals with human costs</li>
+                        <li>Think about how medical knowledge and resources become tools of state power</li>
+                        <li>Examine how individual suffering is rationalized through collective benefit narratives</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 2: Ritualized Violence -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="ritual" class="card-icon"></i>
+                <div class="card-title">Ritualized Violence</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"Ten Duel Commandments"</strong> reveals the function of <strong>ritualized violence</strong> in maintaining social order and examine its role in <strong>state formation</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how dueling rituals <strong>privatize violence</strong> while maintaining social hierarchies and masculine honor</li>
+                        <li>Analyze the relationship between <strong>individual honor</strong> culture and emerging democratic institutions</li>
+                        <li>Evaluate how ritualized violence serves as both <strong>alternative</strong> to and complement of state legal systems</li>
+                        <li>Synthesize how honor culture contributes to <strong>American political</strong> development and democratic fragility</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how dueling rules create controlled violence that preserves social stability</li>
+                        <li>Think about the tension between democratic equality and honor-based hierarchy</li>
+                        <li>Examine how personal honor becomes entangled with political authority</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 3: Democratic Authority -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="gavel" class="card-icon"></i>
+                <div class="card-title">Democratic Authority</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"Meet Me Inside"</strong> explores the fundamental tension between <strong>democratic ideals</strong> and the authoritarian requirements of effective governance.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how Washington's assertion of authority <strong>contradicts</strong> the democratic principles the revolution claims to defend</li>
+                        <li>Examine the paradox of using <strong>hierarchical military</strong> organization to achieve egalitarian political goals</li>
+                        <li>Evaluate how this conflict foreshadows <strong>broader tensions</strong> in American democratic development</li>
+                        <li>Synthesize how revolutionary movements must <strong>balance ideological</strong> purity with practical governance requirements</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how democratic revolutions often require undemocratic methods</li>
+                        <li>Think about the relationship between military effectiveness and democratic principles</li>
+                        <li>Examine how personal loyalty and institutional authority conflict</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 4: Reproductive Futurity -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="baby" class="card-icon"></i>
+                <div class="card-title">Reproductive Futurity</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"That Would Be Enough"</strong> employs concepts of reproductive futurity to critique <strong>masculine heroism</strong> and propose alternative values for political community.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how Eliza's pregnancy and <strong>domestic vision</strong> represent alternative forms of futurity to military glory</li>
+                        <li>Analyze the gendered dimensions of <strong>different temporalities</strong> - immediate family needs versus historical legacy</li>
+                        <li>Evaluate how the song challenges <strong>foundational narratives</strong> that prioritize public achievement over private care</li>
+                        <li>Synthesize how this tension reflects <strong>broader questions</strong> about what makes political communities sustainable and valuable</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how different concepts of "enough" reflect competing value systems</li>
+                        <li>Think about how family formation offers alternative models of social organization</li>
+                        <li>Examine how care work challenges traditional definitions of political contribution</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 5: Revolutionary Temporality -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="clock-9" class="card-icon"></i>
+                <div class="card-title">Revolutionary Temporality</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how these four songs collectively explore competing temporalities within revolutionary movements and analyze their implications for <strong>democratic sustainability</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how each song represents different <strong>temporal orientations</strong> - immediate survival, ritual tradition, hierarchical order, generational continuity</li>
+                        <li>Examine the tension between <strong>revolutionary urgency</strong> and the slower processes of institutional development</li>
+                        <li>Evaluate how competing temporalities create <strong>political conflicts</strong> about priorities and resource allocation</li>
+                        <li>Synthesize how revolutionary movements must <strong>reconcile multiple</strong> temporal demands to achieve sustainable political change</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how different characters represent different relationships to time and change</li>
+                        <li>Think about how revolutionary movements must balance immediate needs with long-term goals</li>
+                        <li>Examine how personal and political temporalities intersect and conflict</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
