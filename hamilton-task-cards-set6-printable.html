@@ -18,59 +18,61 @@
         body {
             font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: white;
-            padding: 0.5in;
-            line-height: 1.4;
+            padding: 0.3in;
+            line-height: 1.3;
             color: #333;
         }
 
         .cards-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.25in;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.2in;
             width: 100%;
         }
 
         .task-card {
             border: 2px solid;
-            border-radius: 8px;
-            padding: 15px;
+            border-radius: 6px;
+            padding: 12px;
             background: white;
-            break-inside: avoid;
-            page-break-inside: avoid;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
             width: 100%;
-            min-height: 4.5in;
+            min-height: 3.5in;
+            max-height: 4.5in;
             display: flex;
             flex-direction: column;
+            box-sizing: border-box;
         }
 
         .card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
             border-bottom: 2px solid;
         }
 
         .card-title {
             font-family: 'Bebas Neue', cursive;
-            font-size: 28px;
+            font-size: 22px;
             font-weight: 400;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.2px;
             flex-grow: 1;
         }
 
         .card-icon {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             flex-shrink: 0;
         }
 
         .difficulty-label {
             font-family: 'Bebas Neue', cursive;
-            font-size: 11px;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            font-size: 9px;
+            letter-spacing: 0.8px;
+            margin-bottom: 4px;
         }
 
         /* Easy Level Colors - Green */
@@ -137,10 +139,10 @@
         }
 
         .instructions {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 15px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            line-height: 1.4;
         }
 
         .instructions strong {
@@ -148,25 +150,25 @@
         }
 
         .directions {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .directions h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
         }
 
         .directions ol {
-            margin-left: 18px;
-            font-size: 12px;
+            margin-left: 15px;
+            font-size: 10px;
         }
 
         .directions li {
-            margin-bottom: 4px;
-            line-height: 1.4;
+            margin-bottom: 3px;
+            line-height: 1.3;
         }
 
         /* Color-themed numbered list styling */
@@ -178,16 +180,16 @@
             counter-increment: easy-counter;
             position: relative;
             list-style: none;
-            margin-left: 25px;
+            margin-left: 20px;
         }
 
         .task-card.easy .directions ol li::before {
             content: counter(easy-counter);
             position: absolute;
-            left: -25px;
+            left: -20px;
             font-weight: bold;
             color: #28a745;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .task-card.medium .directions ol {
@@ -198,16 +200,16 @@
             counter-increment: medium-counter;
             position: relative;
             list-style: none;
-            margin-left: 25px;
+            margin-left: 20px;
         }
 
         .task-card.medium .directions ol li::before {
             content: counter(medium-counter);
             position: absolute;
-            left: -25px;
+            left: -20px;
             font-weight: bold;
             color: #fd7e14;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .task-card.hard .directions ol {
@@ -218,100 +220,100 @@
             counter-increment: hard-counter;
             position: relative;
             list-style: none;
-            margin-left: 25px;
+            margin-left: 20px;
         }
 
         .task-card.hard .directions ol li::before {
             content: counter(hard-counter);
             position: absolute;
-            left: -25px;
+            left: -20px;
             font-weight: bold;
             color: #dc3545;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         .bottom-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
             margin-top: auto;
         }
 
         .sentence-frame {
             border-top: 2px solid #dee2e6;
-            padding-top: 10px;
+            padding-top: 8px;
             font-style: italic;
-            font-size: 12px;
+            font-size: 9px;
         }
 
         .sentence-frame h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             font-style: normal;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .hints {
             border-top: 2px solid #dee2e6;
-            padding-top: 10px;
+            padding-top: 8px;
         }
 
         .hints h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
         }
 
         .hints ul {
-            margin-left: 15px;
-            font-size: 11px;
+            margin-left: 12px;
+            font-size: 9px;
         }
 
         .hints li {
-            margin-bottom: 3px;
-            line-height: 1.3;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         .full-width-hints {
             border-top: 2px solid #dee2e6;
-            padding-top: 10px;
+            padding-top: 8px;
             margin-top: auto;
         }
 
         .full-width-hints h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
         }
 
         .full-width-hints ul {
-            margin-left: 15px;
-            font-size: 11px;
+            margin-left: 12px;
+            font-size: 9px;
         }
 
         .full-width-hints li {
-            margin-bottom: 3px;
-            line-height: 1.3;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         @media print {
             body {
-                padding: 0.5in;
+                padding: 0.3in;
             }
             
             .task-card {
-                break-inside: avoid;
-                page-break-inside: avoid;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
             }
             
             .cards-grid {
-                gap: 0.2in;
+                gap: 0.15in;
             }
         }
 
