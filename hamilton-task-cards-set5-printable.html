@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton Task Cards Set 5 - Printable Format</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            padding: 0.5in;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.25in;
+            width: 100%;
+        }
+
+        .task-card {
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            break-inside: avoid;
+            page-break-inside: avoid;
+            width: 100%;
+            min-height: 4.5in;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+        }
+
+        .card-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            flex-grow: 1;
+        }
+
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+        }
+
+        .difficulty-label {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 11px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        /* Easy Level Colors - Green */
+        .task-card.easy {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-header {
+            border-color: #28a745;
+        }
+        
+        .task-card.easy .card-title,
+        .task-card.easy .card-icon,
+        .task-card.easy .difficulty-label,
+        .task-card.easy .directions h3,
+        .task-card.easy .sentence-frame h3,
+        .task-card.easy .hints h3,
+        .task-card.easy .full-width-hints h3 {
+            color: #28a745;
+        }
+
+        /* Medium Level Colors - Orange */
+        .task-card.medium {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-header {
+            border-color: #fd7e14;
+        }
+        
+        .task-card.medium .card-title,
+        .task-card.medium .card-icon,
+        .task-card.medium .difficulty-label,
+        .task-card.medium .directions h3,
+        .task-card.medium .sentence-frame h3,
+        .task-card.medium .hints h3,
+        .task-card.medium .full-width-hints h3 {
+            color: #fd7e14;
+        }
+
+        /* Hard Level Colors - Red */
+        .task-card.hard {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-header {
+            border-color: #dc3545;
+        }
+        
+        .task-card.hard .card-title,
+        .task-card.hard .card-icon,
+        .task-card.hard .difficulty-label,
+        .task-card.hard .directions h3,
+        .task-card.hard .sentence-frame h3,
+        .task-card.hard .hints h3,
+        .task-card.hard .full-width-hints h3 {
+            color: #dc3545;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instructions {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .instructions strong {
+            font-weight: 700;
+        }
+
+        .directions {
+            margin-bottom: 15px;
+        }
+
+        .directions h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .directions ol {
+            margin-left: 18px;
+            font-size: 12px;
+        }
+
+        .directions li {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        /* Color-themed numbered list styling */
+        .task-card.easy .directions ol {
+            counter-reset: easy-counter;
+        }
+
+        .task-card.easy .directions ol li {
+            counter-increment: easy-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.easy .directions ol li::before {
+            content: counter(easy-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #28a745;
+            font-size: 12px;
+        }
+
+        .task-card.medium .directions ol {
+            counter-reset: medium-counter;
+        }
+
+        .task-card.medium .directions ol li {
+            counter-increment: medium-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.medium .directions ol li::before {
+            content: counter(medium-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #fd7e14;
+            font-size: 12px;
+        }
+
+        .task-card.hard .directions ol {
+            counter-reset: hard-counter;
+        }
+
+        .task-card.hard .directions ol li {
+            counter-increment: hard-counter;
+            position: relative;
+            list-style: none;
+            margin-left: 25px;
+        }
+
+        .task-card.hard .directions ol li::before {
+            content: counter(hard-counter);
+            position: absolute;
+            left: -25px;
+            font-weight: bold;
+            color: #dc3545;
+            font-size: 12px;
+        }
+
+        .bottom-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .sentence-frame {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            font-style: italic;
+            font-size: 12px;
+        }
+
+        .sentence-frame h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            font-style: normal;
+            margin-bottom: 8px;
+        }
+
+        .hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+        }
+
+        .hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .full-width-hints {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+
+        .full-width-hints h3 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 14px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .full-width-hints ul {
+            margin-left: 15px;
+            font-size: 11px;
+        }
+
+        .full-width-hints li {
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        @media print {
+            body {
+                padding: 0.5in;
+            }
+            
+            .task-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+            
+            .cards-grid {
+                gap: 0.2in;
+            }
+        }
+
+        @page {
+            size: letter;
+            margin: 0.5in;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-grid">
+        <!-- Easy Level Cards -->
+        
+        <!-- Easy Card 1: Naval Support -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="ship" class="card-icon"></i>
+                <div class="card-title">Naval Support</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Guns and Ships,"</strong> how does the <strong>French navy</strong> help the Americans win battles against the British?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Guns and Ships"</strong> and identify what the French bring to help</li>
+                        <li>Write down <strong>two specific things</strong> the French provide for the war</li>
+                        <li>Find <strong>specific words</strong> that describe how this help changes the fighting</li>
+                        <li>Explain why the Americans <strong>needed help</strong> from another country to win</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        The French help by bringing _____ and _____. This help is important because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for mentions of ships, weapons, and soldiers</li>
+                            <li>Pay attention to words about speed and power</li>
+                            <li>Notice how the French change the balance of the war</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 2: Historical Responsibility -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="eye" class="card-icon"></i>
+                <div class="card-title">Historical Responsibility</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"History Has Its Eyes On You,"</strong> what does Washington tell Hamilton about the <strong>importance</strong> of making good decisions?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"History Has Its Eyes On You"</strong> and focus on Washington's advice</li>
+                        <li>Write down <strong>two reasons</strong> Washington gives for being careful about choices</li>
+                        <li>Find <strong>specific words</strong> that show how people will remember their actions</li>
+                        <li>Explain why leaders need to think about <strong>how history will judge</strong> them</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        Washington warns Hamilton that _____ and _____. History will remember _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what Washington says about being watched</li>
+                            <li>Pay attention to words about future generations</li>
+                            <li>Notice how actions today affect tomorrow's world</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 3: Victory Celebration -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="trophy" class="card-icon"></i>
+                <div class="card-title">Victory Celebration</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"Yorktown (The World Turned Upside Down),"</strong> what specific things happen when the Americans <strong>win the war</strong>?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"Yorktown"</strong> and identify what happens when they win</li>
+                        <li>Write down <strong>two things</strong> that show the British have been defeated</li>
+                        <li>Find <strong>specific words</strong> that describe the Americans' feelings about winning</li>
+                        <li>Explain what <strong>"the world turned upside down"</strong> means after this victory</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        When the Americans win, _____ and _____ happen. The world is upside down because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for what the British do when they lose</li>
+                            <li>Pay attention to words about celebration and freedom</li>
+                            <li>Notice how everything changes after the victory</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 4: Post-War Questions -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="help-circle" class="card-icon"></i>
+                <div class="card-title">Post-War Questions</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    In <strong>"What Comes Next?,"</strong> what <strong>concerns</strong> does King George have about America after they win independence?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Listen to <strong>"What Comes Next?"</strong> and focus on the King's questions</li>
+                        <li>Write down <strong>two problems</strong> the King thinks America will face</li>
+                        <li>Find <strong>specific words</strong> that show he doubts America can succeed alone</li>
+                        <li>Explain why winning independence is just the <strong>beginning</strong> of America's challenges</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        King George thinks America will struggle with _____ and _____. Independence is hard because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Listen for questions about governing and making laws</li>
+                            <li>Pay attention to words about difficulty and challenges</li>
+                            <li>Notice what the King thinks America can't do alone</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Easy Card 5: Turning Points -->
+        <div class="task-card easy">
+            <div class="difficulty-label">EASY LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="rotate-ccw" class="card-icon"></i>
+                <div class="card-title">Turning Points</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Across these songs, what are the <strong>most important moments</strong> that change everything for America?
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Think about the key events mentioned in <strong>all four songs</strong></li>
+                        <li>Write down <strong>two major changes</strong> that happen during this time</li>
+                        <li>Find examples of how <strong>victory brings new challenges</strong></li>
+                        <li>Explain why these moments are <strong>turning points</strong> in American history</li>
+                    </ol>
+                </div>
+
+                <div class="bottom-sections">
+                    <div class="sentence-frame">
+                        <h3>Sentence Frame:</h3>
+                        The biggest changes are _____ and _____. These are turning points because _____.
+                    </div>
+                    
+                    <div class="hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>
+                            <li>Think about military help, victory, and what comes after</li>
+                            <li>Consider how winning creates new responsibilities</li>
+                            <li>Notice how the songs show both success and uncertainty</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Level Cards -->
+        
+        <!-- Medium Card 1: Alliance Strategy -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="handshake" class="card-icon"></i>
+                <div class="card-title">Alliance Strategy</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"Guns and Ships"</strong> depicts the strategic importance of international alliances in <strong>revolutionary warfare</strong> and evaluate their long-term consequences.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how the <strong>Franco-American alliance</strong> transforms military capabilities and strategic options</li>
+                        <li>Analyze the <strong>balance between independence</strong> and dependence inherent in seeking foreign assistance</li>
+                        <li>Evaluate how international alliances shape <strong>post-war relationships</strong> and obligations</li>
+                        <li>Compare revolutionary alliance-building to <strong>modern international</strong> coalition warfare</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how French support changes both tactical and strategic possibilities</li>
+                        <li>Think about the tension between needing help and maintaining autonomy</li>
+                        <li>Notice how wartime alliances create peacetime diplomatic complications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 2: Historical Legacy -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="scroll-text" class="card-icon"></i>
+                <div class="card-title">Historical Legacy</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"History Has Its Eyes On You"</strong> explores the relationship between <strong>individual decision-making</strong> and historical judgment.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how awareness of <strong>historical scrutiny</strong> influences political and military decision-making</li>
+                        <li>Examine the tension between <strong>immediate needs</strong> and long-term historical reputation</li>
+                        <li>Evaluate how the concept of <strong>historical legacy</strong> functions as both motivation and constraint</li>
+                        <li>Compare 18th-century concepts of historical judgment to <strong>modern media</strong> and accountability culture</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how the idea of being "watched" by history affects behavior</li>
+                        <li>Think about how historical consciousness shapes revolutionary leadership</li>
+                        <li>Notice how individual choices are understood to have collective consequences</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 3: Revolutionary Victory -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="crown-off" class="card-icon"></i>
+                <div class="card-title">Revolutionary Victory</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"Yorktown"</strong> depicts victory not just as military triumph but as fundamental <strong>social and political transformation</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how the song portrays <strong>hierarchical reversal</strong> and the overturning of established order</li>
+                        <li>Analyze the relationship between <strong>military victory</strong> and broader social revolution</li>
+                        <li>Evaluate how the concept of <strong>"the world turned upside down"</strong> reflects revolutionary transformation</li>
+                        <li>Compare this revolutionary moment to <strong>other historical</strong> examples of sudden social change</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how military victory enables broader social and political changes</li>
+                        <li>Think about what specific hierarchies and relationships are being reversed</li>
+                        <li>Notice how the song celebrates both triumph and transformation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 4: Post-Colonial Challenges -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="building" class="card-icon"></i>
+                <div class="card-title">Post-Colonial Challenges</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"What Comes Next?"</strong> identifies the fundamental challenges facing newly independent nations in <strong>post-colonial transition</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how the song identifies <strong>specific governance challenges</strong> that independence creates</li>
+                        <li>Examine the tension between <strong>rejecting colonial authority</strong> and establishing legitimate new institutions</li>
+                        <li>Evaluate how <strong>economic and political independence</strong> require different skills than revolutionary warfare</li>
+                        <li>Compare American post-colonial challenges to <strong>modern nations</strong> gaining independence</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider what practical skills revolution versus governance require</li>
+                        <li>Think about how destroying old systems differs from building new ones</li>
+                        <li>Notice how the King's questions reveal real structural challenges</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medium Card 5: Victory and Transition -->
+        <div class="task-card medium">
+            <div class="difficulty-label">MEDIUM LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="arrow-right-circle" class="card-icon"></i>
+                <div class="card-title">Victory and Transition</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Evaluate how these four songs collectively explore the <strong>complex relationship</strong> between military victory and sustainable political transformation.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how each song reveals different <strong>dimensions of transition</strong> from war to peace</li>
+                        <li>Examine the tension between <strong>revolutionary momentum</strong> and institutional stability</li>
+                        <li>Evaluate how <strong>wartime leadership</strong> and skills translate to peacetime governance challenges</li>
+                        <li>Compare this revolutionary transition to <strong>modern examples</strong> of societies moving from conflict to peace</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how different types of victory create different types of challenges</li>
+                        <li>Think about how the skills needed for war differ from those needed for peace</li>
+                        <li>Notice how external support and internal capacity interact</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Level Cards -->
+        
+        <!-- Hard Card 1: Imperial Networks -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="globe" class="card-icon"></i>
+                <div class="card-title">Imperial Networks</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"Guns and Ships"</strong> reveals the global imperial context of the American Revolution and analyze how <strong>inter-imperial rivalry</strong> shapes revolutionary possibilities.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how the American Revolution becomes a proxy war in <strong>broader Franco-British imperial competition</strong></li>
+                        <li>Examine how <strong>revolutionary ideology</strong> intersects with traditional European power politics and territorial ambitions</li>
+                        <li>Evaluate the implications of <strong>revolutionary dependence</strong> on traditional imperial powers for long-term democratic development</li>
+                        <li>Synthesize how this dynamic foreshadows <strong>ongoing tensions</strong> between American democratic ideals and global power politics</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how American independence serves French strategic interests against Britain</li>
+                        <li>Think about the contradiction between democratic revolution and imperial alliance</li>
+                        <li>Examine how global power dynamics shape local revolutionary possibilities</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 2: Temporal Consciousness -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="clock-12" class="card-icon"></i>
+                <div class="card-title">Temporal Consciousness</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"History Has Its Eyes On You"</strong> constructs a particular form of <strong>historical temporality</strong> that shapes revolutionary subjectivity and political action.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how the song constructs <strong>historical time</strong> as simultaneously linear progression and eternal judgment</li>
+                        <li>Analyze how awareness of <strong>historical observation</strong> creates new forms of political subjectivity and responsibility</li>
+                        <li>Evaluate how this temporal consciousness shapes the relationship between <strong>individual agency</strong> and collective historical narrative</li>
+                        <li>Synthesize how revolutionary temporal consciousness differs from <strong>traditional religious</strong> or monarchical concepts of time and judgment</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how "history watching" creates a new form of secular accountability</li>
+                        <li>Think about how revolutionary time differs from cyclical or eternal time</li>
+                        <li>Examine how historical consciousness becomes a form of political discipline</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 3: Carnivalesque Revolution -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="dice-6" class="card-icon"></i>
+                <div class="card-title">Carnivalesque Revolution</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how <strong>"Yorktown"</strong> employs carnivalesque imagery to represent revolutionary victory and analyze its implications for <strong>post-revolutionary order</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how <strong>"the world turned upside down"</strong> functions as both celebratory image and potential threat to stable governance</li>
+                        <li>Examine the tension between <strong>revolutionary inversion</strong> of hierarchy and the need to establish new legitimate authority</li>
+                        <li>Evaluate how carnivalesque victory celebration complicates the transition from <strong>revolution to institutionalization</strong></li>
+                        <li>Synthesize how this tension reflects broader challenges in <strong>revolutionary movements</strong> between liberation and order</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how carnival temporarily suspends normal social order</li>
+                        <li>Think about the difference between overturning authority and establishing new authority</li>
+                        <li>Examine how revolutionary celebration can become revolutionary chaos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 4: Sovereign Transition -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="shield-off" class="card-icon"></i>
+                <div class="card-title">Sovereign Transition</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Analyze how <strong>"What Comes Next?"</strong> exposes the fundamental problem of <strong>sovereign transition</strong> and the creation of legitimate political authority.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Examine how the song reveals the <strong>paradox of revolutionary authority</strong> - using illegitimate means to create legitimate government</li>
+                        <li>Analyze how <strong>post-colonial sovereignty</strong> requires new forms of political legitimacy beyond traditional monarchical authority</li>
+                        <li>Evaluate the tension between <strong>popular sovereignty</strong> and effective governance in the transition from revolution to republic</li>
+                        <li>Synthesize how this sovereign crisis foreshadows ongoing <strong>American constitutional</strong> and democratic challenges</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how revolutionary legitimacy differs from traditional legitimacy</li>
+                        <li>Think about the gap between destroying old authority and creating new authority</li>
+                        <li>Examine how popular will must be translated into effective governance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hard Card 5: Revolutionary Paradox -->
+        <div class="task-card hard">
+            <div class="difficulty-label">HARD LEVEL</div>
+            <div class="card-header">
+                <i data-lucide="triangle-alert" class="card-icon"></i>
+                <div class="card-title">Revolutionary Paradox</div>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    Examine how these four songs collectively reveal the <strong>fundamental paradoxes</strong> of democratic revolution and their implications for <strong>modern democratic theory</strong>.
+                </div>
+                
+                <div class="directions">
+                    <h3>Directions:</h3>
+                    <ol>
+                        <li>Analyze how each song reveals different <strong>contradictions inherent</strong> in democratic revolutionary movements</li>
+                        <li>Examine the tension between <strong>revolutionary means</strong> and democratic ends across military, diplomatic, and political dimensions</li>
+                        <li>Evaluate how these paradoxes create <strong>structural challenges</strong> for democratic institutions and political culture</li>
+                        <li>Synthesize how understanding these revolutionary paradoxes illuminates <strong>contemporary democratic</strong> crises and possibilities</li>
+                    </ol>
+                </div>
+
+                <div class="full-width-hints">
+                    <h3>Helpful Hints:</h3>
+                    <ul>
+                        <li>Consider how different aspects of revolution create different types of contradictions</li>
+                        <li>Think about how revolutionary origins continue to shape democratic practice</li>
+                        <li>Examine how these historical paradoxes remain relevant to contemporary politics</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
