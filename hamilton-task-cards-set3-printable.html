@@ -25,7 +25,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 0.25in;
             width: 100%;
         }
@@ -35,12 +35,24 @@
             border-radius: 8px;
             padding: 15px;
             background: white;
-            break-inside: avoid;
-            page-break-inside: avoid;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
             width: 100%;
             min-height: 4.5in;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            z-index: 10;
         }
 
         .card-header {

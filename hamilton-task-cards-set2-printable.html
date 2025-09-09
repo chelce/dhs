@@ -25,7 +25,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 0.25in;
             width: 100%;
         }
@@ -35,12 +35,24 @@
             border-radius: 8px;
             padding: 15px;
             background: white;
-            break-inside: avoid;
-            page-break-inside: avoid;
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
             width: 100%;
             min-height: 4.5in;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            z-index: 10;
         }
 
         .card-header {
@@ -85,6 +97,7 @@
         .task-card.easy .card-title,
         .task-card.easy .card-icon,
         .task-card.easy .difficulty-label,
+        .task-card.easy .card-number,
         .task-card.easy .directions h3,
         .task-card.easy .sentence-frame h3,
         .task-card.easy .hints h3,
@@ -104,6 +117,7 @@
         .task-card.medium .card-title,
         .task-card.medium .card-icon,
         .task-card.medium .difficulty-label,
+        .task-card.medium .card-number,
         .task-card.medium .directions h3,
         .task-card.medium .sentence-frame h3,
         .task-card.medium .hints h3,
@@ -123,6 +137,7 @@
         .task-card.hard .card-title,
         .task-card.hard .card-icon,
         .task-card.hard .difficulty-label,
+        .task-card.hard .card-number,
         .task-card.hard .directions h3,
         .task-card.hard .sentence-frame h3,
         .task-card.hard .hints h3,
@@ -137,7 +152,7 @@
         }
 
         .instructions {
-            font-size: 14px;
+            font-size: 9px;
             font-weight: 600;
             margin-bottom: 15px;
             line-height: 1.5;
@@ -161,7 +176,7 @@
 
         .directions ol {
             margin-left: 18px;
-            font-size: 12px;
+            font-size: 8px;
         }
 
         .directions li {
@@ -268,7 +283,7 @@
 
         .hints ul {
             margin-left: 15px;
-            font-size: 11px;
+            font-size: 7px;
         }
 
         .hints li {
@@ -292,7 +307,7 @@
 
         .full-width-hints ul {
             margin-left: 15px;
-            font-size: 11px;
+            font-size: 7px;
         }
 
         .full-width-hints li {
@@ -327,6 +342,7 @@
         
         <!-- Easy Card 1: Political Debate -->
         <div class="task-card easy">
+            <div class="card-number">E1</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="megaphone" class="card-icon"></i>
@@ -367,6 +383,7 @@
 
         <!-- Easy Card 2: King's Attitude -->
         <div class="task-card easy">
+            <div class="card-number">E2</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="crown" class="card-icon"></i>
@@ -407,6 +424,7 @@
 
         <!-- Easy Card 3: Military Problems -->
         <div class="task-card easy">
+            <div class="card-number">E3</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="shield" class="card-icon"></i>
@@ -447,6 +465,7 @@
 
         <!-- Easy Card 4: Royal Authority -->
         <div class="task-card easy">
+            <div class="card-number">E4</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="scepter" class="card-icon"></i>
@@ -487,6 +506,7 @@
 
         <!-- Easy Card 5: Leadership Skills -->
         <div class="task-card easy">
+            <div class="card-number">E5</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
                 <i data-lucide="star" class="card-icon"></i>
@@ -529,6 +549,7 @@
         
         <!-- Medium Card 1: Political Philosophy -->
         <div class="task-card medium">
+            <div class="card-number">M1</div>
             <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="book-open" class="card-icon"></i>
@@ -562,6 +583,7 @@
 
         <!-- Medium Card 2: Colonial Relationship -->
         <div class="task-card medium">
+            <div class="card-number">M2</div>
             <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="users" class="card-icon"></i>
@@ -595,6 +617,7 @@
 
         <!-- Medium Card 3: Military Strategy -->
         <div class="task-card medium">
+            <div class="card-number">M3</div>
             <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="map" class="card-icon"></i>
@@ -628,6 +651,7 @@
 
         <!-- Medium Card 4: Political Persuasion -->
         <div class="task-card medium">
+            <div class="card-number">M4</div>
             <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="target" class="card-icon"></i>
@@ -661,6 +685,7 @@
 
         <!-- Medium Card 5: Imperial Psychology -->
         <div class="task-card medium">
+            <div class="card-number">M5</div>
             <div class="difficulty-label">MEDIUM LEVEL</div>
             <div class="card-header">
                 <i data-lucide="brain" class="card-icon"></i>
@@ -696,6 +721,7 @@
         
         <!-- Hard Card 1: Enlightenment Ideologies -->
         <div class="task-card hard">
+            <div class="card-number">H1</div>
             <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="lightbulb" class="card-icon"></i>
@@ -729,6 +755,7 @@
 
         <!-- Hard Card 2: Imperial Discourse -->
         <div class="task-card hard">
+            <div class="card-number">H2</div>
             <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="globe" class="card-icon"></i>
@@ -762,6 +789,7 @@
 
         <!-- Hard Card 3: Military Transformation -->
         <div class="task-card hard">
+            <div class="card-number">H3</div>
             <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="sword" class="card-icon"></i>
@@ -795,6 +823,7 @@
 
         <!-- Hard Card 4: Rhetorical Revolution -->
         <div class="task-card hard">
+            <div class="card-number">H4</div>
             <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="pen-tool" class="card-icon"></i>
@@ -828,6 +857,7 @@
 
         <!-- Hard Card 5: Democratic Inclusion -->
         <div class="task-card hard">
+            <div class="card-number">H5</div>
             <div class="difficulty-label">HARD LEVEL</div>
             <div class="card-header">
                 <i data-lucide="scale" class="card-icon"></i>
