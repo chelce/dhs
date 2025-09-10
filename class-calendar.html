@@ -58,6 +58,38 @@ try {
     console.log('✅ Underline extension loaded');
   } catch(e) { console.warn('⚠️ Underline extension failed to load:', e); }
   
+  try {
+    const TextAlign = (await import('https://esm.sh/@tiptap/extension-text-align')).default;
+    window.TiptapTextAlign = TextAlign;
+    console.log('✅ TextAlign extension loaded');
+  } catch(e) { console.warn('⚠️ TextAlign extension failed to load:', e); }
+  
+  try {
+    const Subscript = (await import('https://esm.sh/@tiptap/extension-subscript')).default;
+    const Superscript = (await import('https://esm.sh/@tiptap/extension-superscript')).default;
+    window.TiptapSubscript = Subscript;
+    window.TiptapSuperscript = Superscript;
+    console.log('✅ Sub/Superscript extensions loaded');
+  } catch(e) { console.warn('⚠️ Sub/Superscript extensions failed to load:', e); }
+  
+  try {
+    const Table = (await import('https://esm.sh/@tiptap/extension-table')).default;
+    const TableRow = (await import('https://esm.sh/@tiptap/extension-table-row')).default;
+    const TableHeader = (await import('https://esm.sh/@tiptap/extension-table-header')).default;
+    const TableCell = (await import('https://esm.sh/@tiptap/extension-table-cell')).default;
+    window.TiptapTable = Table;
+    window.TiptapTableRow = TableRow;
+    window.TiptapTableHeader = TableHeader;
+    window.TiptapTableCell = TableCell;
+    console.log('✅ Table extensions loaded');
+  } catch(e) { console.warn('⚠️ Table extensions failed to load:', e); }
+  
+  try {
+    const CodeBlock = (await import('https://esm.sh/@tiptap/extension-code-block')).default;
+    window.TiptapCodeBlock = CodeBlock;
+    console.log('✅ CodeBlock extension loaded');
+  } catch(e) { console.warn('⚠️ CodeBlock extension failed to load:', e); }
+  
   // Mark as loaded
   window.tiptapLoaded = true;
   console.log('✅ TipTap enhanced module loading complete');
@@ -189,10 +221,10 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Modern Minimal Editor (WYSIWYG Style) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:12px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
-.editor-toolbar{display:flex;flex-wrap:nowrap;gap:0px;padding:6px 10px;background:#fafafa;border-bottom:1px solid #e8e8e8;border-radius:12px 12px 0 0;align-items:center;height:34px}
-.toolbar-group{display:inline-flex;gap:0px;align-items:center}
-.toolbar-divider{width:1px;height:16px;background:#d8d8d8;margin:0 4px}
-.toolbar-btn{background:transparent;border:none;border-radius:4px;padding:5px;min-width:24px;min-height:24px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#525252;font-size:10px;line-height:1;font-weight:400;transition:.12s all ease-out}
+.editor-toolbar{display:flex;flex-wrap:nowrap;gap:2px;padding:8px 12px;background:#fdfdfd;border-bottom:1px solid #eeeeee;border-radius:12px 12px 0 0;align-items:center;height:42px}
+.toolbar-group{display:inline-flex;gap:1px;align-items:center}
+.toolbar-divider{width:1px;height:20px;background:#e0e0e0;margin:0 6px}
+.toolbar-btn{background:transparent;border:none;border-radius:5px;padding:6px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#525252;font-size:11px;line-height:1;font-weight:400;transition:.12s all ease-out}
 .toolbar-btn:hover{background:rgba(0,0,0,0.08);color:#262626}
 .toolbar-btn.is-active{background:#e5e5e5;color:#171717}
 .toolbar-btn i{width:10px;height:10px;display:block;flex-shrink:0;font-size:10px !important}
@@ -937,6 +969,64 @@ function createTipTapEditor(elementId, onUpdate = null) {
     }
   }
   
+  if (window.TiptapTextAlign) {
+    try {
+      extensions.push(window.TiptapTextAlign.configure({
+        types: ['heading', 'paragraph']
+      }));
+      console.log('✅ Added TextAlign');
+    } catch(e) {
+      console.warn('⚠️ TextAlign configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapSubscript) {
+    try {
+      extensions.push(window.TiptapSubscript);
+      console.log('✅ Added Subscript');
+    } catch(e) {
+      console.warn('⚠️ Subscript configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapSuperscript) {
+    try {
+      extensions.push(window.TiptapSuperscript);
+      console.log('✅ Added Superscript');
+    } catch(e) {
+      console.warn('⚠️ Superscript configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
+    try {
+      extensions.push(
+        window.TiptapTable.configure({
+          resizable: true
+        }),
+        window.TiptapTableRow,
+        window.TiptapTableHeader,
+        window.TiptapTableCell
+      );
+      console.log('✅ Added Table support');
+    } catch(e) {
+      console.warn('⚠️ Table configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapCodeBlock) {
+    try {
+      extensions.push(window.TiptapCodeBlock.configure({
+        HTMLAttributes: {
+          class: 'editor-code-block'
+        }
+      }));
+      console.log('✅ Added CodeBlock');
+    } catch(e) {
+      console.warn('⚠️ CodeBlock configuration failed:', e);
+    }
+  }
+  
   console.log(`✅ Configured ${extensions.length} TipTap extensions for editor: ${elementId}`);
   
   // Create editor instance
@@ -1054,6 +1144,23 @@ function buildWorkingToolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">1.</button>
       <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">❝</button>
     </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="underline" title="Underline"><u>U</u></button>
+      <button type="button" class="toolbar-btn" data-action="subscript" title="Subscript">X₂</button>
+      <button type="button" class="toolbar-btn" data-action="superscript" title="Superscript">X²</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="alignLeft" title="Align Left">⇤</button>
+      <button type="button" class="toolbar-btn" data-action="alignCenter" title="Align Center">≡</button>
+      <button type="button" class="toolbar-btn" data-action="alignRight" title="Align Right">⇥</button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="insertTable" title="Insert Table">⊞</button>
+      <button type="button" class="toolbar-btn" data-action="codeBlock" title="Code Block">{ }</button>
+    </div>
   `;
   
   // Keep selection: prevent toolbar from stealing focus on mousedown
@@ -1083,6 +1190,16 @@ function buildWorkingToolbar(editor, el) {
       case 'bulletList': chain.toggleBulletList().run(); break;
       case 'orderedList': chain.toggleOrderedList().run(); break;
       case 'blockquote': chain.toggleBlockquote().run(); break;
+      case 'underline': chain.toggleUnderline().run(); break;
+      case 'subscript': chain.toggleSubscript().run(); break;
+      case 'superscript': chain.toggleSuperscript().run(); break;
+      case 'alignLeft': chain.setTextAlign('left').run(); break;
+      case 'alignCenter': chain.setTextAlign('center').run(); break;
+      case 'alignRight': chain.setTextAlign('right').run(); break;
+      case 'insertTable': 
+        chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); 
+        break;
+      case 'codeBlock': chain.toggleCodeBlock().run(); break;
     }
     
     updateWorkingToolbar(editor, el);
@@ -1112,6 +1229,13 @@ function updateWorkingToolbar(editor, el) {
       case 'bulletList': isActive = editor.isActive('bulletList'); break;
       case 'orderedList': isActive = editor.isActive('orderedList'); break;
       case 'blockquote': isActive = editor.isActive('blockquote'); break;
+      case 'underline': isActive = editor.isActive('underline'); break;
+      case 'subscript': isActive = editor.isActive('subscript'); break;
+      case 'superscript': isActive = editor.isActive('superscript'); break;
+      case 'alignLeft': isActive = editor.isActive({ textAlign: 'left' }); break;
+      case 'alignCenter': isActive = editor.isActive({ textAlign: 'center' }); break;
+      case 'alignRight': isActive = editor.isActive({ textAlign: 'right' }); break;
+      case 'codeBlock': isActive = editor.isActive('codeBlock'); break;
     }
     
     btn.classList.toggle('is-active', isActive);
