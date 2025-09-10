@@ -9,47 +9,64 @@
 <!-- Lucide icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script type="module">
-// TipTap 3.0 ES Module imports - Full Educational Feature Set
-import { Editor } from 'https://esm.sh/@tiptap/core';
-import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
-import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
-import Highlight from 'https://esm.sh/@tiptap/extension-highlight';
-import TextStyle from 'https://esm.sh/@tiptap/extension-text-style';
-import Color from 'https://esm.sh/@tiptap/extension-color';
-import FontFamily from 'https://esm.sh/@tiptap/extension-font-family';
-import TaskList from 'https://esm.sh/@tiptap/extension-task-list';
-import TaskItem from 'https://esm.sh/@tiptap/extension-task-item';
-import Table from 'https://esm.sh/@tiptap/extension-table';
-import TableRow from 'https://esm.sh/@tiptap/extension-table-row';
-import TableHeader from 'https://esm.sh/@tiptap/extension-table-header';
-import TableCell from 'https://esm.sh/@tiptap/extension-table-cell';
-import Link from 'https://esm.sh/@tiptap/extension-link';
-import Underline from 'https://esm.sh/@tiptap/extension-underline';
-import Subscript from 'https://esm.sh/@tiptap/extension-subscript';
-import Superscript from 'https://esm.sh/@tiptap/extension-superscript';
-import CharacterCount from 'https://esm.sh/@tiptap/extension-character-count';
-
-// Make TipTap available globally for the rest of the script
-window.TiptapEditor = Editor;
-window.TiptapStarterKit = StarterKit;
-window.TiptapPlaceholder = Placeholder;
-window.TiptapHighlight = Highlight;
-window.TiptapTextStyle = TextStyle;
-window.TiptapColor = Color;
-window.TiptapFontFamily = FontFamily;
-window.TiptapTaskList = TaskList;
-window.TiptapTaskItem = TaskItem;
-window.TiptapTable = Table;
-window.TiptapTableRow = TableRow;
-window.TiptapTableHeader = TableHeader;
-window.TiptapTableCell = TableCell;
-window.TiptapLink = Link;
-window.TiptapUnderline = Underline;
-window.TiptapSubscript = Subscript;
-window.TiptapSuperscript = Superscript;
-window.TiptapCharacterCount = CharacterCount;
-window.tiptapLoaded = true;
-console.log('TipTap 3.0 ES modules with full educational extensions loaded successfully');
+// TipTap 3.0 ES Module imports - Progressive Enhancement Approach
+try {
+  // Core required modules
+  const { Editor } = await import('https://esm.sh/@tiptap/core');
+  const StarterKit = (await import('https://esm.sh/@tiptap/starter-kit')).default;
+  const Placeholder = (await import('https://esm.sh/@tiptap/extension-placeholder')).default;
+  
+  // Make core modules available globally
+  window.TiptapEditor = Editor;
+  window.TiptapStarterKit = StarterKit;
+  window.TiptapPlaceholder = Placeholder;
+  
+  console.log('✅ Core TipTap modules loaded successfully');
+  
+  // Optional enhanced modules - load progressively
+  try {
+    const Highlight = (await import('https://esm.sh/@tiptap/extension-highlight')).default;
+    window.TiptapHighlight = Highlight;
+    console.log('✅ Highlight extension loaded');
+  } catch(e) { console.warn('⚠️ Highlight extension failed to load:', e); }
+  
+  try {
+    const TextStyle = (await import('https://esm.sh/@tiptap/extension-text-style')).default;
+    const Color = (await import('https://esm.sh/@tiptap/extension-color')).default;
+    window.TiptapTextStyle = TextStyle;
+    window.TiptapColor = Color;
+    console.log('✅ Color extensions loaded');
+  } catch(e) { console.warn('⚠️ Color extensions failed to load:', e); }
+  
+  try {
+    const TaskList = (await import('https://esm.sh/@tiptap/extension-task-list')).default;
+    const TaskItem = (await import('https://esm.sh/@tiptap/extension-task-item')).default;
+    window.TiptapTaskList = TaskList;
+    window.TiptapTaskItem = TaskItem;
+    console.log('✅ Task list extensions loaded');
+  } catch(e) { console.warn('⚠️ Task list extensions failed to load:', e); }
+  
+  try {
+    const Link = (await import('https://esm.sh/@tiptap/extension-link')).default;
+    window.TiptapLink = Link;
+    console.log('✅ Link extension loaded');
+  } catch(e) { console.warn('⚠️ Link extension failed to load:', e); }
+  
+  try {
+    const Underline = (await import('https://esm.sh/@tiptap/extension-underline')).default;
+    window.TiptapUnderline = Underline;
+    console.log('✅ Underline extension loaded');
+  } catch(e) { console.warn('⚠️ Underline extension failed to load:', e); }
+  
+  // Mark as loaded
+  window.tiptapLoaded = true;
+  console.log('✅ TipTap enhanced module loading complete');
+  
+} catch (error) {
+  console.error('❌ Failed to load TipTap modules:', error);
+  // Fallback to basic mode
+  window.tiptapLoaded = false;
+}
 </script>
 <script>
 async function ensureEditors(){
@@ -842,86 +859,84 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return null;
   }
   
-  // Build comprehensive extension list
+  // Build comprehensive extension list with graceful fallbacks
   const extensions = [];
   
-  // Add StarterKit (includes basic formatting)
+  // Add StarterKit (includes basic formatting) - REQUIRED
   if (window.TiptapStarterKit) {
     extensions.push(window.TiptapStarterKit);
+    console.log('✅ Added StarterKit');
+  } else {
+    console.error('❌ StarterKit not available - editor will fail');
+    return null;
   }
   
-  // Add Placeholder
+  // Add Placeholder - RECOMMENDED
   if (window.TiptapPlaceholder) {
     extensions.push(window.TiptapPlaceholder.configure({
       placeholder: 'Start typing your notes...'
     }));
+    console.log('✅ Added Placeholder');
   }
   
-  // Add Text Highlighting
+  // Add optional extensions only if available
   if (window.TiptapHighlight) {
-    extensions.push(window.TiptapHighlight.configure({
-      multicolor: false // Use default yellow highlighting
-    }));
+    try {
+      extensions.push(window.TiptapHighlight.configure({
+        multicolor: false
+      }));
+      console.log('✅ Added Highlight');
+    } catch(e) {
+      console.warn('⚠️ Highlight configuration failed:', e);
+    }
   }
   
-  // Add Text Style and Color
-  if (window.TiptapTextStyle) {
-    extensions.push(window.TiptapTextStyle);
-  }
-  if (window.TiptapColor) {
-    extensions.push(window.TiptapColor);
-  }
-  
-  // Add Font Family
-  if (window.TiptapFontFamily) {
-    extensions.push(window.TiptapFontFamily);
+  if (window.TiptapTextStyle && window.TiptapColor) {
+    try {
+      extensions.push(window.TiptapTextStyle);
+      extensions.push(window.TiptapColor);
+      console.log('✅ Added Text Color');
+    } catch(e) {
+      console.warn('⚠️ Color configuration failed:', e);
+    }
   }
   
-  // Add Task Lists
   if (window.TiptapTaskList && window.TiptapTaskItem) {
-    extensions.push(window.TiptapTaskList);
-    extensions.push(window.TiptapTaskItem.configure({
-      nested: true
-    }));
+    try {
+      extensions.push(window.TiptapTaskList);
+      extensions.push(window.TiptapTaskItem.configure({
+        nested: true
+      }));
+      console.log('✅ Added Task Lists');
+    } catch(e) {
+      console.warn('⚠️ Task List configuration failed:', e);
+    }
   }
   
-  // Add Table support
-  if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
-    extensions.push(window.TiptapTable.configure({
-      resizable: true
-    }));
-    extensions.push(window.TiptapTableRow);
-    extensions.push(window.TiptapTableHeader);
-    extensions.push(window.TiptapTableCell);
-  }
-  
-  // Add Link support
   if (window.TiptapLink) {
-    extensions.push(window.TiptapLink.configure({
-      openOnClick: false,
-      HTMLAttributes: {
-        class: 'editor-link'
-      }
-    }));
+    try {
+      extensions.push(window.TiptapLink.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'editor-link'
+        }
+      }));
+      console.log('✅ Added Link');
+    } catch(e) {
+      console.warn('⚠️ Link configuration failed:', e);
+    }
   }
   
-  // Add additional formatting
   if (window.TiptapUnderline) {
-    extensions.push(window.TiptapUnderline);
-  }
-  if (window.TiptapSubscript) {
-    extensions.push(window.TiptapSubscript);
-  }
-  if (window.TiptapSuperscript) {
-    extensions.push(window.TiptapSuperscript);
-  }
-  
-  // Add Character Count
-  if (window.TiptapCharacterCount) {
-    extensions.push(window.TiptapCharacterCount);
+    try {
+      extensions.push(window.TiptapUnderline);
+      console.log('✅ Added Underline');
+    } catch(e) {
+      console.warn('⚠️ Underline configuration failed:', e);
+    }
   }
   
-  console.log(`✅ Configured ${extensions.length} TipTap extensions:`, extensions.map(ext => ext.name || ext.type?.name || 'Unknown').join(', '));
+  console.log(`✅ Configured ${extensions.length} TipTap extensions for editor: ${elementId}`);
   
   // Create editor instance
   
@@ -1143,9 +1158,10 @@ function buildTipTap3Toolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="italic" title="Italic (Ctrl+I)">
         <i data-lucide="italic"></i>
       </button>
+      ${window.TiptapUnderline ? `
       <button type="button" class="toolbar-btn" data-action="underline" title="Underline (Ctrl+U)">
         <i data-lucide="underline"></i>
-      </button>
+      </button>` : ''}
       <button type="button" class="toolbar-btn" data-action="strike" title="Strikethrough">
         <i data-lucide="strikethrough"></i>
       </button>
@@ -1154,10 +1170,12 @@ function buildTipTap3Toolbar(editor, el) {
       </button>
     </div>
     <div class="toolbar-divider"></div>
+    ${window.TiptapHighlight ? `
     <div class="toolbar-group">
       <button type="button" class="toolbar-btn" data-action="highlight" title="Highlight Text">
         <i data-lucide="highlighter"></i>
       </button>
+      ${window.TiptapColor ? `
       <div class="toolbar-dropdown">
         <button type="button" class="toolbar-btn dropdown-trigger" title="Text Color">
           <i data-lucide="palette"></i>
@@ -1175,15 +1193,9 @@ function buildTipTap3Toolbar(editor, el) {
             <button type="button" class="color-btn" data-action="color" data-color="#e11d48" style="background: #e11d48;" title="Pink"></button>
           </div>
         </div>
-      </div>
-      <button type="button" class="toolbar-btn" data-action="subscript" title="Subscript">
-        <span style="font-size: 14px;">X<sub>2</sub></span>
-      </button>
-      <button type="button" class="toolbar-btn" data-action="superscript" title="Superscript">
-        <span style="font-size: 14px;">X<sup>2</sup></span>
-      </button>
+      </div>` : ''}
     </div>
-    <div class="toolbar-divider"></div>
+    <div class="toolbar-divider"></div>` : ''}
     <div class="toolbar-group">
       <button type="button" class="toolbar-btn" data-action="heading1" title="Heading 1">
         <i data-lucide="heading-1"></i>
@@ -1206,13 +1218,15 @@ function buildTipTap3Toolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="orderedList" title="Numbered List">
         <i data-lucide="list-ordered"></i>
       </button>
+      ${window.TiptapTaskList ? `
       <button type="button" class="toolbar-btn" data-action="taskList" title="Task List">
         <i data-lucide="check-square"></i>
-      </button>
+      </button>` : ''}
       <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">
         <i data-lucide="quote"></i>
       </button>
     </div>
+    ${window.TiptapLink ? `
     <div class="toolbar-divider"></div>
     <div class="toolbar-group">
       <button type="button" class="toolbar-btn" data-action="link" title="Add Link">
@@ -1221,32 +1235,10 @@ function buildTipTap3Toolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="horizontal-rule" title="Horizontal Line">
         <i data-lucide="minus"></i>
       </button>
-      <div class="toolbar-dropdown">
-        <button type="button" class="toolbar-btn dropdown-trigger" title="Insert Table">
-          <i data-lucide="table"></i>
-          <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
-        </button>
-        <div class="dropdown-content">
-          <button type="button" class="dropdown-item" data-action="insertTable">Insert Table</button>
-          <button type="button" class="dropdown-item" data-action="addRowBefore">Add Row Before</button>
-          <button type="button" class="dropdown-item" data-action="addRowAfter">Add Row After</button>
-          <button type="button" class="dropdown-item" data-action="addColumnBefore">Add Column Before</button>
-          <button type="button" class="dropdown-item" data-action="addColumnAfter">Add Column After</button>
-          <button type="button" class="dropdown-item" data-action="deleteRow">Delete Row</button>
-          <button type="button" class="dropdown-item" data-action="deleteColumn">Delete Column</button>
-          <button type="button" class="dropdown-item" data-action="deleteTable">Delete Table</button>
-        </div>
-      </div>
       <button type="button" class="toolbar-btn" data-action="emoji" title="Insert Emoji">
         <span>😊</span>
       </button>
-    </div>
-    <div class="toolbar-divider"></div>
-    <div class="toolbar-group">
-      <div class="word-count" id="wordCount-${el.id}" title="Word Count">
-        <small>0 words</small>
-      </div>
-    </div>
+    </div>` : ''}
   `;
   
   // Ensure we don't stack multiple listeners on the same toolbar element
@@ -1556,10 +1548,11 @@ function buildTipTap3Toolbar(editor, el) {
             let ok = false;
             if (typeof chain.toggleUnderline === 'function') {
               ok = chain.toggleUnderline().run();
+              console.log('✅ toggleUnderline run:', ok);
             } else {
-              console.warn('⚠️ Underline extension not available');
+              console.warn('⚠️ Underline extension not available - gracefully ignoring');
             }
-            console.log('✅ toggleUnderline run:', ok); break;
+            break;
           }
           case 'strike': {
             const ok = chain.toggleStrike().run();
@@ -1569,138 +1562,63 @@ function buildTipTap3Toolbar(editor, el) {
             let ok = false;
             if (typeof chain.toggleHighlight === 'function') {
               ok = chain.toggleHighlight().run();
+              console.log('✅ toggleHighlight run:', ok);
             } else {
-              console.warn('⚠️ Highlight extension not available');
+              console.warn('⚠️ Highlight extension not available - gracefully ignoring');
             }
-            console.log('✅ toggleHighlight run:', ok); break;
+            break;
           }
           case 'color': {
             const color = btn.dataset.color;
             let ok = false;
             if (typeof chain.setColor === 'function' && color) {
               ok = chain.setColor(color).run();
+              console.log('✅ setColor run:', ok);
             } else {
-              console.warn('⚠️ Color extension not available or no color specified');
+              console.warn('⚠️ Color extension not available or no color specified - gracefully ignoring');
             }
-            console.log('✅ setColor run:', ok); break;
-          }
-          case 'subscript': {
-            let ok = false;
-            if (typeof chain.toggleSubscript === 'function') {
-              ok = chain.toggleSubscript().run();
-            } else {
-              console.warn('⚠️ Subscript extension not available');
-            }
-            console.log('✅ toggleSubscript run:', ok); break;
-          }
-          case 'superscript': {
-            let ok = false;
-            if (typeof chain.toggleSuperscript === 'function') {
-              ok = chain.toggleSuperscript().run();
-            } else {
-              console.warn('⚠️ Superscript extension not available');
-            }
-            console.log('✅ toggleSuperscript run:', ok); break;
+            break;
           }
           case 'heading3': {
             const ok = chain.toggleHeading({ level: 3 }).run();
             console.log('✅ toggleHeading(3) run:', ok); break;
+          }
+          case 'taskList': {
+            let ok = false;
+            if (typeof chain.toggleTaskList === 'function') {
+              ok = chain.toggleTaskList().run();
+              console.log('✅ toggleTaskList run:', ok);
+            } else {
+              console.warn('⚠️ TaskList extension not available - gracefully ignoring');
+            }
+            break;
           }
           case 'link': {
             const url = prompt('Enter URL:');
             let ok = false;
             if (url && typeof chain.setLink === 'function') {
               ok = chain.setLink({ href: url }).run();
+              console.log('✅ setLink run:', ok);
             } else if (typeof chain.unsetLink === 'function') {
               ok = chain.unsetLink().run();
+              console.log('✅ unsetLink run:', ok);
             } else {
-              console.warn('⚠️ Link extension not available');
+              console.warn('⚠️ Link extension not available - gracefully ignoring');
             }
-            console.log('✅ setLink run:', ok); break;
+            break;
           }
           case 'horizontal-rule': {
             let ok = false;
             if (typeof chain.setHorizontalRule === 'function') {
               ok = chain.setHorizontalRule().run();
+              console.log('✅ setHorizontalRule run:', ok);
             } else {
-              console.warn('⚠️ HorizontalRule extension not available');
+              console.warn('⚠️ HorizontalRule extension not available - gracefully ignoring');
             }
-            console.log('✅ setHorizontalRule run:', ok); break;
-          }
-          case 'insertTable': {
-            let ok = false;
-            if (typeof chain.insertTable === 'function') {
-              ok = chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ insertTable run:', ok); break;
-          }
-          case 'addRowBefore': {
-            let ok = false;
-            if (typeof chain.addRowBefore === 'function') {
-              ok = chain.addRowBefore().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ addRowBefore run:', ok); break;
-          }
-          case 'addRowAfter': {
-            let ok = false;
-            if (typeof chain.addRowAfter === 'function') {
-              ok = chain.addRowAfter().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ addRowAfter run:', ok); break;
-          }
-          case 'addColumnBefore': {
-            let ok = false;
-            if (typeof chain.addColumnBefore === 'function') {
-              ok = chain.addColumnBefore().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ addColumnBefore run:', ok); break;
-          }
-          case 'addColumnAfter': {
-            let ok = false;
-            if (typeof chain.addColumnAfter === 'function') {
-              ok = chain.addColumnAfter().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ addColumnAfter run:', ok); break;
-          }
-          case 'deleteRow': {
-            let ok = false;
-            if (typeof chain.deleteRow === 'function') {
-              ok = chain.deleteRow().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ deleteRow run:', ok); break;
-          }
-          case 'deleteColumn': {
-            let ok = false;
-            if (typeof chain.deleteColumn === 'function') {
-              ok = chain.deleteColumn().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ deleteColumn run:', ok); break;
-          }
-          case 'deleteTable': {
-            let ok = false;
-            if (typeof chain.deleteTable === 'function') {
-              ok = chain.deleteTable().run();
-            } else {
-              console.warn('⚠️ Table extension not available');
-            }
-            console.log('✅ deleteTable run:', ok); break;
+            break;
           }
           case 'emoji': {
-            // Simple emoji insertion - you could expand this with a picker
+            // Simple emoji insertion
             const emojis = ['😊', '🎉', '👍', '❤️', '📚', '✅', '❌', '⭐', '🔥', '💡'];
             const emoji = emojis[Math.floor(Math.random() * emojis.length)];
             const ok = chain.insertContent(emoji).run();
@@ -1767,24 +1685,35 @@ function updateTipTap3Toolbar(editor, el) {
     
     // Check if editor has isActive method before using it
     if (editor && typeof editor.isActive === 'function') {
-      switch (action) {
-        case 'bold': isActive = editor.isActive('bold'); break;
-        case 'italic': isActive = editor.isActive('italic'); break;
-        case 'underline': isActive = editor.isActive('underline'); break;
-        case 'strike': isActive = editor.isActive('strike'); break;
-        case 'code': isActive = editor.isActive('code'); break;
-        case 'highlight': isActive = editor.isActive('highlight'); break;
-        case 'subscript': isActive = editor.isActive('subscript'); break;
-        case 'superscript': isActive = editor.isActive('superscript'); break;
-        case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
-        case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
-        case 'heading3': isActive = editor.isActive('heading', { level: 3 }); break;
-        case 'paragraph': isActive = editor.isActive('paragraph'); break;
-        case 'bulletList': isActive = editor.isActive('bulletList'); break;
-        case 'orderedList': isActive = editor.isActive('orderedList'); break;
-        case 'taskList': isActive = editor.isActive('taskList'); break;
-        case 'blockquote': isActive = editor.isActive('blockquote'); break;
-        case 'link': isActive = editor.isActive('link'); break;
+      try {
+        switch (action) {
+          case 'bold': isActive = editor.isActive('bold'); break;
+          case 'italic': isActive = editor.isActive('italic'); break;
+          case 'underline': 
+            isActive = window.TiptapUnderline ? editor.isActive('underline') : false; 
+            break;
+          case 'strike': isActive = editor.isActive('strike'); break;
+          case 'code': isActive = editor.isActive('code'); break;
+          case 'highlight': 
+            isActive = window.TiptapHighlight ? editor.isActive('highlight') : false; 
+            break;
+          case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
+          case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
+          case 'heading3': isActive = editor.isActive('heading', { level: 3 }); break;
+          case 'paragraph': isActive = editor.isActive('paragraph'); break;
+          case 'bulletList': isActive = editor.isActive('bulletList'); break;
+          case 'orderedList': isActive = editor.isActive('orderedList'); break;
+          case 'taskList': 
+            isActive = window.TiptapTaskList ? editor.isActive('taskList') : false; 
+            break;
+          case 'blockquote': isActive = editor.isActive('blockquote'); break;
+          case 'link': 
+            isActive = window.TiptapLink ? editor.isActive('link') : false; 
+            break;
+        }
+      } catch(e) {
+        console.warn('⚠️ Error checking active state for:', action, e);
+        isActive = false;
       }
     }
     
