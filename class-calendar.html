@@ -353,6 +353,8 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
     <div class="filter-checkbox"><input type="checkbox" id="show-other" checked><label for="show-other">Other</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-dhs" checked><label for="show-dhs">DHS</label></div>
     <div class="filter-checkbox"><input type="checkbox" id="show-reflection" checked><label for="show-reflection">Reflection</label></div>
+    <button class="btn" id="syncBtn">🔄 Sync with Coda</button>
+    <span id="syncStatus" style="font-size: 11px; color: #666; margin-left: 8px;"></span>
     <button class="btn btn-primary" id="addEventBtn">Add Event</button>
     <button class="btn" id="resetViewBtn">Today</button>
   </div>
@@ -647,6 +649,10 @@ async function init(){
     }
   } else {
     console.log('☁️ Coda data loaded successfully - skipping localStorage');
+    // Start auto-sync only if Coda is working
+    lastSyncTime = Date.now(); // Mark initial load as a sync
+    startAutoSync();
+    updateSyncStatusIndicator();
   }
   
   if (!progressLoaded) {
@@ -666,12 +672,25 @@ function wireUI(){
   document.getElementById('nextWeekBtn').onclick=()=>{weekOffset++;render();};
   document.getElementById('resetViewBtn').onclick=()=>{weekOffset=0;render();};
   document.getElementById('addEventBtn').onclick=()=>openAddModal();
+  document.getElementById('syncBtn').onclick=()=>syncWithCoda();
   document.querySelectorAll('.filter-checkbox input').forEach(cb=>cb.addEventListener('change',applyFilters));
   document.querySelectorAll('.close,[data-close]').forEach(el=>el.addEventListener('click',()=>closeModal(el.getAttribute('data-close'))));
   document.getElementById('eventForm').addEventListener('submit',saveNewEvent);
   document.getElementById('progressForm').addEventListener('submit',saveProgressModal);
   document.getElementById('saveDetailsBtn').addEventListener('click',saveDetailsNotes);
   document.getElementById('deleteEventBtn').addEventListener('click',deleteCurrentEvent);
+  
+  // Cleanup auto-sync when page is unloaded
+  window.addEventListener('beforeunload', stopAutoSync);
+  
+  // Pause auto-sync when page is hidden, resume when visible
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      console.log('📱 Page hidden - auto-sync paused');
+    } else {
+      console.log('📱 Page visible - auto-sync resumed');
+    }
+  });
 }
 
 function initEditors(){
@@ -1864,6 +1883,174 @@ async function loadRemoteEvents(){
   } catch(e){ 
     console.error('❌ Coda load failed:', e); 
     return false;
+  }
+}
+
+/* ========= TWO-WAY SYNC FUNCTIONS ========= */
+let syncInProgress = false;
+let autoSyncInterval = null;
+let lastSyncTime = 0;
+
+// Manual sync function triggered by button
+async function syncWithCoda() {
+  if (syncInProgress) {
+    console.log('🔄 Sync already in progress...');
+    return;
+  }
+  
+  syncInProgress = true;
+  const syncBtn = document.getElementById('syncBtn');
+  const originalText = syncBtn.innerHTML;
+  syncBtn.innerHTML = '🔄 Syncing...';
+  syncBtn.disabled = true;
+  
+  try {
+    console.log('🔄 Manual sync with Coda started...');
+    
+    // Store current events before sync
+    const eventsBeforeSync = [...events];
+    
+    // Clear events array and reload from Coda
+    events = [];
+    const remoteLoaded = await loadRemoteEvents();
+    
+    if (remoteLoaded) {
+      // Also reload progress data
+      await loadProgressData();
+      
+      // Check if we have any meaningful changes
+      const hasChanges = eventsBeforeSync.length !== events.length || 
+        !eventsBeforeSync.every(oldEvent => 
+          events.some(newEvent => 
+            newEvent.id === oldEvent.id && 
+            newEvent.text === oldEvent.text &&
+            newEvent.notes === oldEvent.notes &&
+            JSON.stringify(newEvent.classes) === JSON.stringify(oldEvent.classes)
+          )
+        );
+      
+      if (hasChanges) {
+        console.log('✅ Changes detected - re-rendering calendar');
+        render();
+        showSyncStatus('✅ Synced with Coda - changes found!', false);
+        updateSyncStatusIndicator();
+      } else {
+        console.log('✅ No changes detected');
+        showSyncStatus('✅ Synced with Coda - no changes', false);
+        updateSyncStatusIndicator();
+      }
+      
+      lastSyncTime = Date.now();
+    } else {
+      console.error('❌ Sync failed');
+      showSyncStatus('❌ Sync failed - check connection', true);
+      // Restore events if sync failed
+      events = eventsBeforeSync;
+    }
+    
+  } catch (error) {
+    console.error('❌ Sync error:', error);
+    showSyncStatus('❌ Sync error: ' + error.message, true);
+  } finally {
+    syncInProgress = false;
+    syncBtn.innerHTML = originalText;
+    syncBtn.disabled = false;
+  }
+}
+
+// Update the small sync status indicator in the controls
+function updateSyncStatusIndicator() {
+  const statusEl = document.getElementById('syncStatus');
+  if (statusEl && lastSyncTime > 0) {
+    const now = new Date();
+    const syncTime = new Date(lastSyncTime);
+    const timeDiff = Math.floor((now - syncTime) / 1000 / 60); // minutes ago
+    
+    if (timeDiff < 1) {
+      statusEl.textContent = 'Last sync: just now';
+    } else if (timeDiff < 60) {
+      statusEl.textContent = `Last sync: ${timeDiff}m ago`;
+    } else {
+      const hours = Math.floor(timeDiff / 60);
+      statusEl.textContent = `Last sync: ${hours}h ago`;
+    }
+    statusEl.style.color = '#666';
+  }
+}
+
+// Visual feedback for sync status
+function showSyncStatus(message, isError = false) {
+  // Remove existing status indicator
+  const existing = document.querySelector('.sync-status-indicator');
+  if (existing) existing.remove();
+  
+  // Create new status indicator
+  const indicator = document.createElement('div');
+  indicator.className = 'sync-status-indicator';
+  indicator.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    ${isError ? 
+      'background: #fee; color: #c53030; border: 1px solid #fbb;' : 
+      'background: #f0fff4; color: #22543d; border: 1px solid #9ae6b4;'
+    }
+  `;
+  indicator.textContent = message;
+  document.body.appendChild(indicator);
+  
+  // Auto-remove after 4 seconds
+  setTimeout(() => {
+    if (indicator.parentNode) {
+      indicator.style.opacity = '0';
+      indicator.style.transform = 'translateX(100%)';
+      setTimeout(() => indicator.remove(), 300);
+    }
+  }, 4000);
+}
+
+// Start automatic sync polling
+function startAutoSync() {
+  // Sync every 3 minutes (180,000 ms)
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+  }
+  
+  autoSyncInterval = setInterval(async () => {
+    // Only auto-sync if the page is visible and not recently synced
+    if (!document.hidden && !syncInProgress && (Date.now() - lastSyncTime > 120000)) { // 2 minute minimum
+      console.log('🔄 Auto-syncing with Coda...');
+      await syncWithCoda();
+    }
+    
+    // Update the status indicator every minute regardless
+    updateSyncStatusIndicator();
+  }, 60000); // Check every minute
+  
+  // Also do the longer sync check
+  setInterval(async () => {
+    if (!document.hidden && !syncInProgress && (Date.now() - lastSyncTime > 180000)) { // 3 minute minimum
+      console.log('🔄 Scheduled auto-sync with Coda...');
+      await syncWithCoda();
+    }
+  }, 180000); // 3 minutes
+  
+  console.log('✅ Auto-sync started (every 3 minutes)');
+}
+
+// Stop automatic sync
+function stopAutoSync() {
+  if (autoSyncInterval) {
+    clearInterval(autoSyncInterval);
+    autoSyncInterval = null;
+    console.log('🛑 Auto-sync stopped');
   }
 }
 
