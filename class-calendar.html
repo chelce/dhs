@@ -9,17 +9,47 @@
 <!-- Lucide icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script type="module">
-// TipTap 3.0 ES Module imports
+// TipTap 3.0 ES Module imports - Full Educational Feature Set
 import { Editor } from 'https://esm.sh/@tiptap/core';
 import StarterKit from 'https://esm.sh/@tiptap/starter-kit';
 import Placeholder from 'https://esm.sh/@tiptap/extension-placeholder';
+import Highlight from 'https://esm.sh/@tiptap/extension-highlight';
+import TextStyle from 'https://esm.sh/@tiptap/extension-text-style';
+import Color from 'https://esm.sh/@tiptap/extension-color';
+import FontFamily from 'https://esm.sh/@tiptap/extension-font-family';
+import TaskList from 'https://esm.sh/@tiptap/extension-task-list';
+import TaskItem from 'https://esm.sh/@tiptap/extension-task-item';
+import Table from 'https://esm.sh/@tiptap/extension-table';
+import TableRow from 'https://esm.sh/@tiptap/extension-table-row';
+import TableHeader from 'https://esm.sh/@tiptap/extension-table-header';
+import TableCell from 'https://esm.sh/@tiptap/extension-table-cell';
+import Link from 'https://esm.sh/@tiptap/extension-link';
+import Underline from 'https://esm.sh/@tiptap/extension-underline';
+import Subscript from 'https://esm.sh/@tiptap/extension-subscript';
+import Superscript from 'https://esm.sh/@tiptap/extension-superscript';
+import CharacterCount from 'https://esm.sh/@tiptap/extension-character-count';
 
 // Make TipTap available globally for the rest of the script
 window.TiptapEditor = Editor;
 window.TiptapStarterKit = StarterKit;
 window.TiptapPlaceholder = Placeholder;
+window.TiptapHighlight = Highlight;
+window.TiptapTextStyle = TextStyle;
+window.TiptapColor = Color;
+window.TiptapFontFamily = FontFamily;
+window.TiptapTaskList = TaskList;
+window.TiptapTaskItem = TaskItem;
+window.TiptapTable = Table;
+window.TiptapTableRow = TableRow;
+window.TiptapTableHeader = TableHeader;
+window.TiptapTableCell = TableCell;
+window.TiptapLink = Link;
+window.TiptapUnderline = Underline;
+window.TiptapSubscript = Subscript;
+window.TiptapSuperscript = Superscript;
+window.TiptapCharacterCount = CharacterCount;
 window.tiptapLoaded = true;
-console.log('TipTap 3.0 ES modules loaded successfully');
+console.log('TipTap 3.0 ES modules with full educational extensions loaded successfully');
 </script>
 <script>
 async function ensureEditors(){
@@ -150,6 +180,44 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .toolbar-btn.is-active{background:#e8f4fd;border-color:#cce7ff;color:#0066cc}
 .toolbar-btn i{width:10px;height:10px;display:block}
 .toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2.2}
+
+/* Enhanced Toolbar Features */
+.toolbar-dropdown{position:relative;display:inline-flex}
+.dropdown-trigger{display:inline-flex;align-items:center;gap:2px}
+.dropdown-content{position:absolute;top:100%;left:0;z-index:1000;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);padding:4px;min-width:120px;display:none}
+.toolbar-dropdown:hover .dropdown-content{display:block}
+.dropdown-item{display:block;width:100%;padding:6px 10px;border:none;background:none;text-align:left;font-size:12px;color:#374151;border-radius:4px;cursor:pointer;white-space:nowrap}
+.dropdown-item:hover{background:#f3f4f6}
+
+/* Color Palette */
+.color-palette{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:4px}
+.color-btn{width:20px;height:20px;border:2px solid #fff;border-radius:4px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.color-btn:hover{transform:scale(1.1);box-shadow:0 2px 6px rgba(0,0,0,0.3)}
+
+/* Word Count Display */
+.word-count{font-size:10px;color:#6b7280;padding:2px 6px;border-radius:4px;background:#f9fafb;border:1px solid #e5e7eb;white-space:nowrap}
+
+/* Table Styles for TipTap */
+.editor-content-area table{border-collapse:collapse;margin:1em 0;width:100%;border:1px solid #e5e7eb}
+.editor-content-area th,.editor-content-area td{border:1px solid #e5e7eb;padding:8px 12px;text-align:left;position:relative}
+.editor-content-area th{background:#f9fafb;font-weight:600}
+.editor-content-area .selectedCell{background:#dbeafe !important}
+
+/* Highlight Styles */
+.editor-content-area mark{background:#fef08a;padding:1px 2px;border-radius:2px}
+
+/* Link Styles */
+.editor-content-area a{color:#2563eb;text-decoration:underline;cursor:pointer}
+.editor-content-area a:hover{color:#1d4ed8}
+
+/* Dark Theme Extensions */
+.dark-theme .dropdown-content{background:#374151;border-color:#4b5563;color:#f3f4f6}
+.dark-theme .dropdown-item{color:#f3f4f6}
+.dark-theme .dropdown-item:hover{background:#4b5563}
+.dark-theme .word-count{background:#374151;border-color:#4b5563;color:#d1d5db}
+.dark-theme .editor-content-area table{border-color:#4b5563}
+.dark-theme .editor-content-area th,.dark-theme .editor-content-area td{border-color:#4b5563}
+.dark-theme .editor-content-area th{background:#374151}
 
 /* Force single-row toolbar for Progress modal editors */
 #newLeftOffMenu,
@@ -774,7 +842,86 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return null;
   }
   
-  const extensions = [window.TiptapStarterKit];
+  // Build comprehensive extension list
+  const extensions = [];
+  
+  // Add StarterKit (includes basic formatting)
+  if (window.TiptapStarterKit) {
+    extensions.push(window.TiptapStarterKit);
+  }
+  
+  // Add Placeholder
+  if (window.TiptapPlaceholder) {
+    extensions.push(window.TiptapPlaceholder.configure({
+      placeholder: 'Start typing your notes...'
+    }));
+  }
+  
+  // Add Text Highlighting
+  if (window.TiptapHighlight) {
+    extensions.push(window.TiptapHighlight.configure({
+      multicolor: false // Use default yellow highlighting
+    }));
+  }
+  
+  // Add Text Style and Color
+  if (window.TiptapTextStyle) {
+    extensions.push(window.TiptapTextStyle);
+  }
+  if (window.TiptapColor) {
+    extensions.push(window.TiptapColor);
+  }
+  
+  // Add Font Family
+  if (window.TiptapFontFamily) {
+    extensions.push(window.TiptapFontFamily);
+  }
+  
+  // Add Task Lists
+  if (window.TiptapTaskList && window.TiptapTaskItem) {
+    extensions.push(window.TiptapTaskList);
+    extensions.push(window.TiptapTaskItem.configure({
+      nested: true
+    }));
+  }
+  
+  // Add Table support
+  if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
+    extensions.push(window.TiptapTable.configure({
+      resizable: true
+    }));
+    extensions.push(window.TiptapTableRow);
+    extensions.push(window.TiptapTableHeader);
+    extensions.push(window.TiptapTableCell);
+  }
+  
+  // Add Link support
+  if (window.TiptapLink) {
+    extensions.push(window.TiptapLink.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'editor-link'
+      }
+    }));
+  }
+  
+  // Add additional formatting
+  if (window.TiptapUnderline) {
+    extensions.push(window.TiptapUnderline);
+  }
+  if (window.TiptapSubscript) {
+    extensions.push(window.TiptapSubscript);
+  }
+  if (window.TiptapSuperscript) {
+    extensions.push(window.TiptapSuperscript);
+  }
+  
+  // Add Character Count
+  if (window.TiptapCharacterCount) {
+    extensions.push(window.TiptapCharacterCount);
+  }
+  
+  console.log(`✅ Configured ${extensions.length} TipTap extensions:`, extensions.map(ext => ext.name || ext.type?.name || 'Unknown').join(', '));
   
   // Create editor instance
   
@@ -800,6 +947,48 @@ function createTipTapEditor(elementId, onUpdate = null) {
         transformPastedText(text) {
           return text;
         },
+        handleKeyDown(view, event) {
+          // Handle keyboard shortcuts
+          if (event.ctrlKey || event.metaKey) {
+            switch (event.key.toLowerCase()) {
+              case 'b':
+                event.preventDefault();
+                editor.chain().focus().toggleBold().run();
+                return true;
+              case 'i':
+                event.preventDefault();
+                editor.chain().focus().toggleItalic().run();
+                return true;
+              case 'u':
+                event.preventDefault();
+                if (editor.chain().focus().toggleUnderline) {
+                  editor.chain().focus().toggleUnderline().run();
+                }
+                return true;
+              case 'k':
+                event.preventDefault();
+                const url = prompt('Enter URL:');
+                if (url) {
+                  editor.chain().focus().setLink({ href: url }).run();
+                } else {
+                  editor.chain().focus().unsetLink().run();
+                }
+                return true;
+              case 'z':
+                if (!event.shiftKey) {
+                  event.preventDefault();
+                  editor.chain().focus().undo().run();
+                  return true;
+                }
+                break;
+              case 'y':
+                event.preventDefault();
+                editor.chain().focus().redo().run();
+                return true;
+            }
+          }
+          return false;
+        }
       },
       onCreate: ({ editor }) => {
         // Ensure DOM is mounted before marking ready and flushing queued actions
@@ -939,23 +1128,59 @@ function buildTipTap3Toolbar(editor, el) {
   
   el.innerHTML = `
     <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="undo" title="Undo">
+      <button type="button" class="toolbar-btn" data-action="undo" title="Undo (Ctrl+Z)">
         <i data-lucide="undo-2"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="redo" title="Redo">
+      <button type="button" class="toolbar-btn" data-action="redo" title="Redo (Ctrl+Y)">
         <i data-lucide="redo-2"></i>
       </button>
     </div>
     <div class="toolbar-divider"></div>
     <div class="toolbar-group">
-      <button type="button" class="toolbar-btn" data-action="bold" title="Bold">
+      <button type="button" class="toolbar-btn" data-action="bold" title="Bold (Ctrl+B)">
         <i data-lucide="bold"></i>
       </button>
-      <button type="button" class="toolbar-btn" data-action="italic" title="Italic">
+      <button type="button" class="toolbar-btn" data-action="italic" title="Italic (Ctrl+I)">
         <i data-lucide="italic"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="underline" title="Underline (Ctrl+U)">
+        <i data-lucide="underline"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="strike" title="Strikethrough">
+        <i data-lucide="strikethrough"></i>
       </button>
       <button type="button" class="toolbar-btn" data-action="code" title="Inline Code">
         <i data-lucide="code"></i>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="highlight" title="Highlight Text">
+        <i data-lucide="highlighter"></i>
+      </button>
+      <div class="toolbar-dropdown">
+        <button type="button" class="toolbar-btn dropdown-trigger" title="Text Color">
+          <i data-lucide="palette"></i>
+          <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
+        </button>
+        <div class="dropdown-content">
+          <div class="color-palette">
+            <button type="button" class="color-btn" data-action="color" data-color="#000000" style="background: #000000;" title="Black"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#dc2626" style="background: #dc2626;" title="Red"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#ea580c" style="background: #ea580c;" title="Orange"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#ca8a04" style="background: #ca8a04;" title="Yellow"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#16a34a" style="background: #16a34a;" title="Green"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#2563eb" style="background: #2563eb;" title="Blue"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#9333ea" style="background: #9333ea;" title="Purple"></button>
+            <button type="button" class="color-btn" data-action="color" data-color="#e11d48" style="background: #e11d48;" title="Pink"></button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="toolbar-btn" data-action="subscript" title="Subscript">
+        <span style="font-size: 14px;">X<sub>2</sub></span>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="superscript" title="Superscript">
+        <span style="font-size: 14px;">X<sup>2</sup></span>
       </button>
     </div>
     <div class="toolbar-divider"></div>
@@ -965,6 +1190,9 @@ function buildTipTap3Toolbar(editor, el) {
       </button>
       <button type="button" class="toolbar-btn" data-action="heading2" title="Heading 2">
         <i data-lucide="heading-2"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="heading3" title="Heading 3">
+        <i data-lucide="heading-3"></i>
       </button>
       <button type="button" class="toolbar-btn" data-action="paragraph" title="Paragraph">
         <i data-lucide="pilcrow"></i>
@@ -984,6 +1212,40 @@ function buildTipTap3Toolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="blockquote" title="Quote">
         <i data-lucide="quote"></i>
       </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <button type="button" class="toolbar-btn" data-action="link" title="Add Link">
+        <i data-lucide="link"></i>
+      </button>
+      <button type="button" class="toolbar-btn" data-action="horizontal-rule" title="Horizontal Line">
+        <i data-lucide="minus"></i>
+      </button>
+      <div class="toolbar-dropdown">
+        <button type="button" class="toolbar-btn dropdown-trigger" title="Insert Table">
+          <i data-lucide="table"></i>
+          <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
+        </button>
+        <div class="dropdown-content">
+          <button type="button" class="dropdown-item" data-action="insertTable">Insert Table</button>
+          <button type="button" class="dropdown-item" data-action="addRowBefore">Add Row Before</button>
+          <button type="button" class="dropdown-item" data-action="addRowAfter">Add Row After</button>
+          <button type="button" class="dropdown-item" data-action="addColumnBefore">Add Column Before</button>
+          <button type="button" class="dropdown-item" data-action="addColumnAfter">Add Column After</button>
+          <button type="button" class="dropdown-item" data-action="deleteRow">Delete Row</button>
+          <button type="button" class="dropdown-item" data-action="deleteColumn">Delete Column</button>
+          <button type="button" class="dropdown-item" data-action="deleteTable">Delete Table</button>
+        </div>
+      </div>
+      <button type="button" class="toolbar-btn" data-action="emoji" title="Insert Emoji">
+        <span>😊</span>
+      </button>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <div class="word-count" id="wordCount-${el.id}" title="Word Count">
+        <small>0 words</small>
+      </div>
     </div>
   `;
   
@@ -1290,6 +1552,160 @@ function buildTipTap3Toolbar(editor, el) {
             const ok = chain.toggleBlockquote().run();
             console.log('✅ toggleBlockquote run:', ok); break;
           }
+          case 'underline': {
+            let ok = false;
+            if (typeof chain.toggleUnderline === 'function') {
+              ok = chain.toggleUnderline().run();
+            } else {
+              console.warn('⚠️ Underline extension not available');
+            }
+            console.log('✅ toggleUnderline run:', ok); break;
+          }
+          case 'strike': {
+            const ok = chain.toggleStrike().run();
+            console.log('✅ toggleStrike run:', ok); break;
+          }
+          case 'highlight': {
+            let ok = false;
+            if (typeof chain.toggleHighlight === 'function') {
+              ok = chain.toggleHighlight().run();
+            } else {
+              console.warn('⚠️ Highlight extension not available');
+            }
+            console.log('✅ toggleHighlight run:', ok); break;
+          }
+          case 'color': {
+            const color = btn.dataset.color;
+            let ok = false;
+            if (typeof chain.setColor === 'function' && color) {
+              ok = chain.setColor(color).run();
+            } else {
+              console.warn('⚠️ Color extension not available or no color specified');
+            }
+            console.log('✅ setColor run:', ok); break;
+          }
+          case 'subscript': {
+            let ok = false;
+            if (typeof chain.toggleSubscript === 'function') {
+              ok = chain.toggleSubscript().run();
+            } else {
+              console.warn('⚠️ Subscript extension not available');
+            }
+            console.log('✅ toggleSubscript run:', ok); break;
+          }
+          case 'superscript': {
+            let ok = false;
+            if (typeof chain.toggleSuperscript === 'function') {
+              ok = chain.toggleSuperscript().run();
+            } else {
+              console.warn('⚠️ Superscript extension not available');
+            }
+            console.log('✅ toggleSuperscript run:', ok); break;
+          }
+          case 'heading3': {
+            const ok = chain.toggleHeading({ level: 3 }).run();
+            console.log('✅ toggleHeading(3) run:', ok); break;
+          }
+          case 'link': {
+            const url = prompt('Enter URL:');
+            let ok = false;
+            if (url && typeof chain.setLink === 'function') {
+              ok = chain.setLink({ href: url }).run();
+            } else if (typeof chain.unsetLink === 'function') {
+              ok = chain.unsetLink().run();
+            } else {
+              console.warn('⚠️ Link extension not available');
+            }
+            console.log('✅ setLink run:', ok); break;
+          }
+          case 'horizontal-rule': {
+            let ok = false;
+            if (typeof chain.setHorizontalRule === 'function') {
+              ok = chain.setHorizontalRule().run();
+            } else {
+              console.warn('⚠️ HorizontalRule extension not available');
+            }
+            console.log('✅ setHorizontalRule run:', ok); break;
+          }
+          case 'insertTable': {
+            let ok = false;
+            if (typeof chain.insertTable === 'function') {
+              ok = chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ insertTable run:', ok); break;
+          }
+          case 'addRowBefore': {
+            let ok = false;
+            if (typeof chain.addRowBefore === 'function') {
+              ok = chain.addRowBefore().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ addRowBefore run:', ok); break;
+          }
+          case 'addRowAfter': {
+            let ok = false;
+            if (typeof chain.addRowAfter === 'function') {
+              ok = chain.addRowAfter().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ addRowAfter run:', ok); break;
+          }
+          case 'addColumnBefore': {
+            let ok = false;
+            if (typeof chain.addColumnBefore === 'function') {
+              ok = chain.addColumnBefore().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ addColumnBefore run:', ok); break;
+          }
+          case 'addColumnAfter': {
+            let ok = false;
+            if (typeof chain.addColumnAfter === 'function') {
+              ok = chain.addColumnAfter().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ addColumnAfter run:', ok); break;
+          }
+          case 'deleteRow': {
+            let ok = false;
+            if (typeof chain.deleteRow === 'function') {
+              ok = chain.deleteRow().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ deleteRow run:', ok); break;
+          }
+          case 'deleteColumn': {
+            let ok = false;
+            if (typeof chain.deleteColumn === 'function') {
+              ok = chain.deleteColumn().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ deleteColumn run:', ok); break;
+          }
+          case 'deleteTable': {
+            let ok = false;
+            if (typeof chain.deleteTable === 'function') {
+              ok = chain.deleteTable().run();
+            } else {
+              console.warn('⚠️ Table extension not available');
+            }
+            console.log('✅ deleteTable run:', ok); break;
+          }
+          case 'emoji': {
+            // Simple emoji insertion - you could expand this with a picker
+            const emojis = ['😊', '🎉', '👍', '❤️', '📚', '✅', '❌', '⭐', '🔥', '💡'];
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const ok = chain.insertContent(emoji).run();
+            console.log('✅ insertEmoji run:', ok); break;
+          }
           default:
             console.warn('🤷 Unknown toolbar action:', action);
             return;
@@ -1354,19 +1770,36 @@ function updateTipTap3Toolbar(editor, el) {
       switch (action) {
         case 'bold': isActive = editor.isActive('bold'); break;
         case 'italic': isActive = editor.isActive('italic'); break;
+        case 'underline': isActive = editor.isActive('underline'); break;
+        case 'strike': isActive = editor.isActive('strike'); break;
         case 'code': isActive = editor.isActive('code'); break;
+        case 'highlight': isActive = editor.isActive('highlight'); break;
+        case 'subscript': isActive = editor.isActive('subscript'); break;
+        case 'superscript': isActive = editor.isActive('superscript'); break;
         case 'heading1': isActive = editor.isActive('heading', { level: 1 }); break;
         case 'heading2': isActive = editor.isActive('heading', { level: 2 }); break;
+        case 'heading3': isActive = editor.isActive('heading', { level: 3 }); break;
         case 'paragraph': isActive = editor.isActive('paragraph'); break;
         case 'bulletList': isActive = editor.isActive('bulletList'); break;
         case 'orderedList': isActive = editor.isActive('orderedList'); break;
         case 'taskList': isActive = editor.isActive('taskList'); break;
         case 'blockquote': isActive = editor.isActive('blockquote'); break;
+        case 'link': isActive = editor.isActive('link'); break;
       }
     }
     
     btn.classList.toggle('is-active', isActive);
   });
+  
+  // Update word count if available
+  if (editor && editor.storage && editor.storage.characterCount) {
+    const wordCountEl = el.querySelector('.word-count small');
+    if (wordCountEl) {
+      const words = editor.storage.characterCount.words();
+      const characters = editor.storage.characterCount.characters();
+      wordCountEl.textContent = `${words} words, ${characters} chars`;
+    }
+  }
   
   // Re-initialize icons after state changes
   if (window.lucide) {
