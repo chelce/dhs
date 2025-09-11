@@ -3126,8 +3126,30 @@ function buildWeeks(){
   }
   return weeks;
 }
-function isSameDay(a,b){return a.toISOString().slice(0,10)===b.toISOString().slice(0,10);} 
-function fmtDate(d){return d.toISOString().slice(0,10);} 
+
+// Timezone-safe date functions to prevent off-by-one errors
+function isSameDay(a,b){
+  return fmtDate(a) === fmtDate(b);
+} 
+
+function fmtDate(d){
+  // Use local timezone instead of UTC to prevent date shifting
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+} 
+
+// Create a date from YYYY-MM-DD string in local timezone
+function parseLocalDate(dateStr) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-indexed
+}
+
+// Get today's date in local timezone as YYYY-MM-DD
+function getTodayLocal() {
+  return fmtDate(new Date());
+} 
 
 /* ========= HARD CODED EVENTS ========= */
 /* ========= REMOTE LOAD ========= */
@@ -3195,8 +3217,8 @@ async function loadRemoteEvents(){
         let formattedDate = '';
         if (dateStr) {
           try {
-            const date = new Date(dateStr);
-            formattedDate = date.toISOString().split('T')[0];
+            const date = parseLocalDate(dateStr);
+            formattedDate = fmtDate(date);
           } catch(e) {
             console.warn('Failed to parse date:', dateStr);
             formattedDate = dateStr;
@@ -3438,7 +3460,7 @@ async function loadProgressData(){
 
 async function saveProgressEntry(classCode, leftOffRtf, whatsNextRtf, leftOffHtml = '', whatsNextHtml = '') {
   try {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+    const today = getTodayLocal(); // YYYY-MM-DD format in local timezone
     
     // Check if entry already exists for this class and date
     const existingEntry = progressData.find(entry => 
