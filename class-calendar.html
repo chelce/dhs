@@ -245,8 +245,8 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
   background: #dc2626 !important;
 }
 .day-cell.drag-over{outline:2px dashed #3b82f6;background:#22344a}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:flex-start;justify-content:center;padding-top:60px}
-.modal-content{background:#fff;color:#111;border-radius:12px;padding:18px;max-width:520px;width:92%;box-shadow:0 20px 40px -10px rgba(0,0,0,.55)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:flex-start;justify-content:center;padding:20px}
+.modal-content{background:#fff;color:#111;border-radius:12px;padding:24px;max-width:900px;width:95%;max-height:90vh;box-shadow:0 20px 40px -10px rgba(0,0,0,.55);overflow-y:auto;resize:both;min-width:600px;min-height:400px}
 .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .modal-title{font-size:18px;font-weight:600}
 .close{cursor:pointer;font-size:24px;line-height:1}
@@ -256,15 +256,15 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Modern Minimal Editor (WYSIWYG Style) === */
 .editor-shell{border:1px solid #d1d5db;border-radius:12px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;position:relative}
-.editor-toolbar{display:flex;flex-wrap:nowrap;gap:2px;padding:8px 12px;background:#fdfdfd;border-bottom:1px solid #eeeeee;border-radius:12px 12px 0 0;align-items:center;height:42px}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:2px;padding:8px 12px;background:#fdfdfd;border-bottom:1px solid #eeeeee;border-radius:12px 12px 0 0;align-items:center;min-height:42px;max-height:80px;overflow-y:auto}
 .toolbar-group{display:inline-flex;gap:1px;align-items:center}
 .toolbar-divider{width:1px;height:20px;background:#e0e0e0;margin:0 6px}
-.toolbar-btn{background:transparent;border:none;border-radius:5px;padding:6px;min-width:28px;min-height:28px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#525252;font-size:11px;line-height:1;font-weight:400;transition:.12s all ease-out}
+.toolbar-btn{background:transparent;border:none;border-radius:5px;padding:6px;min-width:30px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#525252;font-size:11px;line-height:1;font-weight:400;transition:.12s all ease-out}
 .toolbar-btn:hover{background:rgba(0,0,0,0.08);color:#262626}
 .toolbar-btn.is-active{background:#e5e5e5;color:#171717}
-.toolbar-btn i{width:10px;height:10px;display:block;flex-shrink:0;font-size:10px !important}
-.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2;width:10px !important;height:10px !important;font-size:10px !important}
-.toolbar-btn svg{width:10px !important;height:10px !important;font-size:10px !important}
+.toolbar-btn i{width:12px;height:12px;display:block;flex-shrink:0;font-size:12px !important}
+.toolbar-btn i[data-lucide]{stroke:currentColor;fill:none;stroke-width:2;width:12px !important;height:12px !important;font-size:12px !important}
+.toolbar-btn svg{width:12px !important;height:12px !important;font-size:12px !important}
 
 /* Enhanced Toolbar Features */
 .toolbar-dropdown{position:relative;display:inline-flex}
@@ -635,7 +635,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .heading-dropdown.open .heading-menu{display:flex}
 .heading-menu button{all:unset;cursor:pointer;padding:6px 10px;border-radius:6px;font-size:13px;color:#374151;line-height:1.2}
 .heading-menu button:hover{background:#eef2f7}
-.editor-content-area{padding:10px 14px;min-height:110px;max-height:260px;overflow:auto;font-size:14px;line-height:1.5}
+.editor-content-area{padding:12px 16px;min-height:200px;max-height:400px;overflow:auto;font-size:14px;line-height:1.5}
 .editor-content-area:focus{outline:none}
 /* Remove TipTap focus outlines */
 .editor-content-area .tiptap{outline:none !important}
@@ -3142,12 +3142,8 @@ function fmtDate(d){
 
 // Create a date from YYYY-MM-DD string in local timezone
 function parseLocalDate(dateStr) {
-  console.log('🔧 parseLocalDate input:', dateStr);
   const [year, month, day] = dateStr.split('-').map(Number);
-  console.log('🔧 parseLocalDate parsed:', {year, month, day});
-  const result = new Date(year, month - 1, day); // month is 0-indexed
-  console.log('🔧 parseLocalDate result:', result);
-  return result;
+  return new Date(year, month - 1, day); // month is 0-indexed
 }
 
 // Get today's date in local timezone as YYYY-MM-DD
@@ -3221,8 +3217,6 @@ async function loadRemoteEvents(){
         let formattedDate = '';
         if (dateStr) {
           try {
-            console.log('📅 Parsing date:', dateStr);
-            
             // Handle different date formats from Coda
             let date;
             if (dateStr.includes('-') && dateStr.length === 10) {
@@ -3237,7 +3231,6 @@ async function loadRemoteEvents(){
             }
             
             formattedDate = fmtDate(date);
-            console.log('📅 Formatted date:', formattedDate);
           } catch(e) {
             console.warn('Failed to parse date:', dateStr, e);
             formattedDate = dateStr;
@@ -3254,12 +3247,9 @@ async function loadRemoteEvents(){
           notes: content,
           createdAt: row.createdAt || formattedDate
         });
-        
-        console.log('✅ Added event:', title, 'for date:', formattedDate);
       }
     });
     
-    console.log(`🎯 Total events loaded: ${events.length}`);
     return true; // Success
     
   } catch(e){ 
