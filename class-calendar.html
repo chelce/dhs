@@ -3142,8 +3142,12 @@ function fmtDate(d){
 
 // Create a date from YYYY-MM-DD string in local timezone
 function parseLocalDate(dateStr) {
+  console.log('🔧 parseLocalDate input:', dateStr);
   const [year, month, day] = dateStr.split('-').map(Number);
-  return new Date(year, month - 1, day); // month is 0-indexed
+  console.log('🔧 parseLocalDate parsed:', {year, month, day});
+  const result = new Date(year, month - 1, day); // month is 0-indexed
+  console.log('🔧 parseLocalDate result:', result);
+  return result;
 }
 
 // Get today's date in local timezone as YYYY-MM-DD
@@ -3217,10 +3221,25 @@ async function loadRemoteEvents(){
         let formattedDate = '';
         if (dateStr) {
           try {
-            const date = parseLocalDate(dateStr);
+            console.log('📅 Parsing date:', dateStr);
+            
+            // Handle different date formats from Coda
+            let date;
+            if (dateStr.includes('-') && dateStr.length === 10) {
+              // Already in YYYY-MM-DD format
+              date = parseLocalDate(dateStr);
+            } else {
+              // Try parsing as JavaScript date
+              date = new Date(dateStr);
+              if (isNaN(date.getTime())) {
+                throw new Error('Invalid date format');
+              }
+            }
+            
             formattedDate = fmtDate(date);
+            console.log('📅 Formatted date:', formattedDate);
           } catch(e) {
-            console.warn('Failed to parse date:', dateStr);
+            console.warn('Failed to parse date:', dateStr, e);
             formattedDate = dateStr;
           }
         }
@@ -3235,9 +3254,12 @@ async function loadRemoteEvents(){
           notes: content,
           createdAt: row.createdAt || formattedDate
         });
+        
+        console.log('✅ Added event:', title, 'for date:', formattedDate);
       }
     });
     
+    console.log(`🎯 Total events loaded: ${events.length}`);
     return true; // Success
     
   } catch(e){ 
