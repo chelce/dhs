@@ -116,6 +116,12 @@ try {
     console.log('✅ HorizontalRule extension loaded');
   } catch(e) { console.warn('⚠️ HorizontalRule extension failed to load:', e); }
   
+  try {
+    const Youtube = (await import('https://esm.sh/@tiptap/extension-youtube')).default;
+    window.TiptapYoutube = Youtube;
+    console.log('✅ Youtube extension loaded');
+  } catch(e) { console.warn('⚠️ Youtube extension failed to load:', e); }
+  
   // Note: Slash commands will be implemented with a custom solution since @tiptap/suggestion can be complex
   console.log('✅ Preparing slash command functionality');
   
@@ -398,6 +404,191 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 
 .dark-theme .command-description{
   color:#9ca3af;
+}
+
+/* HTML and iframe embeds */
+.ProseMirror iframe{
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+  margin:16px 0;
+  max-width:100%;
+}
+
+.ProseMirror .html-block-container{
+  border:2px dashed #e5e7eb;
+  border-radius:8px;
+  padding:16px;
+  margin:16px 0;
+  background:#f9fafb;
+  position:relative;
+  transition:border-color 0.2s ease;
+}
+
+.ProseMirror .html-block-container:hover{
+  border-color:#d1d5db;
+  background:#f3f4f6;
+}
+
+.ProseMirror .html-block-container::before{
+  content:"HTML Block";
+  position:absolute;
+  top:-8px;
+  left:12px;
+  background:#f9fafb;
+  padding:2px 8px;
+  font-size:10px;
+  color:#6b7280;
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.ProseMirror .youtube-embed{
+  margin:16px 0;
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Dark theme support for embeds */
+.dark-theme .ProseMirror .html-block-container{
+  border-color:#374151;
+  background:#1f2937;
+}
+
+.dark-theme .ProseMirror .html-block-container:hover{
+  border-color:#4b5563;
+  background:#111827;
+}
+
+.dark-theme .ProseMirror .html-block-container::before{
+  background:#1f2937;
+  color:#9ca3af;
+}
+
+/* Input Modal for HTML/iframe embedding */
+.input-modal-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(0,0,0,0.5);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10001;
+  backdrop-filter:blur(2px);
+}
+
+.input-modal{
+  background:#ffffff;
+  border-radius:12px;
+  padding:24px;
+  min-width:400px;
+  max-width:600px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.2);
+  animation:modalSlideIn 0.2s ease-out;
+}
+
+.input-modal h3{
+  margin:0 0 16px 0;
+  font-size:18px;
+  font-weight:600;
+  color:#111827;
+}
+
+.input-field{
+  width:100%;
+  padding:12px;
+  border:2px solid #e5e7eb;
+  border-radius:8px;
+  font-size:14px;
+  font-family:ui-monospace,SFMono-Regular,"SF Mono",Consolas,monospace;
+  resize:vertical;
+  outline:none;
+  transition:border-color 0.2s ease;
+  margin-bottom:16px;
+}
+
+.input-field:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 3px rgba(59,130,246,0.1);
+}
+
+.modal-buttons{
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+}
+
+.modal-btn{
+  padding:8px 16px;
+  border-radius:6px;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  border:none;
+}
+
+.modal-btn.cancel{
+  background:#f3f4f6;
+  color:#374151;
+}
+
+.modal-btn.cancel:hover{
+  background:#e5e7eb;
+}
+
+.modal-btn.confirm{
+  background:#3b82f6;
+  color:#ffffff;
+}
+
+.modal-btn.confirm:hover{
+  background:#2563eb;
+}
+
+@keyframes modalSlideIn{
+  from{
+    opacity:0;
+    transform:scale(0.95) translateY(-10px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+
+/* Dark theme modal */
+.dark-theme .input-modal{
+  background:#1f2937;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+
+.dark-theme .input-modal h3{
+  color:#f9fafb;
+}
+
+.dark-theme .input-field{
+  background:#374151;
+  border-color:#4b5563;
+  color:#f9fafb;
+}
+
+.dark-theme .input-field:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 3px rgba(59,130,246,0.2);
+}
+
+.dark-theme .modal-btn.cancel{
+  background:#374151;
+  color:#d1d5db;
+}
+
+.dark-theme .modal-btn.cancel:hover{
+  background:#4b5563;
 }
 .editor-content-area .selectedCell{background:#dbeafe !important}
 
@@ -1222,6 +1413,100 @@ function createTipTapEditor(elementId, onUpdate = null) {
     }
   }
   
+  if (window.TiptapYoutube) {
+    try {
+      extensions.push(window.TiptapYoutube.configure({
+        width: 640,
+        height: 480,
+        allowFullscreen: true
+      }));
+      console.log('✅ Added Youtube');
+    } catch(e) {
+      console.warn('⚠️ Youtube configuration failed:', e);
+    }
+  }
+  
+  // Add custom HTML and iframe support
+  if (window.TiptapEditor) {
+    try {
+      // Custom iframe node
+      const IframeNode = window.TiptapEditor.Node.create({
+        name: 'iframe',
+        group: 'block',
+        atom: true,
+        addAttributes() {
+          return {
+            src: { default: null },
+            width: { default: '100%' },
+            height: { default: '400px' },
+            title: { default: 'Embedded content' }
+          }
+        },
+        parseHTML() {
+          return [{ tag: 'iframe' }]
+        },
+        renderHTML({ HTMLAttributes }) {
+          return ['iframe', { 
+            ...HTMLAttributes,
+            frameborder: '0',
+            allowfullscreen: 'true',
+            style: `width: ${HTMLAttributes.width}; height: ${HTMLAttributes.height}; border-radius: 8px;`
+          }]
+        },
+        addCommands() {
+          return {
+            setIframe: (options) => ({ commands }) => {
+              return commands.insertContent({
+                type: this.name,
+                attrs: options,
+              })
+            },
+          }
+        }
+      });
+      
+      // Custom HTML block node
+      const HtmlBlockNode = window.TiptapEditor.Node.create({
+        name: 'htmlBlock',
+        group: 'block',
+        atom: true,
+        addAttributes() {
+          return {
+            content: { default: '' }
+          }
+        },
+        parseHTML() {
+          return [{ tag: 'div[data-html-block]' }]
+        },
+        renderHTML({ HTMLAttributes }) {
+          return ['div', { 
+            'data-html-block': 'true',
+            class: 'html-block-container',
+            style: 'border: 2px dashed #e5e7eb; border-radius: 8px; padding: 16px; margin: 8px 0; background: #f9fafb;'
+          }, ['div', { 
+            innerHTML: HTMLAttributes.content,
+            style: 'pointer-events: auto;'
+          }]]
+        },
+        addCommands() {
+          return {
+            setHtmlBlock: (content) => ({ commands }) => {
+              return commands.insertContent({
+                type: this.name,
+                attrs: { content },
+              })
+            },
+          }
+        }
+      });
+      
+      extensions.push(IframeNode, HtmlBlockNode);
+      console.log('✅ Added custom HTML and iframe support');
+    } catch(e) {
+      console.warn('⚠️ Custom HTML/iframe setup failed:', e);
+    }
+  }
+  
   console.log(`✅ Configured ${extensions.length} TipTap extensions for editor: ${elementId}`);
   
   // Create editor instance
@@ -1323,6 +1608,58 @@ function addSlashCommands(editor, element) {
   let isCommandMode = false;
   let commandStart = 0;
   
+  // Helper function to show input modal
+  function showInputModal(title, placeholder, callback) {
+    const modal = document.createElement('div');
+    modal.className = 'input-modal-overlay';
+    modal.innerHTML = `
+      <div class="input-modal">
+        <h3>${title}</h3>
+        <textarea class="input-field" placeholder="${placeholder}" rows="6"></textarea>
+        <div class="modal-buttons">
+          <button class="modal-btn cancel">Cancel</button>
+          <button class="modal-btn confirm">Insert</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const textarea = modal.querySelector('.input-field');
+    const cancelBtn = modal.querySelector('.cancel');
+    const confirmBtn = modal.querySelector('.confirm');
+    
+    textarea.focus();
+    
+    cancelBtn.onclick = () => {
+      document.body.removeChild(modal);
+    };
+    
+    confirmBtn.onclick = () => {
+      const value = textarea.value.trim();
+      if (value) {
+        callback(value);
+      }
+      document.body.removeChild(modal);
+    };
+    
+    // Allow Enter to confirm for single-line inputs
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && placeholder.includes('URL')) {
+        e.preventDefault();
+        confirmBtn.click();
+      } else if (e.key === 'Escape') {
+        cancelBtn.click();
+      }
+    });
+    
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        cancelBtn.click();
+      }
+    };
+  }
+  
   const commands = [
     { name: 'Heading 1', command: 'h1', description: 'Large section heading', action: () => editor.chain().focus().toggleHeading({ level: 1 }).run() },
     { name: 'Heading 2', command: 'h2', description: 'Medium section heading', action: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
@@ -1334,7 +1671,22 @@ function addSlashCommands(editor, element) {
     { name: 'Code Block', command: 'code', description: 'Insert code block', action: () => editor.chain().focus().toggleCodeBlock().run() },
     { name: 'Table', command: 'table', description: 'Insert a table', action: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run() },
     { name: 'Horizontal Rule', command: 'hr', description: 'Add a divider line', action: () => editor.chain().focus().setHorizontalRule().run() },
-    { name: 'Task List', command: 'todo', description: 'Create a task list', action: () => editor.chain().focus().toggleTaskList().run() }
+    { name: 'Task List', command: 'todo', description: 'Create a task list', action: () => editor.chain().focus().toggleTaskList().run() },
+    { name: 'Embed iframe', command: 'iframe', description: 'Embed YouTube, forms, etc.', action: () => {
+      showInputModal('Embed iframe', 'Enter iframe URL (YouTube, Google Forms, etc.)', (src) => {
+        editor.chain().focus().setIframe({ src }).run();
+      });
+    }},
+    { name: 'Embed HTML', command: 'html', description: 'Insert custom HTML code', action: () => {
+      showInputModal('Embed HTML', 'Enter your HTML code...', (content) => {
+        editor.chain().focus().setHtmlBlock(content).run();
+      });
+    }},
+    { name: 'YouTube Video', command: 'youtube', description: 'Embed YouTube video', action: () => {
+      showInputModal('Embed YouTube Video', 'Enter YouTube URL', (url) => {
+        editor.chain().focus().setYoutubeVideo({ src: url }).run();
+      });
+    }}
   ];
   
   function createCommandMenu() {
@@ -1566,6 +1918,8 @@ function buildWorkingToolbar(editor, el) {
     <div class="toolbar-group">
       <button type="button" class="toolbar-btn" data-action="insertTable" title="Insert Table">⊞</button>
       <button type="button" class="toolbar-btn" data-action="codeBlock" title="Code Block">{ }</button>
+      <button type="button" class="toolbar-btn" data-action="embedIframe" title="Embed iframe">📺</button>
+      <button type="button" class="toolbar-btn" data-action="embedHtml" title="Embed HTML">🔗</button>
     </div>
     <div class="toolbar-divider"></div>
     <div class="toolbar-group">
@@ -1643,10 +1997,55 @@ function buildWorkingToolbar(editor, el) {
         chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(); 
         break;
       case 'codeBlock': chain.toggleCodeBlock().run(); break;
+      case 'embedIframe':
+        showEmbedModal('Embed iframe', 'Enter iframe URL (YouTube, Google Forms, etc.)', (src) => {
+          editor.chain().focus().setIframe({ src }).run();
+        });
+        break;
+      case 'embedHtml':
+        showEmbedModal('Embed HTML', 'Enter your HTML code...', (content) => {
+          editor.chain().focus().setHtmlBlock(content).run();
+        });
+        break;
     }
     
     updateWorkingToolbar(editor, el);
   });
+  
+  // Helper for toolbar embed modals
+  function showEmbedModal(title, placeholder, callback) {
+    const modal = document.createElement('div');
+    modal.className = 'input-modal-overlay';
+    modal.innerHTML = `
+      <div class="input-modal">
+        <h3>${title}</h3>
+        <textarea class="input-field" placeholder="${placeholder}" rows="6"></textarea>
+        <div class="modal-buttons">
+          <button class="modal-btn cancel">Cancel</button>
+          <button class="modal-btn confirm">Insert</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    const textarea = modal.querySelector('.input-field');
+    const cancelBtn = modal.querySelector('.cancel');
+    const confirmBtn = modal.querySelector('.confirm');
+    
+    textarea.focus();
+    
+    cancelBtn.onclick = () => document.body.removeChild(modal);
+    confirmBtn.onclick = () => {
+      const value = textarea.value.trim();
+      if (value) callback(value);
+      document.body.removeChild(modal);
+    };
+    
+    modal.onclick = (e) => {
+      if (e.target === modal) cancelBtn.click();
+    };
+  }
   
   // Update button states
   editor.on('selectionUpdate', () => updateWorkingToolbar(editor, el));
