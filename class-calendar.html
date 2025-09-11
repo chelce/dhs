@@ -1251,6 +1251,145 @@ function createTipTapEditor(elementId, onUpdate = null) {
     console.log('✅ Added Placeholder');
   }
   
+  // Add all enhanced extensions
+  if (window.TiptapHighlight) {
+    extensions.push(window.TiptapHighlight.configure({ multicolor: false }));
+    console.log('✅ Added Highlight');
+  }
+  
+  if (window.TiptapTextStyle && window.TiptapColor) {
+    extensions.push(window.TiptapTextStyle, window.TiptapColor);
+    console.log('✅ Added Text Color');
+  }
+  
+  if (window.TiptapTaskList && window.TiptapTaskItem) {
+    extensions.push(window.TiptapTaskList, window.TiptapTaskItem.configure({ nested: true }));
+    console.log('✅ Added Task Lists');
+  }
+  
+  if (window.TiptapLink) {
+    extensions.push(window.TiptapLink.configure({
+      openOnClick: false,
+      HTMLAttributes: { class: 'editor-link' }
+    }));
+    console.log('✅ Added Link');
+  }
+  
+  if (window.TiptapUnderline) {
+    extensions.push(window.TiptapUnderline);
+    console.log('✅ Added Underline');
+  }
+  
+  if (window.TiptapTextAlign) {
+    extensions.push(window.TiptapTextAlign.configure({
+      types: ['heading', 'paragraph']
+    }));
+    console.log('✅ Added TextAlign');
+  }
+  
+  if (window.TiptapSubscript) {
+    extensions.push(window.TiptapSubscript);
+    console.log('✅ Added Subscript');
+  }
+  
+  if (window.TiptapSuperscript) {
+    extensions.push(window.TiptapSuperscript);
+    console.log('✅ Added Superscript');
+  }
+  
+  if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
+    extensions.push(
+      window.TiptapTable.configure({ resizable: true }),
+      window.TiptapTableRow,
+      window.TiptapTableHeader,
+      window.TiptapTableCell
+    );
+    console.log('✅ Added Table support');
+  }
+  
+  // Add custom nodes and marks if available
+  if (window.YouTubeNode) {
+    extensions.push(window.YouTubeNode);
+    console.log('✅ Added YouTube embedding');
+  }
+  
+  if (window.FormEmbedNode) {
+    extensions.push(window.FormEmbedNode);
+    console.log('✅ Added Form embedding');
+  }
+  
+  if (window.HTMLEmbedNode) {
+    extensions.push(window.HTMLEmbedNode);
+    console.log('✅ Added HTML embedding');
+  }
+  
+  if (window.DragDropNode) {
+    extensions.push(window.DragDropNode);
+    console.log('✅ Added Drag & Drop');
+  }
+  
+  console.log(`🎯 Creating editor with ${extensions.length} extensions`);
+  
+  try {
+    const editor = new window.TiptapEditor({
+      element: element,
+      extensions: extensions,
+      onUpdate: onUpdate,
+      autofocus: false,
+      editable: true,
+      injectCSS: false
+    });
+    
+    console.log('✅ Enhanced TipTap editor created successfully');
+    return editor;
+  } catch (error) {
+    console.error('❌ Failed to create enhanced editor:', error);
+    return null;
+  }
+}
+
+// Create basic editor with minimal extensions (fallback)
+function createBasicTipTapEditor(elementId, onUpdate = null) {
+  
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error('❌ Element not found:', elementId);
+    return null;
+  }
+  
+  // Element is required for editor creation
+  
+  // Test if TipTap is available
+  if (!window.TiptapEditor) {
+    console.error('❌ TiptapEditor not available on window object');
+    return null;
+  }
+  
+  if (!window.TiptapStarterKit) {
+    console.error('❌ TiptapStarterKit not available');
+    return null;
+  }
+  
+  // Build comprehensive extension list with graceful fallbacks
+  const extensions = [];
+  
+  // Add StarterKit (includes basic formatting) - REQUIRED
+  if (window.TiptapStarterKit) {
+    extensions.push(window.TiptapStarterKit);
+    console.log('✅ Added StarterKit');
+  } else {
+    console.error('❌ StarterKit not available - editor will fail');
+    return null;
+  }
+  
+  // Add Placeholder - RECOMMENDED
+  if (window.TiptapPlaceholder) {
+    extensions.push(window.TiptapPlaceholder.configure({
+      placeholder: 'Start typing your notes...'
+    }));
+    console.log('✅ Added Placeholder');
+  }
+  
   // Add optional extensions only if available
   if (window.TiptapHighlight) {
     try {
@@ -1596,6 +1735,113 @@ function createTipTapEditor(elementId, onUpdate = null) {
     return editor;
   } catch (error) {
     console.error('❌ Failed to create TipTap editor:', error);
+    return null;
+  }
+}
+
+// Enhanced TipTap editor creation with all features for modals
+function createEnhancedTipTapEditor(elementId, onUpdate = null) {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error('❌ Element not found:', elementId);
+    return null;
+  }
+
+  if (!window.TiptapEditor || !window.TiptapStarterKit) {
+    console.error('❌ TipTap core not available');
+    return null;
+  }
+
+  // Build comprehensive extension list
+  const extensions = [window.TiptapStarterKit];
+
+  // Add all available enhanced extensions
+  if (window.TiptapPlaceholder) {
+    extensions.push(window.TiptapPlaceholder.configure({
+      placeholder: ({ node }) => {
+        if (node.type.name === 'heading') {
+          return 'Heading...';
+        }
+        return 'Start typing or use / for commands...';
+      },
+      showOnlyWhenEditable: true,
+      showOnlyCurrent: true
+    }));
+  }
+
+  if (window.TiptapHighlight) {
+    extensions.push(window.TiptapHighlight.configure({ multicolor: false }));
+  }
+
+  if (window.TiptapTextStyle && window.TiptapColor) {
+    extensions.push(window.TiptapTextStyle, window.TiptapColor);
+  }
+
+  if (window.TiptapTaskList && window.TiptapTaskItem) {
+    extensions.push(window.TiptapTaskList, window.TiptapTaskItem.configure({ nested: true }));
+  }
+
+  if (window.TiptapLink) {
+    extensions.push(window.TiptapLink.configure({
+      openOnClick: false,
+      HTMLAttributes: { class: 'editor-link' }
+    }));
+  }
+
+  if (window.TiptapUnderline) {
+    extensions.push(window.TiptapUnderline);
+  }
+
+  if (window.TiptapTextAlign) {
+    extensions.push(window.TiptapTextAlign.configure({
+      types: ['heading', 'paragraph']
+    }));
+  }
+
+  if (window.TiptapSubscript) {
+    extensions.push(window.TiptapSubscript);
+  }
+
+  if (window.TiptapSuperscript) {
+    extensions.push(window.TiptapSuperscript);
+  }
+
+  if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
+    extensions.push(
+      window.TiptapTable.configure({ resizable: true }),
+      window.TiptapTableRow,
+      window.TiptapTableHeader,
+      window.TiptapTableCell
+    );
+  }
+
+  // Add custom nodes if available
+  if (window.YouTubeNode) extensions.push(window.YouTubeNode);
+  if (window.FormEmbedNode) extensions.push(window.FormEmbedNode);
+  if (window.HTMLEmbedNode) extensions.push(window.HTMLEmbedNode);
+  if (window.DragDropNode) extensions.push(window.DragDropNode);
+
+  console.log(`🎯 Creating enhanced editor with ${extensions.length} extensions`);
+
+  try {
+    const editor = new window.TiptapEditor({
+      element: element,
+      extensions: extensions,
+      onUpdate: onUpdate,
+      autofocus: false,
+      editable: true,
+      injectCSS: false
+    });
+
+    // Add slash commands after a brief delay
+    setTimeout(() => {
+      addSlashCommands(editor, element);
+    }, 100);
+
+    console.log('✅ Enhanced editor created successfully');
+    return editor;
+  } catch (error) {
+    console.error('❌ Failed to create enhanced editor:', error);
     return null;
   }
 }
@@ -3728,8 +3974,8 @@ function openAddModal(prefillDate){
       notesEditor = null;
     }
     
-    // Create fresh TipTap editor
-    notesEditor = createTipTapEditor('eventNotesEditor', ({ editor }) => {
+    // Create fresh enhanced TipTap editor
+    notesEditor = createEnhancedTipTapEditor('eventNotesEditor', ({ editor }) => {
       document.getElementById('eventNotes').value = editor.getHTML();
     });
     
@@ -4027,8 +4273,8 @@ function openDetails(id){
       detailsEditor = null;
     }
 
-    // Create fresh TipTap editor
-    detailsEditor = createTipTapEditor('detailsNotesEditor');
+    // Create fresh enhanced TipTap editor
+    detailsEditor = createEnhancedTipTapEditor('detailsNotesEditor');
 
   if (detailsEditor) {
       // Set initial content once on the fresh editor to avoid later resets that move the caret
@@ -5340,132 +5586,58 @@ function initializeNewModalEditors(classCode, latestEntry) {
   console.log('🎨 Initializing enhanced progress modal editors for:', classCode);
   
   try {
-    // Use the same comprehensive extension loading as the main editor
-    if (!window.TiptapEditor || !window.TiptapStarterKit) {
-      console.warn('⚠️ TipTap not available; skipping editor init in progress modal');
-      return;
-    }
-    
-    // Build comprehensive extension list (same as main editor)
-    const extensions = [];
-    
-    // Add StarterKit (includes basic formatting) - REQUIRED
-    if (window.TiptapStarterKit) {
-      extensions.push(window.TiptapStarterKit);
-      console.log('✅ Added StarterKit to progress editors');
-    }
-    
-    // Add all the enhanced extensions
-    if (window.TiptapPlaceholder) {
-      extensions.push(window.TiptapPlaceholder.configure({
-        placeholder: 'Start typing...'
-      }));
-    }
-    
-    if (window.TiptapHighlight) {
-      extensions.push(window.TiptapHighlight.configure({ multicolor: false }));
-    }
-    
-    if (window.TiptapTextStyle && window.TiptapColor) {
-      extensions.push(window.TiptapTextStyle, window.TiptapColor);
-    }
-    
-    if (window.TiptapTaskList && window.TiptapTaskItem) {
-      extensions.push(window.TiptapTaskList, window.TiptapTaskItem.configure({ nested: true }));
-    }
-    
-    if (window.TiptapLink) {
-      extensions.push(window.TiptapLink.configure({
-        openOnClick: false,
-        HTMLAttributes: { class: 'editor-link' }
-      }));
-    }
-    
-    if (window.TiptapUnderline) {
-      extensions.push(window.TiptapUnderline);
-    }
-    
-    if (window.TiptapTextAlign) {
-      extensions.push(window.TiptapTextAlign.configure({
-        types: ['heading', 'paragraph']
-      }));
-    }
-    
-    if (window.TiptapSubscript) {
-      extensions.push(window.TiptapSubscript);
-    }
-    
-    if (window.TiptapSuperscript) {
-      extensions.push(window.TiptapSuperscript);
-    }
-    
-    if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
-      extensions.push(
-        window.TiptapTable.configure({ resizable: true }),
-        window.TiptapTableRow,
-        window.TiptapTableHeader,
-        window.TiptapTableCell
-      );
-    }
-    
-    // Add custom nodes and marks if available
-    if (window.YouTubeNode) extensions.push(window.YouTubeNode);
-    if (window.FormEmbedNode) extensions.push(window.FormEmbedNode);
-    if (window.HTMLEmbedNode) extensions.push(window.HTMLEmbedNode);
-    if (window.DragDropNode) extensions.push(window.DragDropNode);
-    
-    console.log(`🎯 Progress editors using ${extensions.length} extensions`);
-    
     // Create left off editor with enhanced extensions
-    if (window.TiptapEditor && document.getElementById('newLeftOffEditor')) {
-      newLeftOffEditor = new window.TiptapEditor({
-        element: document.getElementById('newLeftOffEditor'),
-        extensions: extensions
-      });
+    if (document.getElementById('newLeftOffEditor')) {
+      newLeftOffEditor = createEnhancedTipTapEditor('newLeftOffEditor');
       
       // Build enhanced toolbar
       console.log('🔧 Building enhanced left off toolbar');
-      buildTipTap3Toolbar(newLeftOffEditor, document.getElementById('newLeftOffMenu'));
-      
-      // Set content
-      if (latestEntry?.leftOffHtml) {
-        console.log('📝 Setting left off HTML content');
-        newLeftOffEditor.commands.setContent(latestEntry.leftOffHtml);
-      } else if (latestEntry?.leftOffRtf) {
-        console.log('📝 Setting left off RTF content');
-        newLeftOffEditor.commands.setContent(latestEntry.leftOffRtf);
-      } else {
-        console.log('📝 No existing left off content');
-        newLeftOffEditor.commands.setContent('<p></p>');
+      if (newLeftOffEditor) {
+        setTimeout(() => {
+          buildTipTap3Toolbar(newLeftOffEditor, document.getElementById('newLeftOffMenu'));
+        }, 100);
+        
+        // Set content
+        if (latestEntry?.leftOffHtml) {
+          console.log('📝 Setting left off HTML content');
+          newLeftOffEditor.commands.setContent(latestEntry.leftOffHtml);
+        } else if (latestEntry?.leftOffRtf) {
+          console.log('📝 Setting left off RTF content');
+          newLeftOffEditor.commands.setContent(latestEntry.leftOffRtf);
+        } else {
+          console.log('📝 No existing left off content');
+          newLeftOffEditor.commands.setContent('<p></p>');
+        }
+        
+        console.log('✅ Enhanced left off editor created');
       }
-      
-      console.log('✅ Enhanced left off editor created');
     }
     
     // Create next editor with enhanced extensions
-    if (window.TiptapEditor && document.getElementById('newNextEditor')) {
-      newNextEditor = new window.TiptapEditor({
-        element: document.getElementById('newNextEditor'),
-        extensions: extensions
-      });
+    if (document.getElementById('newNextEditor')) {
+      newNextEditor = createEnhancedTipTapEditor('newNextEditor');
       
       // Build enhanced toolbar
       console.log('🔧 Building enhanced next toolbar');
-      buildTipTap3Toolbar(newNextEditor, document.getElementById('newNextMenu'));
-      
-      // Set content
-      if (latestEntry?.whatsNextHtml) {
-        console.log('📝 Setting next HTML content');
-        newNextEditor.commands.setContent(latestEntry.whatsNextHtml);
-      } else if (latestEntry?.whatsNextRtf) {
-        console.log('📝 Setting next RTF content');
-        newNextEditor.commands.setContent(latestEntry.whatsNextRtf);
-      } else {
-        console.log('📝 No existing next content');
-        newNextEditor.commands.setContent('<p></p>');
+      if (newNextEditor) {
+        setTimeout(() => {
+          buildTipTap3Toolbar(newNextEditor, document.getElementById('newNextMenu'));
+        }, 100);
+        
+        // Set content
+        if (latestEntry?.whatsNextHtml) {
+          console.log('📝 Setting next HTML content');
+          newNextEditor.commands.setContent(latestEntry.whatsNextHtml);
+        } else if (latestEntry?.whatsNextRtf) {
+          console.log('📝 Setting next RTF content');
+          newNextEditor.commands.setContent(latestEntry.whatsNextRtf);
+        } else {
+          console.log('📝 No existing next content');
+          newNextEditor.commands.setContent('<p></p>');
+        }
+        
+        console.log('✅ Enhanced next editor created');
       }
-      
-      console.log('✅ Enhanced next editor created');
     }
     
     // Initialize Lucide icons for enhanced toolbar
@@ -5473,7 +5645,7 @@ function initializeNewModalEditors(classCode, latestEntry) {
       setTimeout(() => {
         window.lucide.createIcons();
         console.log('🎨 Lucide icons initialized for progress editors');
-      }, 200);
+      }, 300);
     }
     
   } catch (error) {
