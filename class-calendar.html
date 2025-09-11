@@ -5347,27 +5347,94 @@ let newLeftOffEditor = null;
 let newNextEditor = null;
 
 function initializeNewModalEditors(classCode, latestEntry) {
-  console.log('🎨 Initializing new modal editors for:', classCode);
+  console.log('🎨 Initializing enhanced progress modal editors for:', classCode);
   
   try {
-    // Use the same safe extensions as the main editors (StarterKit + Placeholder)
+    // Use the same comprehensive extension loading as the main editor
     if (!window.TiptapEditor || !window.TiptapStarterKit) {
       console.warn('⚠️ TipTap not available; skipping editor init in progress modal');
       return;
     }
-    const extensions = [ window.TiptapStarterKit ];
     
-    // Create left off editor
+    // Build comprehensive extension list (same as main editor)
+    const extensions = [];
+    
+    // Add StarterKit (includes basic formatting) - REQUIRED
+    if (window.TiptapStarterKit) {
+      extensions.push(window.TiptapStarterKit);
+      console.log('✅ Added StarterKit to progress editors');
+    }
+    
+    // Add all the enhanced extensions
+    if (window.TiptapPlaceholder) {
+      extensions.push(window.TiptapPlaceholder.configure({
+        placeholder: 'Start typing...'
+      }));
+    }
+    
+    if (window.TiptapHighlight) {
+      extensions.push(window.TiptapHighlight.configure({ multicolor: false }));
+    }
+    
+    if (window.TiptapTextStyle && window.TiptapColor) {
+      extensions.push(window.TiptapTextStyle, window.TiptapColor);
+    }
+    
+    if (window.TiptapTaskList && window.TiptapTaskItem) {
+      extensions.push(window.TiptapTaskList, window.TiptapTaskItem.configure({ nested: true }));
+    }
+    
+    if (window.TiptapLink) {
+      extensions.push(window.TiptapLink.configure({
+        openOnClick: false,
+        HTMLAttributes: { class: 'editor-link' }
+      }));
+    }
+    
+    if (window.TiptapUnderline) {
+      extensions.push(window.TiptapUnderline);
+    }
+    
+    if (window.TiptapTextAlign) {
+      extensions.push(window.TiptapTextAlign.configure({
+        types: ['heading', 'paragraph']
+      }));
+    }
+    
+    if (window.TiptapSubscript) {
+      extensions.push(window.TiptapSubscript);
+    }
+    
+    if (window.TiptapSuperscript) {
+      extensions.push(window.TiptapSuperscript);
+    }
+    
+    if (window.TiptapTable && window.TiptapTableRow && window.TiptapTableHeader && window.TiptapTableCell) {
+      extensions.push(
+        window.TiptapTable.configure({ resizable: true }),
+        window.TiptapTableRow,
+        window.TiptapTableHeader,
+        window.TiptapTableCell
+      );
+    }
+    
+    // Add custom nodes and marks if available
+    if (window.YouTubeNode) extensions.push(window.YouTubeNode);
+    if (window.FormEmbedNode) extensions.push(window.FormEmbedNode);
+    if (window.HTMLEmbedNode) extensions.push(window.HTMLEmbedNode);
+    if (window.DragDropNode) extensions.push(window.DragDropNode);
+    
+    console.log(`🎯 Progress editors using ${extensions.length} extensions`);
+    
+    // Create left off editor with enhanced extensions
     if (window.TiptapEditor && document.getElementById('newLeftOffEditor')) {
       newLeftOffEditor = new window.TiptapEditor({
         element: document.getElementById('newLeftOffEditor'),
-        extensions: window.TiptapPlaceholder
-          ? [...extensions, window.TiptapPlaceholder.configure({ placeholder: 'What did we accomplish today...' })]
-          : extensions
+        extensions: extensions
       });
       
-      // Build toolbar
-      console.log('🔧 Building left off toolbar');
+      // Build enhanced toolbar
+      console.log('🔧 Building enhanced left off toolbar');
       buildTipTap3Toolbar(newLeftOffEditor, document.getElementById('newLeftOffMenu'));
       
       // Set content
@@ -5382,20 +5449,18 @@ function initializeNewModalEditors(classCode, latestEntry) {
         newLeftOffEditor.commands.setContent('<p></p>');
       }
       
-      console.log('✅ Left off editor created');
+      console.log('✅ Enhanced left off editor created');
     }
     
-    // Create next editor
+    // Create next editor with enhanced extensions
     if (window.TiptapEditor && document.getElementById('newNextEditor')) {
       newNextEditor = new window.TiptapEditor({
         element: document.getElementById('newNextEditor'),
-        extensions: window.TiptapPlaceholder
-          ? [...extensions, window.TiptapPlaceholder.configure({ placeholder: "What's coming up next..." })]
-          : extensions
+        extensions: extensions
       });
       
-      // Build toolbar
-      console.log('🔧 Building next toolbar');
+      // Build enhanced toolbar
+      console.log('🔧 Building enhanced next toolbar');
       buildTipTap3Toolbar(newNextEditor, document.getElementById('newNextMenu'));
       
       // Set content
@@ -5410,16 +5475,19 @@ function initializeNewModalEditors(classCode, latestEntry) {
         newNextEditor.commands.setContent('<p></p>');
       }
       
-      console.log('✅ Next editor created');
+      console.log('✅ Enhanced next editor created');
     }
     
-    // Initialize Lucide icons
+    // Initialize Lucide icons for enhanced toolbar
     if (window.lucide) {
-      window.lucide.createIcons();
+      setTimeout(() => {
+        window.lucide.createIcons();
+        console.log('🎨 Lucide icons initialized for progress editors');
+      }, 200);
     }
     
   } catch (error) {
-    console.error('❌ Error initializing modal editors:', error);
+    console.error('❌ Error initializing enhanced modal editors:', error);
   }
 }
 
