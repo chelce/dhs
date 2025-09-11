@@ -5,7 +5,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Class Calendar & Reflections (Coda-Powered)</title>
-<link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=HarmonyOS+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;600;700&family=Nunito:wght@300;400;500;600;700&family=Raleway:wght@300;400;500;600;700&family=Ubuntu:wght@300;400;500;700&family=Playfair+Display:wght@400;500;600;700&family=Merriweather:wght@300;400;700&family=Crimson+Text:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
 <!-- Lucide icons -->
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script type="module">
@@ -89,6 +89,20 @@ try {
     window.TiptapCodeBlock = CodeBlock;
     console.log('✅ CodeBlock extension loaded');
   } catch(e) { console.warn('⚠️ CodeBlock extension failed to load:', e); }
+  
+  try {
+    const FontFamily = (await import('https://esm.sh/@tiptap/extension-font-family')).default;
+    window.TiptapFontFamily = FontFamily;
+    console.log('✅ FontFamily extension loaded');
+  } catch(e) { console.warn('⚠️ FontFamily extension failed to load:', e); }
+  
+  try {
+    const Dropcursor = (await import('https://esm.sh/@tiptap/extension-dropcursor')).default;
+    const Gapcursor = (await import('https://esm.sh/@tiptap/extension-gapcursor')).default;
+    window.TiptapDropcursor = Dropcursor;
+    window.TiptapGapcursor = Gapcursor;
+    console.log('✅ Drag/Drop cursor extensions loaded');
+  } catch(e) { console.warn('⚠️ Drag/Drop cursor extensions failed to load:', e); }
   
   // Mark as loaded
   window.tiptapLoaded = true;
@@ -220,7 +234,7 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .form-group input,.form-group select{width:100%;padding:8px 10px;border:1px solid #d0d0d4;border-radius:6px;font-size:13px}
 .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
 /* === Modern Minimal Editor (WYSIWYG Style) === */
-.editor-shell{border:1px solid #d1d5db;border-radius:12px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+.editor-shell{border:1px solid #d1d5db;border-radius:12px;background:#ffffff;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;position:relative}
 .editor-toolbar{display:flex;flex-wrap:nowrap;gap:2px;padding:8px 12px;background:#fdfdfd;border-bottom:1px solid #eeeeee;border-radius:12px 12px 0 0;align-items:center;height:42px}
 .toolbar-group{display:inline-flex;gap:1px;align-items:center}
 .toolbar-divider{width:1px;height:20px;background:#e0e0e0;margin:0 6px}
@@ -239,6 +253,12 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .dropdown-item{display:block;width:100%;padding:8px 12px;border:none;background:none;text-align:left;font-size:13px;color:#404040;border-radius:6px;cursor:pointer;white-space:nowrap}
 .dropdown-item:hover{background:#f0f0f0}
 
+/* Font Dropdown */
+.font-dropdown{min-width:180px;max-height:300px;overflow-y:auto}
+.font-preview{display:block;width:100%;padding:10px 12px;border:none;background:none;text-align:left;font-size:14px;color:#404040;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background 0.15s ease}
+.font-preview:hover{background:#f0f0f0}
+.font-display{font-weight:500;font-size:12px}
+
 /* Color Palette */
 .color-palette{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px}
 .color-btn{width:24px;height:24px;border:2px solid #fff;border-radius:6px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
@@ -251,6 +271,25 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .editor-content-area table{border-collapse:collapse;margin:1em 0;width:100%;border:1px solid #e5e7eb}
 .editor-content-area th,.editor-content-area td{border:1px solid #e5e7eb;padding:8px 12px;text-align:left;position:relative}
 .editor-content-area th{background:#f9fafb;font-weight:600}
+
+/* Draggable Elements */
+.ProseMirror .drag-handle{position:absolute;left:-24px;top:50%;transform:translateY(-50%);width:16px;height:16px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:3px;cursor:grab;opacity:0;transition:opacity 0.2s ease}
+.ProseMirror .drag-handle:hover{background:#e5e7eb;opacity:1}
+.ProseMirror p:hover .drag-handle,.ProseMirror h1:hover .drag-handle,.ProseMirror h2:hover .drag-handle,.ProseMirror h3:hover .drag-handle{opacity:0.7}
+.ProseMirror .drag-handle:active{cursor:grabbing}
+
+/* Drop Cursor */
+.ProseMirror .ProseMirror-dropcursor{background:#3b82f6;height:2px;pointer-events:none;position:relative}
+.ProseMirror .ProseMirror-dropcursor:after{content:'';position:absolute;left:-4px;top:-3px;width:8px;height:8px;background:#3b82f6;border-radius:50%}
+
+/* Gap Cursor */
+.ProseMirror .ProseMirror-gapcursor{display:none;pointer-events:none;position:absolute}
+.ProseMirror .ProseMirror-gapcursor:after{content:'';display:block;position:absolute;top:-2px;width:20px;border-top:2px solid #3b82f6;animation:ProseMirror-cursor-blink 1.1s steps(2,start) infinite}
+
+@keyframes ProseMirror-cursor-blink{to{visibility:hidden}}
+
+/* Font Family Styles */
+.ProseMirror [data-font-family]{font-family:var(--font-family) !important}
 .editor-content-area .selectedCell{background:#dbeafe !important}
 
 /* Highlight Styles */
@@ -1027,6 +1066,35 @@ function createTipTapEditor(elementId, onUpdate = null) {
     }
   }
   
+  if (window.TiptapFontFamily) {
+    try {
+      extensions.push(window.TiptapFontFamily.configure({
+        types: ['textStyle']
+      }));
+      console.log('✅ Added FontFamily');
+    } catch(e) {
+      console.warn('⚠️ FontFamily configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapDropcursor) {
+    try {
+      extensions.push(window.TiptapDropcursor);
+      console.log('✅ Added Dropcursor');
+    } catch(e) {
+      console.warn('⚠️ Dropcursor configuration failed:', e);
+    }
+  }
+  
+  if (window.TiptapGapcursor) {
+    try {
+      extensions.push(window.TiptapGapcursor);
+      console.log('✅ Added Gapcursor');
+    } catch(e) {
+      console.warn('⚠️ Gapcursor configuration failed:', e);
+    }
+  }
+  
   console.log(`✅ Configured ${extensions.length} TipTap extensions for editor: ${elementId}`);
   
   // Create editor instance
@@ -1161,6 +1229,30 @@ function buildWorkingToolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="insertTable" title="Insert Table">⊞</button>
       <button type="button" class="toolbar-btn" data-action="codeBlock" title="Code Block">{ }</button>
     </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <div class="toolbar-dropdown">
+        <button type="button" class="toolbar-btn dropdown-trigger" title="Font Family">
+          <span class="font-display">Aa</span>
+        </button>
+        <div class="dropdown-content font-dropdown">
+          <div class="font-preview" data-font="Inter" style="font-family: 'Inter', sans-serif;">Inter</div>
+          <div class="font-preview" data-font="Roboto" style="font-family: 'Roboto', sans-serif;">Roboto</div>
+          <div class="font-preview" data-font="Open Sans" style="font-family: 'Open Sans', sans-serif;">Open Sans</div>
+          <div class="font-preview" data-font="Lato" style="font-family: 'Lato', sans-serif;">Lato</div>
+          <div class="font-preview" data-font="Poppins" style="font-family: 'Poppins', sans-serif;">Poppins</div>
+          <div class="font-preview" data-font="Montserrat" style="font-family: 'Montserrat', sans-serif;">Montserrat</div>
+          <div class="font-preview" data-font="Source Sans Pro" style="font-family: 'Source Sans Pro', sans-serif;">Source Sans Pro</div>
+          <div class="font-preview" data-font="Nunito" style="font-family: 'Nunito', sans-serif;">Nunito</div>
+          <div class="font-preview" data-font="Raleway" style="font-family: 'Raleway', sans-serif;">Raleway</div>
+          <div class="font-preview" data-font="Ubuntu" style="font-family: 'Ubuntu', sans-serif;">Ubuntu</div>
+          <div class="font-preview" data-font="Playfair Display" style="font-family: 'Playfair Display', serif;">Playfair Display</div>
+          <div class="font-preview" data-font="Merriweather" style="font-family: 'Merriweather', serif;">Merriweather</div>
+          <div class="font-preview" data-font="Crimson Text" style="font-family: 'Crimson Text', serif;">Crimson Text</div>
+          <div class="font-preview" data-font="Libre Baskerville" style="font-family: 'Libre Baskerville', serif;">Libre Baskerville</div>
+        </div>
+      </div>
+    </div>
   `;
   
   // Keep selection: prevent toolbar from stealing focus on mousedown
@@ -1173,6 +1265,19 @@ function buildWorkingToolbar(editor, el) {
 
   el.addEventListener('click', (e) => {
     const btn = e.target.closest('.toolbar-btn');
+    const fontPreview = e.target.closest('.font-preview');
+    
+    if (fontPreview && editor) {
+      const fontName = fontPreview.dataset.font;
+      editor.chain().focus().setFontFamily(fontName).run();
+      // Hide dropdown
+      fontPreview.closest('.dropdown-content').style.display = 'none';
+      setTimeout(() => {
+        fontPreview.closest('.dropdown-content').style.display = '';
+      }, 100);
+      return;
+    }
+    
     if (!btn || !editor) return;
     
     const action = btn.dataset.action;
