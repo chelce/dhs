@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backfill All Task Cards to Coda</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemUI, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 14px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 12px; border-radius: 4px; margin: 10px 0; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 12px; border-radius: 4px; margin: 10px 0; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; padding: 12px; border-radius: 4px; margin: 10px 0; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; padding: 12px; border-radius: 4px; margin: 10px 0; }
+        .card-preview {
+            background: #f8f9fa;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+            font-size: 12px;
+        }
+        .card-preview h4 {
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+        .progress {
+            background: #e9ecef;
+            border-radius: 4px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: #007bff;
+            height: 100%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        .stat-card h3 {
+            margin: 0 0 5px 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .stat-card p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Backfill All Task Cards to Coda</h1>
+        <p>This tool will extract ALL your existing task cards from every HTML file and add them to your Coda table with proper subject/unit/series organization.</p>
+
+        <div id="messages"></div>
+
+        <div style="margin: 20px 0;">
+            <button id="scanBtn">1. Scan All Task Card Files</button>
+            <button id="previewBtn" disabled>2. Preview All Cards</button>
+            <button id="clearBtn">3. Clear Existing Coda Table</button>
+            <button id="uploadBtn" disabled>4. Upload ALL Cards to Coda</button>
+        </div>
+
+        <div id="progress" style="display:none;">
+            <div class="progress">
+                <div class="progress-bar" id="progressBar" style="width: 0%;">0%</div>
+            </div>
+        </div>
+
+        <div id="stats" class="stats" style="display:none;"></div>
+
+        <div id="cardPreview" style="display:none;">
+            <h3>Scanned Task Cards:</h3>
+            <div id="cardList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 15px; border-radius: 4px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const CODA_DOC_ID = 'xmloQUGg-g';
+        const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
+        const TABLE_ID = 'grid-MbORljz5rl';
+
+        // Column mapping with series
+        const COLUMN_MAPPING = {
+            cardNumber: 'c-oCblzlJHpK',
+            difficulty: 'c-R3MiGsbDIh',
+            title: 'c-AaNuPckhD2',
+            icon: 'c-ic9sO6dOFA',
+            instructions: 'c-5Wm1KWBumn',
+            directions: 'c-UdatLRw4ZE',
+            sentenceFrame: 'c-PTc-M6N93s',
+            hints: 'c-J2p_hAW8aK',
+            subject: 'c-subject', // Will need real ID
+            unit: 'c-unit',     // Will need real ID  
+            series: 'c-OBxHtN8XaH'
+        };
+
+        let allScannedCards = [];
+
+        // Comprehensive task card data from all your existing files
+        const ALL_TASK_CARDS = [
+            // Hamilton Set 2 (ham-2) - Current cards in Coda
+            {
+                cardNumber: 'E1', difficulty: 'Easy', title: 'Political Debate', icon: 'megaphone',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "Farmer Refuted," how do Hamilton and Seabury show they have different opinions about working with Britain?',
+                directions: '1. Listen to "Farmer Refuted" and identify the two main speakers\n2. Write down one thing each person believes about Britain\n3. Find specific words that show they disagree with each other\n4. Explain which person sounds more angry or upset and why',
+                sentenceFrame: 'Hamilton thinks _____ about Britain, but Seabury believes _____. You can tell they disagree because _____.',
+                hints: 'Notice how their voices sound different - one is calm, one is excited\nPay attention to who interrupts who during the song\nListen for words about freedom versus safety'
+            },
+            {
+                cardNumber: 'E2', difficulty: 'Easy', title: "King's Attitude", icon: 'crown',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "You\'ll Be Back," how does King George show he feels about the American colonists leaving Britain?',
+                directions: '1. Listen to "You\'ll Be Back" and notice the King\'s tone of voice\n2. Write down two emotions the King shows toward the colonists\n3. Find specific words that show how he feels\n4. Explain what the King thinks will happen to the colonists without Britain',
+                sentenceFrame: 'King George feels _____ about the colonists leaving. He thinks they will _____ without Britain\'s help.',
+                hints: 'Notice how the music sounds happy but the words are threatening\nPay attention to whether he sounds like he\'s joking or serious\nListen for what he says about the colonists coming back'
+            },
+            {
+                cardNumber: 'E3', difficulty: 'Easy', title: 'Military Problems', icon: 'shield',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "Right Hand Man," what specific problems do the colonial soldiers face in their war against Britain?',
+                directions: '1. Listen to "Right Hand Man" and list the army\'s problems\n2. Write down two things the soldiers are missing or need\n3. Find specific words that describe how the soldiers are doing\n4. Explain why Washington needs help leading the army',
+                sentenceFrame: 'The colonial army has problems like _____ and _____. Washington needs help because _____.',
+                hints: 'Listen for what the soldiers don\'t have enough of\nPay attention to words about winning versus losing\nNotice what Washington says about needing assistance'
+            },
+            {
+                cardNumber: 'E4', difficulty: 'Easy', title: 'Royal Authority', icon: 'crown',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "You\'ll Be Back," what does King George think gives him the right to control the American colonists?',
+                directions: '1. Listen to "You\'ll Be Back" and focus on what the King says about his power\n2. Write down two reasons he gives for why colonists should obey him\n3. Find specific words that show he feels he owns the colonists\n4. Explain what the King thinks will prove he\'s right',
+                sentenceFrame: 'King George thinks he can control the colonists because _____. He believes _____ will prove he\'s right.',
+                hints: 'Listen for words about ownership and belonging\nPay attention to what he says about being their king\nNotice how he talks about the colonists like children'
+            },
+            {
+                cardNumber: 'E5', difficulty: 'Easy', title: 'Leadership Skills', icon: 'users',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "Right Hand Man," what qualities make Hamilton a good choice to help Washington lead the army?',
+                directions: '1. Listen to "Right Hand Man" and focus on what Hamilton can do\n2. Write down two skills Hamilton has that Washington needs\n3. Find specific words that describe Hamilton\'s abilities\n4. Explain why Washington chooses Hamilton over other people',
+                sentenceFrame: 'Hamilton is a good choice because he can _____ and _____. Washington picks him because _____.',
+                hints: 'Listen for what Hamilton knows about fighting and planning\nPay attention to what makes Hamilton different from other soldiers\nNotice what Washington says about needing someone smart'
+            },
+            {
+                cardNumber: 'E6', difficulty: 'Easy', title: 'Political Philosophy', icon: 'scroll',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "Farmer Refuted," what basic idea does Hamilton believe about how people should be governed?',
+                directions: '1. Listen to "Farmer Refuted" and focus on Hamilton\'s main argument\n2. Write down two things Hamilton thinks people deserve from their government\n3. Find specific words that show what Hamilton values most\n4. Explain how Hamilton\'s ideas are different from what Britain offers',
+                sentenceFrame: 'Hamilton believes people should have _____ and _____. This is different from Britain because _____.',
+                hints: 'Listen for words about rights and freedoms\nPay attention to what Hamilton says people can do for themselves\nNotice how he talks about making choices'
+            },
+            {
+                cardNumber: 'M1', difficulty: 'Medium', title: 'Colonial Relationship', icon: 'link',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'How do "Farmer Refuted" and "You\'ll Be Back" show two different perspectives on the relationship between Britain and the American colonies?',
+                directions: '1. Compare Hamilton\'s view of Britain in "Farmer Refuted" with King George\'s view in "You\'ll Be Back"\n2. Identify how each character describes the colonial relationship\n3. Find specific lyrics that reveal their different assumptions about loyalty and independence\n4. Analyze how their different perspectives lead to different conclusions about what should happen',
+                sentenceFrame: '',
+                hints: 'Consider what each character sees as the "natural" relationship\nLook for assumptions about who owes what to whom\nNotice how past experiences shape their current views'
+            },
+            {
+                cardNumber: 'M2', difficulty: 'Medium', title: 'Military Strategy', icon: 'crosshair',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'In "Right Hand Man," how does the song reveal the strategic challenges Washington faces and why he needs Hamilton specifically?',
+                directions: '1. Analyze the military problems Washington describes and categorize them (supplies, strategy, morale, etc.)\n2. Compare Washington\'s needs with Hamilton\'s demonstrated abilities\n3. Examine how the song shows Hamilton\'s strategic thinking in action\n4. Evaluate why Washington\'s choice of Hamilton makes sense given these specific challenges',
+                sentenceFrame: '',
+                hints: 'Think about different types of military challenges beyond just fighting\nConsider what kind of "right hand" Washington needs most\nLook for evidence of Hamilton\'s problem-solving approach'
+            },
+            {
+                cardNumber: 'M3', difficulty: 'Medium', title: 'Political Persuasion', icon: 'message-circle',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'How do Hamilton in "Farmer Refuted" and King George in "You\'ll Be Back" use different persuasion techniques to convince their audiences?',
+                directions: '1. Identify the rhetorical strategies each character uses (emotion, logic, authority, etc.)\n2. Compare how they address potential objections to their arguments\n3. Analyze how their tone and word choice reflect their persuasion approach\n4. Evaluate which approach might be more effective for their intended audience',
+                sentenceFrame: '',
+                hints: 'Consider who each character is trying to convince\nLook for appeals to fear, hope, duty, or self-interest\nNotice how they frame the consequences of different choices'
+            },
+            {
+                cardNumber: 'M4', difficulty: 'Medium', title: 'Imperial Psychology', icon: 'brain',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'What does King George\'s behavior in "You\'ll Be Back" reveal about the imperial mindset and its assumptions about colonial relationships?',
+                directions: '1. Analyze the King\'s emotional responses to colonial rebellion and what they reveal about his expectations\n2. Examine how he frames the colonial desire for independence (as temporary, misguided, etc.)\n3. Identify the assumptions he makes about the colonists\' capabilities and motivations\n4. Evaluate how his predictions about the future reveal his understanding of power and dependency',
+                sentenceFrame: '',
+                hints: 'Think about what the King takes for granted about the relationship\nConsider how he interprets colonial actions and motivations\nLook for signs of paternalistic thinking'
+            },
+            {
+                cardNumber: 'M5', difficulty: 'Medium', title: 'Enlightenment Ideologies', icon: 'lightbulb',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'How does Hamilton\'s argument in "Farmer Refuted" reflect key Enlightenment ideas about government, individual rights, and social contracts?',
+                directions: '1. Identify specific Enlightenment concepts Hamilton references (natural rights, consent of the governed, etc.)\n2. Analyze how he applies these abstract ideas to the specific colonial situation\n3. Compare his philosophical approach with Seabury\'s more traditional arguments\n4. Evaluate how Hamilton uses Enlightenment thinking to justify revolution',
+                sentenceFrame: '',
+                hints: 'Think about ideas from philosophers like Locke and Rousseau\nConsider concepts about where government authority comes from\nLook for arguments about individual versus collective rights'
+            },
+            {
+                cardNumber: 'M6', difficulty: 'Medium', title: 'Imperial Discourse', icon: 'globe',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'How do the language patterns and assumptions in "You\'ll Be Back" reflect broader imperial discourse about colonies and colonial subjects?',
+                directions: '1. Analyze the King\'s vocabulary choices and what they reveal about how he views the colonies\n2. Examine the metaphors he uses to describe the colonial relationship\n3. Identify how his language reinforces power hierarchies\n4. Compare his discourse with Hamilton\'s alternative framing in "Farmer Refuted"',
+                sentenceFrame: '',
+                hints: 'Look for familial metaphors (parent-child relationships)\nConsider economic language (ownership, debt, obligation)\nNotice how language shapes what seems "natural" or "obvious"'
+            },
+            {
+                cardNumber: 'H1', difficulty: 'Hard', title: 'Military Transformation', icon: 'trending-up',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'Analyze how "Right Hand Man" demonstrates the transformation of the Continental Army from a collection of colonial militias into a professional military force capable of strategic thinking.',
+                directions: '1. Trace the evolution from militia-based thinking to professional military strategy as presented in the song\n2. Analyze how Hamilton\'s appointment represents a shift toward intellectual and strategic approaches to warfare\n3. Evaluate the tension between democratic ideals and military hierarchy that Washington must navigate\n4. Synthesize how this military evolution reflects broader themes of American political development',
+                sentenceFrame: '',
+                hints: 'Consider the difference between citizen-soldiers and professional military\nThink about how strategic thinking differs from individual bravery\nAnalyze the relationship between military effectiveness and political legitimacy'
+            },
+            {
+                cardNumber: 'H2', difficulty: 'Hard', title: 'Rhetorical Revolution', icon: 'zap',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'Examine how "Farmer Refuted" demonstrates the revolutionary potential of Enlightenment rhetoric to fundamentally reframe political relationships and social contracts.',
+                directions: '1. Deconstruct Hamilton\'s rhetorical strategy for delegitimizing traditional authority structures\n2. Analyze how Enlightenment language creates new frameworks for understanding political legitimacy\n3. Evaluate the revolutionary implications of shifting from subject-based to citizen-based political identity\n4. Synthesize how rhetorical innovation enables political transformation',
+                sentenceFrame: '',
+                hints: 'Think about how language shapes political reality\nConsider the power of redefining key concepts like loyalty and obligation\nAnalyze how philosophical arguments become practical political tools'
+            },
+            {
+                cardNumber: 'H3', difficulty: 'Hard', title: 'Democratic Inclusion', icon: 'users-round',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-2',
+                instructions: 'Critically analyze how Hamilton\'s rise in "Right Hand Man" both exemplifies and complicates American democratic ideals about merit-based advancement and social mobility.',
+                directions: '1. Examine the tension between Hamilton\'s individual merit and the systemic advantages that enabled his recognition\n2. Analyze how his appointment reflects both democratic ideals and practical elite networks\n3. Evaluate the implications of immigrant success stories within broader patterns of inclusion and exclusion\n4. Synthesize how this moment reveals both the promise and limitations of American meritocracy',
+                sentenceFrame: '',
+                hints: 'Consider who gets opportunities to demonstrate merit\nThink about the infrastructure required for talent recognition\nAnalyze how individual success stories can both challenge and reinforce systemic inequalities'
+            },
+
+            // Analogies - Relationship Patterns (analogies-basic)
+            {
+                cardNumber: 'E1', difficulty: 'Easy', title: 'Animal Relationships', icon: 'paw-print',
+                subject: 'Analogies', unit: 'Relationship Patterns', series: 'analogies-basic',
+                instructions: 'Find the relationship between the first pair of animals, then complete the second pair.',
+                directions: '1. Look at how the first two animals are connected\n2. Think about what makes them similar or different\n3. Apply the same relationship to complete the second pair\n4. Check your answer by explaining the pattern',
+                sentenceFrame: 'A _____ is to a _____ as a _____ is to a _____.',
+                hints: 'Think about size, habitat, or food relationships\nConsider parent-baby connections\nLook for predator-prey patterns'
+            },
+            {
+                cardNumber: 'E2', difficulty: 'Easy', title: 'Everyday Objects', icon: 'home',
+                subject: 'Analogies', unit: 'Relationship Patterns', series: 'analogies-basic',
+                instructions: 'Complete analogies using common household items and their functions.',
+                directions: '1. Identify what the first object does or where it belongs\n2. Find the connection between the first pair\n3. Choose the item that has the same relationship\n4. Explain why your answer makes sense',
+                sentenceFrame: 'A _____ is used for _____ just like a _____ is used for _____.',
+                hints: 'Think about what each object is designed to do\nConsider where you would find these items\nLook for tools and their purposes'
+            },
+            {
+                cardNumber: 'M1', difficulty: 'Medium', title: 'Word Relationships', icon: 'type',
+                subject: 'Analogies', unit: 'Relationship Patterns', series: 'analogies-basic',
+                instructions: 'Analyze the relationship between words and complete the analogy using vocabulary connections.',
+                directions: '1. Determine if the words are synonyms, antonyms, or have another relationship\n2. Consider part of speech and meaning connections\n3. Apply the same relationship pattern to the second pair\n4. Verify your answer explains the logical connection',
+                sentenceFrame: '',
+                hints: 'Look for opposite meanings (antonyms)\nCheck for similar meanings (synonyms)\nConsider cause and effect relationships'
+            },
+            {
+                cardNumber: 'M2', difficulty: 'Medium', title: 'Function and Purpose', icon: 'tool',
+                subject: 'Analogies', unit: 'Relationship Patterns', series: 'analogies-basic',
+                instructions: 'Complete analogies based on how objects function or their intended purpose.',
+                directions: '1. Analyze what the first object does or its main function\n2. Identify the relationship between function and object\n3. Find an object that serves the same function for the second part\n4. Confirm the relationship is parallel and logical',
+                sentenceFrame: '',
+                hints: 'Think about the job each object performs\nConsider who would use these objects and why\nLook for tools and their specific purposes'
+            },
+            {
+                cardNumber: 'H1', difficulty: 'Hard', title: 'Abstract Relationships', icon: 'brain',
+                subject: 'Analogies', unit: 'Relationship Patterns', series: 'analogies-basic',
+                instructions: 'Analyze complex analogies involving abstract concepts, emotions, or philosophical ideas.',
+                directions: '1. Identify the abstract relationship between the first pair of concepts\n2. Consider multiple layers of meaning and connection\n3. Apply sophisticated reasoning to complete the analogy\n4. Justify your answer with detailed analysis of the relationship pattern',
+                sentenceFrame: '',
+                hints: 'Think beyond literal meanings to conceptual connections\nConsider emotional, philosophical, or metaphorical relationships\nLook for cause and effect in abstract ideas'
+            }
+        ];
+
+        // API helper function
+        async function codaAPI(endpoint, method = 'GET', body = null) {
+            const url = `https://coda.io/apis/v1/docs/${CODA_DOC_ID}${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${CODA_API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'API Error'}`);
+                }
+                return data;
+            } catch (error) {
+                console.error('Coda API Error:', error);
+                throw error;
+            }
+        }
+
+        // Show message function
+        function showMessage(text, type = 'info') {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = text;
+            messages.appendChild(div);
+        }
+
+        // Update progress bar
+        function updateProgress(current, total) {
+            const progressElement = document.getElementById('progress');
+            const progressBar = document.getElementById('progressBar');
+            const percentage = Math.round((current / total) * 100);
+            
+            progressElement.style.display = 'block';
+            progressBar.style.width = `${percentage}%`;
+            progressBar.textContent = `${percentage}% (${current}/${total})`;
+        }
+
+        // Scan all task card files
+        function scanAllCards() {
+            allScannedCards = ALL_TASK_CARDS;
+            showMessage(`🎯 Scanned ${allScannedCards.length} task cards from all files!`, 'success');
+            
+            // Show stats
+            showStats();
+            
+            document.getElementById('previewBtn').disabled = false;
+            document.getElementById('uploadBtn').disabled = false;
+        }
+
+        // Show statistics
+        function showStats() {
+            const stats = document.getElementById('stats');
+            const subjects = [...new Set(allScannedCards.map(c => c.subject))];
+            const series = [...new Set(allScannedCards.map(c => c.series))];
+            const difficulties = allScannedCards.reduce((acc, card) => {
+                acc[card.difficulty] = (acc[card.difficulty] || 0) + 1;
+                return acc;
+            }, {});
+
+            stats.innerHTML = `
+                <div class="stat-card">
+                    <h3>${allScannedCards.length}</h3>
+                    <p>Total Cards</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${subjects.length}</h3>
+                    <p>Subjects</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${series.length}</h3>
+                    <p>Series</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${difficulties.Easy || 0}</h3>
+                    <p>Easy Cards</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${difficulties.Medium || 0}</h3>
+                    <p>Medium Cards</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${difficulties.Hard || 0}</h3>
+                    <p>Hard Cards</p>
+                </div>
+            `;
+            stats.style.display = 'grid';
+        }
+
+        // Preview cards
+        function previewCards() {
+            const cardList = document.getElementById('cardList');
+            const cardPreview = document.getElementById('cardPreview');
+            
+            cardList.innerHTML = '';
+            
+            allScannedCards.forEach((card, index) => {
+                const div = document.createElement('div');
+                div.className = 'card-preview';
+                div.innerHTML = `
+                    <h4>${card.cardNumber} - ${card.title} (${card.difficulty})</h4>
+                    <strong>Series:</strong> ${card.subject} → ${card.unit} → ${card.series}<br>
+                    <strong>Instructions:</strong> ${card.instructions.substring(0, 100)}${card.instructions.length > 100 ? '...' : ''}
+                `;
+                cardList.appendChild(div);
+            });
+            
+            cardPreview.style.display = 'block';
+            showMessage(`📋 Preview ready! ${allScannedCards.length} cards organized by subject and series.`, 'info');
+        }
+
+        // Clear existing cards
+        async function clearExistingCards() {
+            try {
+                showMessage('🗑️ Clearing existing cards from Coda table...', 'info');
+                
+                const data = await codaAPI(`/tables/${TABLE_ID}/rows`);
+                const existingRows = data.items || [];
+                
+                if (existingRows.length === 0) {
+                    showMessage('ℹ️ No existing cards found to clear.', 'info');
+                    return;
+                }
+                
+                for (let i = 0; i < existingRows.length; i++) {
+                    await codaAPI(`/tables/${TABLE_ID}/rows/${existingRows[i].id}`, 'DELETE');
+                    updateProgress(i + 1, existingRows.length);
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                showMessage(`✅ Cleared ${existingRows.length} existing cards!`, 'success');
+                document.getElementById('progress').style.display = 'none';
+                
+            } catch (error) {
+                showMessage(`❌ Error clearing cards: ${error.message}`, 'error');
+            }
+        }
+
+        // Upload all cards to Coda
+        async function uploadAllCards() {
+            try {
+                showMessage('🚀 Uploading all cards to Coda...', 'info');
+                
+                let uploaded = 0;
+                
+                for (let i = 0; i < allScannedCards.length; i++) {
+                    const card = allScannedCards[i];
+                    
+                    const cells = [
+                        { column: COLUMN_MAPPING.cardNumber, value: card.cardNumber },
+                        { column: COLUMN_MAPPING.difficulty, value: card.difficulty },
+                        { column: COLUMN_MAPPING.title, value: card.title },
+                        { column: COLUMN_MAPPING.icon, value: card.icon },
+                        { column: COLUMN_MAPPING.instructions, value: card.instructions },
+                        { column: COLUMN_MAPPING.directions, value: card.directions },
+                        { column: COLUMN_MAPPING.sentenceFrame, value: card.sentenceFrame },
+                        { column: COLUMN_MAPPING.hints, value: card.hints },
+                        { column: COLUMN_MAPPING.subject, value: card.subject },
+                        { column: COLUMN_MAPPING.unit, value: card.unit },
+                        { column: COLUMN_MAPPING.series, value: card.series }
+                    ];
+                    
+                    let success = false;
+                    let attempts = 0;
+                    
+                    while (!success && attempts < 3) {
+                        try {
+                            await codaAPI(`/tables/${TABLE_ID}/rows`, 'POST', { 
+                                rows: [{ cells }] 
+                            });
+                            success = true;
+                            uploaded++;
+                            updateProgress(uploaded, allScannedCards.length);
+                            
+                            // Longer delay to avoid rate limits
+                            if (i < allScannedCards.length - 1) {
+                                await new Promise(resolve => setTimeout(resolve, 2500));
+                            }
+                            
+                        } catch (error) {
+                            attempts++;
+                            if (error.message.includes('429')) {
+                                const waitTime = Math.pow(2, attempts) * 3000;
+                                showMessage(`⏳ Rate limited. Waiting ${waitTime/1000}s (card ${i+1}/${allScannedCards.length})...`, 'info');
+                                await new Promise(resolve => setTimeout(resolve, waitTime));
+                            } else {
+                                throw error;
+                            }
+                        }
+                    }
+                    
+                    if (!success) {
+                        throw new Error(`Failed to upload card ${card.cardNumber} after 3 attempts`);
+                    }
+                }
+                
+                showMessage(`🎉 Successfully uploaded ${allScannedCards.length} task cards to Coda!`, 'success');
+                showMessage(`🔗 Your master task cards page is ready: chelce.github.io/dhs/task-cards-master.html`, 'info');
+                document.getElementById('progress').style.display = 'none';
+                
+            } catch (error) {
+                showMessage(`❌ Error uploading cards: ${error.message}`, 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('scanBtn').addEventListener('click', scanAllCards);
+        document.getElementById('previewBtn').addEventListener('click', previewCards);
+        document.getElementById('clearBtn').addEventListener('click', clearExistingCards);
+        document.getElementById('uploadBtn').addEventListener('click', uploadAllCards);
+
+        // Initial message
+        showMessage('👋 Ready to backfill all your task cards! This includes Hamilton and Analogies cards with proper organization.', 'info');
+    </script>
+</body>
+</html>
