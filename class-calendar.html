@@ -285,6 +285,13 @@ body {margin:0;font-family:'HarmonyOS Sans',system-ui,sans-serif;background:#0a0
 .color-btn{width:24px;height:24px;border:2px solid #fff;border-radius:6px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.15)}
 .color-btn:hover{transform:scale(1.05);box-shadow:0 2px 4px rgba(0,0,0,0.2)}
 
+/* Font Options */
+.font-options{display:flex;flex-direction:column;gap:2px;padding:4px}
+.font-btn{width:100%;padding:8px 12px;border:1px solid #e0e0e0;border-radius:6px;cursor:pointer;background:#fff;text-align:left;font-size:14px;transition:all 0.15s ease}
+.font-btn:hover{background:#f5f5f5;border-color:#d0d0d0}
+.font-btn:active{background:#e5e5e5}
+.font-label{font-size:11px;margin-left:4px}
+
 /* Word Count Display */
 .word-count{font-size:11px;color:#6b6b6b;padding:4px 8px;border-radius:6px;background:#f8f8f8;border:1px solid #e0e0e0;white-space:nowrap}
 
@@ -2364,6 +2371,36 @@ function buildTipTap3Toolbar(editor, el) {
       </button>
     </div>
     <div class="toolbar-divider"></div>
+    ${window.TiptapFontFamily ? `
+    <div class="toolbar-group">
+      <div class="toolbar-dropdown">
+        <button type="button" class="toolbar-btn dropdown-trigger" title="Font Family">
+          <i data-lucide="type"></i>
+          <span class="font-label">Font</span>
+          <i data-lucide="chevron-down" style="width: 12px; height: 12px;"></i>
+        </button>
+        <div class="dropdown-content font-dropdown">
+          <div class="font-options">
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Inter" style="font-family: 'Inter', sans-serif;" title="Inter">Inter</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Roboto" style="font-family: 'Roboto', sans-serif;" title="Roboto">Roboto</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Open Sans" style="font-family: 'Open Sans', sans-serif;" title="Open Sans">Open Sans</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Lato" style="font-family: 'Lato', sans-serif;" title="Lato">Lato</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Poppins" style="font-family: 'Poppins', sans-serif;" title="Poppins">Poppins</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Montserrat" style="font-family: 'Montserrat', sans-serif;" title="Montserrat">Montserrat</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Source Sans Pro" style="font-family: 'Source Sans Pro', sans-serif;" title="Source Sans Pro">Source Sans Pro</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Nunito" style="font-family: 'Nunito', sans-serif;" title="Nunito">Nunito</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Playfair Display" style="font-family: 'Playfair Display', serif;" title="Playfair Display">Playfair Display</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Merriweather" style="font-family: 'Merriweather', serif;" title="Merriweather">Merriweather</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="PT Serif" style="font-family: 'PT Serif', serif;" title="PT Serif">PT Serif</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Crimson Text" style="font-family: 'Crimson Text', serif;" title="Crimson Text">Crimson Text</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="JetBrains Mono" style="font-family: 'JetBrains Mono', monospace;" title="JetBrains Mono">JetBrains Mono</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="Source Code Pro" style="font-family: 'Source Code Pro', monospace;" title="Source Code Pro">Source Code Pro</button>
+            <button type="button" class="font-btn" data-action="fontFamily" data-font="default" title="Reset to Default">Default</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="toolbar-divider"></div>` : ''}
     <div class="toolbar-group">
       <button type="button" class="toolbar-btn" data-action="bold" title="Bold (Ctrl+B)">
         <i data-lucide="bold"></i>
@@ -2451,6 +2488,22 @@ function buildTipTap3Toolbar(editor, el) {
       <button type="button" class="toolbar-btn" data-action="emoji" title="Insert Emoji">
         <span>😊</span>
       </button>
+    </div>` : ''}
+    ${window.TiptapYouTube || window.TiptapImage || window.TiptapCodeBlock ? `
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      ${window.TiptapYouTube ? `
+      <button type="button" class="toolbar-btn" data-action="youtube" title="Embed YouTube Video">
+        <i data-lucide="video"></i>
+      </button>` : ''}
+      ${window.TiptapImage ? `
+      <button type="button" class="toolbar-btn" data-action="image" title="Insert Image">
+        <i data-lucide="image"></i>
+      </button>` : ''}
+      ${window.TiptapCodeBlock ? `
+      <button type="button" class="toolbar-btn" data-action="codeBlock" title="Code Block">
+        <i data-lucide="code-2"></i>
+      </button>` : ''}
     </div>` : ''}
   `;
   
@@ -2837,6 +2890,54 @@ function buildTipTap3Toolbar(editor, el) {
             const ok = chain.insertContent(emoji).run();
             console.log('✅ insertEmoji run:', ok); break;
           }
+          case 'fontFamily': {
+            const font = btn.dataset.font;
+            let ok = false;
+            if (typeof chain.setFontFamily === 'function' && font) {
+              if (font === 'default') {
+                ok = chain.unsetFontFamily().run();
+                console.log('✅ unsetFontFamily run:', ok);
+              } else {
+                ok = chain.setFontFamily(font).run();
+                console.log('✅ setFontFamily run:', ok, 'font:', font);
+              }
+            } else {
+              console.warn('⚠️ FontFamily extension not available or no font specified - gracefully ignoring');
+            }
+            break;
+          }
+          case 'youtube': {
+            const url = prompt('Enter YouTube URL:');
+            let ok = false;
+            if (url && typeof chain.setYouTubeVideo === 'function') {
+              ok = chain.setYouTubeVideo({ src: url }).run();
+              console.log('✅ setYouTubeVideo run:', ok);
+            } else {
+              console.warn('⚠️ YouTube extension not available or no URL provided - gracefully ignoring');
+            }
+            break;
+          }
+          case 'image': {
+            const url = prompt('Enter image URL:');
+            let ok = false;
+            if (url && typeof chain.setImage === 'function') {
+              ok = chain.setImage({ src: url }).run();
+              console.log('✅ setImage run:', ok);
+            } else {
+              console.warn('⚠️ Image extension not available or no URL provided - gracefully ignoring');
+            }
+            break;
+          }
+          case 'codeBlock': {
+            let ok = false;
+            if (typeof chain.toggleCodeBlock === 'function') {
+              ok = chain.toggleCodeBlock().run();
+              console.log('✅ toggleCodeBlock run:', ok);
+            } else {
+              console.warn('⚠️ CodeBlock extension not available - gracefully ignoring');
+            }
+            break;
+          }
           default:
             console.warn('🤷 Unknown toolbar action:', action);
             return;
@@ -2889,6 +2990,64 @@ function buildTipTap3Toolbar(editor, el) {
     });
   }
   
+  // Set up dropdown interactions
+  el.querySelectorAll('.toolbar-dropdown').forEach(dropdown => {
+    const trigger = dropdown.querySelector('.dropdown-trigger');
+    const content = dropdown.querySelector('.dropdown-content');
+    
+    if (trigger && content) {
+      // Font dropdown specific behavior
+      if (content.classList.contains('font-dropdown')) {
+        const fontButtons = content.querySelectorAll('.font-btn');
+        fontButtons.forEach(fontBtn => {
+          fontBtn.addEventListener('mouseenter', () => {
+            // Live preview on hover
+            const font = fontBtn.dataset.font;
+            if (font && font !== 'default') {
+              const editorEl = editor.view?.dom || editor.editorView?.dom;
+              if (editorEl) {
+                editorEl.style.fontFamily = `'${font}', sans-serif`;
+              }
+            }
+          });
+          
+          fontBtn.addEventListener('mouseleave', () => {
+            // Reset preview
+            const editorEl = editor.view?.dom || editor.editorView?.dom;
+            if (editorEl) {
+              editorEl.style.fontFamily = '';
+            }
+          });
+        });
+      }
+      
+      // General dropdown behavior
+      let isOpen = false;
+      
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isOpen = !isOpen;
+        content.style.display = isOpen ? 'block' : 'none';
+        
+        // Close other dropdowns
+        el.querySelectorAll('.dropdown-content').forEach(otherContent => {
+          if (otherContent !== content) {
+            otherContent.style.display = 'none';
+          }
+        });
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target)) {
+          content.style.display = 'none';
+          isOpen = false;
+        }
+      });
+    }
+  });
+  
   updateTipTap3Toolbar(editor, el);
 }
 
@@ -2925,6 +3084,9 @@ function updateTipTap3Toolbar(editor, el) {
           case 'blockquote': isActive = editor.isActive('blockquote'); break;
           case 'link': 
             isActive = window.TiptapLink ? editor.isActive('link') : false; 
+            break;
+          case 'codeBlock': 
+            isActive = window.TiptapCodeBlock ? editor.isActive('codeBlock') : false; 
             break;
         }
       } catch(e) {

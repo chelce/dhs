@@ -399,7 +399,7 @@
                     <ol>
                         <li>Listen to <strong>"You'll Be Back"</strong> and notice the King's tone of voice</li>
                         <li>Write down <strong>two emotions</strong> the King shows toward the colonists</li>
-                        <li>Find <strong>specific words</strong> that show whether he's angry or sad</li>
+                        <li>Find <strong>specific words</strong> that show how he feels</li>
                         <li>Explain what the King thinks will happen to the <strong>colonists without Britain</strong></li>
                     </ol>
                 </div>
@@ -468,7 +468,7 @@
             <div class="card-number">E4</div>
             <div class="difficulty-label">EASY LEVEL</div>
             <div class="card-header">
-                <i data-lucide="scepter" class="card-icon"></i>
+                <i data-lucide="crown" class="card-icon"></i>
                 <div class="card-title">Royal Authority</div>
             </div>
             <div class="card-content">
@@ -891,7 +891,178 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        // Coda API Configuration
+        const CODA_CONFIG = {
+            docId: 'xmloQUGg-g',
+            tableId: 'grid-MbORljz5rl', // Hamilton task cards table
+            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
+            columns: {
+                cardNumber: 'c-cardNumber',      // Card number (E1, M2, H3, etc.)
+                difficulty: 'c-difficulty',      // Easy, Medium, Hard
+                title: 'c-title',               // Card title
+                icon: 'c-icon',                 // Lucide icon name
+                instructions: 'c-instructions', // Main instruction text
+                directions: 'c-directions',     // Numbered list (JSON array or newline separated)
+                sentenceFrame: 'c-sentenceFrame', // Sentence frame text
+                hints: 'c-hints'                // Helpful hints (JSON array or newline separated)
+            }
+        };
+
+        // Load task cards from Coda
+        async function loadTaskCards() {
+            try {
+                console.log('🔄 Loading Hamilton task cards from Coda...');
+                
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Loaded', data.items.length, 'task cards from Coda');
+                
+                renderTaskCards(data.items);
+                
+            } catch (error) {
+                console.error('❌ Failed to load task cards:', error);
+                // Keep static cards as fallback
+                console.log('📋 Using static fallback cards');
+            }
+        }
+
+        // Render task cards dynamically
+        function renderTaskCards(items) {
+            const cardsGrid = document.querySelector('.cards-grid');
+            
+            // Clear existing static cards
+            cardsGrid.innerHTML = '';
+            
+            items.forEach(item => {
+                const values = item.values;
+                const cardData = {
+                    cardNumber: values[CODA_CONFIG.columns.cardNumber] || '',
+                    difficulty: values[CODA_CONFIG.columns.difficulty] || 'easy',
+                    title: values[CODA_CONFIG.columns.title] || 'Untitled Card',
+                    icon: values[CODA_CONFIG.columns.icon] || 'help-circle',
+                    instructions: values[CODA_CONFIG.columns.instructions] || '',
+                    directions: values[CODA_CONFIG.columns.directions] || '',
+                    sentenceFrame: values[CODA_CONFIG.columns.sentenceFrame] || '',
+                    hints: values[CODA_CONFIG.columns.hints] || ''
+                };
+
+                const cardHtml = createTaskCardHtml(cardData);
+                cardsGrid.innerHTML += cardHtml;
+            });
+
+            // Re-initialize Lucide icons for new cards
+            lucide.createIcons();
+        }
+
+        // Create HTML for a single task card
+        function createTaskCardHtml(data) {
+            const difficultyClass = data.difficulty.toLowerCase();
+            
+            // Parse directions (could be JSON array or newline-separated text)
+            let directionsHtml = '';
+            if (data.directions) {
+                try {
+                    const directionsList = JSON.parse(data.directions);
+                    if (Array.isArray(directionsList)) {
+                        directionsHtml = directionsList.map(item => `<li>${item}</li>`).join('');
+                    }
+                } catch {
+                    // Fallback: split by newlines
+                    const directionsList = data.directions.split('\n').filter(item => item.trim());
+                    directionsHtml = directionsList.map(item => `<li>${item.trim()}</li>`).join('');
+                }
+            }
+
+            // Parse hints (could be JSON array or newline-separated text)
+            let hintsHtml = '';
+            if (data.hints) {
+                try {
+                    const hintsList = JSON.parse(data.hints);
+                    if (Array.isArray(hintsList)) {
+                        hintsHtml = hintsList.map(item => `<li>${item}</li>`).join('');
+                    }
+                } catch {
+                    // Fallback: split by newlines
+                    const hintsList = data.hints.split('\n').filter(item => item.trim());
+                    hintsHtml = hintsList.map(item => `<li>${item.trim()}</li>`).join('');
+                }
+            }
+
+            // Determine layout based on difficulty
+            const isEasy = difficultyClass === 'easy';
+            const hasSentenceFrame = isEasy && data.sentenceFrame;
+            
+            let bottomSectionHtml = '';
+            if (isEasy && (hasSentenceFrame || data.hints)) {
+                bottomSectionHtml = `
+                    <div class="bottom-sections">
+                        ${hasSentenceFrame ? `
+                            <div class="sentence-frame">
+                                <h3>Sentence Frame:</h3>
+                                ${data.sentenceFrame}
+                            </div>
+                        ` : ''}
+                        
+                        ${data.hints ? `
+                            <div class="hints">
+                                <h3>Helpful Hints:</h3>
+                                <ul>${hintsHtml}</ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            } else if (data.hints) {
+                bottomSectionHtml = `
+                    <div class="full-width-hints">
+                        <h3>Helpful Hints:</h3>
+                        <ul>${hintsHtml}</ul>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="task-card ${difficultyClass}">
+                    <div class="card-number">${data.cardNumber}</div>
+                    <div class="difficulty-label">${data.difficulty.toUpperCase()} LEVEL</div>
+                    <div class="card-header">
+                        <i data-lucide="${data.icon}" class="card-icon"></i>
+                        <div class="card-title">${data.title}</div>
+                    </div>
+                    <div class="card-content">
+                        ${data.instructions ? `
+                            <div class="instructions">
+                                ${data.instructions}
+                            </div>
+                        ` : ''}
+                        
+                        ${data.directions ? `
+                            <div class="directions">
+                                <h3>Directions:</h3>
+                                <ol>${directionsHtml}</ol>
+                            </div>
+                        ` : ''}
+
+                        ${bottomSectionHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize Lucide icons and load cards
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            loadTaskCards();
+        });
     </script>
 </body>
 </html>
