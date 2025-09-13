@@ -362,6 +362,13 @@
             </div>
             
             <div class="filter-group">
+                <label for="seriesFilter">Series:</label>
+                <select id="seriesFilter">
+                    <option value="">All Series</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
                 <label for="difficultyFilter">Difficulty:</label>
                 <select id="difficultyFilter">
                     <option value="">All Levels</option>
@@ -399,11 +406,11 @@
     </div>
 
     <script>
-        // Configuration - will need to be updated when we expand the Coda table
+        // Configuration - now with series support
         const CODA_CONFIG = {
             docId: 'xmloQUGg-g',
             apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
-            tableId: 'grid-MbORljz5rl', // Current Hamilton table - we'll expand this
+            tableId: 'grid-MbORljz5rl',
             columns: {
                 cardNumber: 'c-oCblzlJHpK',
                 difficulty: 'c-R3MiGsbDIh',
@@ -413,9 +420,9 @@
                 directions: 'c-UdatLRw4ZE',
                 sentenceFrame: 'c-PTc-M6N93s',
                 hints: 'c-J2p_hAW8aK',
-                // We'll add these columns to support multiple subjects:
-                subject: 'c-subject', // e.g., "Hamilton", "Analogies", "Vocabulary"
-                unit: 'c-unit'       // e.g., "Act 1", "Relationship Patterns", "Week 1"
+                subject: 'c-subject', // Will be updated with real ID
+                unit: 'c-unit',     // Will be updated with real ID
+                series: 'c-OBxHtN8XaH' // NEW: Series column for specific sets
             }
         };
 
@@ -453,8 +460,9 @@
                         directions: values[CODA_CONFIG.columns.directions] || '',
                         sentenceFrame: values[CODA_CONFIG.columns.sentenceFrame] || '',
                         hints: values[CODA_CONFIG.columns.hints] || '',
-                        subject: values[CODA_CONFIG.columns.subject] || 'Hamilton', // Default for now
-                        unit: values[CODA_CONFIG.columns.unit] || 'Act 1' // Default for now
+                        subject: values[CODA_CONFIG.columns.subject] || 'Unknown',
+                        unit: values[CODA_CONFIG.columns.unit] || 'Unknown',
+                        series: values[CODA_CONFIG.columns.series] || 'Unknown'
                     };
                 });
                 
@@ -473,9 +481,18 @@
         function populateFilterOptions() {
             const subjects = [...new Set(allCards.map(card => card.subject))].sort();
             const units = [...new Set(allCards.map(card => card.unit))].sort();
+            const series = [...new Set(allCards.map(card => card.series))].sort();
             
             const subjectSelect = document.getElementById('subjectFilter');
             const unitSelect = document.getElementById('unitFilter');
+            const seriesSelect = document.getElementById('seriesFilter');
+            
+            // Clear existing options (except first "All" option)
+            [subjectSelect, unitSelect, seriesSelect].forEach(select => {
+                while (select.children.length > 1) {
+                    select.removeChild(select.lastChild);
+                }
+            });
             
             subjects.forEach(subject => {
                 const option = document.createElement('option');
@@ -490,18 +507,27 @@
                 option.textContent = unit;
                 unitSelect.appendChild(option);
             });
+            
+            series.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s;
+                option.textContent = s;
+                seriesSelect.appendChild(option);
+            });
         }
 
         // Apply filters
         function applyFilters() {
             const subjectFilter = document.getElementById('subjectFilter').value;
             const unitFilter = document.getElementById('unitFilter').value;
+            const seriesFilter = document.getElementById('seriesFilter').value;
             const difficultyFilter = document.getElementById('difficultyFilter').value;
             const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
 
             filteredCards = allCards.filter(card => {
                 if (subjectFilter && card.subject !== subjectFilter) return false;
                 if (unitFilter && card.unit !== unitFilter) return false;
+                if (seriesFilter && card.series !== seriesFilter) return false;
                 if (difficultyFilter && card.difficulty !== difficultyFilter) return false;
                 if (searchFilter) {
                     const searchText = `${card.title} ${card.instructions}`.toLowerCase();
@@ -545,7 +571,7 @@
                 <div class="task-card ${difficultyClass}">
                     <div class="card-number">${card.cardNumber}</div>
                     <div class="difficulty-label">${card.difficulty.toUpperCase()} LEVEL</div>
-                    <div class="subject-tag">${card.subject} - ${card.unit}</div>
+                    <div class="subject-tag">${card.subject} - ${card.unit} - ${card.series}</div>
                     
                     <div class="card-header">
                         <i data-lucide="${card.icon}" class="card-icon"></i>
@@ -635,6 +661,7 @@
         // Event listeners
         document.getElementById('subjectFilter').addEventListener('change', applyFilters);
         document.getElementById('unitFilter').addEventListener('change', applyFilters);
+        document.getElementById('seriesFilter').addEventListener('change', applyFilters);
         document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
         document.getElementById('searchFilter').addEventListener('input', applyFilters);
 
