@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coda Table Inspector</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .table-list {
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .table-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .table-item:last-child {
+            border-bottom: none;
+        }
+        .table-info {
+            flex-grow: 1;
+        }
+        .table-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .table-id {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 14px;
+            background: #6c757d;
+        }
+        .btn-small:hover {
+            background: #545b62;
+        }
+        .log {
+            background: #343a40;
+            color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 15px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Coda Table Inspector</h1>
+        
+        <div class="step">
+            <h3>📋 Current Configuration</h3>
+            <p><strong>Doc ID:</strong> <code>xmloQUGg-g</code></p>
+            <p><strong>Target Table:</strong> <code>grid-MbORljz5rl</code></p>
+            <p><strong>API Token:</strong> <code>3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c</code> (first 8 chars)</p>
+        </div>
+
+        <div class="step">
+            <button onclick="listAllTables()" id="listBtn">📄 List All Tables</button>
+            <button onclick="inspectSpecificTable('grid-MbORljz5rl')" id="inspectBtn">🔍 Inspect Target Table</button>
+        </div>
+
+        <div id="messageArea"></div>
+        <div id="tablesArea"></div>
+        <div id="logArea" class="log" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Coda API Configuration
+        const CODA_CONFIG = {
+            docId: 'xmloQUGg-g',
+            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c'
+        };
+
+        let logElement = null;
+
+        function log(message, type = 'info') {
+            console.log(message);
+            
+            if (!logElement) {
+                logElement = document.getElementById('logArea');
+                logElement.style.display = 'block';
+            }
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            logElement.textContent += logEntry;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageArea = document.getElementById('messageArea');
+            const className = type === 'success' ? 'step success' : 
+                             type === 'error' ? 'step error' : 'step';
+            
+            messageArea.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        async function listAllTables() {
+            try {
+                log('📄 Fetching all tables from Coda doc...');
+                showMessage('📄 Loading tables...', 'info');
+
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables`, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`);
+                }
+
+                const data = await response.json();
+                log(`✅ Found ${data.items.length} tables`);
+                
+                displayTables(data.items);
+                showMessage(`✅ Found ${data.items.length} tables in your Coda doc`, 'success');
+
+            } catch (error) {
+                log(`❌ Error fetching tables: ${error.message}`);
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayTables(tables) {
+            const tablesArea = document.getElementById('tablesArea');
+            
+            let html = '<div class="step"><h3>📊 Available Tables</h3><div class="table-list">';
+            
+            tables.forEach(table => {
+                const isTarget = table.id === 'grid-MbORljz5rl';
+                const targetBadge = isTarget ? ' 🎯 <strong>(TARGET TABLE)</strong>' : '';
+                
+                html += `
+                    <div class="table-item" ${isTarget ? 'style="background: #fff3cd;"' : ''}>
+                        <div class="table-info">
+                            <div class="table-name">${table.name}${targetBadge}</div>
+                            <div class="table-id">ID: ${table.id}</div>
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 3px;">
+                                Type: ${table.tableType || 'table'} | 
+                                Columns: ${table.columnCount || 'unknown'} | 
+                                Rows: ${table.rowCount || 'unknown'}
+                            </div>
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn-small" onclick="inspectSpecificTable('${table.id}')">
+                                🔍 Inspect
+                            </button>
+                            <button class="btn-small" onclick="useAsTarget('${table.id}', '${table.name}')">
+                                🎯 Use This
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div></div>';
+            tablesArea.innerHTML = html;
+        }
+
+        async function inspectSpecificTable(tableId) {
+            try {
+                log(`🔍 Inspecting table: ${tableId}`);
+                showMessage(`🔍 Inspecting table: ${tableId}...`, 'info');
+
+                // Get table info
+                const tableResponse = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${tableId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!tableResponse.ok) {
+                    throw new Error(`Table not found: HTTP ${tableResponse.status}`);
+                }
+
+                const tableData = await tableResponse.json();
+                log(`✅ Table found: "${tableData.name}"`);
+
+                // Get columns
+                const columnsResponse = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${tableId}/columns`, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!columnsResponse.ok) {
+                    throw new Error(`Columns not found: HTTP ${columnsResponse.status}`);
+                }
+
+                const columnsData = await columnsResponse.json();
+                log(`✅ Found ${columnsData.items.length} columns`);
+
+                displayTableDetails(tableData, columnsData.items);
+                showMessage(`✅ Successfully inspected table "${tableData.name}"`, 'success');
+
+            } catch (error) {
+                log(`❌ Error inspecting table: ${error.message}`);
+                showMessage(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function displayTableDetails(table, columns) {
+            const tablesArea = document.getElementById('tablesArea');
+            
+            let html = `
+                <div class="step success">
+                    <h3>📊 Table Details: ${table.name}</h3>
+                    <p><strong>ID:</strong> <code>${table.id}</code></p>
+                    <p><strong>Type:</strong> ${table.tableType || 'table'}</p>
+                    <p><strong>Columns:</strong> ${columns.length}</p>
+                    <p><strong>Rows:</strong> ${table.rowCount || 'unknown'}</p>
+                </div>
+                
+                <div class="step">
+                    <h3>📝 Existing Columns</h3>
+                    <div class="table-list">
+            `;
+            
+            columns.forEach(column => {
+                html += `
+                    <div class="table-item">
+                        <div class="table-info">
+                            <div class="table-name">${column.name || column.display || 'Unnamed'}</div>
+                            <div class="table-id">ID: ${column.id}</div>
+                            <div style="font-size: 12px; color: #6c757d; margin-top: 3px;">
+                                Type: ${column.format?.type || 'unknown'} | 
+                                Display: ${column.display || 'N/A'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                    <button onclick="testCreateColumn('${table.id}')" style="margin-top: 15px;">
+                        🧪 Test Create Column
+                    </button>
+                </div>
+            `;
+            
+            tablesArea.innerHTML = html;
+        }
+
+        async function testCreateColumn(tableId) {
+            try {
+                log(`🧪 Testing column creation on table: ${tableId}`);
+                showMessage('🧪 Testing column creation...', 'info');
+
+                const testColumn = {
+                    name: 'testColumn_' + Date.now(),
+                    display: 'Test Column',
+                    format: { type: 'text' }
+                };
+
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${tableId}/columns`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testColumn)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}\n${errorText}`);
+                }
+
+                const result = await response.json();
+                log(`✅ Test column created successfully! ID: ${result.id}`);
+                showMessage('✅ Column creation works! You can now use the setup tool.', 'success');
+
+                // Clean up - delete the test column
+                setTimeout(() => deleteTestColumn(tableId, result.id), 2000);
+
+            } catch (error) {
+                log(`❌ Column creation failed: ${error.message}`);
+                showMessage(`❌ Column creation failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteTestColumn(tableId, columnId) {
+            try {
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${tableId}/columns/${columnId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    log('🗑️ Test column cleaned up successfully');
+                }
+            } catch (error) {
+                log(`⚠️ Could not clean up test column: ${error.message}`);
+            }
+        }
+
+        function useAsTarget(tableId, tableName) {
+            showMessage(`🎯 To use "${tableName}" (${tableId}) as your target table, update the setup tool configuration and task cards configuration to use this table ID.`, 'info');
+            log(`🎯 Target table selected: ${tableName} (${tableId})`);
+        }
+    </script>
+</body>
+</html>
