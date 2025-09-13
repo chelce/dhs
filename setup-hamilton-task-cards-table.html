@@ -279,8 +279,11 @@
                 );
 
                 if (missingColumns.length === 0) {
-                    showMessage('🎉 All required columns already exist! You can now use the Hamilton task cards.', 'success');
-                    document.getElementById('populateBtn').disabled = false;
+                    showMessage('🎉 All required columns already exist! You can now generate the column mapping.', 'success');
+                    const populateBtn = document.getElementById('populateBtn');
+                    if (populateBtn) populateBtn.disabled = false;
+                    const mapBtn = document.getElementById('mapBtn');
+                    if (mapBtn) mapBtn.disabled = false;
                 } else {
                     showMessage(`📋 Found ${missingColumns.length} missing columns. Click "Create Missing Columns" to add them.`, 'warning');
                     document.getElementById('createBtn').disabled = false;
