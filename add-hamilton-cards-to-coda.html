@@ -411,10 +411,13 @@
                 showMessage('🚀 Adding cards to Coda table...', 'info');
                 
                 const rows = extractedCards.map(card => {
-                    const cells = {};
+                    const cells = [];
                     Object.keys(COLUMN_MAPPING).forEach(key => {
                         if (card[key] !== undefined) {
-                            cells[COLUMN_MAPPING[key]] = card[key];
+                            cells.push({
+                                column: COLUMN_MAPPING[key],
+                                value: card[key]
+                            });
                         }
                     });
                     return { cells };
@@ -476,10 +479,13 @@
                 
                 const testCards = extractedCards.slice(0, 5); // Just first 5 cards
                 const rows = testCards.map(card => {
-                    const cells = {};
+                    const cells = [];
                     Object.keys(COLUMN_MAPPING).forEach(key => {
                         if (card[key] !== undefined) {
-                            cells[COLUMN_MAPPING[key]] = card[key];
+                            cells.push({
+                                column: COLUMN_MAPPING[key],
+                                value: card[key]
+                            });
                         }
                     });
                     return { cells };
