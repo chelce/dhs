@@ -135,9 +135,20 @@
         </div>
 
         <div class="step">
-            <button onclick="checkExistingColumns()" id="checkBtn">🔍 Check Existing Columns</button>
-            <button onclick="createColumns()" id="createBtn" disabled>➕ Create Missing Columns</button>
-            <button onclick="populateSampleData()" id="populateBtn" disabled>📝 Add Sample Data</button>
+            <h3>⚠️ Column Creation Permission Issue</h3>
+            <p>The Coda API is returning 404 errors when trying to create columns. This likely means:</p>
+            <ul>
+                <li>Your API token doesn't have column creation permissions</li>
+                <li>Column creation might require a different API endpoint or permissions</li>
+                <li>The table might be read-only for API operations</li>
+            </ul>
+            <p><strong>Solution:</strong> Let's set up the columns manually and then map them via the API.</p>
+        </div>
+
+        <div class="step">
+            <button onclick="checkExistingColumns()" id="checkBtn">🔍 Check Current Columns</button>
+            <button onclick="showManualSetup()" id="manualBtn">📋 Show Manual Setup Guide</button>
+            <button onclick="generateColumnMapping()" id="mapBtn" disabled>� Generate Column Mapping</button>
         </div>
 
         <div id="messageArea"></div>
@@ -281,167 +292,166 @@
             }
         }
 
-        async function createColumns() {
-            try {
-                log('➕ Creating missing columns...');
-                showMessage('➕ Creating missing columns...', 'info');
-
-                const missingColumns = REQUIRED_COLUMNS.filter(reqCol => 
-                    !existingColumns.some(col => col.name === reqCol.name || col.display === reqCol.display)
-                );
-
-                let createdCount = 0;
-                let errors = [];
-
-                for (const column of missingColumns) {
-                    try {
-                        log(`Creating column: ${column.name}`);
-                        
-                        const columnData = {
-                            name: column.name,
-                            display: column.display,
-                            format: column.format
-                        };
-
-                        const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/columns`, {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(columnData)
-                        });
-
-                        if (!response.ok) {
-                            const errorData = await response.json();
-                            throw new Error(`${response.status}: ${errorData.message || response.statusText}`);
-                        }
-
-                        const result = await response.json();
-                        log(`✅ Created column: ${column.name} (ID: ${result.id})`);
-                        
-                        // Update status
-                        const statusElement = document.getElementById(`status-${column.name}`);
-                        statusElement.textContent = '✅ Created';
-                        statusElement.style.color = '#28a745';
-                        
-                        createdCount++;
-                        
-                        // Small delay to avoid rate limiting
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                    } catch (error) {
-                        log(`❌ Failed to create column ${column.name}: ${error.message}`);
-                        errors.push(`${column.name}: ${error.message}`);
-                    }
-                }
-
-                if (errors.length === 0) {
-                    showMessage(`🎉 Successfully created ${createdCount} columns! Your Hamilton task cards table is ready.`, 'success');
-                    document.getElementById('populateBtn').disabled = false;
-                } else {
-                    showMessage(`⚠️ Created ${createdCount} columns, but ${errors.length} failed. Check the log for details.`, 'warning');
-                }
-
-            } catch (error) {
-                log(`❌ Error creating columns: ${error.message}`);
-                showMessage(`❌ Error creating columns: ${error.message}`, 'error');
-            }
+        async function showManualSetup() {
+            showMessage('📋 Follow these steps to manually set up your Hamilton Task Cards table:', 'info');
+            
+            const setupHtml = `
+                <div class="step">
+                    <h3>📋 Manual Setup Instructions</h3>
+                    <ol style="line-height: 1.8; margin-left: 20px;">
+                        <li><strong>Go to your Coda doc:</strong> <a href="https://coda.io/d/xmloQUGg-g" target="_blank">Open your Coda document</a></li>
+                        <li><strong>Find the "task-cards-cms" table</strong> (ID: grid-MbORljz5rl)</li>
+                        <li><strong>Add these columns</strong> to the table (exact names matter):
+                            <ul style="margin: 10px 0; line-height: 1.6;">
+                                <li><code>cardNumber</code> - Text column (E1, M2, H3, etc.)</li>
+                                <li><code>difficulty</code> - Select column with options: Easy, Medium, Hard</li>
+                                <li><code>title</code> - Text column (Card titles)</li>
+                                <li><code>icon</code> - Text column (Lucide icon names like "megaphone", "crown")</li>
+                                <li><code>instructions</code> - Text column (Main instruction text)</li>
+                                <li><code>directions</code> - Text column (JSON array or newline-separated directions)</li>
+                                <li><code>sentenceFrame</code> - Text column (Sentence frames for Easy cards)</li>
+                                <li><code>hints</code> - Text column (JSON array or newline-separated hints)</li>
+                            </ul>
+                        </li>
+                        <li><strong>After adding columns:</strong> Click "Generate Column Mapping" below</li>
+                        <li><strong>Add sample data</strong> to test (we'll provide examples)</li>
+                    </ol>
+                </div>
+                
+                <div class="step success">
+                    <h4>💡 Column Setup Tips:</h4>
+                    <ul>
+                        <li><strong>For "difficulty" column:</strong> Create as Select List with exactly these options: Easy, Medium, Hard</li>
+                        <li><strong>For "directions" and "hints":</strong> You can enter as simple text with each item on a new line</li>
+                        <li><strong>Column names must match exactly</strong> - they're case sensitive</li>
+                        <li><strong>After setup:</strong> Your task cards will automatically pull from this table</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('messageArea').innerHTML = setupHtml;
+            document.getElementById('mapBtn').disabled = false;
+            
+            log('📋 Manual setup instructions displayed');
         }
 
-        async function populateSampleData() {
+        async function generateColumnMapping() {
             try {
-                log('📝 Adding sample Hamilton task card data...');
-                showMessage('📝 Adding sample data...', 'info');
+                log('� Generating column mapping for Hamilton task cards...');
+                showMessage('� Reading your table columns...', 'info');
 
-                // Get current columns to map names to IDs
-                const columnsResponse = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/columns`, {
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/columns`, {
                     headers: {
                         'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
                         'Content-Type': 'application/json'
                     }
-                });
-
-                if (!columnsResponse.ok) {
-                    throw new Error(`HTTP error! status: ${columnsResponse.status}`);
-                }
-
-                const columnsData = await columnsResponse.json();
-                const columnMap = {};
-                columnsData.items.forEach(col => {
-                    columnMap[col.name] = col.id;
-                });
-
-                // Sample data for a few cards
-                const sampleCards = [
-                    {
-                        cardNumber: 'E1',
-                        difficulty: 'Easy',
-                        title: 'Political Debate',
-                        icon: 'megaphone',
-                        instructions: 'In "Farmer Refuted," how do Hamilton and Seabury show they have different opinions about working with Britain?',
-                        directions: '["Listen to \\"Farmer Refuted\\" and identify the two main speakers", "Write down one thing each person believes about Britain", "Find specific words that show they disagree with each other", "Explain which person sounds more angry or upset and why"]',
-                        sentenceFrame: 'Hamilton thinks _____ about Britain, but Seabury believes _____. You can tell they disagree because _____.',
-                        hints: '["Notice how their voices sound different - one is calm, one is excited", "Pay attention to who interrupts who during the song", "Listen for words about freedom versus safety"]'
-                    },
-                    {
-                        cardNumber: 'M1',
-                        difficulty: 'Medium',
-                        title: 'Political Philosophy',
-                        icon: 'book-open',
-                        instructions: 'Compare the political arguments presented in "Farmer Refuted" and analyze how each speaker uses different reasoning strategies to support their position.',
-                        directions: '["Identify the core argument each speaker makes about American independence", "Analyze how each speaker uses evidence or examples to support their position", "Compare their rhetorical techniques (appeals to emotion, logic, or authority)", "Evaluate which argument is more persuasive and explain your reasoning"]',
-                        sentenceFrame: '',
-                        hints: '["Notice how Hamilton uses rapid-fire facts while Seabury appeals to tradition", "Consider how their different speaking styles reflect their arguments", "Pay attention to which speaker interrupts and what that suggests about confidence"]'
-                    },
-                    {
-                        cardNumber: 'H1',
-                        difficulty: 'Hard',
-                        title: 'Enlightenment Ideologies',
-                        icon: 'lightbulb',
-                        instructions: 'Examine how "Farmer Refuted" embodies competing Enlightenment philosophies and analyze their implications for revolutionary legitimacy and social contract theory.',
-                        directions: '["Identify how each speaker\'s arguments reflect specific Enlightenment philosophers (Locke, Hobbes, etc.)", "Analyze the tension between natural rights theory and traditional authority", "Evaluate how their debate anticipates key questions in American constitutional development", "Synthesize how this intellectual conflict influenced the broader revolutionary movement\'s ideological foundation"]',
-                        sentenceFrame: '',
-                        hints: '["Consider how Hamilton\'s rapid argumentation mirrors Enlightenment emphasis on reason and evidence", "Think about how Seabury\'s appeal to stability reflects Hobbesian concerns about social order", "Examine how their debate prefigures Federalist vs. Anti-Federalist tensions"]'
-                    }
-                ];
-
-                // Create rows
-                const rowsData = sampleCards.map(card => ({
-                    cells: [
-                        { column: columnMap.cardNumber, value: card.cardNumber },
-                        { column: columnMap.difficulty, value: card.difficulty },
-                        { column: columnMap.title, value: card.title },
-                        { column: columnMap.icon, value: card.icon },
-                        { column: columnMap.instructions, value: card.instructions },
-                        { column: columnMap.directions, value: card.directions },
-                        { column: columnMap.sentenceFrame, value: card.sentenceFrame },
-                        { column: columnMap.hints, value: card.hints }
-                    ]
-                }));
-
-                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ rows: rowsData })
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`${response.status}: ${errorData.message || response.statusText}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const result = await response.json();
-                log(`✅ Added ${result.addedRowIds.length} sample cards to the table`);
-                showMessage(`🎉 Successfully added ${result.addedRowIds.length} sample Hamilton task cards! You can now edit them in your Coda table and they'll appear on your task cards page.`, 'success');
+                const data = await response.json();
+                existingColumns = data.items;
+                
+                log(`✅ Found ${existingColumns.length} columns`);
+                
+                // Generate column mapping
+                const columnMapping = {};
+                const requiredColumnNames = [
+                    'cardNumber', 'difficulty', 'title', 'icon', 
+                    'instructions', 'directions', 'sentenceFrame', 'hints'
+                ];
+                
+                let foundColumns = 0;
+                let mappingHtml = `
+                    <div class="step success">
+                        <h3>🔗 Generated Column Mapping</h3>
+                        <p>Copy this code and paste it into your Hamilton task cards file:</p>
+                        <div style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; margin: 15px 0;">
+                            <pre>// Update the CODA_CONFIG.columns object with these mappings:
+columns: {`;
+
+                requiredColumnNames.forEach(reqName => {
+                    const column = existingColumns.find(col => 
+                        col.name === reqName || col.display === reqName
+                    );
+                    
+                    if (column) {
+                        columnMapping[reqName] = column.id;
+                        mappingHtml += `\n    ${reqName}: '${column.id}', // ${column.display || column.name}`;
+                        foundColumns++;
+                        log(`✅ Found column: ${reqName} -> ${column.id}`);
+                    } else {
+                        mappingHtml += `\n    ${reqName}: 'COLUMN_NOT_FOUND', // ❌ Please add '${reqName}' column`;
+                        log(`❌ Missing column: ${reqName}`);
+                    }
+                });
+
+                mappingHtml += `\n}</pre>
+                        </div>
+                    </div>
+                `;
+
+                if (foundColumns === requiredColumnNames.length) {
+                    mappingHtml += `
+                        <div class="step success">
+                            <h4>🎉 All columns found! (${foundColumns}/${requiredColumnNames.length})</h4>
+                            <p>Your Hamilton task cards are ready to use. The mapping above will connect your Coda table to the task cards display.</p>
+                            <button onclick="updateTaskCardsConfig(${JSON.stringify(columnMapping).replace(/"/g, '&quot;')})" style="background: #28a745;">
+                                🚀 Apply This Mapping
+                            </button>
+                        </div>
+                    `;
+                    showMessage('🎉 Perfect! All required columns found and mapped.', 'success');
+                } else {
+                    const missing = requiredColumnNames.length - foundColumns;
+                    mappingHtml += `
+                        <div class="step error">
+                            <h4>⚠️ Missing ${missing} columns</h4>
+                            <p>Please add the missing columns to your Coda table, then click "Generate Column Mapping" again.</p>
+                        </div>
+                    `;
+                    showMessage(`⚠️ Found ${foundColumns}/${requiredColumnNames.length} columns. Please add the missing ones.`, 'warning');
+                }
+
+                document.getElementById('messageArea').innerHTML = mappingHtml;
 
             } catch (error) {
-                log(`❌ Error adding sample data: ${error.message}`);
-                showMessage(`❌ Error adding sample data: ${error.message}`, 'error');
+                log(`❌ Error generating mapping: ${error.message}`);
+                showMessage(`❌ Error: ${error.message}`, 'error');
             }
+        }
+
+        function updateTaskCardsConfig(mapping) {
+            const codeHtml = `
+                <div class="step success">
+                    <h3>🚀 Configuration Updated!</h3>
+                    <p>The column mapping has been generated. You now need to:</p>
+                    <ol>
+                        <li><strong>Add some sample data</strong> to your Coda table to test</li>
+                        <li><strong>View your task cards:</strong> <a href="https://chelce.github.io/dhs/hamilton-task-cards-set2-printable.html" target="_blank">Hamilton Task Cards</a></li>
+                        <li><strong>Edit cards directly in Coda</strong> and refresh the page to see changes</li>
+                    </ol>
+                    
+                    <h4>📝 Sample Data for Testing:</h4>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0;">
+                        <strong>Row 1 (Easy Card):</strong><br>
+                        • cardNumber: E1<br>
+                        • difficulty: Easy<br>
+                        • title: Political Debate<br>
+                        • icon: megaphone<br>
+                        • instructions: In "Farmer Refuted," how do Hamilton and Seabury show they have different opinions about working with Britain?<br>
+                        • directions: Listen to "Farmer Refuted" and identify the two main speakers<br>Write down one thing each person believes about Britain<br>
+                        • sentenceFrame: Hamilton thinks _____ about Britain, but Seabury believes _____.<br>
+                        • hints: Notice how their voices sound different<br>Pay attention to who interrupts who during the song<br>
+                    </div>
+                </div>
+            `;
+            
+            showMessage('🚀 Ready to use! Add sample data to your Coda table.', 'success');
+            document.getElementById('messageArea').innerHTML = codeHtml;
+            log('🚀 Column mapping ready for use');
         }
     </script>
 </body>
