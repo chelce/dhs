@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Cards - All Subjects</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemUI, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .filter-group select, .filter-group input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .stats {
+            background: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Reuse existing task card styles */
+        .task-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            position: relative;
+            height: auto;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            page-break-inside: avoid;
+            border: 2px solid #28a745;
+        }
+
+        .task-card.medium {
+            border-color: #fd7e14;
+        }
+
+        .task-card.hard {
+            border-color: #dc3545;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .card-icon {
+            width: 24px;
+            height: 24px;
+            color: #28a745;
+        }
+
+        .task-card.medium .card-icon {
+            color: #fd7e14;
+        }
+
+        .task-card.hard .card-icon {
+            color: #dc3545;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #28a745;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 6px 10px;
+            border-radius: 15px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .task-card.medium .card-number {
+            background: #fd7e14;
+        }
+
+        .task-card.hard .card-number {
+            background: #dc3545;
+        }
+
+        .difficulty-label {
+            position: absolute;
+            top: 50px;
+            right: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #28a745;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .task-card.medium .difficulty-label {
+            color: #fd7e14;
+        }
+
+        .task-card.hard .difficulty-label {
+            color: #dc3545;
+        }
+
+        .subject-tag {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: #6c757d;
+            color: white;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 30px;
+        }
+
+        .instructions {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .directions {
+            margin-bottom: 15px;
+        }
+
+        .directions h3 {
+            font-size: 12px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #28a745;
+        }
+
+        .task-card.medium .directions h3 {
+            color: #fd7e14;
+        }
+
+        .task-card.hard .directions h3 {
+            color: #dc3545;
+        }
+
+        .directions ol {
+            font-size: 11px;
+            line-height: 1.4;
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        .directions li {
+            margin-bottom: 4px;
+        }
+
+        .bottom-sections {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        .sentence-frame, .hints {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+        }
+
+        .task-card.medium .sentence-frame, .task-card.medium .hints {
+            border-left-color: #fd7e14;
+        }
+
+        .task-card.hard .sentence-frame, .task-card.hard .hints {
+            border-left-color: #dc3545;
+        }
+
+        .sentence-frame h3, .hints h3 {
+            font-size: 10px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #28a745;
+        }
+
+        .task-card.medium .sentence-frame h3, .task-card.medium .hints h3 {
+            color: #fd7e14;
+        }
+
+        .task-card.hard .sentence-frame h3, .task-card.hard .hints h3 {
+            color: #dc3545;
+        }
+
+        .sentence-frame p, .hints ul {
+            font-size: 10px;
+            line-height: 1.4;
+            margin: 0;
+            color: #555;
+        }
+
+        .hints ul {
+            padding-left: 16px;
+        }
+
+        .hints li {
+            margin-bottom: 3px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .no-cards {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            background: white;
+            border-radius: 8px;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .header {
+                box-shadow: none;
+                border-bottom: 2px solid #333;
+                page-break-after: avoid;
+            }
+            
+            .cards-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .task-card {
+                box-shadow: none;
+                border: 2px solid #333;
+                page-break-inside: avoid;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bottom-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Task Cards - All Subjects</h1>
+        <p>Dynamic task cards loaded from Coda database with filtering and search capabilities.</p>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <label for="subjectFilter">Subject:</label>
+                <select id="subjectFilter">
+                    <option value="">All Subjects</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="unitFilter">Unit:</label>
+                <select id="unitFilter">
+                    <option value="">All Units</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="difficultyFilter">Difficulty:</label>
+                <select id="difficultyFilter">
+                    <option value="">All Levels</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="searchFilter">Search:</label>
+                <input type="text" id="searchFilter" placeholder="Search titles, instructions...">
+            </div>
+        </div>
+        
+        <div class="stats" id="stats">
+            Loading cards...
+        </div>
+    </div>
+
+    <div id="loadingMessage" class="loading">
+        🔄 Loading task cards from database...
+    </div>
+
+    <div id="errorMessage" class="error" style="display: none;">
+        ❌ Failed to load task cards. Please try refreshing the page.
+    </div>
+
+    <div id="noCards" class="no-cards" style="display: none;">
+        📋 No cards match your current filters. Try adjusting your selection.
+    </div>
+
+    <div class="cards-grid" id="cardsGrid">
+        <!-- Cards will be loaded here dynamically -->
+    </div>
+
+    <script>
+        // Configuration - will need to be updated when we expand the Coda table
+        const CODA_CONFIG = {
+            docId: 'xmloQUGg-g',
+            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c',
+            tableId: 'grid-MbORljz5rl', // Current Hamilton table - we'll expand this
+            columns: {
+                cardNumber: 'c-oCblzlJHpK',
+                difficulty: 'c-R3MiGsbDIh',
+                title: 'c-AaNuPckhD2',
+                icon: 'c-ic9sO6dOFA',
+                instructions: 'c-5Wm1KWBumn',
+                directions: 'c-UdatLRw4ZE',
+                sentenceFrame: 'c-PTc-M6N93s',
+                hints: 'c-J2p_hAW8aK',
+                // We'll add these columns to support multiple subjects:
+                subject: 'c-subject', // e.g., "Hamilton", "Analogies", "Vocabulary"
+                unit: 'c-unit'       // e.g., "Act 1", "Relationship Patterns", "Week 1"
+            }
+        };
+
+        let allCards = [];
+        let filteredCards = [];
+
+        // Load task cards from Coda
+        async function loadTaskCards() {
+            try {
+                console.log('🔄 Loading task cards from Coda...');
+                
+                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`, {
+                    headers: {
+                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Loaded', data.items.length, 'task cards from Coda');
+                
+                allCards = data.items.map(item => {
+                    const values = item.values;
+                    return {
+                        id: item.id,
+                        cardNumber: values[CODA_CONFIG.columns.cardNumber] || '',
+                        difficulty: values[CODA_CONFIG.columns.difficulty] || 'Easy',
+                        title: values[CODA_CONFIG.columns.title] || 'Untitled Card',
+                        icon: values[CODA_CONFIG.columns.icon] || 'help-circle',
+                        instructions: values[CODA_CONFIG.columns.instructions] || '',
+                        directions: values[CODA_CONFIG.columns.directions] || '',
+                        sentenceFrame: values[CODA_CONFIG.columns.sentenceFrame] || '',
+                        hints: values[CODA_CONFIG.columns.hints] || '',
+                        subject: values[CODA_CONFIG.columns.subject] || 'Hamilton', // Default for now
+                        unit: values[CODA_CONFIG.columns.unit] || 'Act 1' // Default for now
+                    };
+                });
+                
+                populateFilterOptions();
+                applyFilters();
+                document.getElementById('loadingMessage').style.display = 'none';
+                
+            } catch (error) {
+                console.error('❌ Failed to load task cards:', error);
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        // Populate filter dropdown options
+        function populateFilterOptions() {
+            const subjects = [...new Set(allCards.map(card => card.subject))].sort();
+            const units = [...new Set(allCards.map(card => card.unit))].sort();
+            
+            const subjectSelect = document.getElementById('subjectFilter');
+            const unitSelect = document.getElementById('unitFilter');
+            
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+            
+            units.forEach(unit => {
+                const option = document.createElement('option');
+                option.value = unit;
+                option.textContent = unit;
+                unitSelect.appendChild(option);
+            });
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const subjectFilter = document.getElementById('subjectFilter').value;
+            const unitFilter = document.getElementById('unitFilter').value;
+            const difficultyFilter = document.getElementById('difficultyFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+
+            filteredCards = allCards.filter(card => {
+                if (subjectFilter && card.subject !== subjectFilter) return false;
+                if (unitFilter && card.unit !== unitFilter) return false;
+                if (difficultyFilter && card.difficulty !== difficultyFilter) return false;
+                if (searchFilter) {
+                    const searchText = `${card.title} ${card.instructions}`.toLowerCase();
+                    if (!searchText.includes(searchFilter)) return false;
+                }
+                return true;
+            });
+
+            renderCards();
+            updateStats();
+        }
+
+        // Render cards
+        function renderCards() {
+            const cardsGrid = document.getElementById('cardsGrid');
+            const noCards = document.getElementById('noCards');
+            
+            if (filteredCards.length === 0) {
+                cardsGrid.innerHTML = '';
+                noCards.style.display = 'block';
+                return;
+            }
+            
+            noCards.style.display = 'none';
+            cardsGrid.innerHTML = filteredCards.map(createTaskCardHtml).join('');
+            
+            // Initialize Lucide icons
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }
+
+        // Create HTML for a single task card
+        function createTaskCardHtml(card) {
+            const difficultyClass = card.difficulty.toLowerCase();
+            const directionsHtml = formatDirections(card.directions);
+            const hintsHtml = formatHints(card.hints);
+            const sentenceFrameHtml = card.sentenceFrame ? `<p>${card.sentenceFrame}</p>` : '';
+
+            return `
+                <div class="task-card ${difficultyClass}">
+                    <div class="card-number">${card.cardNumber}</div>
+                    <div class="difficulty-label">${card.difficulty.toUpperCase()} LEVEL</div>
+                    <div class="subject-tag">${card.subject} - ${card.unit}</div>
+                    
+                    <div class="card-header">
+                        <i data-lucide="${card.icon}" class="card-icon"></i>
+                        <div class="card-title">${card.title}</div>
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="instructions">
+                            ${card.instructions}
+                        </div>
+                        
+                        <div class="directions">
+                            <h3>Directions:</h3>
+                            ${directionsHtml}
+                        </div>
+
+                        <div class="bottom-sections">
+                            ${card.sentenceFrame ? `
+                                <div class="sentence-frame">
+                                    <h3>Sentence Frame:</h3>
+                                    ${sentenceFrameHtml}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="hints">
+                                <h3>Helpful Hints:</h3>
+                                ${hintsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Format directions text
+        function formatDirections(directions) {
+            if (!directions) return '<ol><li>No directions provided</li></ol>';
+            
+            // If it contains newlines, treat as separate list items
+            if (directions.includes('\n')) {
+                const items = directions.split('\n').map((item, index) => {
+                    const cleaned = item.replace(/^\d+\.?\s*/, '').trim(); // Remove existing numbers
+                    return cleaned ? `<li>${cleaned}</li>` : '';
+                }).filter(item => item);
+                
+                return `<ol>${items.join('')}</ol>`;
+            }
+            
+            return `<ol><li>${directions}</li></ol>`;
+        }
+
+        // Format hints text
+        function formatHints(hints) {
+            if (!hints) return '<ul><li>No hints provided</li></ul>';
+            
+            // If it contains newlines, treat as separate list items
+            if (hints.includes('\n')) {
+                const items = hints.split('\n').map(item => {
+                    const cleaned = item.replace(/^[-*•]\s*/, '').trim(); // Remove bullet points
+                    return cleaned ? `<li>${cleaned}</li>` : '';
+                }).filter(item => item);
+                
+                return `<ul>${items.join('')}</ul>`;
+            }
+            
+            return `<ul><li>${hints}</li></ul>`;
+        }
+
+        // Update stats
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            const total = allCards.length;
+            const filtered = filteredCards.length;
+            const difficulties = filteredCards.reduce((acc, card) => {
+                acc[card.difficulty] = (acc[card.difficulty] || 0) + 1;
+                return acc;
+            }, {});
+
+            stats.innerHTML = `
+                Showing ${filtered} of ${total} cards | 
+                Easy: ${difficulties.Easy || 0} | 
+                Medium: ${difficulties.Medium || 0} | 
+                Hard: ${difficulties.Hard || 0}
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('subjectFilter').addEventListener('change', applyFilters);
+        document.getElementById('unitFilter').addEventListener('change', applyFilters);
+        document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
+        document.getElementById('searchFilter').addEventListener('input', applyFilters);
+
+        // Initialize
+        loadTaskCards();
+    </script>
+</body>
+</html>
