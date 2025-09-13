@@ -102,7 +102,8 @@
         <div style="margin: 20px 0;">
             <button id="extractBtn">1. Extract Current Cards</button>
             <button id="previewBtn" disabled>2. Preview Cards</button>
-            <button id="uploadBtn" disabled>3. Add Cards to Coda Table</button>
+            <button id="uploadBtn" disabled>3. Add ALL Cards to Coda Table</button>
+            <button id="uploadFewBtn" disabled>3a. Add First 5 Cards Only (Test)</button>
             <button id="clearBtn">Clear Existing Cards First</button>
         </div>
 
@@ -372,6 +373,7 @@
             
             cardPreview.style.display = 'block';
             document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('uploadFewBtn').disabled = false;
             showMessage(`📋 Preview generated for ${extractedCards.length} cards. Ready to upload!`, 'info');
         }
 
@@ -403,7 +405,7 @@
             }
         }
 
-        // Upload cards to Coda
+        // Upload cards to Coda with retry logic and rate limiting
         async function uploadCards() {
             try {
                 showMessage('🚀 Adding cards to Coda table...', 'info');
@@ -418,18 +420,43 @@
                     return { cells };
                 });
 
-                // Add cards in batches to avoid API limits
-                const batchSize = 5;
+                // Add cards ONE AT A TIME to avoid rate limits
                 let added = 0;
                 
-                for (let i = 0; i < rows.length; i += batchSize) {
-                    const batch = rows.slice(i, i + batchSize);
-                    await codaAPI(`/tables/${TABLE_ID}/rows`, 'POST', { rows: batch });
-                    added += batch.length;
-                    updateProgress(added, rows.length);
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    let success = false;
+                    let attempts = 0;
+                    const maxAttempts = 3;
                     
-                    // Small delay between batches
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    while (!success && attempts < maxAttempts) {
+                        try {
+                            await codaAPI(`/tables/${TABLE_ID}/rows`, 'POST', { rows: [row] });
+                            success = true;
+                            added++;
+                            updateProgress(added, rows.length);
+                            
+                            // Longer delay between individual requests to avoid rate limits
+                            if (i < rows.length - 1) {
+                                showMessage(`✅ Added card ${added}/${rows.length} - waiting to avoid rate limits...`, 'info');
+                                await new Promise(resolve => setTimeout(resolve, 2000)); // 2 second delay
+                            }
+                            
+                        } catch (error) {
+                            attempts++;
+                            if (error.message.includes('429') || error.message.includes('Too Many Requests')) {
+                                const waitTime = Math.pow(2, attempts) * 5000; // Exponential backoff: 5s, 10s, 20s
+                                showMessage(`⏳ Rate limited. Waiting ${waitTime/1000} seconds before retry ${attempts}/${maxAttempts}...`, 'info');
+                                await new Promise(resolve => setTimeout(resolve, waitTime));
+                            } else {
+                                throw error; // Re-throw non-rate-limit errors
+                            }
+                        }
+                    }
+                    
+                    if (!success) {
+                        throw new Error(`Failed to add card after ${maxAttempts} attempts`);
+                    }
                 }
                 
                 showMessage(`🎉 Successfully added ${extractedCards.length} Hamilton task cards to your Coda table!`, 'success');
@@ -438,6 +465,72 @@
                 
             } catch (error) {
                 showMessage(`❌ Error uploading cards: ${error.message}`, 'error');
+                showMessage(`💡 Try using "Clear Existing Cards First" and then upload again with fewer cards at once.`, 'info');
+            }
+        }
+
+        // Upload just first 5 cards for testing
+        async function uploadFewCards() {
+            try {
+                showMessage('🧪 Adding first 5 cards to Coda table for testing...', 'info');
+                
+                const testCards = extractedCards.slice(0, 5); // Just first 5 cards
+                const rows = testCards.map(card => {
+                    const cells = {};
+                    Object.keys(COLUMN_MAPPING).forEach(key => {
+                        if (card[key] !== undefined) {
+                            cells[COLUMN_MAPPING[key]] = card[key];
+                        }
+                    });
+                    return { cells };
+                });
+
+                // Add cards ONE AT A TIME with longer delays
+                let added = 0;
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    let success = false;
+                    let attempts = 0;
+                    const maxAttempts = 3;
+                    
+                    while (!success && attempts < maxAttempts) {
+                        try {
+                            await codaAPI(`/tables/${TABLE_ID}/rows`, 'POST', { rows: [row] });
+                            success = true;
+                            added++;
+                            updateProgress(added, rows.length);
+                            
+                            // 3 second delay between requests for testing
+                            if (i < rows.length - 1) {
+                                showMessage(`✅ Added test card ${added}/${rows.length} - waiting to avoid rate limits...`, 'info');
+                                await new Promise(resolve => setTimeout(resolve, 3000)); // 3 second delay
+                            }
+                            
+                        } catch (error) {
+                            attempts++;
+                            if (error.message.includes('429') || error.message.includes('Too Many Requests')) {
+                                const waitTime = Math.pow(2, attempts) * 5000; // Exponential backoff: 5s, 10s, 20s
+                                showMessage(`⏳ Rate limited. Waiting ${waitTime/1000} seconds before retry ${attempts}/${maxAttempts}...`, 'info');
+                                await new Promise(resolve => setTimeout(resolve, waitTime));
+                            } else {
+                                throw error;
+                            }
+                        }
+                    }
+                    
+                    if (!success) {
+                        throw new Error(`Failed to add test card after ${maxAttempts} attempts`);
+                    }
+                }
+                
+                showMessage(`🎉 Successfully added ${testCards.length} test Hamilton task cards to your Coda table!`, 'success');
+                showMessage(`🔗 Test your task cards page to verify they load correctly before adding the rest!`, 'info');
+                document.getElementById('progress').style.display = 'none';
+                
+            } catch (error) {
+                showMessage(`❌ Error uploading test cards: ${error.message}`, 'error');
+                showMessage(`💡 If this fails, the rate limits are very strict. Try clearing and uploading just 1-2 cards manually.`, 'info');
             }
         }
 
@@ -445,6 +538,7 @@
         document.getElementById('extractBtn').addEventListener('click', extractCards);
         document.getElementById('previewBtn').addEventListener('click', previewCards);
         document.getElementById('uploadBtn').addEventListener('click', uploadCards);
+        document.getElementById('uploadFewBtn').addEventListener('click', uploadFewCards);
         document.getElementById('clearBtn').addEventListener('click', clearExistingCards);
 
         // Initial message
