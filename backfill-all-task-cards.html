@@ -53,7 +53,7 @@
             background: white;
             margin: 10px 0;
             width: 100%;
-            min-height: 200px;
+            min-height: 200px; /* Scaled down from 4.5in for preview */
             display: flex;
             flex-direction: column;
             position: relative;
@@ -81,15 +81,15 @@
 
         .card-preview .card-title {
             font-family: 'Bebas Neue', cursive;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 400;
             letter-spacing: 1.5px;
             flex-grow: 1;
         }
 
         .card-preview .card-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             flex-shrink: 0;
         }
 
@@ -101,19 +101,25 @@
         }
 
         .card-preview .instructions {
-            font-size: 12px;
+            font-size: 9px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             line-height: 1.5;
         }
 
         .card-preview .series-info {
-            font-size: 11px;
+            font-size: 9px;
             font-style: italic;
             margin-top: auto;
             padding-top: 10px;
-            border-top: 1px solid #dee2e6;
+            border-top: 2px solid #dee2e6;
             color: #666;
+        }
+
+        .card-preview .card-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Easy Level Colors - Green */
@@ -537,9 +543,11 @@
                         <i data-lucide="${card.icon}" class="card-icon"></i>
                         <div class="card-title">${card.title}</div>
                     </div>
-                    <div class="instructions">${card.instructions}</div>
-                    <div class="series-info">
-                        <strong>Series:</strong> ${card.subject} → ${card.unit} → ${card.series}
+                    <div class="card-content">
+                        <div class="instructions">${card.instructions}</div>
+                        <div class="series-info">
+                            <strong>Series:</strong> ${card.subject} → ${card.unit} → ${card.series}
+                        </div>
                     </div>
                 `;
                 cardList.appendChild(div);
@@ -551,7 +559,7 @@
             });
             
             cardPreview.style.display = 'block';
-            showMessage(`📋 Preview ready! ${allScannedCards.length} cards with beautiful Hamilton styling.`, 'info');
+            showMessage(`📋 Preview ready! ${allScannedCards.length} cards with exact Hamilton formatting.`, 'info');
         }
 
         // Clear existing cards
