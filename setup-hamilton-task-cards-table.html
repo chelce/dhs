@@ -6,7 +6,7 @@
     <title>Setup Hamilton Task Cards Table</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemUI, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             max-width: 800px;
             margin: 50px auto;
             padding: 20px;
@@ -18,266 +18,262 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
         .step {
-            background: #f8f9fa;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 6px;
-            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         .success {
             background: #d4edda;
             color: #155724;
-            border-left-color: #28a745;
+            border: 1px solid #c3e6cb;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
         .error {
             background: #f8d7da;
             color: #721c24;
-            border-left-color: #dc3545;
+            border: 1px solid #f5c6cb;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
         .warning {
             background: #fff3cd;
             color: #856404;
-            border-left-color: #ffc107;
-        }
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            margin: 10px 5px;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-        button:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-        }
-        .column-list {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
+            border: 1px solid #ffeaa7;
+            padding: 12px;
+            border-radius: 4px;
             margin: 10px 0;
         }
-        .column-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 10px 0;
         }
-        .column-item:last-child {
-            border-bottom: none;
-        }
-        .status {
-            font-weight: bold;
-        }
-        .log {
-            background: #343a40;
-            color: #f8f9fa;
+        pre {
+            background: #f8f9fa;
             padding: 15px;
-            border-radius: 6px;
-            font-family: 'Courier New', Consolas, Monaco, monospace;
-            font-size: 14px;
-            max-height: 300px;
-            overflow-y: auto;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+        }
+        .hidden {
+            display: none;
+        }
+        .column-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin: 15px 0;
+        }
+        .column-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .column-item.exists {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .column-item.missing {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .instructions {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .instructions h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .instructions ol {
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .code-block {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎭 Hamilton Task Cards Table Setup</h1>
-        
+        <h1>🎭 Setup Hamilton Task Cards Table</h1>
+        <p>This tool will help you set up your Coda table to work with the Hamilton task cards. We need to check for required columns and configure the table structure.</p>
+
+        <div id="messages"></div>
+
+        <!-- Step 1: Check Table Structure -->
         <div class="step">
-            <h3>📋 Required Columns for Hamilton Task Cards</h3>
-            <div class="column-list">
-                <div class="column-item">
-                    <span><strong>cardNumber</strong> (Text)</span>
-                    <span class="status" id="status-cardNumber">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>difficulty</strong> (Select List: Easy, Medium, Hard)</span>
-                    <span class="status" id="status-difficulty">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>title</strong> (Text)</span>
-                    <span class="status" id="status-title">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>icon</strong> (Text)</span>
-                    <span class="status" id="status-icon">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>instructions</strong> (Text)</span>
-                    <span class="status" id="status-instructions">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>directions</strong> (Text - JSON array or newlines)</span>
-                    <span class="status" id="status-directions">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>sentenceFrame</strong> (Text)</span>
-                    <span class="status" id="status-sentenceFrame">Not Created</span>
-                </div>
-                <div class="column-item">
-                    <span><strong>hints</strong> (Text - JSON array or newlines)</span>
-                    <span class="status" id="status-hints">Not Created</span>
-                </div>
+            <h3>📊 Step 1: Check Current Table Structure</h3>
+            <p>First, let's see what columns already exist in your table and identify what's missing.</p>
+            <button id="checkBtn">Check Existing Columns</button>
+            <div id="columnStatus" class="hidden">
+                <h4>Column Status:</h4>
+                <div id="columnList" class="column-list"></div>
             </div>
         </div>
 
+        <!-- Step 2: Add Missing Columns -->
         <div class="step">
-            <h3>⚠️ Column Creation Permission Issue</h3>
-            <p>The Coda API is returning 404 errors when trying to create columns. This likely means:</p>
-            <ul>
-                <li>Your API token doesn't have column creation permissions</li>
-                <li>Column creation might require a different API endpoint or permissions</li>
-                <li>The table might be read-only for API operations</li>
-            </ul>
-            <p><strong>Solution:</strong> Let's set up the columns manually and then map them via the API.</p>
+            <h3>➕ Step 2: Add Missing Columns</h3>
+            <p>Based on the check above, we'll help you add any missing columns.</p>
+            <button id="createBtn" disabled>Show Manual Setup Guide</button>
+            <div id="manualInstructions" class="hidden instructions">
+                <h4>Manual Column Setup Instructions</h4>
+                <p>Since the API doesn't have permission to create columns automatically, please add these columns manually in your Coda table:</p>
+                <ol>
+                    <li>Go to your Coda document and open the <strong>task-cards-cms</strong> table</li>
+                    <li>For each missing column below, click the <strong>+</strong> button to add a new column</li>
+                    <li>Set the column name and type exactly as shown:</li>
+                </ol>
+                <div id="missingColumnsList"></div>
+                <p><strong>After adding all columns, click "Check Existing Columns" again to verify they were created successfully.</strong></p>
+            </div>
         </div>
 
+        <!-- Step 3: Generate Column Mapping -->
         <div class="step">
-            <button onclick="checkExistingColumns()" id="checkBtn">🔍 Check Current Columns</button>
-            <button onclick="showManualSetup()" id="manualBtn">📋 Show Manual Setup Guide</button>
-            <button onclick="generateColumnMapping()" id="mapBtn" disabled>� Generate Column Mapping</button>
+            <h3>🔗 Step 3: Generate Column Mapping</h3>
+            <p>Once all columns exist, we'll generate the column ID mapping for the task cards.</p>
+            <button id="mapBtn" disabled>Generate Column Mapping</button>
+            <div id="mappingResult" class="hidden">
+                <h4>Column Mapping Generated!</h4>
+                <p>Copy this mapping and use it to update your task cards file:</p>
+                <pre id="mappingCode"></pre>
+                <p>The mapping above shows the actual column IDs from your Coda table that the task cards will use to load data dynamically.</p>
+            </div>
         </div>
 
-        <div id="messageArea"></div>
-        <div id="logArea" class="log" style="display: none;"></div>
+        <!-- Step 4: Test & Deploy -->
+        <div class="step">
+            <h3>🚀 Step 4: Test Integration</h3>
+            <p>After updating the task cards with the column mapping, test the integration.</p>
+            <button id="populateBtn" disabled>Add Sample Task Card Data</button>
+            <div id="sampleDataResult" class="hidden">
+                <h4>Sample Data Added!</h4>
+                <p>Sample task card data has been added to your table. You can now test the Hamilton task cards page to see if it loads correctly.</p>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Coda API Configuration
-        const CODA_CONFIG = {
-            docId: 'xmloQUGg-g',
-            tableId: 'grid-MbORljz5rl', // Hamilton task cards table
-            apiToken: '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c'
-        };
+        const CODA_DOC_ID = 'xmloQUGg-g';
+        const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
+        const TABLE_ID = 'grid-MbORljz5rl';
 
+        // Required columns for task cards
         const REQUIRED_COLUMNS = [
-            {
-                name: 'cardNumber',
-                display: 'Card Number',
-                format: { type: 'text' }
-            },
-            {
-                name: 'difficulty',
-                display: 'Difficulty Level',
-                format: { 
-                    type: 'select',
-                    options: ['Easy', 'Medium', 'Hard']
-                }
-            },
-            {
-                name: 'title',
-                display: 'Card Title',
-                format: { type: 'text' }
-            },
-            {
-                name: 'icon',
-                display: 'Lucide Icon Name',
-                format: { type: 'text' }
-            },
-            {
-                name: 'instructions',
-                display: 'Instructions Text',
-                format: { type: 'text' }
-            },
-            {
-                name: 'directions',
-                display: 'Directions List',
-                format: { type: 'text' }
-            },
-            {
-                name: 'sentenceFrame',
-                display: 'Sentence Frame',
-                format: { type: 'text' }
-            },
-            {
-                name: 'hints',
-                display: 'Helpful Hints',
-                format: { type: 'text' }
-            }
+            { name: 'cardNumber', type: 'number' },
+            { name: 'difficulty', type: 'text' },
+            { name: 'title', type: 'text' },
+            { name: 'icon', type: 'text' },
+            { name: 'instructions', type: 'text' },
+            { name: 'directions', type: 'text' },
+            { name: 'sentenceFrame', type: 'text' },
+            { name: 'hints', type: 'text' }
         ];
 
         let existingColumns = [];
-        let logElement = null;
+        let missingColumns = [];
 
-        function log(message, type = 'info') {
-            console.log(message);
-            
-            if (!logElement) {
-                logElement = document.getElementById('logArea');
-                logElement.style.display = 'block';
+        // API helper function
+        async function codaAPI(endpoint, method = 'GET', body = null) {
+            const url = `https://coda.io/apis/v1/docs/${CODA_DOC_ID}${endpoint}`;
+            const options = {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${CODA_API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${data.message || 'API Error'}`);
+                }
+                return data;
+            } catch (error) {
+                console.error('Coda API Error:', error);
+                throw error;
             }
-            
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}\n`;
-            logElement.textContent += logEntry;
-            logElement.scrollTop = logElement.scrollHeight;
         }
 
-        function showMessage(message, type = 'info') {
-            const messageArea = document.getElementById('messageArea');
-            const className = type === 'success' ? 'step success' : 
-                             type === 'error' ? 'step error' : 
-                             type === 'warning' ? 'step warning' : 'step';
+        // Show message function
+        function showMessage(text, type = 'info') {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = text;
+            messages.appendChild(div);
             
-            messageArea.innerHTML = `<div class="${className}">${message}</div>`;
+            // Auto-remove after 10 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (div.parentNode) {
+                        div.parentNode.removeChild(div);
+                    }
+                }, 10000);
+            }
         }
 
+        // Check existing columns
         async function checkExistingColumns() {
             try {
-                log('🔍 Checking existing columns in table...');
                 showMessage('🔍 Checking existing columns...', 'info');
-
-                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/columns`, {
-                    headers: {
-                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                existingColumns = data.items;
                 
-                log(`✅ Found ${existingColumns.length} existing columns`);
+                const data = await codaAPI(`/tables/${TABLE_ID}/columns`);
+                existingColumns = data.items || [];
                 
-                // Update status for each required column
-                REQUIRED_COLUMNS.forEach(reqCol => {
-                    const exists = existingColumns.some(col => 
-                        col.name === reqCol.name || col.display === reqCol.display
-                    );
-                    
-                    const statusElement = document.getElementById(`status-${reqCol.name}`);
-                    if (exists) {
-                        statusElement.textContent = '✅ Exists';
-                        statusElement.style.color = '#28a745';
-                        log(`✅ Column '${reqCol.name}' already exists`);
-                    } else {
-                        statusElement.textContent = '❌ Missing';
-                        statusElement.style.color = '#dc3545';
-                        log(`❌ Column '${reqCol.name}' needs to be created`);
-                    }
-                });
-
-                const missingColumns = REQUIRED_COLUMNS.filter(reqCol => 
-                    !existingColumns.some(col => col.name === reqCol.name || col.display === reqCol.display)
+                // Find missing columns
+                missingColumns = REQUIRED_COLUMNS.filter(required => 
+                    !existingColumns.some(existing => existing.name === required.name)
                 );
 
+                // Display results
+                displayColumnStatus();
+                
                 if (missingColumns.length === 0) {
                     showMessage('🎉 All required columns already exist! You can now generate the column mapping.', 'success');
                     const populateBtn = document.getElementById('populateBtn');
@@ -285,177 +281,191 @@
                     const mapBtn = document.getElementById('mapBtn');
                     if (mapBtn) mapBtn.disabled = false;
                 } else {
-                    showMessage(`📋 Found ${missingColumns.length} missing columns. Click "Create Missing Columns" to add them.`, 'warning');
-                    document.getElementById('createBtn').disabled = false;
+                    showMessage(`📋 Found ${missingColumns.length} missing columns. Click "Show Manual Setup Guide" to add them.`, 'warning');
+                    const createBtn = document.getElementById('createBtn');
+                    if (createBtn) createBtn.disabled = false;
+                    const mapBtn = document.getElementById('mapBtn');
+                    if (mapBtn) mapBtn.disabled = false; // Enable mapping even with missing columns to show what's missing
                 }
 
             } catch (error) {
-                log(`❌ Error checking columns: ${error.message}`);
                 showMessage(`❌ Error checking columns: ${error.message}`, 'error');
             }
         }
 
-        async function showManualSetup() {
-            showMessage('📋 Follow these steps to manually set up your Hamilton Task Cards table:', 'info');
+        // Display column status
+        function displayColumnStatus() {
+            const columnStatus = document.getElementById('columnStatus');
+            const columnList = document.getElementById('columnList');
             
-            const setupHtml = `
-                <div class="step">
-                    <h3>📋 Manual Setup Instructions</h3>
-                    <ol style="line-height: 1.8; margin-left: 20px;">
-                        <li><strong>Go to your Coda doc:</strong> <a href="https://coda.io/d/xmloQUGg-g" target="_blank">Open your Coda document</a></li>
-                        <li><strong>Find the "task-cards-cms" table</strong> (ID: grid-MbORljz5rl)</li>
-                        <li><strong>Add these columns</strong> to the table (exact names matter):
-                            <ul style="margin: 10px 0; line-height: 1.6;">
-                                <li><code>cardNumber</code> - Text column (E1, M2, H3, etc.)</li>
-                                <li><code>difficulty</code> - Select column with options: Easy, Medium, Hard</li>
-                                <li><code>title</code> - Text column (Card titles)</li>
-                                <li><code>icon</code> - Text column (Lucide icon names like "megaphone", "crown")</li>
-                                <li><code>instructions</code> - Text column (Main instruction text)</li>
-                                <li><code>directions</code> - Text column (JSON array or newline-separated directions)</li>
-                                <li><code>sentenceFrame</code> - Text column (Sentence frames for Easy cards)</li>
-                                <li><code>hints</code> - Text column (JSON array or newline-separated hints)</li>
-                            </ul>
-                        </li>
-                        <li><strong>After adding columns:</strong> Click "Generate Column Mapping" below</li>
-                        <li><strong>Add sample data</strong> to test (we'll provide examples)</li>
-                    </ol>
-                </div>
-                
-                <div class="step success">
-                    <h4>💡 Column Setup Tips:</h4>
-                    <ul>
-                        <li><strong>For "difficulty" column:</strong> Create as Select List with exactly these options: Easy, Medium, Hard</li>
-                        <li><strong>For "directions" and "hints":</strong> You can enter as simple text with each item on a new line</li>
-                        <li><strong>Column names must match exactly</strong> - they're case sensitive</li>
-                        <li><strong>After setup:</strong> Your task cards will automatically pull from this table</li>
-                    </ul>
-                </div>
-            `;
+            columnList.innerHTML = '';
             
-            document.getElementById('messageArea').innerHTML = setupHtml;
-            document.getElementById('mapBtn').disabled = false;
+            REQUIRED_COLUMNS.forEach(required => {
+                const exists = existingColumns.some(existing => existing.name === required.name);
+                const div = document.createElement('div');
+                div.className = `column-item ${exists ? 'exists' : 'missing'}`;
+                div.innerHTML = `
+                    <strong>${required.name}</strong><br>
+                    <small>Type: ${required.type}</small><br>
+                    <small>Status: ${exists ? '✅ Exists' : '❌ Missing'}</small>
+                `;
+                columnList.appendChild(div);
+            });
             
-            log('📋 Manual setup instructions displayed');
+            columnStatus.classList.remove('hidden');
         }
 
+        // Show manual setup guide
+        function showManualSetup() {
+            const instructions = document.getElementById('manualInstructions');
+            const missingList = document.getElementById('missingColumnsList');
+            
+            missingList.innerHTML = '';
+            
+            if (missingColumns.length === 0) {
+                missingList.innerHTML = '<p class="success">🎉 All columns already exist!</p>';
+            } else {
+                missingColumns.forEach((column, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'code-block';
+                    div.innerHTML = `
+                        <strong>Column ${index + 1}:</strong><br>
+                        Name: <code>${column.name}</code><br>
+                        Type: <code>${column.type}</code>
+                    `;
+                    missingList.appendChild(div);
+                });
+            }
+            
+            instructions.classList.remove('hidden');
+            showMessage('📖 Manual setup instructions are now displayed below. Follow them to add the missing columns.', 'info');
+        }
+
+        // Generate column mapping
         async function generateColumnMapping() {
             try {
-                log('� Generating column mapping for Hamilton task cards...');
-                showMessage('� Reading your table columns...', 'info');
-
-                const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/columns`, {
-                    headers: {
-                        'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                existingColumns = data.items;
+                showMessage('🔗 Generating column mapping...', 'info');
                 
-                log(`✅ Found ${existingColumns.length} columns`);
+                // Re-check columns to get latest data
+                const data = await codaAPI(`/tables/${TABLE_ID}/columns`);
+                const currentColumns = data.items || [];
                 
-                // Generate column mapping
-                const columnMapping = {};
-                const requiredColumnNames = [
-                    'cardNumber', 'difficulty', 'title', 'icon', 
-                    'instructions', 'directions', 'sentenceFrame', 'hints'
-                ];
+                // Generate mapping object
+                const mapping = {};
+                let allFound = true;
                 
-                let foundColumns = 0;
-                let mappingHtml = `
-                    <div class="step success">
-                        <h3>🔗 Generated Column Mapping</h3>
-                        <p>Copy this code and paste it into your Hamilton task cards file:</p>
-                        <div style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; margin: 15px 0;">
-                            <pre>// Update the CODA_CONFIG.columns object with these mappings:
-columns: {`;
-
-                requiredColumnNames.forEach(reqName => {
-                    const column = existingColumns.find(col => 
-                        col.name === reqName || col.display === reqName
-                    );
-                    
+                REQUIRED_COLUMNS.forEach(required => {
+                    const column = currentColumns.find(col => col.name === required.name);
                     if (column) {
-                        columnMapping[reqName] = column.id;
-                        mappingHtml += `\n    ${reqName}: '${column.id}', // ${column.display || column.name}`;
-                        foundColumns++;
-                        log(`✅ Found column: ${reqName} -> ${column.id}`);
+                        mapping[required.name] = column.id;
                     } else {
-                        mappingHtml += `\n    ${reqName}: 'COLUMN_NOT_FOUND', // ❌ Please add '${reqName}' column`;
-                        log(`❌ Missing column: ${reqName}`);
+                        mapping[required.name] = `// MISSING: ${required.name} column not found`;
+                        allFound = false;
                     }
                 });
 
-                mappingHtml += `\n}</pre>
-                        </div>
-                    </div>
-                `;
-
-                if (foundColumns === requiredColumnNames.length) {
-                    mappingHtml += `
-                        <div class="step success">
-                            <h4>🎉 All columns found! (${foundColumns}/${requiredColumnNames.length})</h4>
-                            <p>Your Hamilton task cards are ready to use. The mapping above will connect your Coda table to the task cards display.</p>
-                            <button onclick="updateTaskCardsConfig(${JSON.stringify(columnMapping).replace(/"/g, '&quot;')})" style="background: #28a745;">
-                                🚀 Apply This Mapping
-                            </button>
-                        </div>
-                    `;
-                    showMessage('🎉 Perfect! All required columns found and mapped.', 'success');
+                // Display mapping
+                const mappingResult = document.getElementById('mappingResult');
+                const mappingCode = document.getElementById('mappingCode');
+                
+                mappingCode.textContent = `// Column ID Mapping for Hamilton Task Cards
+const COLUMN_MAPPING = ${JSON.stringify(mapping, null, 4)};`;
+                
+                mappingResult.classList.remove('hidden');
+                
+                if (allFound) {
+                    showMessage('✅ Column mapping generated successfully! All columns found.', 'success');
                 } else {
-                    const missing = requiredColumnNames.length - foundColumns;
-                    mappingHtml += `
-                        <div class="step error">
-                            <h4>⚠️ Missing ${missing} columns</h4>
-                            <p>Please add the missing columns to your Coda table, then click "Generate Column Mapping" again.</p>
-                        </div>
-                    `;
-                    showMessage(`⚠️ Found ${foundColumns}/${requiredColumnNames.length} columns. Please add the missing ones.`, 'warning');
+                    showMessage('⚠️ Column mapping generated but some columns are missing. Add the missing columns and regenerate.', 'warning');
                 }
-
-                document.getElementById('messageArea').innerHTML = mappingHtml;
 
             } catch (error) {
-                log(`❌ Error generating mapping: ${error.message}`);
-                showMessage(`❌ Error: ${error.message}`, 'error');
+                showMessage(`❌ Error generating mapping: ${error.message}`, 'error');
             }
         }
 
-        function updateTaskCardsConfig(mapping) {
-            const codeHtml = `
-                <div class="step success">
-                    <h3>🚀 Configuration Updated!</h3>
-                    <p>The column mapping has been generated. You now need to:</p>
-                    <ol>
-                        <li><strong>Add some sample data</strong> to your Coda table to test</li>
-                        <li><strong>View your task cards:</strong> <a href="https://chelce.github.io/dhs/hamilton-task-cards-set2-printable.html" target="_blank">Hamilton Task Cards</a></li>
-                        <li><strong>Edit cards directly in Coda</strong> and refresh the page to see changes</li>
-                    </ol>
-                    
-                    <h4>📝 Sample Data for Testing:</h4>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin: 10px 0;">
-                        <strong>Row 1 (Easy Card):</strong><br>
-                        • cardNumber: E1<br>
-                        • difficulty: Easy<br>
-                        • title: Political Debate<br>
-                        • icon: megaphone<br>
-                        • instructions: In "Farmer Refuted," how do Hamilton and Seabury show they have different opinions about working with Britain?<br>
-                        • directions: Listen to "Farmer Refuted" and identify the two main speakers<br>Write down one thing each person believes about Britain<br>
-                        • sentenceFrame: Hamilton thinks _____ about Britain, but Seabury believes _____.<br>
-                        • hints: Notice how their voices sound different<br>Pay attention to who interrupts who during the song<br>
-                    </div>
-                </div>
-            `;
-            
-            showMessage('🚀 Ready to use! Add sample data to your Coda table.', 'success');
-            document.getElementById('messageArea').innerHTML = codeHtml;
-            log('🚀 Column mapping ready for use');
+        // Add sample data
+        async function addSampleData() {
+            try {
+                showMessage('📝 Adding sample task card data...', 'info');
+                
+                // Get current columns to build the row data
+                const data = await codaAPI(`/tables/${TABLE_ID}/columns`);
+                const currentColumns = data.items || [];
+                
+                // Build column mapping
+                const columnMapping = {};
+                REQUIRED_COLUMNS.forEach(required => {
+                    const column = currentColumns.find(col => col.name === required.name);
+                    if (column) {
+                        columnMapping[required.name] = column.id;
+                    }
+                });
+
+                // Sample task card data
+                const sampleCards = [
+                    {
+                        cardNumber: 1,
+                        difficulty: 'Easy',
+                        title: 'Character Introduction',
+                        icon: '👤',
+                        instructions: 'Read Act 1, Scene 1 and identify the main characters.',
+                        directions: 'List each character mentioned and write one sentence describing their role.',
+                        sentenceFrame: 'The character _____ is important because _____.',
+                        hints: 'Look for characters who speak the most lines, Pay attention to how other characters talk about them, Notice who makes important decisions'
+                    },
+                    {
+                        cardNumber: 2,
+                        difficulty: 'Medium',
+                        title: 'Historical Context',
+                        icon: '🏛️',
+                        instructions: 'Research the time period when Hamilton lived and connect it to the musical.',
+                        directions: 'Find 3 historical events mentioned in Act 1 and explain their significance.',
+                        sentenceFrame: '',
+                        hints: 'Look up the Revolutionary War timeline, Research the founding of America, Check what year Hamilton immigrated'
+                    },
+                    {
+                        cardNumber: 3,
+                        difficulty: 'Hard',
+                        title: 'Theme Analysis',
+                        icon: '💭',
+                        instructions: 'Analyze the theme of ambition in Hamilton\'s character development.',
+                        directions: 'Write a paragraph analyzing how Hamilton\'s ambition drives the plot and affects other characters.',
+                        sentenceFrame: '',
+                        hints: 'Consider Hamilton\'s goals and dreams, Look at conflicts caused by his ambition, Think about positive and negative effects'
+                    }
+                ];
+
+                // Add rows to table
+                const rows = sampleCards.map(card => {
+                    const cells = {};
+                    Object.keys(card).forEach(key => {
+                        if (columnMapping[key]) {
+                            cells[columnMapping[key]] = card[key];
+                        }
+                    });
+                    return { cells };
+                });
+
+                await codaAPI(`/tables/${TABLE_ID}/rows`, 'POST', { rows });
+                
+                const sampleDataResult = document.getElementById('sampleDataResult');
+                sampleDataResult.classList.remove('hidden');
+                showMessage(`✅ Successfully added ${sampleCards.length} sample task cards to your table!`, 'success');
+
+            } catch (error) {
+                showMessage(`❌ Error adding sample data: ${error.message}`, 'error');
+            }
         }
+
+        // Event listeners
+        document.getElementById('checkBtn').addEventListener('click', checkExistingColumns);
+        document.getElementById('createBtn').addEventListener('click', showManualSetup);
+        document.getElementById('mapBtn').addEventListener('click', generateColumnMapping);
+        document.getElementById('populateBtn').addEventListener('click', addSampleData);
+
+        // Initial message
+        showMessage('👋 Welcome! Start by checking your current table structure.', 'info');
     </script>
 </body>
 </html>
