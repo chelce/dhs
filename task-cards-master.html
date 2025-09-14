@@ -903,11 +903,13 @@
             /* Preserve all text formatting and scaling */
             .task-card .card-title {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: 12px !important; /* 60% of 20px = 12px */
+                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px */
                 font-weight: 400 !important;
-                letter-spacing: 0.6px !important; /* 60% of 1px = 0.6px */
+                letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
                 color: inherit !important; /* Inherit color from difficulty level */
-                margin-bottom: 5px !important; /* 60% of 8px = 4.8px, rounded to 5px */
+                margin-bottom: 0 !important; /* Remove margin since header handles spacing */
+                flex-grow: 1 !important; /* Ensure title takes available space */
+                line-height: 1.2 !important; /* Ensure proper vertical centering */
             }
 
             .task-card .difficulty-label {
@@ -1041,7 +1043,10 @@
             .task-card .card-header {
                 display: flex !important;
                 align-items: center !important;
+                gap: 5px !important; /* 60% of 8px = 4.8px, rounded to 5px */
                 margin-bottom: 7px !important; /* 60% of 12px = 7.2px, rounded to 7px */
+                padding-bottom: 6px !important; /* 60% of 10px = 6px */
+                border-bottom: 1px solid !important; /* 60% of 2px = 1.2px, rounded to 1px */
             }
 
             .task-card .card-content {
