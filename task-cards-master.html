@@ -9,6 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=HarmonyOS+Sans:opsz,wght@8..48,300;8..48,400;8..48,500;8..48,600;8..48,700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <style>
+        :root {
+            /* Base font sizes for consistent scaling */
+            --base-font-size: 14px;
+            --base-line-height: 1.4;
+            --title-size: 1.2em;
+            --difficulty-size: 0.8em;
+            --card-number-size: 1.1em;
+            --subject-tag-size: 8px;
+            
+            /* Default layout values */
+            --cards-per-row: 3;
+            --card-gap: 40px;
+            --card-font-scale: 1;
+            --card-margin: 20px;
+        }
+        
         body {
             font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
@@ -36,27 +52,26 @@
         /* Collapsible Controls */
         .controls-toggle {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             z-index: 1000;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            background: white;
+            color: #666;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            transition: all 0.3s ease;
+            font-size: 16px;
+            transition: all 0.2s ease;
         }
 
         .controls-toggle:hover {
-            background: #0056b3;
-            transform: scale(1.05);
+            background: #f8f9fa;
+            border-color: #999;
         }
 
         .controls-drawer {
@@ -211,9 +226,10 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(var(--cards-per-row, 3), 1fr);
+            gap: var(--card-gap, 40px);
             margin-top: 20px;
+            padding-right: 60px; /* Extra padding to prevent cutoff */
         }
 
         /* Hamilton-style task card design */
@@ -230,21 +246,46 @@
             page-break-inside: avoid;
             break-inside: avoid;
             margin-bottom: var(--card-margin, 20px);
-            /* Removed box-shadow for clean printing */
-        }
-
-        .task-card .card-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 10;
-            width: 18px;
-            height: 18px;
             cursor: pointer;
+            transition: all 0.2s ease;
+            /* Apply font scaling to entire card */
+            font-size: calc(var(--base-font-size, 14px) * var(--card-font-scale, 1));
+            line-height: calc(var(--base-line-height, 1.4) * var(--card-font-scale, 1));
         }
 
         .task-card.selected {
-            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+            border-width: 4px;
+            border-style: dashed;
+            transform: scale(1.02);
+        }
+
+        /* Selection mode styling */
+        .selection-mode .task-card {
+            cursor: pointer;
+        }
+        
+        .selection-mode .task-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .selection-mode-toggle {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .selection-mode-toggle.active {
+            background: #dc3545;
+        }
+
+        .selection-mode-toggle:hover {
+            opacity: 0.9;
         }
 
         .cards-grid {
@@ -402,16 +443,16 @@
 
         .task-card .difficulty-label {
             font-family: 'Bebas Neue', cursive;
-            font-size: 11px;
-            letter-spacing: 1px;
+            font-size: calc(11px * var(--card-font-scale, 1));
+            letter-spacing: calc(1px * var(--card-font-scale, 1));
             margin-bottom: 5px;
         }
 
         .task-card .instructions {
-            font-size: 12px;
+            font-size: calc(12px * var(--card-font-scale, 1));
             font-weight: 600;
             margin-bottom: 15px;
-            line-height: 1.5;
+            line-height: calc(1.5 * var(--card-font-scale, 1));
         }
 
         .task-card .card-content {
@@ -426,10 +467,10 @@
 
         .task-card .directions h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 16px;
+            font-size: calc(16px * var(--card-font-scale, 1));
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: calc(1px * var(--card-font-scale, 1));
+            margin-bottom: calc(8px * var(--card-font-scale, 1));
         }
 
         .task-card .directions ol {
@@ -453,16 +494,16 @@
             border-top: 2px solid #dee2e6;
             padding-top: 10px;
             font-style: italic;
-            font-size: 10px;
+            font-size: calc(10px * var(--card-font-scale, 1));
         }
 
         .task-card .sentence-frame h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: calc(14px * var(--card-font-scale, 1));
             font-weight: 400;
-            letter-spacing: 1px;
+            letter-spacing: calc(1px * var(--card-font-scale, 1));
             font-style: normal;
-            margin-bottom: 8px;
+            margin-bottom: calc(8px * var(--card-font-scale, 1));
         }
 
         .task-card .hints {
@@ -472,20 +513,20 @@
 
         .task-card .hints h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: calc(14px * var(--card-font-scale, 1));
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: calc(1px * var(--card-font-scale, 1));
+            margin-bottom: calc(8px * var(--card-font-scale, 1));
         }
 
         .task-card .hints ul {
             margin-left: 15px;
-            font-size: 10px;
+            font-size: calc(10px * var(--card-font-scale, 1));
         }
 
         .task-card .hints li {
-            margin-bottom: 3px;
-            line-height: 1.3;
+            margin-bottom: calc(3px * var(--card-font-scale, 1));
+            line-height: calc(1.3 * var(--card-font-scale, 1));
         }
 
         .task-card .full-width-hints {
@@ -497,33 +538,35 @@
 
         .task-card .full-width-hints h3 {
             font-family: 'Bebas Neue', cursive;
-            font-size: 14px;
+            font-size: calc(14px * var(--card-font-scale, 1));
             font-weight: 400;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: calc(1px * var(--card-font-scale, 1));
+            margin-bottom: calc(8px * var(--card-font-scale, 1));
         }
 
         .task-card .full-width-hints ul {
             margin-left: 15px;
-            font-size: 10px;
+            font-size: calc(10px * var(--card-font-scale, 1));
         }
 
         .task-card .full-width-hints li {
-            margin-bottom: 3px;
-            line-height: 1.3;
+            margin-bottom: calc(3px * var(--card-font-scale, 1));
+            line-height: calc(1.3 * var(--card-font-scale, 1));
         }
 
         .task-card .subject-tag {
             position: absolute;
             bottom: 10px;
             left: 15px;
-            background: #6c757d;
-            color: white;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 10px;
+            background: transparent;
+            color: #999;
+            font-size: 8px;
+            padding: 0;
+            border: none;
+            border-radius: 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            opacity: 0.6;
         }
 
         /* Easy Level Colors - Green */
@@ -628,9 +671,10 @@
             
             .cards-grid {
                 display: grid;
-                grid-template-columns: repeat(var(--cards-per-row, 2), 1fr);
-                gap: var(--card-gap, 20px);
+                grid-template-columns: repeat(var(--cards-per-row, 2), 1fr) !important;
+                gap: var(--card-gap, 20px) !important;
                 margin: 0;
+                padding: 0;
                 page-break-before: avoid;
             }
             
@@ -642,7 +686,7 @@
                 margin: 0;
                 margin-bottom: var(--card-margin, 10px);
                 background: white !important;
-                font-size: calc(1em * var(--card-font-scale, 1)) !important;
+                transform: none !important; /* Remove any hover/selection effects */
             }
 
             .task-card .card-checkbox {
@@ -655,9 +699,48 @@
                 display: none;
             }
 
-            /* Ensure all text scales properly in print */
-            .task-card * {
+            /* Comprehensive font scaling for all text elements in print */
+            .task-card,
+            .task-card *,
+            .task-card .card-title,
+            .task-card .instructions,
+            .task-card .directions h3,
+            .task-card .directions p,
+            .task-card .directions ul,
+            .task-card .directions li,
+            .task-card .hints h3,
+            .task-card .hints ul,
+            .task-card .hints li,
+            .task-card .sentence-frame h3,
+            .task-card .sentence-frame p,
+            .task-card .difficulty-label {
+                font-size: calc(var(--base-font-size, 1em) * var(--card-font-scale, 1)) !important;
                 color: black !important;
+                line-height: calc(var(--base-line-height, 1.4) * var(--card-font-scale, 1)) !important;
+            }
+            
+            /* Scale specific elements proportionally */
+            .task-card .card-title {
+                font-size: calc(var(--title-size, 1.2em) * var(--card-font-scale, 1)) !important;
+            }
+            
+            .task-card .difficulty-label {
+                font-size: calc(var(--difficulty-size, 0.8em) * var(--card-font-scale, 1)) !important;
+            }
+            
+            .task-card .card-number {
+                font-size: calc(var(--card-number-size, 1.1em) * var(--card-font-scale, 1)) !important;
+            }
+
+            .task-card .subject-tag {
+                font-size: calc(var(--subject-tag-size, 8px) * var(--card-font-scale, 1)) !important;
+            }
+            
+            /* Remove selection highlighting in print */
+            .task-card.selected {
+                border-style: solid !important;
+                border-width: 2px !important;
+                transform: none !important;
             }
         }
 
@@ -730,6 +813,9 @@
         <div class="control-section">
             <h3>Card Selection</h3>
             <div class="control-group">
+                <button class="selection-mode-toggle" id="selectionModeToggle" onclick="toggleSelectionMode()">
+                    Enable Multi-Select Mode
+                </button>
                 <div class="control-row">
                     <label>
                         <input type="checkbox" id="showOnlySelected"> Show Only Selected
@@ -781,21 +867,6 @@
         </div>
     </div>
 
-    <div class="header">
-        <h1>Task Cards - All Subjects</h1>
-        <p>Dynamic task cards loaded from Coda database with filtering and search capabilities.</p>
-        
-        <div class="filters" style="display: none;">
-            <!-- Moved to drawer -->
-        </div>
-        
-        <div class="stats" id="statsOld" style="display: none;">
-            <!-- Moved to drawer -->
-        </div>
-            Loading cards...
-        </div>
-    </div>
-
     <div id="loadingMessage" class="loading">
         🔄 Loading task cards from database...
     </div>
@@ -835,7 +906,6 @@
 
         let allCards = [];
         let filteredCards = [];
-        let selectedCards = new Set(); // Initialize selection tracking
 
         // Load task cards from Coda
         async function loadTaskCards() {
@@ -1009,8 +1079,7 @@
             const hasFullWidthHints = !card.sentenceFrame && (card.difficulty === 'Medium' || card.difficulty === 'Hard');
 
             return `
-                <div class="task-card ${difficultyClass}" data-card-id="${cardId}">
-                    <input type="checkbox" class="card-checkbox" onchange="updateSelection()">
+                <div class="task-card ${difficultyClass}" data-card-id="${cardId}" onclick="handleCardClick(this)">
                     <div class="card-number">${card.cardNumber}</div>
                     <div class="subject-tag">${card.subject} - ${card.unit} - ${card.series}</div>
                     
@@ -1146,27 +1215,51 @@
             preview.innerHTML = Array.from({length: cardsPerRow * 2}, () => '<div class="preview-card"></div>').join('');
         }
 
-        // Card selection functionality
-        function updateSelection() {
-            selectedCards.clear();
-            const checkboxes = document.querySelectorAll('.card-checkbox:checked');
-            checkboxes.forEach(checkbox => {
-                const card = checkbox.closest('.task-card');
-                const cardId = card.getAttribute('data-card-id');
-                selectedCards.add(cardId);
-                card.classList.add('selected');
-            });
+        // Multi-select mode functionality
+        let isSelectionMode = false;
+        let selectedCards = new Set();
+        
+        function toggleSelectionMode() {
+            isSelectionMode = !isSelectionMode;
+            const toggleButton = document.getElementById('selection-mode-toggle');
+            const body = document.body;
             
-            // Remove selected class from unchecked cards
-            document.querySelectorAll('.card-checkbox:not(:checked)').forEach(checkbox => {
-                checkbox.closest('.task-card').classList.remove('selected');
-            });
-            
+            if (isSelectionMode) {
+                toggleButton.textContent = 'Exit Selection Mode';
+                toggleButton.style.backgroundColor = '#dc3545';
+                body.classList.add('selection-mode');
+                selectedCards.clear();
+            } else {
+                toggleButton.textContent = 'Enter Selection Mode';
+                toggleButton.style.backgroundColor = '#28a745';
+                body.classList.remove('selection-mode');
+                selectedCards.clear();
+                // Remove selected class from all cards
+                document.querySelectorAll('.task-card.selected').forEach(card => {
+                    card.classList.remove('selected');
+                });
+            }
             updateSelectionCounter();
-            
-            // Apply show only selected filter if enabled
-            if (document.getElementById('showOnlySelected').checked) {
-                applyFilters();
+        }
+        
+        function handleCardClick(cardElement) {
+            if (isSelectionMode) {
+                const cardId = cardElement.dataset.cardId;
+                
+                if (cardElement.classList.contains('selected')) {
+                    cardElement.classList.remove('selected');
+                    selectedCards.delete(cardId);
+                } else {
+                    cardElement.classList.add('selected');
+                    selectedCards.add(cardId);
+                }
+                
+                updateSelectionCounter();
+                
+                // Apply show only selected filter if enabled
+                if (document.getElementById('showOnlySelected').checked) {
+                    applyFilters();
+                }
             }
         }
 
@@ -1175,28 +1268,109 @@
         }
 
         function selectAll() {
-            document.querySelectorAll('.card-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
+            if (!isSelectionMode) {
+                // Enter selection mode first
+                toggleSelectionMode();
+            }
+            
+            document.querySelectorAll('.task-card:not([style*="display: none"])').forEach(card => {
+                const cardId = card.dataset.cardId;
+                card.classList.add('selected');
+                selectedCards.add(cardId);
             });
-            updateSelection();
+            updateSelectionCounter();
         }
 
         function selectNone() {
-            document.querySelectorAll('.card-checkbox').forEach(checkbox => {
-                checkbox.checked = false;
+            document.querySelectorAll('.task-card.selected').forEach(card => {
+                card.classList.remove('selected');
             });
-            updateSelection();
+            selectedCards.clear();
+            updateSelectionCounter();
         }
 
         function selectVisible() {
-            document.querySelectorAll('.task-card:not([style*="display: none"]) .card-checkbox').forEach(checkbox => {
-                checkbox.checked = true;
+            if (!isSelectionMode) {
+                // Enter selection mode first
+                toggleSelectionMode();
+            }
+            
+            document.querySelectorAll('.task-card:not([style*="display: none"])').forEach(card => {
+                const cardId = card.dataset.cardId;
+                card.classList.add('selected');
+                selectedCards.add(cardId);
             });
-            updateSelection();
+            updateSelectionCounter();
+        }
+        
+        function exportSelected() {
+            if (!isSelectionMode || selectedCards.size === 0) {
+                alert('Please select cards first by entering selection mode');
+                return;
+            }
+            
+            // Get selected card elements
+            const selectedElements = Array.from(selectedCards).map(cardId => {
+                return document.querySelector(`[data-card-id="${cardId}"]`);
+            }).filter(el => el);
+            
+            if (selectedElements.length === 0) {
+                alert('No valid cards selected');
+                return;
+            }
+
+            const printWindow = window.open('', '_blank');
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Selected Task Cards</title>
+                    <style>
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 20px; 
+                            background: white;
+                            line-height: 1.4;
+                        }
+                        .task-card { 
+                            border: 2px solid #333; 
+                            margin: 20px 0; 
+                            padding: 20px; 
+                            page-break-inside: avoid;
+                            background: white;
+                        }
+                        .card-header { display: flex; align-items: center; margin-bottom: 10px; }
+                        .card-icon { margin-right: 10px; }
+                        .card-title { font-size: 18px; font-weight: bold; }
+                        .difficulty-label { font-weight: bold; margin-bottom: 10px; }
+                        .directions, .hints, .sentence-frame { margin: 10px 0; }
+                        .directions h3, .hints h3, .sentence-frame h3 { 
+                            font-size: 14px; 
+                            margin: 5px 0; 
+                            color: #333;
+                        }
+                        .subject-tag { 
+                            font-size: 10px; 
+                            color: #666; 
+                            margin-bottom: 5px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${selectedElements.map(card => card.outerHTML).join('')}
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
         }
 
         // Event listeners
         document.getElementById('controlsToggle').addEventListener('click', toggleControlsDrawer);
+        document.getElementById('selection-mode-toggle').addEventListener('click', toggleSelectionMode);
         document.getElementById('subjectFilter').addEventListener('change', applyFilters);
         document.getElementById('unitFilter').addEventListener('change', applyFilters);
         document.getElementById('seriesFilter').addEventListener('change', applyFilters);
