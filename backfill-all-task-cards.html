@@ -350,7 +350,7 @@
         const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
         const TABLE_ID = 'grid-MbORljz5rl';
 
-        // Column mapping with actual IDs
+        // Column mapping with actual IDs - will be updated by setup
         const COLUMN_MAPPING = {
             cardNumber: 'c-oCblzlJHpK',
             difficulty: 'c-R3MiGsbDIh',
@@ -360,8 +360,8 @@
             directions: 'c-UdatLRw4ZE',
             sentenceFrame: 'c-PTc-M6N93s',
             hints: 'c-J2p_hAW8aK',
-            subject: 'c-ZWMo6MZ9_3',    // From inspection
-            unit: 'c-kRrJJAhAWo',       // From inspection
+            subject: null,    // Will be set by setup
+            unit: null,       // Will be set by setup
             series: 'c-OBxHtN8XaH'      // Series column we added
         };
 
@@ -854,10 +854,99 @@
             }
         }
 
+        // Setup function to ensure required columns exist
+        async function setupColumns() {
+            updateStatus('Setting up table columns...');
+            
+            try {
+                // Get current table structure
+                const response = await fetch(`https://coda.io/apis/v1/docs/${DOC_ID}/tables/${TABLE_ID}/columns`, {
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to get columns: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                const columns = data.items;
+                
+                // Look for subject and unit columns
+                let subjectColumn = columns.find(col => col.name.toLowerCase() === 'subject');
+                let unitColumn = columns.find(col => col.name.toLowerCase() === 'unit');
+                
+                // Create subject column if it doesn't exist
+                if (!subjectColumn) {
+                    updateStatus('Creating Subject column...');
+                    const createResponse = await fetch(`https://coda.io/apis/v1/docs/${DOC_ID}/tables/${TABLE_ID}/columns`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: 'Subject',
+                            type: 'text'
+                        })
+                    });
+                    
+                    if (!createResponse.ok) {
+                        throw new Error(`Failed to create Subject column: ${createResponse.status}`);
+                    }
+                    
+                    const subjectData = await createResponse.json();
+                    subjectColumn = subjectData;
+                }
+                
+                // Create unit column if it doesn't exist
+                if (!unitColumn) {
+                    updateStatus('Creating Unit column...');
+                    const createResponse = await fetch(`https://coda.io/apis/v1/docs/${DOC_ID}/tables/${TABLE_ID}/columns`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${API_KEY}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: 'Unit',
+                            type: 'text'
+                        })
+                    });
+                    
+                    if (!createResponse.ok) {
+                        throw new Error(`Failed to create Unit column: ${createResponse.status}`);
+                    }
+                    
+                    const unitData = await createResponse.json();
+                    unitColumn = unitData;
+                }
+                
+                // Update column mapping
+                COLUMN_MAPPING.subject = subjectColumn.id;
+                COLUMN_MAPPING.unit = unitColumn.id;
+                
+                updateStatus(`✅ Columns ready: Subject (${subjectColumn.id}), Unit (${unitColumn.id})`);
+                return true;
+                
+            } catch (error) {
+                updateStatus(`❌ Error setting up columns: ${error.message}`);
+                return false;
+            }
+        }
+
         // Upload all cards to Coda
         async function uploadAllCards() {
             try {
                 showMessage('🚀 Uploading all cards to Coda...', 'info');
+                
+                // First setup columns
+                const setupSuccess = await setupColumns();
+                if (!setupSuccess) {
+                    showMessage('❌ Failed to setup columns', 'error');
+                    return;
+                }
                 
                 let uploaded = 0;
                 
