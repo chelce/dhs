@@ -1380,28 +1380,28 @@
                     
                     <div class="card-content">
                         <div class="instructions">
-                            ${card.instructions}
+                            ${boldKeyWords(card.instructions)}
                         </div>
                         
                         <div class="directions">
                             <h3>Directions:</h3>
-                            ${directionsHtml}
+                            ${boldKeyWords(directionsHtml)}
                         </div>
 
                         <div class="bottom-sections">
                             ${card.sentenceFrame ? `
                                 <div class="sentence-frame">
                                     <h3>Sentence Frame:</h3>
-                                    <p>${card.sentenceFrame}</p>
+                                    <p>${boldKeyWords(card.sentenceFrame)}</p>
                                 </div>
                                 <div class="hints">
                                     <h3>Helpful Hints:</h3>
-                                    ${hintsHtml}
+                                    ${boldKeyWords(hintsHtml)}
                                 </div>
                             ` : `
                                 <div class="full-width-hints">
                                     <h3>Helpful Hints:</h3>
-                                    ${hintsHtml}
+                                    ${boldKeyWords(hintsHtml)}
                                 </div>
                             `}
                         </div>
@@ -1442,6 +1442,38 @@
             }
             
             return `<ul><li>${hints}</li></ul>`;
+        }
+
+        // Bold key words function
+        function boldKeyWords(text) {
+            if (!text) return text;
+            
+            // Define key words to bold (add more as needed)
+            const keyWords = [
+                // Action words
+                'analyze', 'compare', 'contrast', 'identify', 'describe', 'explain', 'create', 'design', 'choose', 'find', 'list', 'write', 'discuss', 'track', 'map', 'trace', 'show', 'demonstrate',
+                
+                // Hamilton-specific terms
+                'Hamilton', 'Washington', 'Burr', 'Jefferson', 'Eliza', 'Angelica', 'cabinet', 'duel', 'immigrant', 'founding father', 'revolution', 'federalist', 
+                
+                // Literary terms
+                'character', 'theme', 'conflict', 'motivation', 'relationship', 'development', 'change', 'growth', 'flaw', 'strength', 
+                
+                // Important concepts
+                'power', 'ambition', 'legacy', 'sacrifice', 'loyalty', 'betrayal', 'decision', 'consequence', 'leadership', 'friendship', 'rivalry',
+                
+                // Musical terms
+                'song', 'lyrics', 'rap', 'melody', 'rhythm', 'verse', 'chorus',
+                
+                // Analysis words
+                'evidence', 'example', 'proof', 'reason', 'cause', 'effect', 'result', 'impact', 'influence', 'pattern'
+            ];
+            
+            // Create regex pattern for all key words (case insensitive, whole words only)
+            const pattern = new RegExp(`\\b(${keyWords.join('|')})\\b`, 'gi');
+            
+            // Replace matches with bold versions
+            return text.replace(pattern, '<strong>$1</strong>');
         }
 
         // Update stats
