@@ -350,7 +350,7 @@
         const CODA_API_TOKEN = '3f19aabb-ed6a-4bb1-9dc6-5cb058fcd94c';
         const TABLE_ID = 'grid-MbORljz5rl';
 
-        // Column mapping with actual IDs - will be updated by setup
+        // Column mapping with actual IDs - now with correct subject/unit IDs
         const COLUMN_MAPPING = {
             cardNumber: 'c-oCblzlJHpK',
             difficulty: 'c-R3MiGsbDIh',
@@ -360,8 +360,8 @@
             directions: 'c-UdatLRw4ZE',
             sentenceFrame: 'c-PTc-M6N93s',
             hints: 'c-J2p_hAW8aK',
-            subject: null,    // Will be set by setup
-            unit: null,       // Will be set by setup
+            subject: 'c-PvCf__AtLS',    // Provided by user
+            unit: 'c-VMuDoulorO',       // Provided by user  
             series: 'c-OBxHtN8XaH'      // Series column we added
         };
 
@@ -940,13 +940,6 @@
         async function uploadAllCards() {
             try {
                 showMessage('🚀 Uploading all cards to Coda...', 'info');
-                
-                // First setup columns
-                const setupSuccess = await setupColumns();
-                if (!setupSuccess) {
-                    showMessage('❌ Failed to setup columns', 'error');
-                    return;
-                }
                 
                 let uploaded = 0;
                 
