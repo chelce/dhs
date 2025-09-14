@@ -644,13 +644,14 @@
         .task-card.easy .directions li,
         .task-card.easy .hints li,
         .task-card.easy .full-width-hints li {
-            color: #28a745; /* Force color on list items */
+            color: #333; /* Keep text black */
         }
 
         .task-card.easy .directions li::marker,
         .task-card.easy .hints li::marker,
         .task-card.easy .full-width-hints li::marker {
-            color: #28a745; /* Force color on markers */
+            color: #28a745; /* Force green on markers only */
+            font-weight: bold; /* Make markers bold */
         }
 
         /* Medium Level Colors - Orange */
@@ -676,13 +677,14 @@
         .task-card.medium .directions li,
         .task-card.medium .hints li,
         .task-card.medium .full-width-hints li {
-            color: #fd7e14; /* Force color on list items */
+            color: #333; /* Keep text black */
         }
 
         .task-card.medium .directions li::marker,
         .task-card.medium .hints li::marker,
         .task-card.medium .full-width-hints li::marker {
-            color: #fd7e14; /* Force color on markers */
+            color: #fd7e14; /* Force orange on markers only */
+            font-weight: bold; /* Make markers bold */
         }
 
         /* Hard Level Colors - Red */
@@ -708,13 +710,14 @@
         .task-card.hard .directions li,
         .task-card.hard .hints li,
         .task-card.hard .full-width-hints li {
-            color: #dc3545; /* Force color on list items */
+            color: #333; /* Keep text black */
         }
 
         .task-card.hard .directions li::marker,
         .task-card.hard .hints li::marker,
         .task-card.hard .full-width-hints li::marker {
-            color: #dc3545; /* Force color on markers */
+            color: #dc3545; /* Force red on markers only */
+            font-weight: bold; /* Make markers bold */
         }
 
         .loading {
