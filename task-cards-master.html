@@ -1042,17 +1042,15 @@
             /* Preserve all text formatting and scaling */
             .task-card .card-title {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px - base print size */
+                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px */
                 font-weight: 400 !important;
                 letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
                 color: inherit !important; /* Inherit color from difficulty level */
                 margin: 0 !important; /* No margins - dynamic sizing handles space */
                 flex-grow: 1 !important; /* Ensure title takes available space */
-                line-height: 1 !important; /* Tight line height for print */
                 display: flex !important; /* Use flex for precise alignment */
-                align-items: center !important; /* Center align by default */
-                white-space: nowrap !important; /* Start with nowrap - dynamic sizing will change if needed */
                 max-width: calc(100% - 60px) !important; /* Force maximum width constraint */
+                /* Allow dynamic JavaScript to control line-height, white-space, and align-items */
                 word-wrap: break-word !important; /* Allow word breaking when wrapping */
                 overflow: visible !important; /* Show wrapped text */
             }
@@ -1576,52 +1574,23 @@
             return text.replace(pattern, '<strong>$1</strong>');
         }
 
-        // Dynamic font resizing for titles based on character count
+        // Simple approach: just allow wrapping for long titles
         function adjustTitleFontSize(titleElement) {
             if (!titleElement) return;
             
             const titleText = titleElement.textContent.trim();
             const charCount = titleText.length;
-            const threshold = 40; // Character threshold
             
-            // Check if we're in print mode
-            const isPrintMode = window.matchMedia && window.matchMedia('print').matches;
-            
-            // Base font sizes - match original CSS values
-            const baseFontSize = isPrintMode ? 14 : 24;
-            
-            // Reset to defaults first
-            titleElement.style.whiteSpace = 'nowrap';
-            titleElement.style.setProperty('line-height', isPrintMode ? '1' : '1.2', 'important');
-            titleElement.style.setProperty('align-items', 'center', 'important');
-            
-            if (charCount <= threshold) {
-                // Title is short enough - use base font size
-                titleElement.style.setProperty('font-size', baseFontSize + 'px', 'important');
-                console.log('Title normal size:', titleText.substring(0, 30) + '...', 'Length:', charCount, 'Font:', baseFontSize + 'px');
+            // If title is longer than 45 characters, allow it to wrap
+            if (charCount > 45) {
+                titleElement.style.setProperty('white-space', 'normal', 'important');
+                titleElement.style.setProperty('line-height', '1.1', 'important');
+                titleElement.style.setProperty('align-items', 'flex-start', 'important');
+                console.log('Title wrapping enabled for:', titleText.substring(0, 30) + '... (', charCount, 'chars)');
             } else {
-                // Title is too long - scale down based on excess characters
-                const excessChars = charCount - threshold;
-                
-                // Reduce font size by 0.5px for every 2 excess characters
-                const fontReduction = Math.floor(excessChars / 2) * 0.5;
-                const newFontSize = Math.max(baseFontSize - fontReduction, isPrintMode ? 8 : 12);
-                
-                titleElement.style.setProperty('font-size', newFontSize + 'px', 'important');
-                
-                // If we've hit minimum font size and it's still very long, allow wrapping
-                if (newFontSize <= (isPrintMode ? 8 : 12) && charCount > (threshold + 20)) {
-                    titleElement.style.setProperty('white-space', 'normal', 'important');
-                    titleElement.style.setProperty('line-height', isPrintMode ? '1.1' : '1.2', 'important');
-                    titleElement.style.setProperty('align-items', 'flex-start', 'important'); // Top align when wrapped
-                }
-                
-                console.log('Title scaled down:', 
-                           'Text:', titleText.substring(0, 30) + '...', 
-                           'Length:', charCount,
-                           'Excess chars:', excessChars,
-                           'Reduction:', fontReduction + 'px',
-                           'Final font:', newFontSize + 'px');
+                // Keep normal single-line behavior for shorter titles
+                titleElement.style.setProperty('white-space', 'nowrap', 'important');
+                titleElement.style.setProperty('align-items', 'center', 'important');
             }
         }
 
