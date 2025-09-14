@@ -338,7 +338,7 @@
             margin-bottom: 4px;
             line-height: 1.4;
             font-size: calc(11px * var(--card-font-scale, 1)) !important;
-            font-weight: bold; /* Make direction text bold */
+            font-weight: normal; /* Keep direction text normal weight */
             color: inherit; /* Inherit color from difficulty level */
         }
 
@@ -538,7 +538,7 @@
             margin-bottom: calc(3px * var(--card-font-scale, 1));
             line-height: calc(1.3 * var(--card-font-scale, 1));
             font-size: calc(10px * var(--card-font-scale, 1)) !important;
-            font-weight: bold; /* Make hint text bold */
+            font-weight: normal; /* Keep hint text normal weight */
             color: inherit; /* Inherit color from difficulty level */
         }
 
@@ -573,7 +573,7 @@
             margin-bottom: calc(3px * var(--card-font-scale, 1));
             line-height: calc(1.3 * var(--card-font-scale, 1));
             font-size: calc(10px * var(--card-font-scale, 1)) !important;
-            font-weight: bold; /* Make hint text bold */
+            font-weight: normal; /* Keep hint text normal weight */
             color: inherit; /* Inherit color from difficulty level */
         }
 
@@ -596,7 +596,7 @@
         .task-card .hints li,
         .task-card .full-width-hints li {
             font-size: calc(10px * var(--card-font-scale, 1)) !important; /* Double-force list items */
-            font-weight: bold !important; /* Force bold styling */
+            font-weight: normal !important; /* Keep text normal weight */
             color: inherit !important; /* Force color inheritance */
         }
 
@@ -881,7 +881,7 @@
                 line-height: 1.3 !important; /* Keep line height for readability */
                 margin-bottom: 2px !important; /* 60% of 4px = 2.4px, rounded to 2px */
                 color: #333 !important; /* Keep body text black for readability */
-                font-weight: bold !important; /* Make text bold */
+                font-weight: normal !important; /* Keep text normal weight */
             }
 
             .task-card .directions li {
@@ -912,7 +912,7 @@
                 line-height: 1.3 !important;
                 margin-bottom: 2px !important;
                 color: inherit !important; /* Use difficulty color instead of black */
-                font-weight: bold !important; /* Make text bold */
+                font-weight: normal !important; /* Keep text normal weight */
             }
 
             .task-card .hints li::marker,
