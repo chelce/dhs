@@ -369,6 +369,128 @@
 
         // Comprehensive task card data from all your existing files
         const ALL_TASK_CARDS = [
+            // Hamilton Set 1 (ham-1) - Original printable cards
+            {
+                cardNumber: 'E1', difficulty: 'Easy', title: "Hamilton's Early Life", icon: 'history',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Which events were most <strong>influential</strong> in Hamilton\'s early life? Find <strong>two quotes</strong> to support your answer.',
+                directions: '1. Listen to "Alexander Hamilton" with your group\n2. Identify the most important events from Hamilton\'s childhood and youth\n3. Choose the TWO events that shaped him the most\n4. Find two specific quotes that show how these events affected him',
+                sentenceFrame: 'The most influential events in Hamilton\'s early life were _______ and _______. This is shown in the quotes \'...\' and \'...\' because _______.',
+                hints: 'Listen for events like being orphaned, poverty, hurricanes\nLook for quotes that show how events changed Hamilton\nThink about which events made Hamilton who he became'
+            },
+            {
+                cardNumber: 'E2', difficulty: 'Easy', title: 'Burr vs. Hamilton', icon: 'users',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Find <strong>two similarities</strong> and <strong>two differences</strong> between Burr and Hamilton. Support each with a quote.',
+                directions: '1. Listen to "Aaron Burr, Sir" with your group\n2. Find 2 ways Burr and Hamilton are similar\n3. Find 2 ways they are different\n4. Write down a quote that proves each similarity and difference',
+                sentenceFrame: 'Burr and Hamilton are similar because they both _______. The quote \'...\' shows this. They are different because Burr _______ while Hamilton _______.',
+                hints: 'Think about their backgrounds, goals, and personalities\nListen to how they speak to each other\nLook for quotes that show their different approaches to life'
+            },
+            {
+                cardNumber: 'E3', difficulty: 'Easy', title: "Hamilton's Revolution Attitude", icon: 'flag',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'What is Hamilton\'s <strong>attitude</strong> toward the revolution? Find <strong>two quotes</strong> that show how he feels.',
+                directions: '1. Listen to "My Shot" as a group\n2. Pay attention to Hamilton\'s tone and word choices\n3. Identify his feelings about the revolution\n4. Find two quotes that clearly show his attitude',
+                sentenceFrame: 'Hamilton feels _______ about the revolution. This is shown in the quotes \'...\' and \'...\' because _______.',
+                hints: 'Think about words like: excited, eager, determined, passionate\nListen to how Hamilton talks about fighting and change\nLook for quotes that show his energy and commitment'
+            },
+            {
+                cardNumber: 'E4', difficulty: 'Easy', title: 'Characterizing Angelica', icon: 'crown',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'How would you <strong>characterize</strong> Angelica? Support your answer with <strong>two quotes</strong>.',
+                directions: '1. Listen to "The Schuyler Sisters" as a group\n2. Pay attention to what Angelica says and does\n3. Choose 2-3 words that best describe her personality\n4. Find two quotes from Angelica that prove your description',
+                sentenceFrame: '',
+                hints: 'Think about words like: smart, strong, independent, outspoken\nListen to how she talks compared to her sisters\nLook for quotes where she shows her personality clearly'
+            },
+            {
+                cardNumber: 'E5', difficulty: 'Easy', title: 'Revolutionary Passion', icon: 'heart',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Based on all five opening songs, what <strong>drives</strong> Hamilton\'s passion for the revolution? Find <strong>two quotes</strong> that show his motivation.',
+                directions: '1. Think about all five opening songs together\n2. Identify what motivates Hamilton to join the revolution\n3. Look for patterns in his reasons across the songs\n4. Choose two quotes that best show his driving force',
+                sentenceFrame: 'Hamilton\'s passion for the revolution is driven by _______. The quotes \'...\' and \'...\' show this because _______.',
+                hints: 'Think about his personal experiences and goals\nLook for quotes about opportunity, legacy, and change\nConsider how his background influences his motivation'
+            },
+            {
+                cardNumber: 'M1', difficulty: 'Medium', title: 'What Burr Really Means', icon: 'eye',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'When Burr tells Hamilton to "talk less, smile more," what does he <strong>really mean</strong>? What is he trying to teach Hamilton about success in politics?',
+                directions: '1. Listen carefully to "Aaron Burr, Sir" focusing on Burr\'s advice\n2. Think about the context - why is Burr giving this advice?\n3. Consider what Burr has learned about surviving in politics\n4. Analyze what Hamilton\'s reaction reveals about his character',
+                sentenceFrame: '',
+                hints: 'Think about the dangers of being too outspoken in 1776\nConsider how Burr has survived politically when others haven\'t\nLook at Hamilton\'s reaction - does he understand the advice?'
+            },
+            {
+                cardNumber: 'M2', difficulty: 'Medium', title: "Hamilton's Insecurities and Overcompensation", icon: 'shield',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'How do Hamilton\'s <strong>insecurities</strong> about his background lead to <strong>overcompensation</strong> in "My Shot"? What is he trying to prove?',
+                directions: '1. Identify Hamilton\'s insecurities mentioned in "Alexander Hamilton"\n2. Listen to "My Shot" for signs of overcompensation\n3. Analyze specific lyrics that show him trying to prove himself\n4. Connect his past experiences to his current behavior',
+                sentenceFrame: '',
+                hints: 'Think about how being an orphan and outsider affects him\nLook for moments where he seems to be proving his worth\nConsider why he needs to constantly demonstrate his abilities'
+            },
+            {
+                cardNumber: 'M3', difficulty: 'Medium', title: "The Schuyler Sisters' Social Commentary", icon: 'message-square',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'What <strong>social commentary</strong> do the Schuyler sisters make about women\'s roles in revolutionary America? How do they challenge expectations?',
+                directions: '1. Listen to "The Schuyler Sisters" focusing on their different perspectives\n2. Identify what each sister wants that goes against traditional expectations\n3. Analyze how they justify their desires and ambitions\n4. Consider how their class status affects their ability to challenge norms',
+                sentenceFrame: '',
+                hints: 'Pay attention to Angelica\'s intellectual ambitions\nNotice how they talk about "wanting to be in the room where it happens"\nConsider how wealth gives them more freedom than other women'
+            },
+            {
+                cardNumber: 'M4', difficulty: 'Medium', title: 'Friendship and Competition Subtext', icon: 'handshake',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Analyze the <strong>subtext</strong> in Hamilton and Burr\'s interaction. How does their friendship contain the seeds of future <strong>competition and conflict</strong>?',
+                directions: '1. Look beyond the surface friendliness in "Aaron Burr, Sir"\n2. Identify moments of subtle tension or disagreement\n3. Analyze how their different philosophies create potential for conflict\n4. Predict how their relationship might evolve based on these early signs',
+                sentenceFrame: '',
+                hints: 'Notice how they give each other advice but don\'t take it\nLook for signs that they see each other as rivals\nConsider how their opposite approaches might clash later'
+            },
+            {
+                cardNumber: 'M5', difficulty: 'Medium', title: "Hamilton's Desperate Urgency", icon: 'clock',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Why does Hamilton feel such <strong>desperate urgency</strong> to make his mark? How does this drive both his <strong>ambition and his recklessness</strong>?',
+                directions: '1. Analyze Hamilton\'s references to mortality and time in "My Shot"\n2. Connect his urgency to his background and circumstances\n3. Identify how this urgency manifests as both strength and weakness\n4. Predict how this trait might help and hurt him',
+                sentenceFrame: '',
+                hints: 'Think about his youth and lack of family connections\nConsider how being an outsider creates urgency\nLook at how his impatience affects his decision-making'
+            },
+            {
+                cardNumber: 'H1', difficulty: 'Hard', title: 'Performance Elements and Character Essence', icon: 'music',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'How do the <strong>performance elements</strong> (rap style, rhythm, staging) in "My Shot" reveal the <strong>essence</strong> of Hamilton\'s character and his approach to revolution?',
+                directions: '1. Analyze how Hamilton\'s rap style differs from other characters\n2. Consider how the rhythm and pace mirror his personality\n3. Examine how staging and movement reflect his energy\n4. Synthesize how these elements reveal deeper character truths',
+                sentenceFrame: '',
+                hints: 'Think about how rapid-fire delivery mirrors his mind\nConsider how his energy contrasts with Burr\'s measured approach\nAnalyze how performance style becomes character development'
+            },
+            {
+                cardNumber: 'H2', difficulty: 'Hard', title: 'Musical Contrast and Character Opposition', icon: 'split',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Analyze how Miranda uses <strong>musical contrast</strong> between Hamilton and Burr to establish their fundamental <strong>philosophical opposition</strong> and foreshadow future conflict.',
+                directions: '1. Compare their musical styles, rhythms, and lyrical approaches\n2. Analyze how these musical differences reflect deeper philosophical differences\n3. Examine how their contrasting styles create dramatic tension\n4. Predict how this musical opposition will develop throughout the musical',
+                sentenceFrame: '',
+                hints: 'Notice Hamilton\'s rapid verses vs. Burr\'s smoother flow\nConsider how musical style reflects life philosophy\nThink about how audience hears their conflict before they do'
+            },
+            {
+                cardNumber: 'H3', difficulty: 'Hard', title: 'Ensemble Dynamics and Collective Voice', icon: 'users-round',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'How does Miranda use <strong>ensemble dynamics</strong> in the opening songs to create a sense of <strong>collective revolutionary energy</strong> while maintaining individual character development?',
+                directions: '1. Analyze how group vocals support and challenge individual characters\n2. Examine how ensemble members represent different aspects of revolutionary society\n3. Consider how collective voice creates historical momentum\n4. Evaluate how individual stories contribute to the larger revolutionary narrative',
+                sentenceFrame: '',
+                hints: 'Think about how ensemble represents "the people"\nConsider how group energy amplifies individual ambitions\nAnalyze how collective singing creates historical weight'
+            },
+            {
+                cardNumber: 'H4', difficulty: 'Hard', title: 'Genre Fusion and Character Complexity', icon: 'layers',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'How does Miranda\'s fusion of <strong>hip-hop, R&B, and traditional musical theater</strong> create complex characterizations that transcend simple historical archetypes?',
+                directions: '1. Identify different musical genres used for different characters\n2. Analyze how genre choice affects audience perception of characters\n3. Consider how modern musical styles comment on historical figures\n4. Synthesize how genre fusion creates contemporary relevance',
+                sentenceFrame: '',
+                hints: 'Think about why rap fits Hamilton vs. why R&B fits the Schuyler sisters\nConsider how modern genres make historical figures accessible\nAnalyze how musical style challenges traditional casting and interpretation'
+            },
+            {
+                cardNumber: 'H5', difficulty: 'Hard', title: 'Rhythmic Intensity and Psychological State', icon: 'brain',
+                subject: 'Hamilton', unit: 'Act 1', series: 'ham-1',
+                instructions: 'Analyze how the <strong>rhythmic intensity</strong> and <strong>verbal density</strong> in Hamilton\'s songs mirror his <strong>psychological state</strong> and reveal his internal drives and fears.',
+                directions: '1. Map the connection between rhythm patterns and Hamilton\'s emotional states\n2. Analyze how word density reflects his racing thoughts and urgency\n3. Consider how musical intensity reveals psychological complexity\n4. Synthesize how sound becomes a window into character psychology',
+                sentenceFrame: '',
+                hints: 'Notice how his pace increases with emotional intensity\nConsider how verbal overflow reflects mental overflow\nThink about how rhythm becomes characterization technique'
+            },
+
             // Hamilton Set 2 (ham-2) - Current cards in Coda
             {
                 cardNumber: 'E1', difficulty: 'Easy', title: 'Political Debate', icon: 'megaphone',
