@@ -641,6 +641,18 @@
             color: #28a745;
         }
 
+        .task-card.easy .directions li,
+        .task-card.easy .hints li,
+        .task-card.easy .full-width-hints li {
+            color: #28a745; /* Force color on list items */
+        }
+
+        .task-card.easy .directions li::marker,
+        .task-card.easy .hints li::marker,
+        .task-card.easy .full-width-hints li::marker {
+            color: #28a745; /* Force color on markers */
+        }
+
         /* Medium Level Colors - Orange */
         .task-card.medium {
             border-color: #fd7e14;
@@ -661,6 +673,18 @@
             color: #fd7e14;
         }
 
+        .task-card.medium .directions li,
+        .task-card.medium .hints li,
+        .task-card.medium .full-width-hints li {
+            color: #fd7e14; /* Force color on list items */
+        }
+
+        .task-card.medium .directions li::marker,
+        .task-card.medium .hints li::marker,
+        .task-card.medium .full-width-hints li::marker {
+            color: #fd7e14; /* Force color on markers */
+        }
+
         /* Hard Level Colors - Red */
         .task-card.hard {
             border-color: #dc3545;
@@ -679,6 +703,18 @@
         .task-card.hard .hints h3,
         .task-card.hard .full-width-hints h3 {
             color: #dc3545;
+        }
+
+        .task-card.hard .directions li,
+        .task-card.hard .hints li,
+        .task-card.hard .full-width-hints li {
+            color: #dc3545; /* Force color on list items */
+        }
+
+        .task-card.hard .directions li::marker,
+        .task-card.hard .hints li::marker,
+        .task-card.hard .full-width-hints li::marker {
+            color: #dc3545; /* Force color on markers */
         }
 
         .loading {
@@ -777,6 +813,18 @@
             .task-card.easy .sentence-frame h3 {
                 color: #28a745 !important; /* Green text for Easy */
             }
+
+            .task-card.easy .directions li,
+            .task-card.easy .hints li,
+            .task-card.easy .full-width-hints li {
+                color: #28a745 !important; /* Force green on list items */
+            }
+
+            .task-card.easy .directions li::marker,
+            .task-card.easy .hints li::marker,
+            .task-card.easy .full-width-hints li::marker {
+                color: #28a745 !important; /* Force green on markers */
+            }
             
             .task-card.easy .directions h3,
             .task-card.easy .hints h3,
@@ -796,6 +844,18 @@
             .task-card.medium .sentence-frame h3 {
                 color: #fd7e14 !important; /* Orange text for Medium */
             }
+
+            .task-card.medium .directions li,
+            .task-card.medium .hints li,
+            .task-card.medium .full-width-hints li {
+                color: #fd7e14 !important; /* Force orange on list items */
+            }
+
+            .task-card.medium .directions li::marker,
+            .task-card.medium .hints li::marker,
+            .task-card.medium .full-width-hints li::marker {
+                color: #fd7e14 !important; /* Force orange on markers */
+            }
             
             .task-card.medium .directions h3,
             .task-card.medium .hints h3,
@@ -814,6 +874,18 @@
             .task-card.hard .hints h3,
             .task-card.hard .sentence-frame h3 {
                 color: #dc3545 !important; /* Red text for Hard */
+            }
+
+            .task-card.hard .directions li,
+            .task-card.hard .hints li,
+            .task-card.hard .full-width-hints li {
+                color: #dc3545 !important; /* Force red on list items */
+            }
+
+            .task-card.hard .directions li::marker,
+            .task-card.hard .hints li::marker,
+            .task-card.hard .full-width-hints li::marker {
+                color: #dc3545 !important; /* Force red on markers */
             }
             
             .task-card.hard .directions h3,
@@ -850,6 +922,12 @@
                 letter-spacing: 0.6px !important; /* 60% of 1px = 0.6px */
                 z-index: 10 !important;
                 color: inherit !important; /* Inherit color from difficulty level */
+            }
+
+            .task-card .card-icon {
+                width: 17px !important; /* 60% of 28px = 16.8px, rounded to 17px */
+                height: 17px !important; /* 60% of 28px = 16.8px, rounded to 17px */
+                flex-shrink: 0 !important;
             }
 
             .task-card .instructions {
