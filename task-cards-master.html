@@ -441,6 +441,9 @@
             font-weight: 400;
             letter-spacing: 1.5px;
             flex-grow: 1;
+            white-space: nowrap; /* Prevent wrapping, use dynamic sizing instead */
+            overflow: hidden; /* Hide overflow if any */
+            margin-right: 25px; /* Reserve space for card number */
         }
 
         .task-card .card-icon {
@@ -1045,11 +1048,13 @@
                 font-weight: 400 !important;
                 letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
                 color: inherit !important; /* Inherit color from difficulty level */
-                margin: 0 20px 0 0 !important; /* Right margin to avoid card number overlap */
+                margin: 0 !important; /* No margins - dynamic sizing handles space */
                 flex-grow: 1 !important; /* Ensure title takes available space */
                 line-height: 1 !important; /* Tight line height for better centering */
                 display: flex !important; /* Use flex for precise alignment */
                 align-items: center !important; /* Center vertically within its space */
+                white-space: nowrap !important; /* Prevent wrapping, use dynamic sizing instead */
+                overflow: hidden !important; /* Hide overflow if any */
             }
 
             .task-card .card-content {
@@ -1446,6 +1451,9 @@
             if (window.lucide) {
                 window.lucide.createIcons();
             }
+            
+            // Apply dynamic font sizing to titles
+            setTimeout(() => applyDynamicTitleSizing(), 100);
         }
 
         // Create HTML for a single task card
@@ -1566,6 +1574,36 @@
             
             // Replace matches with bold versions
             return text.replace(pattern, '<strong>$1</strong>');
+        }
+
+        // Dynamic font resizing for titles
+        function adjustTitleFontSize(titleElement) {
+            const container = titleElement.parentElement;
+            const maxWidth = container.offsetWidth - 25; // Reserve space for card number (20px + 5px buffer)
+            
+            let fontSize = 24; // Start with original size (screen) or 14 (print)
+            const isPrint = window.matchMedia('print').matches;
+            if (isPrint) fontSize = 14;
+            
+            // Set initial font size
+            titleElement.style.fontSize = fontSize + 'px';
+            
+            // Reduce font size until it fits
+            while (titleElement.scrollWidth > maxWidth && fontSize > 8) {
+                fontSize -= 1;
+                titleElement.style.fontSize = fontSize + 'px';
+            }
+        }
+
+        // Apply dynamic font sizing to all titles
+        function applyDynamicTitleSizing() {
+            const titles = document.querySelectorAll('.task-card .card-title');
+            titles.forEach(title => {
+                // Reset to auto first to get natural size
+                title.style.fontSize = '';
+                // Then adjust
+                setTimeout(() => adjustTitleFontSize(title), 10);
+            });
         }
 
         // Update stats
@@ -1822,6 +1860,15 @@
             
             // Initialize print layout controls
             updatePrintLayout();
+            
+            // Listen for print media changes to reapply font sizing
+            const printMediaQuery = window.matchMedia('print');
+            printMediaQuery.addListener(function(e) {
+                if (e.matches) {
+                    // Entering print mode
+                    setTimeout(() => applyDynamicTitleSizing(), 50);
+                }
+            });
             
             // Initialize Lucide icons
             if (window.lucide) {
