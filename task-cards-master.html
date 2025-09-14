@@ -1051,9 +1051,9 @@
                 line-height: 1 !important; /* Tight line height for better centering */
                 display: flex !important; /* Use flex for precise alignment */
                 align-items: center !important; /* Center vertically within its space */
-                white-space: nowrap !important; /* Prevent wrapping initially, allow as fallback */
-                overflow: hidden !important; /* Hide overflow in print */
+                white-space: nowrap !important; /* Prevent wrapping initially, JS will override if needed */
                 max-width: calc(100% - 60px) !important; /* Force maximum width constraint */
+                word-wrap: break-word !important; /* Allow word breaking when wrapping */
             }
 
             .task-card .card-content {
@@ -1584,8 +1584,9 @@
             const isPrint = window.matchMedia('print').matches;
             if (isPrint) fontSize = 14;
             
-            // Set initial font size
+            // Set initial font size and nowrap
             titleElement.style.fontSize = fontSize + 'px';
+            titleElement.style.whiteSpace = 'nowrap';
             
             // Reduce font size until it fits (allow very small minimum)
             while (titleElement.scrollWidth > maxWidth && fontSize > 3) {
@@ -1597,6 +1598,8 @@
             if (titleElement.scrollWidth > maxWidth) {
                 titleElement.style.whiteSpace = 'normal';
                 titleElement.style.lineHeight = '1.1';
+                titleElement.style.overflow = 'visible';
+                titleElement.style.alignItems = 'flex-start'; // Top align when wrapping
             }
         }
 
