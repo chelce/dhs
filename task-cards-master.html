@@ -1592,12 +1592,13 @@
             
             // Reset to defaults first
             titleElement.style.whiteSpace = 'nowrap';
-            titleElement.style.lineHeight = isPrintMode ? '1' : '1.2';
-            titleElement.style.alignItems = 'center';
+            titleElement.style.setProperty('line-height', isPrintMode ? '1' : '1.2', 'important');
+            titleElement.style.setProperty('align-items', 'center', 'important');
             
             if (charCount <= threshold) {
                 // Title is short enough - use base font size
-                titleElement.style.fontSize = baseFontSize + 'px';
+                titleElement.style.setProperty('font-size', baseFontSize + 'px', 'important');
+                console.log('Title normal size:', titleText.substring(0, 30) + '...', 'Length:', charCount, 'Font:', baseFontSize + 'px');
             } else {
                 // Title is too long - scale down based on excess characters
                 const excessChars = charCount - threshold;
@@ -1606,21 +1607,22 @@
                 const fontReduction = Math.floor(excessChars / 2) * 0.5;
                 const newFontSize = Math.max(baseFontSize - fontReduction, isPrintMode ? 8 : 10);
                 
-                titleElement.style.fontSize = newFontSize + 'px';
+                titleElement.style.setProperty('font-size', newFontSize + 'px', 'important');
                 
                 // If we've hit minimum font size and it's still very long, allow wrapping
                 if (newFontSize <= (isPrintMode ? 8 : 10) && charCount > (threshold + 20)) {
-                    titleElement.style.whiteSpace = 'normal';
-                    titleElement.style.lineHeight = isPrintMode ? '1.1' : '1.2';
-                    titleElement.style.alignItems = 'flex-start'; // Top align when wrapped
+                    titleElement.style.setProperty('white-space', 'normal', 'important');
+                    titleElement.style.setProperty('line-height', isPrintMode ? '1.1' : '1.2', 'important');
+                    titleElement.style.setProperty('align-items', 'flex-start', 'important'); // Top align when wrapped
                 }
+                
+                console.log('Title scaled down:', 
+                           'Text:', titleText.substring(0, 30) + '...', 
+                           'Length:', charCount,
+                           'Excess chars:', excessChars,
+                           'Reduction:', fontReduction + 'px',
+                           'Final font:', newFontSize + 'px');
             }
-            
-            console.log('Title sized by character count:', 
-                       'Text:', titleText.substring(0, 30) + '...', 
-                       'Length:', charCount,
-                       'Print mode:', isPrintMode,
-                       'Font size:', titleElement.style.fontSize);
         }
 
         // Apply dynamic font sizing to all titles
