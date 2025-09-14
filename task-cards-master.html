@@ -741,6 +741,7 @@
 
         let allCards = [];
         let filteredCards = [];
+        let selectedCards = new Set(); // Initialize selection tracking
 
         // Load task cards from Coda
         async function loadTaskCards() {
@@ -836,6 +837,7 @@
             const seriesFilter = document.getElementById('seriesFilter').value;
             const difficultyFilter = document.getElementById('difficultyFilter').value;
             const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            const showOnlySelected = document.getElementById('showOnlySelected')?.checked;
 
             filteredCards = allCards.filter(card => {
                 if (subjectFilter && card.subject !== subjectFilter) return false;
@@ -846,6 +848,13 @@
                     const searchText = `${card.title} ${card.instructions}`.toLowerCase();
                     if (!searchText.includes(searchFilter)) return false;
                 }
+                
+                // Apply selection filter if enabled
+                if (showOnlySelected && selectedCards && selectedCards.size > 0) {
+                    const cardId = `card-${card.cardNumber}-${card.series}`;
+                    if (!selectedCards.has(cardId)) return false;
+                }
+                
                 return true;
             });
 
@@ -1022,8 +1031,6 @@
         }
 
         // Card selection functionality
-        let selectedCards = new Set();
-
         function updateSelection() {
             selectedCards.clear();
             const checkboxes = document.querySelectorAll('.card-checkbox:checked');
@@ -1070,30 +1077,6 @@
                 checkbox.checked = true;
             });
             updateSelection();
-        }
-
-        // Enhanced applyFilters to work with selection
-        const originalApplyFilters = applyFilters;
-        function applyFilters() {
-            originalApplyFilters();
-            
-            // Apply selection filter if enabled
-            const showOnlySelected = document.getElementById('showOnlySelected').checked;
-            if (showOnlySelected && selectedCards.size > 0) {
-                const cards = document.querySelectorAll('.task-card');
-                cards.forEach(card => {
-                    const cardId = card.getAttribute('data-card-id');
-                    if (!selectedCards.has(cardId)) {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                // Update stats for selected cards only
-                const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
-                document.getElementById('stats').innerHTML = `
-                    <strong>Selected & Visible:</strong> ${visibleCards.length} of ${selectedCards.size} selected cards
-                `;
-            }
         }
 
         // Event listeners
