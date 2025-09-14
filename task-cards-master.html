@@ -660,7 +660,7 @@
         @media print {
             @page {
                 size: auto;
-                margin: 0.5in; /* Add proper page margins to prevent cutoff */
+                margin: 0.75in; /* Increase page margins to prevent cutoff */
             }
             
             body {
@@ -686,7 +686,7 @@
                 grid-template-columns: repeat(var(--cards-per-row, 3), 1fr) !important;
                 gap: var(--card-gap, 40px) !important;
                 margin: 0 !important;
-                padding: 20px !important; /* Add padding to prevent edge cutoff */
+                padding: 30px !important; /* Increase padding to prevent edge cutoff */
                 page-break-before: avoid;
                 max-width: none !important;
                 width: 100% !important;
@@ -719,6 +719,7 @@
             
             .task-card.easy .difficulty-label,
             .task-card.easy .card-number,
+            .task-card.easy .card-title,
             .task-card.easy .directions h3,
             .task-card.easy .hints h3,
             .task-card.easy .sentence-frame h3 {
@@ -737,6 +738,7 @@
             
             .task-card.medium .difficulty-label,
             .task-card.medium .card-number,
+            .task-card.medium .card-title,
             .task-card.medium .directions h3,
             .task-card.medium .hints h3,
             .task-card.medium .sentence-frame h3 {
@@ -755,6 +757,7 @@
             
             .task-card.hard .difficulty-label,
             .task-card.hard .card-number,
+            .task-card.hard .card-title,
             .task-card.hard .directions h3,
             .task-card.hard .hints h3,
             .task-card.hard .sentence-frame h3 {
@@ -960,7 +963,7 @@
         <div class="control-section">
             <h3>Card Selection</h3>
             <div class="control-group">
-                <button class="selection-mode-toggle" id="selectionModeToggle" onclick="toggleSelectionMode()">
+                <button class="selection-mode-toggle" id="selectionModeToggle">
                     Enable Multi-Select Mode
                 </button>
                 <div class="control-row">
@@ -1401,12 +1404,12 @@
             const body = document.body;
             
             if (isSelectionMode) {
-                toggleButton.textContent = 'Exit Selection Mode';
+                toggleButton.textContent = 'Disable Multi-Select Mode';
                 toggleButton.style.backgroundColor = '#dc3545';
                 body.classList.add('selection-mode');
                 selectedCards.clear();
             } else {
-                toggleButton.textContent = 'Enter Selection Mode';
+                toggleButton.textContent = 'Enable Multi-Select Mode';
                 toggleButton.style.backgroundColor = '#28a745';
                 body.classList.remove('selection-mode');
                 selectedCards.clear();
