@@ -485,7 +485,7 @@
 
         .task-card .bottom-sections {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(120px, 0.6fr) 1fr; /* Responsive: sentence frame can be smaller but not too small */
             gap: 15px;
             margin-top: auto;
         }
@@ -520,7 +520,9 @@
         }
 
         .task-card .hints ul {
-            margin-left: 15px;
+            margin-left: 0; /* Remove left margin so bullets align with heading */
+            padding-left: 0; /* Remove default padding */
+            list-style-position: outside; /* Ensure bullets are outside the content area */
             font-size: calc(10px * var(--card-font-scale, 1));
         }
 
@@ -545,7 +547,9 @@
         }
 
         .task-card .full-width-hints ul {
-            margin-left: 15px;
+            margin-left: 0; /* Remove left margin so bullets align with heading */
+            padding-left: 0; /* Remove default padding */
+            list-style-position: outside; /* Ensure bullets are outside the content area */
             font-size: calc(10px * var(--card-font-scale, 1));
         }
 
@@ -1110,7 +1114,7 @@
             return `
                 <div class="task-card ${difficultyClass}" data-card-id="${cardId}" onclick="handleCardClick(this)">
                     <div class="card-number">${card.cardNumber}</div>
-                    <div class="subject-tag">${card.subject} - ${card.unit} - ${card.series}</div>
+                    <div class="subject-tag">${card.series}</div>
                     
                     <div class="card-header">
                         <i data-lucide="${card.icon}" class="card-icon"></i>
