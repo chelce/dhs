@@ -1250,7 +1250,7 @@
         
         function toggleSelectionMode() {
             isSelectionMode = !isSelectionMode;
-            const toggleButton = document.getElementById('selection-mode-toggle');
+            const toggleButton = document.getElementById('selectionModeToggle'); // Fixed ID
             const body = document.body;
             
             if (isSelectionMode) {
@@ -1397,31 +1397,54 @@
             printWindow.print();
         }
 
-        // Event listeners
-        document.getElementById('controlsToggle').addEventListener('click', toggleControlsDrawer);
-        document.getElementById('selection-mode-toggle').addEventListener('click', toggleSelectionMode);
-        document.getElementById('subjectFilter').addEventListener('change', applyFilters);
-        document.getElementById('unitFilter').addEventListener('change', applyFilters);
-        document.getElementById('seriesFilter').addEventListener('change', applyFilters);
-        document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
-        document.getElementById('searchFilter').addEventListener('input', applyFilters);
-        document.getElementById('showOnlySelected').addEventListener('change', applyFilters);
-        
-        // Print layout controls
-        document.getElementById('cardsPerRow').addEventListener('input', updatePrintLayout);
-        document.getElementById('cardGap').addEventListener('input', updatePrintLayout);
-        document.getElementById('cardFontScale').addEventListener('input', updatePrintLayout);
+        // Event listeners - wrapped in DOMContentLoaded to ensure DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for required elements and add event listeners only if they exist
+            const controlsToggle = document.getElementById('controlsToggle');
+            if (controlsToggle) controlsToggle.addEventListener('click', toggleControlsDrawer);
+            
+            const selectionModeToggle = document.getElementById('selectionModeToggle');
+            if (selectionModeToggle) selectionModeToggle.addEventListener('click', toggleSelectionMode);
+            
+            const subjectFilter = document.getElementById('subjectFilter');
+            if (subjectFilter) subjectFilter.addEventListener('change', applyFilters);
+            
+            const unitFilter = document.getElementById('unitFilter');
+            if (unitFilter) unitFilter.addEventListener('change', applyFilters);
+            
+            const seriesFilter = document.getElementById('seriesFilter');
+            if (seriesFilter) seriesFilter.addEventListener('change', applyFilters);
+            
+            const difficultyFilter = document.getElementById('difficultyFilter');
+            if (difficultyFilter) difficultyFilter.addEventListener('change', applyFilters);
+            
+            const searchFilter = document.getElementById('searchFilter');
+            if (searchFilter) searchFilter.addEventListener('input', applyFilters);
+            
+            const showOnlySelected = document.getElementById('showOnlySelected');
+            if (showOnlySelected) showOnlySelected.addEventListener('change', applyFilters);
+            
+            // Print layout controls
+            const cardsPerRow = document.getElementById('cardsPerRow');
+            if (cardsPerRow) cardsPerRow.addEventListener('input', updatePrintLayout);
+            
+            const cardGap = document.getElementById('cardGap');
+            if (cardGap) cardGap.addEventListener('input', updatePrintLayout);
+            
+            const cardFontScale = document.getElementById('cardFontScale');
+            if (cardFontScale) cardFontScale.addEventListener('input', updatePrintLayout);
 
-        // Initialize
-        loadTaskCards();
-        
-        // Initialize print layout controls
-        updatePrintLayout();
-        
-        // Initialize Lucide icons
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+            // Initialize the application after DOM is ready
+            loadTaskCards();
+            
+            // Initialize print layout controls
+            updatePrintLayout();
+            
+            // Initialize Lucide icons
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        });
     </script>
 </body>
 </html>
