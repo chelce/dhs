@@ -660,7 +660,7 @@
         @media print {
             @page {
                 size: auto;
-                margin: 0.75in; /* Increase page margins to prevent cutoff */
+                margin: 1in; /* Generous margins to prevent cutoff */
             }
             
             body {
@@ -670,6 +670,7 @@
                 font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
                 -webkit-print-color-adjust: exact !important; /* Preserve colors in WebKit browsers */
                 print-color-adjust: exact !important; /* Standard property for color preservation */
+                color-adjust: exact !important; /* Alternative property */
             }
             
             .header,
@@ -683,13 +684,14 @@
             
             .cards-grid {
                 display: grid !important;
-                grid-template-columns: repeat(var(--cards-per-row, 3), 1fr) !important;
-                gap: var(--card-gap, 40px) !important;
+                grid-template-columns: repeat(3, 1fr) !important; /* Fixed 3 columns instead of variable */
+                gap: 20px !important; /* Smaller gap to prevent cutoff */
                 margin: 0 !important;
-                padding: 30px !important; /* Increase padding to prevent edge cutoff */
+                padding: 20px !important; /* Moderate padding with generous page margins */
                 page-break-before: avoid;
                 max-width: none !important;
                 width: 100% !important;
+                box-sizing: border-box !important;
             }
             
             .task-card {
@@ -698,18 +700,20 @@
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
                 margin: 0 !important;
-                margin-bottom: var(--card-margin, 10px) !important;
                 background: white !important;
                 transform: none !important;
                 width: 100% !important;
-                min-height: 350px !important;
+                height: auto !important; /* Let height be determined by content */
+                min-height: 300px !important; /* Smaller minimum height */
+                max-height: none !important; /* Remove max-height restrictions */
                 display: flex !important;
                 flex-direction: column !important;
                 position: relative !important;
                 border-radius: 8px !important;
-                padding: 15px !important;
-                font-size: calc(var(--base-font-size, 14px) * var(--card-font-scale, 1)) !important;
-                line-height: calc(var(--base-line-height, 1.4) * var(--card-font-scale, 1)) !important;
+                padding: 12px !important; /* Smaller padding for more content space */
+                font-size: 11px !important; /* Fixed font size instead of calculated */
+                line-height: 1.3 !important; /* Fixed line height */
+                box-sizing: border-box !important;
             }
 
             /* Preserve all color coding for difficulty levels */
@@ -733,7 +737,7 @@
             }
 
             .task-card.medium {
-                border-color: #ffc107 !important; /* Yellow for Medium */
+                border-color: #fd7e14 !important; /* Orange for Medium */
             }
             
             .task-card.medium .difficulty-label,
@@ -742,13 +746,13 @@
             .task-card.medium .directions h3,
             .task-card.medium .hints h3,
             .task-card.medium .sentence-frame h3 {
-                color: #ffc107 !important; /* Yellow text for Medium */
+                color: #fd7e14 !important; /* Orange text for Medium */
             }
             
             .task-card.medium .directions h3,
             .task-card.medium .hints h3,
             .task-card.medium .sentence-frame h3 {
-                border-color: #ffc107 !important; /* Yellow border for Medium */
+                border-color: #fd7e14 !important; /* Orange border for Medium */
             }
 
             .task-card.hard {
@@ -773,26 +777,27 @@
             /* Preserve all text formatting and scaling */
             .task-card .card-title {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: calc(24px * var(--card-font-scale, 1)) !important;
+                font-size: 20px !important; /* Fixed size instead of calculated */
                 font-weight: 400 !important;
-                letter-spacing: 1.5px !important;
+                letter-spacing: 1px !important;
                 color: inherit !important; /* Inherit color from difficulty level */
+                margin-bottom: 8px !important;
             }
 
             .task-card .difficulty-label {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: calc(11px * var(--card-font-scale, 1)) !important;
-                letter-spacing: calc(1px * var(--card-font-scale, 1)) !important;
+                font-size: 10px !important; /* Fixed size */
+                letter-spacing: 1px !important;
                 color: inherit !important; /* Inherit color from difficulty level */
                 margin-bottom: 5px !important;
             }
 
             .task-card .card-number {
                 position: absolute !important;
-                top: 10px !important;
-                right: 15px !important;
+                top: 8px !important;
+                right: 12px !important;
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: calc(16px * var(--card-font-scale, 1)) !important;
+                font-size: 14px !important; /* Fixed size */
                 font-weight: 600 !important;
                 letter-spacing: 1px !important;
                 z-index: 10 !important;
@@ -800,10 +805,10 @@
             }
 
             .task-card .instructions {
-                font-size: calc(12px * var(--card-font-scale, 1)) !important;
+                font-size: 10px !important; /* Fixed size */
                 font-weight: 600 !important;
-                margin-bottom: 15px !important;
-                line-height: calc(1.5 * var(--card-font-scale, 1)) !important;
+                margin-bottom: 12px !important;
+                line-height: 1.4 !important; /* Fixed line height */
                 color: #333 !important; /* Keep instructions black for readability */
             }
 
@@ -811,12 +816,12 @@
             .task-card .hints h3,
             .task-card .sentence-frame h3 {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: calc(16px * var(--card-font-scale, 1)) !important;
+                font-size: 13px !important; /* Fixed size */
                 font-weight: 400 !important;
-                letter-spacing: calc(1px * var(--card-font-scale, 1)) !important;
-                margin-bottom: calc(8px * var(--card-font-scale, 1)) !important;
+                letter-spacing: 1px !important;
+                margin-bottom: 6px !important;
                 color: inherit !important; /* Inherit color from difficulty level */
-                padding-bottom: calc(10px * var(--card-font-scale, 1)) !important;
+                padding-bottom: 8px !important;
                 border-bottom: 2px solid !important; /* Border color inherited from difficulty */
             }
 
@@ -824,19 +829,19 @@
             .task-card .directions li,
             .task-card .hints li,
             .task-card .sentence-frame p {
-                font-size: calc(12px * var(--card-font-scale, 1)) !important;
-                line-height: calc(1.4 * var(--card-font-scale, 1)) !important;
-                margin-bottom: calc(5px * var(--card-font-scale, 1)) !important;
+                font-size: 10px !important; /* Fixed size */
+                line-height: 1.3 !important; /* Fixed line height */
+                margin-bottom: 4px !important;
                 color: #333 !important; /* Keep body text black for readability */
             }
 
             .task-card .subject-tag {
                 position: absolute !important;
-                bottom: 10px !important;
-                left: 15px !important;
+                bottom: 8px !important;
+                left: 12px !important;
                 background: transparent !important;
                 color: #999 !important;
-                font-size: calc(8px * var(--card-font-scale, 1)) !important;
+                font-size: 7px !important; /* Fixed size */
                 padding: 0 !important;
                 border: none !important;
                 border-radius: 0 !important;
@@ -849,7 +854,7 @@
             .task-card .card-header {
                 display: flex !important;
                 align-items: center !important;
-                margin-bottom: 15px !important;
+                margin-bottom: 12px !important;
             }
 
             .task-card .card-content {
@@ -860,14 +865,14 @@
 
             .task-card .bottom-sections {
                 display: grid !important;
-                grid-template-columns: minmax(120px, 0.6fr) 1fr !important;
-                gap: 15px !important;
+                grid-template-columns: minmax(100px, 0.6fr) 1fr !important;
+                gap: 12px !important; /* Fixed gap */
                 margin-top: auto !important;
             }
 
             .task-card .full-width-hints {
                 border-top: 2px solid #dee2e6 !important;
-                padding-top: 10px !important;
+                padding-top: 8px !important;
                 margin-top: auto !important;
                 grid-column: 1 / -1 !important;
             }
@@ -875,7 +880,7 @@
             .task-card .sentence-frame,
             .task-card .hints {
                 border-top: 2px solid #dee2e6 !important;
-                padding-top: 10px !important;
+                padding-top: 8px !important;
             }
 
             /* Preserve bullet alignment */
