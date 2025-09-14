@@ -900,18 +900,6 @@
                 border-color: #dc3545 !important; /* Red border for Hard */
             }
 
-            /* Preserve all text formatting and scaling */
-            .task-card .card-title {
-                font-family: 'Bebas Neue', cursive !important;
-                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px */
-                font-weight: 400 !important;
-                letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
-                color: inherit !important; /* Inherit color from difficulty level */
-                margin-bottom: 0 !important; /* Remove margin since header handles spacing */
-                flex-grow: 1 !important; /* Ensure title takes available space */
-                line-height: 1.2 !important; /* Ensure proper vertical centering */
-            }
-
             .task-card .difficulty-label {
                 font-family: 'Bebas Neue', cursive !important;
                 font-size: 6px !important; /* 60% of 10px = 6px */
@@ -1047,6 +1035,21 @@
                 margin-bottom: 7px !important; /* 60% of 12px = 7.2px, rounded to 7px */
                 padding-bottom: 6px !important; /* 60% of 10px = 6px */
                 border-bottom: 1px solid !important; /* 60% of 2px = 1.2px, rounded to 1px */
+                border-color: inherit !important; /* Use difficulty color for the line */
+            }
+
+            /* Preserve all text formatting and scaling */
+            .task-card .card-title {
+                font-family: 'Bebas Neue', cursive !important;
+                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px */
+                font-weight: 400 !important;
+                letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
+                color: inherit !important; /* Inherit color from difficulty level */
+                margin: 0 !important; /* Remove all margins for precise centering */
+                flex-grow: 1 !important; /* Ensure title takes available space */
+                line-height: 1 !important; /* Tight line height for better centering */
+                display: flex !important; /* Use flex for precise alignment */
+                align-items: center !important; /* Center vertically within its space */
             }
 
             .task-card .card-content {
