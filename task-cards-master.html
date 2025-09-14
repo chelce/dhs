@@ -1042,15 +1042,17 @@
             /* Preserve all text formatting and scaling */
             .task-card .card-title {
                 font-family: 'Bebas Neue', cursive !important;
+                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px - base print size */
                 font-weight: 400 !important;
                 letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
                 color: inherit !important; /* Inherit color from difficulty level */
                 margin: 0 !important; /* No margins - dynamic sizing handles space */
                 flex-grow: 1 !important; /* Ensure title takes available space */
+                line-height: 1 !important; /* Tight line height for print */
                 display: flex !important; /* Use flex for precise alignment */
-                align-items: flex-start !important; /* Top align when wrapping */
+                align-items: center !important; /* Center align by default */
+                white-space: nowrap !important; /* Start with nowrap - dynamic sizing will change if needed */
                 max-width: calc(100% - 60px) !important; /* Force maximum width constraint */
-                /* Let dynamic sizing handle font-size, line-height, and white-space */
                 word-wrap: break-word !important; /* Allow word breaking when wrapping */
                 overflow: visible !important; /* Show wrapped text */
             }
@@ -1583,25 +1585,28 @@
             
             const cardNumber = container.querySelector('.card-number');
             
-            // Reset to initial state
+            // Check if we're in print mode
+            const isPrintMode = window.matchMedia && window.matchMedia('print').matches;
+            
+            // Reset to initial state with appropriate base size
             titleElement.style.fontSize = '';
             titleElement.style.whiteSpace = 'nowrap';
-            titleElement.style.lineHeight = '1';
+            titleElement.style.lineHeight = isPrintMode ? '1' : '1.2';
             
             // Calculate available width
             const containerRect = container.getBoundingClientRect();
             const cardNumberRect = cardNumber ? cardNumber.getBoundingClientRect() : { width: 0 };
-            const padding = 20; // Account for padding and margins
+            const padding = isPrintMode ? 15 : 20; // Less padding in print mode
             const availableWidth = containerRect.width - cardNumberRect.width - padding;
             
-            // Start with a reasonable font size and reduce until it fits
-            let fontSize = 18; // Base font size
+            // Start with base font size (smaller for print mode)
+            let fontSize = isPrintMode ? 14 : 18; 
             titleElement.style.fontSize = fontSize + 'px';
             
             let titleRect = titleElement.getBoundingClientRect();
             let attempts = 0;
-            const maxAttempts = 20;
-            const minFontSize = 10;
+            const maxAttempts = 15;
+            const minFontSize = isPrintMode ? 8 : 10; // Smaller minimum for print
             
             while (titleRect.width > availableWidth && fontSize > minFontSize && attempts < maxAttempts) {
                 fontSize -= 0.5;
@@ -1613,10 +1618,12 @@
             // If still doesn't fit after reaching minimum size, allow wrapping as fallback
             if (titleRect.width > availableWidth) {
                 titleElement.style.whiteSpace = 'normal';
-                titleElement.style.lineHeight = '1.1';
+                titleElement.style.lineHeight = isPrintMode ? '1.1' : '1.2';
+                titleElement.style.alignItems = 'flex-start'; // Top align when wrapped
             }
             
             console.log('Title sized:', titleElement.textContent.substring(0, 30) + '...', 
+                       'Print mode:', isPrintMode,
                        'Final font size:', fontSize + 'px', 
                        'Available width:', availableWidth.toFixed(0) + 'px',
                        'Title width:', titleRect.width.toFixed(0) + 'px');
