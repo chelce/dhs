@@ -251,7 +251,52 @@
             grid-template-columns: repeat(var(--cards-per-row, 3), 1fr);
             gap: var(--card-gap, 20px);
             margin-top: 20px;
-            font-size: var(--card-font-scale, 1em);
+            font-size: calc(1em * var(--card-font-scale, 1));
+        }
+
+        /* Apply font scaling to all card text */
+        .task-card {
+            font-size: calc(1em * var(--card-font-scale, 1));
+        }
+
+        .task-card .card-title {
+            font-size: calc(24px * var(--card-font-scale, 1));
+        }
+
+        .task-card .instructions {
+            font-size: calc(12px * var(--card-font-scale, 1));
+        }
+
+        .task-card .directions h3 {
+            font-size: calc(16px * var(--card-font-scale, 1));
+        }
+
+        .task-card .directions ol {
+            font-size: calc(11px * var(--card-font-scale, 1));
+        }
+
+        .task-card .sentence-frame h3,
+        .task-card .hints h3,
+        .task-card .full-width-hints h3 {
+            font-size: calc(14px * var(--card-font-scale, 1));
+        }
+
+        .task-card .hints ul,
+        .task-card .full-width-hints ul,
+        .task-card .sentence-frame p {
+            font-size: calc(10px * var(--card-font-scale, 1));
+        }
+
+        .task-card .card-number {
+            font-size: calc(16px * var(--card-font-scale, 1));
+        }
+
+        .task-card .difficulty-label {
+            font-size: calc(11px * var(--card-font-scale, 1));
+        }
+
+        .task-card .subject-tag {
+            font-size: calc(10px * var(--card-font-scale, 1));
         }
 
         :root {
@@ -524,7 +569,7 @@
             .cards-grid {
                 display: grid;
                 grid-template-columns: repeat(var(--cards-per-row, 2), 1fr);
-                gap: var(--card-gap, 10px);
+                gap: var(--card-gap, 20px);
                 margin: 0;
                 page-break-before: avoid;
             }
@@ -537,6 +582,7 @@
                 margin: 0;
                 margin-bottom: var(--card-margin, 10px);
                 background: white !important;
+                font-size: calc(1em * var(--card-font-scale, 1)) !important;
             }
 
             .task-card .card-checkbox {
@@ -549,21 +595,9 @@
                 display: none;
             }
 
-            /* Ensure proper print sizing */
-            .task-card .card-title {
-                font-size: calc(24px * var(--card-font-scale, 1));
-            }
-
-            .task-card .instructions {
-                font-size: calc(12px * var(--card-font-scale, 1));
-            }
-
-            .task-card .directions h3 {
-                font-size: calc(16px * var(--card-font-scale, 1));
-            }
-
-            .task-card .directions ol {
-                font-size: calc(11px * var(--card-font-scale, 1));
+            /* Ensure all text scales properly in print */
+            .task-card * {
+                color: black !important;
             }
         }
 
@@ -663,7 +697,7 @@
                 
                 <div class="control-row">
                     <label for="cardGap">Card Spacing:</label>
-                    <input type="range" id="cardGap" min="5" max="40" value="20">
+                    <input type="range" id="cardGap" min="10" max="100" value="20">
                     <span class="range-display" id="cardGapDisplay">20px</span>
                 </div>
                 
@@ -778,6 +812,28 @@
                         unit: values[CODA_CONFIG.columns.unit] || 'Unknown',
                         series: values[CODA_CONFIG.columns.series] || 'Unknown'
                     };
+                });
+
+                // Sort cards: Series together, then Easy→Medium→Hard, then sequential within each
+                allCards.sort((a, b) => {
+                    // First sort by series
+                    if (a.series !== b.series) {
+                        return a.series.localeCompare(b.series);
+                    }
+                    
+                    // Then sort by difficulty (Easy, Medium, Hard)
+                    const difficultyOrder = { 'Easy': 1, 'Medium': 2, 'Hard': 3 };
+                    const aDiff = difficultyOrder[a.difficulty] || 999;
+                    const bDiff = difficultyOrder[b.difficulty] || 999;
+                    
+                    if (aDiff !== bDiff) {
+                        return aDiff - bDiff;
+                    }
+                    
+                    // Finally sort by card number (sequential within difficulty)
+                    const aNum = parseInt(a.cardNumber) || 0;
+                    const bNum = parseInt(b.cardNumber) || 0;
+                    return aNum - bNum;
                 });
                 
                 populateFilterOptions();
