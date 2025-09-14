@@ -1578,7 +1578,7 @@
         // Dynamic font resizing for titles
         function adjustTitleFontSize(titleElement) {
             const container = titleElement.parentElement;
-            const maxWidth = container.offsetWidth - 85; // Much more aggressive space reservation (80px + 5px buffer)
+            const maxWidth = container.offsetWidth - 120; // Very aggressive space reservation for card labels
             
             let fontSize = 24; // Start with original size (screen) or 14 (print)
             const isPrint = window.matchMedia('print').matches;
