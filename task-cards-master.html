@@ -1042,17 +1042,15 @@
             /* Preserve all text formatting and scaling */
             .task-card .card-title {
                 font-family: 'Bebas Neue', cursive !important;
-                font-size: 14px !important; /* 60% of 24px = 14.4px, rounded to 14px */
                 font-weight: 400 !important;
                 letter-spacing: 0.9px !important; /* 60% of 1.5px = 0.9px */
                 color: inherit !important; /* Inherit color from difficulty level */
                 margin: 0 !important; /* No margins - dynamic sizing handles space */
                 flex-grow: 1 !important; /* Ensure title takes available space */
-                line-height: 1.1 !important; /* Allow some line height for wrapped text */
                 display: flex !important; /* Use flex for precise alignment */
                 align-items: flex-start !important; /* Top align when wrapping */
-                white-space: normal !important; /* Allow wrapping to prevent overlap */
                 max-width: calc(100% - 60px) !important; /* Force maximum width constraint */
+                /* Let dynamic sizing handle font-size, line-height, and white-space */
                 word-wrap: break-word !important; /* Allow word breaking when wrapping */
                 overflow: visible !important; /* Show wrapped text */
             }
@@ -1583,13 +1581,45 @@
             const container = titleElement.parentElement;
             if (!container) return;
             
-            // Simply allow wrapping for all titles - no aggressive resizing
-            titleElement.style.whiteSpace = 'normal';
-            titleElement.style.lineHeight = '1.1';
-            titleElement.style.overflow = 'visible';
-            titleElement.style.fontSize = ''; // Reset to CSS default
+            const cardNumber = container.querySelector('.card-number');
             
-            console.log('Title wrapping enabled for:', titleElement.textContent);
+            // Reset to initial state
+            titleElement.style.fontSize = '';
+            titleElement.style.whiteSpace = 'nowrap';
+            titleElement.style.lineHeight = '1';
+            
+            // Calculate available width
+            const containerRect = container.getBoundingClientRect();
+            const cardNumberRect = cardNumber ? cardNumber.getBoundingClientRect() : { width: 0 };
+            const padding = 20; // Account for padding and margins
+            const availableWidth = containerRect.width - cardNumberRect.width - padding;
+            
+            // Start with a reasonable font size and reduce until it fits
+            let fontSize = 18; // Base font size
+            titleElement.style.fontSize = fontSize + 'px';
+            
+            let titleRect = titleElement.getBoundingClientRect();
+            let attempts = 0;
+            const maxAttempts = 20;
+            const minFontSize = 10;
+            
+            while (titleRect.width > availableWidth && fontSize > minFontSize && attempts < maxAttempts) {
+                fontSize -= 0.5;
+                titleElement.style.fontSize = fontSize + 'px';
+                titleRect = titleElement.getBoundingClientRect();
+                attempts++;
+            }
+            
+            // If still doesn't fit after reaching minimum size, allow wrapping as fallback
+            if (titleRect.width > availableWidth) {
+                titleElement.style.whiteSpace = 'normal';
+                titleElement.style.lineHeight = '1.1';
+            }
+            
+            console.log('Title sized:', titleElement.textContent.substring(0, 30) + '...', 
+                       'Final font size:', fontSize + 'px', 
+                       'Available width:', availableWidth.toFixed(0) + 'px',
+                       'Title width:', titleRect.width.toFixed(0) + 'px');
         }
 
         // Apply dynamic font sizing to all titles
@@ -1604,6 +1634,25 @@
                 // Then adjust with a longer delay to ensure layout is ready
                 setTimeout(() => adjustTitleFontSize(title), 100);
             });
+        }
+
+        // Listen for print mode changes and reapply sizing
+        function setupPrintListener() {
+            if (window.matchMedia) {
+                const mediaQueryList = window.matchMedia('print');
+                mediaQueryList.addListener((mql) => {
+                    if (mql.matches) {
+                        console.log('Entering print mode - reapplying font sizing');
+                        setTimeout(() => applyDynamicTitleSizing(), 250);
+                    }
+                });
+                
+                // Also listen for before print event
+                window.addEventListener('beforeprint', () => {
+                    console.log('Before print event - reapplying font sizing');
+                    setTimeout(() => applyDynamicTitleSizing(), 100);
+                });
+            }
         }
 
         // Update stats
@@ -1857,6 +1906,9 @@
 
             // Initialize the application after DOM is ready
             loadTaskCards();
+            
+            // Setup print mode listener for dynamic font sizing
+            setupPrintListener();
             
             // Initialize print layout controls
             updatePrintLayout();
