@@ -856,7 +856,7 @@
 
         // Setup function to ensure required columns exist
         async function setupColumns() {
-            updateStatus('Setting up table columns...');
+            showMessage('🔧 Setting up table columns...', 'info');
             
             try {
                 // Get current table structure
@@ -879,7 +879,7 @@
                 
                 // Create subject column if it doesn't exist
                 if (!subjectColumn) {
-                    updateStatus('Creating Subject column...');
+                    showMessage('📝 Creating Subject column...', 'info');
                     const createResponse = await fetch(`https://coda.io/apis/v1/docs/${DOC_ID}/tables/${TABLE_ID}/columns`, {
                         method: 'POST',
                         headers: {
@@ -902,7 +902,7 @@
                 
                 // Create unit column if it doesn't exist
                 if (!unitColumn) {
-                    updateStatus('Creating Unit column...');
+                    showMessage('📝 Creating Unit column...', 'info');
                     const createResponse = await fetch(`https://coda.io/apis/v1/docs/${DOC_ID}/tables/${TABLE_ID}/columns`, {
                         method: 'POST',
                         headers: {
@@ -927,11 +927,11 @@
                 COLUMN_MAPPING.subject = subjectColumn.id;
                 COLUMN_MAPPING.unit = unitColumn.id;
                 
-                updateStatus(`✅ Columns ready: Subject (${subjectColumn.id}), Unit (${unitColumn.id})`);
+                showMessage(`✅ Columns ready: Subject (${subjectColumn.id}), Unit (${unitColumn.id})`, 'success');
                 return true;
                 
             } catch (error) {
-                updateStatus(`❌ Error setting up columns: ${error.message}`);
+                showMessage(`❌ Error setting up columns: ${error.message}`, 'error');
                 return false;
             }
         }
