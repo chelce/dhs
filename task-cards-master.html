@@ -817,13 +817,14 @@
             .task-card.easy .directions li,
             .task-card.easy .hints li,
             .task-card.easy .full-width-hints li {
-                color: #28a745 !important; /* Force green on list items */
+                color: #333 !important; /* Keep text black */
             }
 
             .task-card.easy .directions li::marker,
             .task-card.easy .hints li::marker,
             .task-card.easy .full-width-hints li::marker {
-                color: #28a745 !important; /* Force green on markers */
+                color: #28a745 !important; /* Force green on markers only */
+                font-weight: bold !important; /* Make markers bold */
             }
             
             .task-card.easy .directions h3,
@@ -848,13 +849,14 @@
             .task-card.medium .directions li,
             .task-card.medium .hints li,
             .task-card.medium .full-width-hints li {
-                color: #fd7e14 !important; /* Force orange on list items */
+                color: #333 !important; /* Keep text black */
             }
 
             .task-card.medium .directions li::marker,
             .task-card.medium .hints li::marker,
             .task-card.medium .full-width-hints li::marker {
-                color: #fd7e14 !important; /* Force orange on markers */
+                color: #fd7e14 !important; /* Force orange on markers only */
+                font-weight: bold !important; /* Make markers bold */
             }
             
             .task-card.medium .directions h3,
@@ -879,13 +881,14 @@
             .task-card.hard .directions li,
             .task-card.hard .hints li,
             .task-card.hard .full-width-hints li {
-                color: #dc3545 !important; /* Force red on list items */
+                color: #333 !important; /* Keep text black */
             }
 
             .task-card.hard .directions li::marker,
             .task-card.hard .hints li::marker,
             .task-card.hard .full-width-hints li::marker {
-                color: #dc3545 !important; /* Force red on markers */
+                color: #dc3545 !important; /* Force red on markers only */
+                font-weight: bold !important; /* Make markers bold */
             }
             
             .task-card.hard .directions h3,
@@ -963,12 +966,12 @@
             }
 
             .task-card .directions li {
-                color: inherit !important; /* Override black color for directions, use difficulty color */
+                color: #333 !important; /* Keep text black for readability */
             }
 
             .task-card .directions li::marker {
                 font-weight: bold !important; /* Make numbers bold */
-                color: inherit !important; /* Color-code numbers to match difficulty */
+                /* Color will be set by difficulty-specific rules above */
             }
 
             .task-card .hints li::marker,
@@ -989,14 +992,14 @@
                 font-size: 6px !important; /* Override any other font size rules */
                 line-height: 1.3 !important;
                 margin-bottom: 2px !important;
-                color: inherit !important; /* Use difficulty color instead of black */
+                color: #333 !important; /* Keep text black for readability */
                 font-weight: normal !important; /* Keep text normal weight */
             }
 
             .task-card .hints li::marker,
             .task-card .full-width-hints li::marker {
                 font-weight: bold !important; /* Make bullets bold */
-                color: inherit !important; /* Color-code bullets to match difficulty */
+                /* Color will be set by difficulty-specific rules above */
             }
 
             /* Force consistent sizing for hint containers - PDF override */
