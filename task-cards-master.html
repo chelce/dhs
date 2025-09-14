@@ -1584,10 +1584,20 @@
             
             // Check if we're in print mode
             const isPrint = window.matchMedia('print').matches;
-            const maxWidth = container.offsetWidth - 120; // Very aggressive space reservation for card labels
             
-            // Start with the appropriate base font size
-            let fontSize = isPrint ? 14 : 24;
+            // Use different calculations for print vs screen
+            let maxWidth, fontSize;
+            
+            if (isPrint) {
+                // Print mode: use fixed calculations based on print card dimensions
+                // Print cards are scaled to 60%, so we need to account for that
+                maxWidth = 300; // Conservative estimate for print title area (was too aggressive before)
+                fontSize = 14; // Start with print font size
+            } else {
+                // Screen mode: use container-based calculations
+                maxWidth = container.offsetWidth - 120; // Screen calculation
+                fontSize = 24; // Start with screen font size
+            }
             
             // Force the correct initial font size for measurement
             titleElement.style.fontSize = fontSize + 'px';
