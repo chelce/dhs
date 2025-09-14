@@ -747,13 +747,13 @@
         @media print {
             @page {
                 size: auto;
-                margin: 1in; /* Generous margins to prevent cutoff */
+                margin: 6px; /* Small consistent margin - half the card gap (12px/2 = 6px) */
             }
             
             body {
                 background: white !important;
-                padding: 0;
-                margin: 0;
+                padding: 0 !important;
+                margin: 0 !important;
                 font-family: 'HarmonyOS Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
                 -webkit-print-color-adjust: exact !important; /* Preserve colors in WebKit browsers */
                 print-color-adjust: exact !important; /* Standard property for color preservation */
@@ -774,7 +774,7 @@
                 grid-template-columns: repeat(3, 1fr) !important; /* Fixed 3 columns instead of variable */
                 gap: 12px !important; /* 60% of 20px = 12px */
                 margin: 0 !important;
-                padding: 12px !important; /* 60% of 20px = 12px */
+                padding: 0 !important; /* Remove padding since page margin handles spacing */
                 page-break-before: avoid;
                 max-width: none !important;
                 width: 100% !important;
