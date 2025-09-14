@@ -441,9 +441,7 @@
             font-weight: 400;
             letter-spacing: 1.5px;
             flex-grow: 1;
-            white-space: nowrap; /* Prevent wrapping, use dynamic sizing instead */
-            overflow: hidden; /* Hide overflow if any */
-            margin-right: 25px; /* Reserve space for card number */
+            margin-right: 30px; /* Reserve more space for card number in dynamic sizing */
         }
 
         .task-card .card-icon {
@@ -1053,8 +1051,6 @@
                 line-height: 1 !important; /* Tight line height for better centering */
                 display: flex !important; /* Use flex for precise alignment */
                 align-items: center !important; /* Center vertically within its space */
-                white-space: nowrap !important; /* Prevent wrapping, use dynamic sizing instead */
-                overflow: hidden !important; /* Hide overflow if any */
             }
 
             .task-card .card-content {
@@ -1579,19 +1575,30 @@
         // Dynamic font resizing for titles
         function adjustTitleFontSize(titleElement) {
             const container = titleElement.parentElement;
-            const maxWidth = container.offsetWidth - 25; // Reserve space for card number (20px + 5px buffer)
+            const maxWidth = container.offsetWidth - 35; // More space for card number (30px + 5px buffer)
             
             let fontSize = 24; // Start with original size (screen) or 14 (print)
             const isPrint = window.matchMedia('print').matches;
             if (isPrint) fontSize = 14;
             
+            // Temporarily apply nowrap for measurement
+            const originalWhiteSpace = titleElement.style.whiteSpace;
+            titleElement.style.whiteSpace = 'nowrap';
+            
             // Set initial font size
             titleElement.style.fontSize = fontSize + 'px';
             
-            // Reduce font size until it fits
-            while (titleElement.scrollWidth > maxWidth && fontSize > 8) {
+            // Reduce font size until it fits (allow smaller minimum)
+            while (titleElement.scrollWidth > maxWidth && fontSize > 6) {
                 fontSize -= 1;
                 titleElement.style.fontSize = fontSize + 'px';
+            }
+            
+            // Restore original white-space if it was set
+            if (originalWhiteSpace) {
+                titleElement.style.whiteSpace = originalWhiteSpace;
+            } else {
+                titleElement.style.removeProperty('white-space');
             }
         }
 
