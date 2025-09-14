@@ -441,7 +441,7 @@
             font-weight: 400;
             letter-spacing: 1.5px;
             flex-grow: 1;
-            margin-right: 30px; /* Reserve more space for card number in dynamic sizing */
+            margin-right: 40px; /* Match the reserved space for consistency */
         }
 
         .task-card .card-icon {
@@ -1577,7 +1577,7 @@
         // Dynamic font resizing for titles
         function adjustTitleFontSize(titleElement) {
             const container = titleElement.parentElement;
-            const maxWidth = container.offsetWidth - 35; // More space for card number (30px + 5px buffer)
+            const maxWidth = container.offsetWidth - 45; // Even more space for card number (40px + 5px buffer)
             
             let fontSize = 24; // Start with original size (screen) or 14 (print)
             const isPrint = window.matchMedia('print').matches;
@@ -1586,9 +1586,9 @@
             // Set initial font size
             titleElement.style.fontSize = fontSize + 'px';
             
-            // Reduce font size until it fits (allow smaller minimum)
-            while (titleElement.scrollWidth > maxWidth && fontSize > 6) {
-                fontSize -= 1;
+            // Reduce font size until it fits (allow even smaller minimum)
+            while (titleElement.scrollWidth > maxWidth && fontSize > 4) {
+                fontSize -= 0.5; // Use smaller increments for finer control
                 titleElement.style.fontSize = fontSize + 'px';
             }
         }
