@@ -1051,9 +1051,8 @@
                 line-height: 1 !important; /* Tight line height for better centering */
                 display: flex !important; /* Use flex for precise alignment */
                 align-items: center !important; /* Center vertically within its space */
-                white-space: nowrap !important; /* Prevent wrapping in print, use dynamic sizing */
+                white-space: nowrap !important; /* Prevent wrapping initially, allow as fallback */
                 overflow: hidden !important; /* Hide overflow in print */
-                text-overflow: ellipsis !important; /* Add ellipsis as final safety */
                 max-width: calc(100% - 60px) !important; /* Force maximum width constraint */
             }
 
@@ -1594,9 +1593,11 @@
                 titleElement.style.fontSize = fontSize + 'px';
             }
             
-            // Force overflow hidden as final safety
-            titleElement.style.overflow = 'hidden';
-            titleElement.style.textOverflow = 'ellipsis';
+            // If still too wide after reaching minimum, allow wrapping as fallback
+            if (titleElement.scrollWidth > maxWidth) {
+                titleElement.style.whiteSpace = 'normal';
+                titleElement.style.lineHeight = '1.1';
+            }
         }
 
         // Apply dynamic font sizing to all titles
