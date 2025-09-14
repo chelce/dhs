@@ -1578,7 +1578,7 @@
         // Dynamic font resizing for titles
         function adjustTitleFontSize(titleElement) {
             const container = titleElement.parentElement;
-            const maxWidth = container.offsetWidth - 70; // Even more space + extra buffer (65px + 5px buffer)
+            const maxWidth = container.offsetWidth - 85; // Much more aggressive space reservation (80px + 5px buffer)
             
             let fontSize = 24; // Start with original size (screen) or 14 (print)
             const isPrint = window.matchMedia('print').matches;
@@ -1589,14 +1589,14 @@
             titleElement.style.whiteSpace = 'nowrap';
             
             // Reduce font size until it fits (allow very small minimum)
-            while (titleElement.scrollWidth > maxWidth && fontSize > 3) {
-                fontSize -= 0.25; // Even smaller increments for finest control
+            while (titleElement.scrollWidth > maxWidth && fontSize > 2.5) {
+                fontSize -= 0.2; // Even smaller increments for finest control
                 titleElement.style.fontSize = fontSize + 'px';
             }
             
-            // Add extra safety reduction - go a bit smaller than calculated
-            if (fontSize < 24 && fontSize > 3) { // Only if we did some resizing
-                fontSize -= 1; // Extra safety buffer
+            // Add extra aggressive safety reduction - go smaller than calculated
+            if (fontSize < 24 && fontSize > 2.5) { // Only if we did some resizing
+                fontSize -= 1.5; // Much more aggressive safety buffer
                 titleElement.style.fontSize = fontSize + 'px';
             }
             
