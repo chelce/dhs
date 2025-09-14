@@ -1587,8 +1587,8 @@
             // Check if we're in print mode
             const isPrintMode = window.matchMedia && window.matchMedia('print').matches;
             
-            // Base font sizes
-            const baseFontSize = isPrintMode ? 14 : 18;
+            // Base font sizes - match original CSS values
+            const baseFontSize = isPrintMode ? 14 : 24;
             
             // Reset to defaults first
             titleElement.style.whiteSpace = 'nowrap';
@@ -1605,12 +1605,12 @@
                 
                 // Reduce font size by 0.5px for every 2 excess characters
                 const fontReduction = Math.floor(excessChars / 2) * 0.5;
-                const newFontSize = Math.max(baseFontSize - fontReduction, isPrintMode ? 8 : 10);
+                const newFontSize = Math.max(baseFontSize - fontReduction, isPrintMode ? 8 : 12);
                 
                 titleElement.style.setProperty('font-size', newFontSize + 'px', 'important');
                 
                 // If we've hit minimum font size and it's still very long, allow wrapping
-                if (newFontSize <= (isPrintMode ? 8 : 10) && charCount > (threshold + 20)) {
+                if (newFontSize <= (isPrintMode ? 8 : 12) && charCount > (threshold + 20)) {
                     titleElement.style.setProperty('white-space', 'normal', 'important');
                     titleElement.style.setProperty('line-height', isPrintMode ? '1.1' : '1.2', 'important');
                     titleElement.style.setProperty('align-items', 'flex-start', 'important'); // Top align when wrapped
