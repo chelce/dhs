@@ -898,9 +898,9 @@
                 directions: 'c-UdatLRw4ZE',
                 sentenceFrame: 'c-PTc-M6N93s',
                 hints: 'c-J2p_hAW8aK',
-                subject: 'c-subject', // Will be updated with real ID
-                unit: 'c-unit',     // Will be updated with real ID
-                series: 'c-OBxHtN8XaH' // NEW: Series column for specific sets
+                subject: 'c-PvCf__AtLS', // Correct subject column ID
+                unit: 'c-VMuDoulorO',     // Correct unit column ID
+                series: 'c-OBxHtN8XaH' // Series column for specific sets
             }
         };
 
@@ -911,20 +911,36 @@
         async function loadTaskCards() {
             try {
                 console.log('🔄 Loading task cards from Coda...');
+                console.log('📋 Config:', CODA_CONFIG);
+                
+                // Add timeout to prevent hanging
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
                 
                 const response = await fetch(`https://coda.io/apis/v1/docs/${CODA_CONFIG.docId}/tables/${CODA_CONFIG.tableId}/rows`, {
                     headers: {
                         'Authorization': `Bearer ${CODA_CONFIG.apiToken}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+                console.log('📡 Response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('❌ HTTP Error details:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
                 }
 
                 const data = await response.json();
-                console.log('✅ Loaded', data.items.length, 'task cards from Coda');
+                console.log('✅ Raw data from Coda:', data);
+                console.log('✅ Loaded', data.items?.length || 0, 'task cards from Coda');
+                
+                if (!data.items || data.items.length === 0) {
+                    throw new Error('No task cards found in the database');
+                }
                 
                 allCards = data.items.map(item => {
                     const values = item.values;
@@ -972,7 +988,20 @@
                 
             } catch (error) {
                 console.error('❌ Failed to load task cards:', error);
+                
+                let errorMessage = 'Failed to load task cards. ';
+                if (error.name === 'AbortError') {
+                    errorMessage += 'Request timed out after 30 seconds.';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage += 'Cross-origin request blocked. Try accessing the page from the GitHub Pages URL.';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage += 'Network error. Check your internet connection.';
+                } else {
+                    errorMessage += error.message;
+                }
+                
                 document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('errorMessage').innerHTML = `❌ ${errorMessage}`;
                 document.getElementById('errorMessage').style.display = 'block';
             }
         }
