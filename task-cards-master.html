@@ -1582,25 +1582,32 @@
             const container = titleElement.parentElement;
             if (!container) return;
             
-            const maxWidth = container.offsetWidth - 120; // Very aggressive space reservation for card labels
-            console.log('Adjusting font for:', titleElement.textContent, 'Container width:', container.offsetWidth, 'Max width:', maxWidth);
-            
-            let fontSize = 24; // Start with original size (screen) or 14 (print)
+            // Check if we're in print mode
             const isPrint = window.matchMedia('print').matches;
-            if (isPrint) fontSize = 14;
+            const maxWidth = container.offsetWidth - 120; // Very aggressive space reservation for card labels
             
-            // Set initial font size and nowrap
+            // Start with the appropriate base font size
+            let fontSize = isPrint ? 14 : 24;
+            
+            // Force the correct initial font size for measurement
             titleElement.style.fontSize = fontSize + 'px';
             titleElement.style.whiteSpace = 'nowrap';
+            
+            // Force a reflow to get accurate measurements
+            titleElement.offsetWidth;
+            
+            console.log('Adjusting font for:', titleElement.textContent, 'Container width:', container.offsetWidth, 'Max width:', maxWidth, 'Print mode:', isPrint, 'Initial size:', fontSize, 'Initial title width:', titleElement.scrollWidth);
             
             // Reduce font size until it fits (allow very small minimum)
             while (titleElement.scrollWidth > maxWidth && fontSize > 2.5) {
                 fontSize -= 0.2; // Even smaller increments for finest control
                 titleElement.style.fontSize = fontSize + 'px';
+                // Force reflow after each change
+                titleElement.offsetWidth;
             }
             
             // Add extra aggressive safety reduction - go smaller than calculated
-            if (fontSize < 24 && fontSize > 2.5) { // Only if we did some resizing
+            if (fontSize < (isPrint ? 14 : 24) && fontSize > 2.5) { // Only if we did some resizing
                 fontSize -= 1.5; // Much more aggressive safety buffer
                 titleElement.style.fontSize = fontSize + 'px';
             }
