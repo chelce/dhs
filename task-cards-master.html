@@ -1577,8 +1577,13 @@
 
         // Dynamic font resizing for titles
         function adjustTitleFontSize(titleElement) {
+            if (!titleElement) return;
+            
             const container = titleElement.parentElement;
+            if (!container) return;
+            
             const maxWidth = container.offsetWidth - 120; // Very aggressive space reservation for card labels
+            console.log('Adjusting font for:', titleElement.textContent, 'Container width:', container.offsetWidth, 'Max width:', maxWidth);
             
             let fontSize = 24; // Start with original size (screen) or 14 (print)
             const isPrint = window.matchMedia('print').matches;
@@ -1600,23 +1605,29 @@
                 titleElement.style.fontSize = fontSize + 'px';
             }
             
+            console.log('Final font size:', fontSize, 'Title width:', titleElement.scrollWidth, 'Max width:', maxWidth);
+            
             // If still too wide after reaching minimum, allow wrapping as fallback
             if (titleElement.scrollWidth > maxWidth) {
                 titleElement.style.whiteSpace = 'normal';
                 titleElement.style.lineHeight = '1.1';
                 titleElement.style.overflow = 'visible';
                 titleElement.style.alignItems = 'flex-start'; // Top align when wrapping
+                console.log('Title wrapping activated for:', titleElement.textContent);
             }
         }
 
         // Apply dynamic font sizing to all titles
         function applyDynamicTitleSizing() {
+            console.log('Applying dynamic title sizing...');
             const titles = document.querySelectorAll('.task-card .card-title');
+            console.log('Found', titles.length, 'titles to resize');
             titles.forEach(title => {
                 // Reset to auto first to get natural size
                 title.style.fontSize = '';
-                // Then adjust
-                setTimeout(() => adjustTitleFontSize(title), 10);
+                title.style.whiteSpace = '';
+                // Then adjust with a longer delay to ensure layout is ready
+                setTimeout(() => adjustTitleFontSize(title), 100);
             });
         }
 
@@ -1878,9 +1889,19 @@
             // Listen for print media changes to reapply font sizing
             const printMediaQuery = window.matchMedia('print');
             printMediaQuery.addListener(function(e) {
+                console.log('Print media query changed:', e.matches ? 'entering print' : 'leaving print');
                 if (e.matches) {
-                    // Entering print mode
-                    setTimeout(() => applyDynamicTitleSizing(), 50);
+                    // Entering print mode - wait longer for layout to stabilize
+                    setTimeout(() => {
+                        console.log('Applying font sizing for print mode...');
+                        applyDynamicTitleSizing();
+                    }, 200);
+                } else {
+                    // Leaving print mode - restore normal sizing
+                    setTimeout(() => {
+                        console.log('Applying font sizing for screen mode...');
+                        applyDynamicTitleSizing();
+                    }, 100);
                 }
             });
             
